@@ -1,0 +1,67 @@
+name: Fix invalid Vercel AI env
+
+on:
+  push:
+    branches:
+      - feat/saas-cloud-scale
+    paths:
+      - .github/workflows/fix-vercel-ai-env.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/saas-cloud-scale
+
+      - name: Remove invalid Vercel env variable
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              Path('.env.example'): [
+                  'VERCEL_AI_GATEWAY_URL=\n',
+              ],
+              Path('lib/env.ts'): [
+                  '  VERCEL_AI_GATEWAY_URL: z.string().optional().default(""),\n',
+              ],
+          }
+
+          for path, needles in replacements.items():
+              text = path.read_text()
+              original = text
+              for needle in needles:
+                  text = text.replace(needle, '')
+              if text == original:
+                  print(f'No replacement needed in {path}')
+              else:
+                  path.write_text(text)
+                  print(f'Updated {path}')
+          PY
+
+          if grep -n "VERCEL_AI_GATEWAY_URL" .env.example lib/env.ts; then
+            echo "VERCEL_AI_GATEWAY_URL still exists in deployment config files"
+            exit 1
+          fi
+
+          git diff --check
+
+      - name: Commit fix
+        shell: bash
+        run: |
+          if git diff --quiet -- .env.example lib/env.ts; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .env.example lib/env.ts
+          git commit -m "fix(vercel): remove invalid AI Gateway env variable"
+          git push origin HEAD:feat/saas-cloud-scale

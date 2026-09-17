@@ -39,7 +39,7 @@ export interface RetratoDaInstalacao {
 export function provedorDaOrg(settings: unknown): string {
   const llm = (settings as { llm?: unknown } | null)?.llm;
   const p = (llm as { provider?: unknown } | null | undefined)?.provider;
-  return typeof p === "string" && p.trim() !== "" ? p : "anthropic";
+  return typeof p === "string" && p.trim() !== "" ? p : "saas_ai";
 }
 
 export interface DependenciasDoRetrato {

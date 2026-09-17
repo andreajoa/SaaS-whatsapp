@@ -38,11 +38,24 @@ export interface ProvedorSuportado {
   catalogoSincronizavel: boolean;
   /** Onde o operador pega a chave — a tela mostra o link. */
   ondePegarAChave: string;
+  /** true = credencial pertence à plataforma; o tenant nunca precisa fornecer chave. */
+  gerenciadoPelaPlataforma?: boolean;
   /** Como a chave começa — vira placeholder do campo, para a pessoa reconhecer que copiou a coisa certa. */
   prefixoDaChave: string;
 }
 
 export const PROVEDORES = [
+  {
+    id: "saas_ai",
+    rotulo: "IA do SaaS Whatsapp",
+    quandoUsar:
+      "Padrão do SaaS: a plataforma fornece a inteligência, e cada empresa ensina seu negócio, regras, tom e materiais sem cadastrar chave de API.",
+    aceitaEndpointProprio: true,
+    catalogoSincronizavel: false,
+    ondePegarAChave: "https://github.com/andreajoa/SaaS-whatsapp",
+    prefixoDaChave: "gerenciada pela plataforma",
+    gerenciadoPelaPlataforma: true,
+  },
   {
     id: "anthropic",
     rotulo: "Anthropic (Claude)",
@@ -57,7 +70,7 @@ export const PROVEDORES = [
     id: "openai",
     rotulo: "OpenAI (GPT)",
     quandoUsar:
-      "Necessário para transcrever áudio e para indexar o seu material — esses dois pontos usam tecnologia da OpenAI mesmo quando o resto está em outro provedor.",
+      "Compatibilidade avançada para instalações que ainda usam modelos GPT ou endpoints OpenAI-compatíveis. No SaaS hospedado, áudio e conhecimento usam a IA da plataforma.",
     aceitaEndpointProprio: true,
     catalogoSincronizavel: false,
     ondePegarAChave: "https://platform.openai.com/api-keys",

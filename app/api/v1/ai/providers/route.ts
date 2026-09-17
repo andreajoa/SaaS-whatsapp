@@ -93,7 +93,7 @@ export async function GET(): Promise<Response> {
   const llm = ((orgRes.data?.settings as { llm?: Record<string, unknown> } | null)?.llm ??
     {}) as { provider?: string; default_model?: string | null };
   const padraoDaOrganizacao = {
-    provider: typeof llm.provider === "string" ? llm.provider : "anthropic",
+    provider: typeof llm.provider === "string" ? llm.provider : "saas_ai",
     defaultModel: typeof llm.default_model === "string" ? llm.default_model : null,
   };
 

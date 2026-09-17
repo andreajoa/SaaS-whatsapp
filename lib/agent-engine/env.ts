@@ -20,6 +20,13 @@ const envSchema = z.object({
   // service-role. Mesmos valores do .env.local do app.
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  // IA central do SaaS — endpoint OpenAI-compatível controlado pela plataforma.
+  SAAS_AI_BASE_URL: z.string().url().optional(),
+  SAAS_AI_API_KEY: z.string().min(1).optional(),
+  SAAS_AI_CHAT_MODEL: z.string().min(1).default('platform-chat'),
+  SAAS_AI_FAST_MODEL: z.string().min(1).default('platform-fast'),
+  SAAS_AI_EMBEDDING_MODEL: z.string().min(1).default('platform-embedding'),
+  SAAS_AI_TRANSCRIPTION_MODEL: z.string().min(1).default('platform-transcribe'),
   // Chave LLM de plataforma (fallback quando a org não tem BYOK em
   // ai_provider_credentials). Opcional no boot: sem ela e sem BYOK, o turno
   // falha com erro instrutivo — nunca silêncio.
@@ -41,7 +48,7 @@ const envSchema = z.object({
   // ao mexer aqui, confira as três de uma vez.
   OPENROUTER_API_KEY: z.string().min(1).optional(),
   // Modelo default do agente quando a org não define o dela (knob, nunca constante).
-  AGENT_DEFAULT_MODEL: z.string().min(1).default('claude-sonnet-4-5'),
+  AGENT_DEFAULT_MODEL: z.string().min(1).default('platform-chat'),
   // Teto de conexões por pool do pg. Sem valor = pg decide (default 10).
   DB_POOL_MAX: z.coerce.number().int().positive().optional(),
   // Knobs da fila. (Esta linha já afirmou "documentados no .env.example" quando

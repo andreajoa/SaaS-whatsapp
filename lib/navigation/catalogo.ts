@@ -308,7 +308,7 @@ export const NAV_CATALOG = [
   {
     href: "/app/ai/credentials",
     label: "Credenciais",
-    description: "A chave do provedor de IA que os agentes usam para pensar.",
+    description: "Compatibilidade avançada para instalações que usam credenciais próprias; o SaaS não exige chaves do cliente.",
     icon: "Key",
     group: "ia",
     section: "Montar o agente",
@@ -320,7 +320,7 @@ export const NAV_CATALOG = [
     // havia onde responder "quem usa IA aqui, e com qual chave?".
     href: "/app/ai/providers",
     label: "Provedores",
-    description: "Qual inteligência atende cada parte do sistema — e o que acontece se ela falhar.",
+    description: "Configuração avançada. No SaaS, a IA da plataforma já vem selecionada e gerenciada.",
     icon: "Plugs",
     group: "ia",
     section: "Montar o agente",

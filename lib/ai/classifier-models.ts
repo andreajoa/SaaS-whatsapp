@@ -13,8 +13,8 @@
  * ─── As duas origens de credencial, e por que ambas contam ───────────────────
  *  - BYOK: `ai_provider_credentials` ativa E validada (é o que
  *    `resolveOrgLlmConfig` exige para usar a chave da organização).
- *  - Plataforma: `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` do ambiente, o fallback
- *    de quem hospeda o próprio sistema e configurou a chave no `.env`.
+ *  - Plataforma: `SAAS_AI_BASE_URL` é o caminho padrão do SaaS; chaves legadas
+ *    do ambiente continuam disponíveis apenas para compatibilidade/self-host.
  *
  * Ter a chave não garante que ela tenha saldo — isso só o provedor sabe, na
  * hora da chamada. O que esta lista garante é que não oferecemos um caminho que
@@ -33,6 +33,7 @@ export interface ClassifierModelOption {
 
 /** Chaves de plataforma disponíveis, por provedor. */
 export interface PlatformKeys {
+  saas_ai?: boolean;
   anthropic: boolean;
   openai: boolean;
 }
@@ -56,6 +57,9 @@ export async function listClassifierModels(
   const origemPorProvider = new Map<string, "org" | "plataforma">();
   for (const c of (creds ?? []) as Array<{ provider: string }>) {
     origemPorProvider.set(c.provider, "org");
+  }
+  if (platformKeys.saas_ai && !origemPorProvider.has("saas_ai")) {
+    origemPorProvider.set("saas_ai", "plataforma");
   }
   if (platformKeys.anthropic && !origemPorProvider.has("anthropic")) {
     origemPorProvider.set("anthropic", "plataforma");

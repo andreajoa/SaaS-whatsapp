@@ -170,6 +170,15 @@ const schema = z.object({
   UPSTASH_REDIS_REST_URL: required("UPSTASH_REDIS_REST_URL"),
   UPSTASH_REDIS_REST_TOKEN: required("UPSTASH_REDIS_REST_TOKEN"),
 
+  // IA central do SaaS — endpoint OpenAI-compatível sob controle da plataforma.
+  // O tenant NÃO fornece esta credencial; ela é infraestrutura do produto.
+  SAAS_AI_BASE_URL: z.string().optional().default(""),
+  SAAS_AI_API_KEY: z.string().optional().default(""),
+  SAAS_AI_CHAT_MODEL: z.string().optional().default("platform-chat"),
+  SAAS_AI_FAST_MODEL: z.string().optional().default("platform-fast"),
+  SAAS_AI_EMBEDDING_MODEL: z.string().optional().default("platform-embedding"),
+  SAAS_AI_TRANSCRIPTION_MODEL: z.string().optional().default("platform-transcribe"),
+
   // AI providers — env-gated. Worker no-ops with skip="ai_gateway_key_missing"
   // when AI_GATEWAY_API_KEY is absent, so production boot must not be fatal.
   AI_GATEWAY_API_KEY: z.string().optional().default(""),
@@ -392,9 +401,9 @@ export const env = parsed.data;
 // cadastrava uma chave da Anthropic que não precisava, só para calar o aviso.
 // O texto era verdadeiro enquanto a Anthropic era a única chave que o
 // instalador pedia; o menu novo o tornou falso.
-if (!env.AI_GATEWAY_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENROUTER_API_KEY) {
+if (!env.SAAS_AI_BASE_URL && !env.AI_GATEWAY_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENROUTER_API_KEY) {
   console.warn(
-    "[env] Nenhuma chave de IA configurada (AI_GATEWAY_API_KEY, ANTHROPIC_API_KEY ou OPENROUTER_API_KEY) — " +
+    "[env] Nenhuma IA configurada (SAAS_AI_BASE_URL, AI_GATEWAY_API_KEY, ANTHROPIC_API_KEY ou OPENROUTER_API_KEY) — " +
       "o agente vai pular toda resposta com reason='ai_gateway_key_missing'.",
   );
 }
@@ -412,7 +421,7 @@ if (!env.AI_GATEWAY_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENROUTER_API_KEY
 // uma chave que ela já tem — ou, pior, desistir do recurso. Então o aviso passou
 // a dizer só o que ESTE processo sabe: o que a variável é, e o que fazer se não
 // houver chave em lugar nenhum.
-if (!env.OPENAI_API_KEY) {
+if (!env.SAAS_AI_BASE_URL && !env.OPENAI_API_KEY) {
   console.warn(
     "[env] OPENAI_API_KEY ausente — ela é o ÚLTIMO degrau da escada de chave da OpenAI " +
       "(preparo de material do acervo e transcrição de áudio). Se alguma organização já " +

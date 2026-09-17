@@ -30,6 +30,10 @@ import type { CacheTtl } from './stable-prefix';
 
 /** Config da camada LLM montada do env validado (padrão crmEdgeConfigFromEnv). */
 export interface LlmEdgeConfig {
+  /** Endpoint OpenAI-compatível da IA gerenciada pelo SaaS (origem, sem /v1 obrigatório). */
+  saasAiBaseUrl?: string;
+  /** Token interno opcional; rede privada pode operar sem segredo externo. */
+  saasAiApiKey?: string;
   /** chave de plataforma (fallback quando a org não tem BYOK). Opcional no boot. */
   anthropicApiKey?: string;
   /**
@@ -80,6 +84,8 @@ export interface LlmEdgeConfig {
  * o caminho existe.
  */
 export function llmEdgeConfigFromEnv(env: {
+  SAAS_AI_BASE_URL?: string;
+  SAAS_AI_API_KEY?: string;
   ANTHROPIC_API_KEY?: string;
   OPENAI_API_KEY?: string;
   OPENROUTER_API_KEY?: string;
@@ -91,6 +97,8 @@ export function llmEdgeConfigFromEnv(env: {
     throw new Error("LLM_CACHE_TTL inválido — use '5m' ou '1h' (default 1h)");
   }
   return {
+    ...(env.SAAS_AI_BASE_URL ? { saasAiBaseUrl: env.SAAS_AI_BASE_URL } : {}),
+    ...(env.SAAS_AI_API_KEY ? { saasAiApiKey: env.SAAS_AI_API_KEY } : {}),
     ...(env.ANTHROPIC_API_KEY ? { anthropicApiKey: env.ANTHROPIC_API_KEY } : {}),
     ...(env.OPENAI_API_KEY ? { openaiApiKey: env.OPENAI_API_KEY } : {}),
     ...(env.OPENROUTER_API_KEY ? { openrouterApiKey: env.OPENROUTER_API_KEY } : {}),
@@ -108,7 +116,7 @@ export class LlmNotConfiguredError extends Error {
   override readonly name = 'llm_not_configured';
   constructor() {
     super(
-      'org sem credencial LLM utilizável — cadastre uma chave BYOK ativa/validada em ai_provider_credentials ou defina ANTHROPIC_API_KEY / OPENAI_API_KEY (fallback de plataforma, conforme o provider do modelo)',
+      'IA não configurada — defina SAAS_AI_BASE_URL para a IA da plataforma ou, em modo legado, cadastre uma credencial BYOK válida',
     );
   }
 }
@@ -163,14 +171,14 @@ export interface OrgLlmConfig {
 // que continua sendo jsonb livre.
 const llmSettingsSchema = z
   .object({
-    provider: z.string().min(1).catch('anthropic'),
+    provider: z.string().min(1).catch('saas_ai'),
     default_model: z.string().min(1).nullable().catch(null),
     params: z.record(z.string(), z.unknown()).catch({}),
     enabled_models: z.array(z.string()).catch([]),
   })
   .passthrough()
   .catch({
-    provider: 'anthropic',
+    provider: 'saas_ai',
     default_model: null,
     params: {},
     enabled_models: [],
@@ -329,6 +337,8 @@ export async function resolveOrgLlmConfig(
       iv: byteaToBuffer(cred.api_key_iv),
       tag: byteaToBuffer(cred.api_key_tag),
     });
+  } else if (provider === 'saas_ai' && cfg.saasAiBaseUrl) {
+    apiKey = cfg.saasAiApiKey?.trim() || 'saas-platform';
   } else if (provider === 'anthropic' && cfg.anthropicApiKey) {
     apiKey = cfg.anthropicApiKey;
   } else if (provider === 'openai' && cfg.openaiApiKey) {

@@ -42,6 +42,15 @@ const GOOGLE_ENDPOINT = 'https://generativelanguage.googleapis.com';
  * `familia/modelo`, o mesmo dos nossos, sem tradução no meio.
  */
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1';
+function saasAiEndpoint(baseUrl?: string): { root: string; api: string } {
+  const configured = (baseUrl ?? process.env.SAAS_AI_BASE_URL ?? '').trim();
+  if (!configured) {
+    throw new Error('SAAS_AI_BASE_URL não configurada — a IA da plataforma precisa de um endpoint OpenAI-compatível');
+  }
+  const root = configured.replace(/\/v1\/?$/, '').replace(/\/$/, '');
+  return { root, api: `${root}/v1` };
+}
+
 
 /**
  * Cabeçalhos OPCIONAIS de atribuição da OpenRouter.
@@ -90,6 +99,14 @@ export function createDefaultRegistry(opts?: { allowedHosts?: string[] }): Provi
     };
   };
   return {
+    saas_ai: (apiKey, modelId, baseUrl) => {
+      const endpoint = saasAiEndpoint(baseUrl);
+      return createOpenAI({
+        apiKey: apiKey || 'saas-platform',
+        baseURL: endpoint.api,
+        fetch: contain(endpoint.root),
+      })(modelId);
+    },
     anthropic: (apiKey, modelId) =>
       createAnthropic({ apiKey, fetch: contain(ANTHROPIC_ENDPOINT) })(modelId),
     openai: (apiKey, modelId) =>

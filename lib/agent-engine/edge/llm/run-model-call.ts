@@ -420,7 +420,11 @@ export async function runModelCall(db: pg.Pool, cfg: LlmEdgeConfig, input: RunMo
       // `decisao.baseUrl` só é preenchido quando o painel apontou um endpoint
       // (gateway OpenAI-compatível, ou modelo local). Providers canônicos
       // ignoram o terceiro argumento e vão ao endpoint intrínseco.
-      model: factory(config.apiKey, model, decisao.baseUrl ?? undefined),
+      model: factory(
+        config.apiKey,
+        model,
+        config.provider === 'saas_ai' ? cfg.saasAiBaseUrl : (decisao.baseUrl ?? undefined),
+      ),
       system: prefix.system,
       messages: input.messages,
       tools: guardServiceTools(prefix.tools),

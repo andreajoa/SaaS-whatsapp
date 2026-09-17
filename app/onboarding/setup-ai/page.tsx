@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
-import { createClient } from "@/lib/supabase/server";
-import { lerRetratoDaInstalacao } from "@/lib/instalacao/retrato";
 import { SetupAiForm } from "./_form";
 import { InteligenciaDele } from "./_inteligencia";
 import { capacidadesPadraoDoOnboarding } from "@/lib/ai/agents/capacidades-padrao";
@@ -32,8 +30,6 @@ export default async function SetupAiPage() {
   if (!activeOrg) redirect("/login");
   const idioma = user.idioma;
 
-  const supabase = await createClient();
-  const retrato = await lerRetratoDaInstalacao({ supabase, orgId: activeOrg.orgId });
 
   const porNome = new Map(TOOL_CATALOG.map((c) => [c.name, c]));
   const capacidades = capacidadesPadraoDoOnboarding()
@@ -56,14 +52,7 @@ export default async function SetupAiPage() {
         pessoa preencher abaixo produz um funcionário que responde. E é aqui que
         a chave passa a importar — um clique antes de ele ser criado com ela.
       */}
-      <InteligenciaDele
-        inicial={{
-          origem: retrato.inteligencia.origemDaChave,
-          provedor: retrato.inteligencia.provedor,
-          rotulo: retrato.inteligencia.rotulo,
-          final: retrato.inteligencia.chaveDaOrg?.final ?? null,
-        }}
-      />
+      <InteligenciaDele />
 
       <SetupAiForm capacidades={capacidades} conferencias={conferencias} />
     </div>

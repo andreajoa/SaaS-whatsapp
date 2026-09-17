@@ -79,13 +79,13 @@ describe("forma de cada provedor", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("a OpenAI segue na lista e é declarada como necessária além do chat", () => {
+  it("a OpenAI segue na lista como compatibilidade avançada, sem ser requisito do SaaS", () => {
     // Áudio e indexação usam OpenAI mesmo com o resto em outro provedor. Se
     // essa frase sumir, o operador que migrar tudo para outro provedor perde
     // transcrição e busca sem entender por quê — o defeito medido em VPS.
     const openai = PROVEDOR_POR_ID.get("openai");
     expect(openai).toBeDefined();
-    expect(openai?.quandoUsar.toLowerCase()).toMatch(/áudio|transcre|indexar/);
+    expect(openai?.quandoUsar.toLowerCase()).toMatch(/compatibilidade|openai-compat/);
   });
 });
 

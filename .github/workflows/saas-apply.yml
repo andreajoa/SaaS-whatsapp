@@ -1,0 +1,39 @@
+name: Apply verified SaaS transformation
+
+on:
+  push:
+    branches:
+      - feat/saas-cloud-scale
+    paths:
+      - ".saas-apply/READY"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct, verify and apply patch
+        run: |
+          set -euo pipefail
+          cat .saas-apply/p0* | base64 -d | gzip -d > /tmp/saas.patch
+          echo "d821a020a09b3fa5039515f9c1fc7aa19499d6bb9a4df0b528ad1cdd33d3457f  /tmp/saas.patch" | sha256sum -c -
+          git apply --check /tmp/saas.patch
+          git apply /tmp/saas.patch
+
+          rm -rf .saas-apply .saas-patch .saas-patch2
+
+          git add -A
+          git diff --cached --check
+
+          git config user.name "SaaS Whatsapp Automation"
+          git config user.email "100246160+andreajoa@users.noreply.github.com"
+          git commit -m "feat: transform baseline into SaaS Whatsapp cloud scale"
+          git push origin HEAD:feat/saas-cloud-scale

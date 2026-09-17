@@ -53,6 +53,7 @@ export default async function RouterEditorPage({ params }: { params: Promise<{ i
   // Só os modelos que esta organização consegue usar de fato — ver a razão em
   // lib/ai/classifier-models.
   const classifierModels = await listClassifierModels(supabase, activeOrg.orgId, {
+    saas_ai: Boolean(process.env.SAAS_AI_BASE_URL),
     anthropic: Boolean(process.env.ANTHROPIC_API_KEY),
     openai: Boolean(process.env.OPENAI_API_KEY),
   });

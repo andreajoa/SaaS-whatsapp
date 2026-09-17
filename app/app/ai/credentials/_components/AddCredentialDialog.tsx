@@ -58,7 +58,7 @@ export function AddCredentialDialog({ open, onOpenChange }: Props) {
   const t = useT();
   const router = useRouter();
   const qc = useQueryClient();
-  const [provider, setProvider] = useState<Provider>("anthropic");
+  const [provider, setProvider] = useState<Provider>("openrouter");
   const [label, setLabel] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -66,7 +66,7 @@ export function AddCredentialDialog({ open, onOpenChange }: Props) {
   const provedor = PROVEDORES.find((p) => p.id === provider) ?? PROVEDORES[0];
 
   const reset = () => {
-    setProvider("anthropic");
+    setProvider("openrouter");
     setLabel("");
     setApiKey("");
     setErrors({});
@@ -151,7 +151,7 @@ export function AddCredentialDialog({ open, onOpenChange }: Props) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {PROVEDORES.map((p) => (
+                {PROVEDORES.filter((p) => !("gerenciadoPelaPlataforma" in p && p.gerenciadoPelaPlataforma)).map((p) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.rotulo}
                   </SelectItem>

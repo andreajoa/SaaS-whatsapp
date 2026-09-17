@@ -3511,7 +3511,7 @@ async function executarTurnoDoAgente(
         ? []
         : await buildNativeMediaParts({
             messages: effectiveContext.messages,
-            provider: agentConfig?.provider ?? 'anthropic',
+            provider: agentConfig?.provider ?? 'saas_ai',
             model: agentConfig?.model ?? '',
             multimodalInput: agentConfig?.multimodalInput ?? false,
             admin: deps.crmCfg.supabase,

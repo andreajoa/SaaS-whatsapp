@@ -174,6 +174,8 @@ export function validateProviderKey(
   apiKey: string,
 ): Promise<ValidationResult> {
   switch (provider) {
+    case "saas_ai":
+      return Promise.resolve({ ok: true, models: ["platform-chat", "platform-fast"] });
     case "anthropic":
       return validateAnthropicKey(apiKey);
     case "openai":

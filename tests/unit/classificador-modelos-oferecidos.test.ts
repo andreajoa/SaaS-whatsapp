@@ -36,7 +36,7 @@ function db(opts: {
   } as never;
 }
 
-const SEM_PLATAFORMA = { anthropic: false, openai: false };
+const SEM_PLATAFORMA = { saas_ai: false, anthropic: false, openai: false };
 
 describe("listClassifierModels", () => {
   it("oferece apenas provedores com credencial da organização ativa e validada", async () => {

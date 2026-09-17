@@ -4,10 +4,12 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/brand/deskcomm-logo-dark.svg">
-  <img src="docs/brand/deskcomm-logo.svg" alt="Deskcomm CRM" width="420">
+  <img src="docs/brand/deskcomm-logo.svg" alt="SaaS Whatsapp" width="420">
 </picture>
 
-# 🛠️ DeskcommCRM — o Sistema Operacional de Vendas com IA, open source, pro WhatsApp
+# SaaS Whatsapp — atendimento multiempresa no WhatsApp com IA
+
+> Este repositório parte do DeskcommCRM v1.20.0 (MIT) e está sendo adaptado para operação SaaS centralizada: cada organização conecta seu WhatsApp e mantém conhecimento, memória, regras e dados isolados. A inferência padrão é fornecida pela plataforma por um endpoint OpenAI-compatível próprio (`SAAS_AI_BASE_URL`), sem exigir chaves OpenAI/Anthropic dos clientes.
 
 **Agentes de IA que atendem, qualificam e vendem no WhatsApp — dentro de um CRM open source rodando no seu servidor.**
 **Sem mensalidade, sem feature travada, seus dados com você. A alternativa aberta a Kommo, Octadesk e Intercom.**

@@ -275,8 +275,8 @@ describe("KnowledgeSourceCard — só oferece controle onde existe ação", () =
   });
 });
 
-describe("ChaveDeConhecimento — o beco vira saída", () => {
-  it("sem chave, avisa E oferece cadastrar ali mesmo", () => {
+describe("ChaveDeConhecimento — infraestrutura gerenciada pela plataforma", () => {
+  it("quando a infraestrutura está indisponível, não pede chave ao tenant", () => {
     render(
       <ChaveDeConhecimento
         estado={{ ...CHAVE_OK, pode_indexar: false, chave_em_uso: null }}
@@ -284,15 +284,13 @@ describe("ChaveDeConhecimento — o beco vira saída", () => {
       />,
     );
     expect(screen.getByTestId("conhecimento-sem-chave")).toBeInTheDocument();
-    // Avisar sem oferecer conserto é um diagnóstico que a pessoa não tem o que
-    // fazer com — o defeito que este componente existe para acabar.
-    fireEvent.click(screen.getByTestId("conhecimento-cadastrar-chave"));
-    expect(screen.getByTestId("conhecimento-chave-input")).toBeInTheDocument();
+    expect(screen.getByText(/não precisa contratar nem cadastrar uma chave de IA/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Cadastrar a chave aqui/i)).not.toBeInTheDocument();
   });
 
-  it("com chave, diz QUAL está valendo", () => {
+  it("com a infraestrutura pronta, informa que o material pode ser preparado", () => {
     render(<ChaveDeConhecimento estado={CHAVE_OK} onChaveCadastrada={() => {}} />);
     expect(screen.getByTestId("conhecimento-chave-ok")).toBeInTheDocument();
-    expect(screen.getByText(/Chave principal/)).toBeInTheDocument();
+    expect(screen.getByText(/Pronto para preparar material/i)).toBeInTheDocument();
   });
 });

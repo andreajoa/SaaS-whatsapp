@@ -49,7 +49,7 @@ export type PublishOutcome =
 function provedorDaInstalacao(settings: unknown): string {
   const llm = (settings as { llm?: unknown } | null)?.llm;
   const provider = (llm as { provider?: unknown } | null | undefined)?.provider;
-  return typeof provider === "string" && provider.trim() !== "" ? provider : "anthropic";
+  return typeof provider === "string" && provider.trim() !== "" ? provider : "saas_ai";
 }
 
 function mensagemDoErro(err: unknown): string {

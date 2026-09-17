@@ -155,6 +155,11 @@ function buildSentinelRegex(keywords: string[]): RegExp | null {
  * lá não existe faria o ensaio passar e a mensagem real falhar.
  */
 export function chaveDePlataforma(provider: string): string | null {
+  if (provider === "saas_ai") {
+    const endpoint = (process.env.SAAS_AI_BASE_URL ?? "").trim();
+    if (!endpoint) return null;
+    return (process.env.SAAS_AI_API_KEY ?? "").trim() || "saas-platform";
+  }
   const nome = { anthropic: "ANTHROPIC_API_KEY", openai: "OPENAI_API_KEY", openrouter: "OPENROUTER_API_KEY" }[
     provider
   ];
@@ -165,6 +170,11 @@ export function chaveDePlataforma(provider: string): string | null {
 
 export function buildModel(provider: string, apiKey: string, modelId: string): LanguageModel {
   switch (provider) {
+    case "saas_ai": {
+      const configured = (process.env.SAAS_AI_BASE_URL ?? "http://127.0.0.1").trim();
+      const root = configured.replace(/\/v1\/?$/, "").replace(/\/$/, "");
+      return createOpenAI({ apiKey: apiKey || "saas-platform", baseURL: `${root}/v1` })(modelId);
+    }
     case "anthropic":
       return createAnthropic({ apiKey })(modelId);
     case "openai":

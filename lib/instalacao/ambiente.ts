@@ -49,6 +49,7 @@ export interface AmbienteDaInstalacao {
 
 /** O nome da variável de chave de plataforma de cada provedor. */
 const VARIAVEL_DA_CHAVE: Record<string, string> = {
+  saas_ai: "SAAS_AI_BASE_URL",
   anthropic: "ANTHROPIC_API_KEY",
   openai: "OPENAI_API_KEY",
   openrouter: "OPENROUTER_API_KEY",

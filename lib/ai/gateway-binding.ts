@@ -279,6 +279,15 @@ function instanciar(
   baseUrl: string | null,
 ): LanguageModel | null {
   switch (provider) {
+    case "saas_ai": {
+      const configured = (baseUrl ?? process.env.SAAS_AI_BASE_URL ?? "").trim();
+      if (!configured) return null;
+      const root = configured.replace(/\/v1\/?$/, "").replace(/\/$/, "");
+      return createOpenAI({
+        apiKey: apiKey || process.env.SAAS_AI_API_KEY || "saas-platform",
+        baseURL: `${root}/v1`,
+      })(modelId);
+    }
     case "anthropic":
       return createAnthropic({ apiKey })(modelId);
     case "openai":

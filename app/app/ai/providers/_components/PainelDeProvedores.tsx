@@ -186,14 +186,11 @@ export function PainelDeProvedores() {
       </header>
 
       {semChave && (
-        <Card className="mb-6 border-amber-500/40 bg-amber-500/5 p-4" data-testid="aviso-sem-chave">
+        <Card className="mb-6 p-4" data-testid="aviso-sem-chave">
           <p className="text-sm">
             {t(
-              "Você ainda não cadastrou nenhuma chave de provedor. Enquanto isso, tudo usa a chave que veio na instalação.",
-            )}{" "}
-            <Link className="underline underline-offset-4" href="/app/ai/credentials">
-              {t("Cadastrar uma chave")}
-            </Link>
+              "A IA do SaaS Whatsapp é gerenciada pela plataforma. Credenciais próprias são opcionais e servem apenas ao modo avançado/legado.",
+            )}
           </p>
         </Card>
       )}

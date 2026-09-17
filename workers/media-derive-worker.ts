@@ -89,6 +89,8 @@ export async function deriveMessageMedia(row: EventRow): Promise<HandlerResult> 
 
     // Credencial BYOK da org p/ visão (imagem).
     const llmCfg: LlmEdgeConfig = {
+      saasAiBaseUrl: process.env.SAAS_AI_BASE_URL,
+      saasAiApiKey: process.env.SAAS_AI_API_KEY,
       anthropicApiKey: process.env.ANTHROPIC_API_KEY,
       openaiApiKey: process.env.OPENAI_API_KEY,
       // Sem esta linha, a instalação que escolheu OpenRouter no install.sh (a
@@ -138,21 +140,32 @@ export async function deriveMessageMedia(row: EventRow): Promise<HandlerResult> 
     // Anthropic era enviada para a OpenAI e voltava 401 em toda tentativa
     // (visto nesta VPS: media.derive_requested preso com transcription_401,
     // e o cliente ouvindo "não consigo ouvir áudio" com a chave certa no .env).
-    let openaiKey: string | null = null;
-    if (llm.provider === "openai") {
-      openaiKey = llm.apiKey;
+    let transcription: { apiKey: string; baseUrl?: string; model?: string } | null = null;
+    if (process.env.SAAS_AI_BASE_URL) {
+      const root = process.env.SAAS_AI_BASE_URL.replace(/\/v1\/?$/, "").replace(/\/$/, "");
+      transcription = {
+        apiKey: process.env.SAAS_AI_API_KEY?.trim() || "saas-platform",
+        baseUrl: root,
+        model: process.env.SAAS_AI_TRANSCRIPTION_MODEL?.trim() || "platform-transcribe",
+      };
     } else {
-      try {
-        const oa = await resolveOrgLlmConfig(derivePool(), llmCfg, row.organization_id, {
-          provider: "openai",
-        });
-        openaiKey = oa.apiKey;
-      } catch {
-        openaiKey = null; // sem credencial e sem OPENAI_API_KEY: áudio fica sem transcrição
+      let openaiKey: string | null = null;
+      if (llm.provider === "openai") {
+        openaiKey = llm.apiKey;
+      } else {
+        try {
+          const oa = await resolveOrgLlmConfig(derivePool(), llmCfg, row.organization_id, {
+            provider: "openai",
+          });
+          openaiKey = oa.apiKey;
+        } catch {
+          openaiKey = null;
+        }
       }
+      if (openaiKey) transcription = { apiKey: openaiKey };
     }
 
-    const deps = buildDeriveDeps(llm, openaiKey, row.organization_id, admin);
+    const deps = buildDeriveDeps(llm, transcription, row.organization_id, admin);
 
     const text = await deriveMediaText(msg.type, buffer, msg.media_mime ?? "application/octet-stream", deps);
     await admin.from("messages")
@@ -200,7 +213,7 @@ async function lerBindingDoPonto(
 
 function buildDeriveDeps(
   llm: { provider: string; apiKey: string; defaultModel: string | null },
-  openaiKey: string | null,
+  transcription: { apiKey: string; baseUrl?: string; model?: string } | null,
   orgId: string,
   admin: ReturnType<typeof createAdminClient>,
 ): DeriveDeps {
@@ -285,15 +298,15 @@ function buildDeriveDeps(
   // Sem chave OpenAI não há como transcrever: devolver string vazia é honesto
   // (o derivado fica vazio e o marcador "[áudio]" continua valendo) e evita o
   // loop de 401 que retentava a cada drain.
-  const transcriber: DeriveDeps["transcriber"] = openaiKey
-    ? apiTranscriptionProvider({ apiKey: openaiKey })
+  const transcriber: DeriveDeps["transcriber"] = transcription
+    ? apiTranscriptionProvider(transcription)
     : {
         transcribe: async () => {
           // Mesma razão da visão: devolver "" fazia o agente responder ao áudio
           // como se ele não existisse. O aviso é o que dá ao operador a chance
           // de cadastrar a chave — sem ele, o sintoma é indistinguível de "o
           // agente é ruim".
-          await avisarMidiaNaoLida(orgId, "áudio", "falta uma chave da OpenAI para transcrever");
+          await avisarMidiaNaoLida(orgId, "áudio", "a transcrição da plataforma ainda não está configurada");
           return MARCADOR_NAO_LIDA;
         },
       };

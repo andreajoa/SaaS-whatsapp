@@ -55,16 +55,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export type PontoDeEmbedding = "embedding_indexar" | "embedding_consultar";
 
 /** Pin de contrato: o mesmo modelo dos dois lados, com a mesma dimensão. */
-export const MODELO_DE_EMBEDDING = "openai/text-embedding-3-small";
+export const MODELO_DE_EMBEDDING = "saas_ai/platform-embedding";
 export const DIMENSOES_DO_EMBEDDING = 1536;
 
 export type OrigemDaChave =
+  | "ia_da_plataforma"
   | "binding_do_ponto"
   | "credencial_da_organizacao"
   | "gateway_da_instalacao"
   | "chave_da_instalacao";
 
 export const EXPLICACAO_DA_ORIGEM: Record<OrigemDaChave, string> = {
+  ia_da_plataforma: "IA gerenciada pelo SaaS Whatsapp; nenhuma chave é exigida desta empresa.",
   binding_do_ponto: "Escolhida por você no painel de Provedores.",
   credencial_da_organizacao: "Usando a chave OpenAI cadastrada em Credenciais.",
   gateway_da_instalacao: "Usando o gateway de IA configurado nesta instalação.",
@@ -97,6 +99,21 @@ export async function resolverChaveDeEmbedding(
   ponto: PontoDeEmbedding = "embedding_indexar",
 ): Promise<ChaveDeEmbedding | null> {
   const avisos: string[] = [];
+
+  // No SaaS hospedado, a infraestrutura da plataforma vence: o tenant fornece
+  // conhecimento, não credencial de modelo. Instalações legadas continuam
+  // usando a escada antiga quando SAAS_AI_BASE_URL não existe.
+  if (env.SAAS_AI_BASE_URL) {
+    const root = env.SAAS_AI_BASE_URL.replace(/\/v1\/?$/, "").replace(/\/$/, "");
+    return {
+      apiKey: env.SAAS_AI_API_KEY || "saas-platform",
+      baseUrl: `${root}/v1`,
+      viaGateway: false,
+      origem: "ia_da_plataforma",
+      rotulo: "IA do SaaS Whatsapp",
+      avisos,
+    };
+  }
 
   // 1 · A escolha explícita do painel.
   const binding = await lerBindingDeEmbedding(ponto, organizationId);

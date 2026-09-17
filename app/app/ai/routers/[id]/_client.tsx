@@ -315,7 +315,7 @@ export function RouterEditorClient({
                   {classifierModels.map((m) => (
                     <SelectItem key={`${m.provider}::${m.model_id}`} value={`${m.provider}::${m.model_id}`}>
                       {m.display_name} · {m.provider}
-                      {m.origem === "plataforma" ? ` (${t("chave desta instalação")})` : ""}
+                      {m.origem === "plataforma" ? ` (${t("IA da plataforma")})` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -323,10 +323,10 @@ export function RouterEditorClient({
               <p className="text-xs text-muted-foreground">
                 {classifierModels.length === 0
                   ? t(
-                      "Nenhuma chave de IA utilizável nesta organização — cadastre uma em Agentes IA › Credenciais para poder escolher o modelo.",
+                      "A IA da plataforma ainda não está disponível nesta instalação. O roteamento continua no automático até a infraestrutura ser configurada.",
                     )
                   : t(
-                      "Só aparecem modelos de provedores com chave cadastrada aqui. Se a conta do provedor estiver sem crédito, a identificação falha e tudo cai no fallback.",
+                      "A IA do SaaS é o padrão. Credenciais externas aparecem apenas quando a organização opta por uma integração avançada; se um provedor externo falhar, o fallback protege o atendimento.",
                     )}
               </p>
             </div>

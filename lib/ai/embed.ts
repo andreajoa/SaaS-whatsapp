@@ -49,8 +49,8 @@ export class SemChaveDeEmbeddingError extends Error {
   readonly code = "embedding_sem_chave";
   constructor(readonly organizationId: string) {
     super(
-      "Esta organização não tem chave da OpenAI para indexar nem consultar o material. " +
-        "Cadastre uma em Credenciais, ou defina OPENAI_API_KEY na instalação.",
+      "A IA da plataforma não está configurada para indexar nem consultar o material. " +
+        "Defina SAAS_AI_BASE_URL na infraestrutura do SaaS (ou use a configuração legada).",
     );
     this.name = "SemChaveDeEmbeddingError";
   }
@@ -81,7 +81,7 @@ export async function embedText(
     : createOpenAI({
         apiKey: chave.apiKey ?? "",
         ...(chave.baseUrl ? { baseURL: chave.baseUrl } : {}),
-      }).textEmbeddingModel(modelId.replace(/^openai\//, ""));
+      }).textEmbeddingModel(modelId.replace(/^(openai|saas_ai)\//, ""));
 
   const result = await embed({
     model: resolvido,

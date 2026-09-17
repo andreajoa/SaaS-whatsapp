@@ -29,12 +29,13 @@ export type ModelId =
   // Allow arbitrary tenant-configured strings without losing autocomplete on the canonical ones.
   | (string & {});
 
-export const DEFAULT_BOT_MODEL: ModelId = "anthropic/claude-sonnet-5";
-export const DEFAULT_CLASSIFIER_MODEL: ModelId = "anthropic/claude-haiku-4-5";
-export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
+export const DEFAULT_BOT_MODEL: ModelId = "saas_ai/platform-chat";
+export const DEFAULT_CLASSIFIER_MODEL: ModelId = "saas_ai/platform-fast";
+export const DEFAULT_EMBEDDING_MODEL: ModelId = "saas_ai/platform-embedding";
 
 export function isAiGatewayConfigured(): boolean {
   return (
+    Boolean(env.SAAS_AI_BASE_URL) ||
     Boolean(env.AI_GATEWAY_API_KEY) ||
     Boolean(env.OPENROUTER_API_KEY) ||
     Boolean(env.ANTHROPIC_API_KEY)
@@ -69,6 +70,14 @@ export function isAiGatewayConfigured(): boolean {
 export function resolveLanguageModel(model: ModelId): LanguageModel | null {
   const id = String(model);
 
+  if (id.startsWith("saas_ai/") && env.SAAS_AI_BASE_URL) {
+    const root = env.SAAS_AI_BASE_URL.replace(/\/v1\/?$/, "").replace(/\/$/, "");
+    return createOpenAI({
+      apiKey: env.SAAS_AI_API_KEY || "saas-platform",
+      baseURL: `${root}/v1`,
+    })(id.slice("saas_ai/".length));
+  }
+
   if (gatewayConfig()) return id as LanguageModel;
 
   if (env.OPENROUTER_API_KEY) {
@@ -94,7 +103,7 @@ export function resolveLanguageModel(model: ModelId): LanguageModel | null {
 export function isEmbeddingProviderConfigured(): boolean {
   // Embeddings go through the gateway when `AI_GATEWAY_API_KEY` is set;
   // otherwise the worker calls `openai/...` directly via OPENAI_API_KEY.
-  return Boolean(env.AI_GATEWAY_API_KEY) || Boolean(env.OPENAI_API_KEY);
+  return Boolean(env.SAAS_AI_BASE_URL) || Boolean(env.AI_GATEWAY_API_KEY) || Boolean(env.OPENAI_API_KEY);
 }
 
 /**

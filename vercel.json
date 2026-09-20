@@ -6,6 +6,9 @@
     "gru1"
   ],
   "functions": {
+    "app/api/internal/agents/run/route.ts": {
+      "maxDuration": 300
+    },
     "app/api/v1/cron/agent-dispatcher/route.ts": {
       "maxDuration": 25
     },

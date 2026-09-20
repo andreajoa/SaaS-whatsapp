@@ -212,6 +212,38 @@ describe("crons no deploy hospedado (Vercel)", () => {
     ).toEqual([]);
   });
 
+  it("o vercel.json é o ÚNICO arquivo de configuração da Vercel no repo", () => {
+    // Esta é a cerca mais barata do arquivo e a que custou mais caro não ter.
+    //
+    // A Vercel aceita `vercel.ts` (e `.js`/`.mjs`) além do `.json`, e quando
+    // acha DOIS ela não escolhe nem avisa — ela ABORTA:
+    //
+    //   Multiple configuration files found: vercel.ts, vercel.json.
+    //
+    // O `vercel.ts` chegou dentro do baseline importado (336bdf2), com crons
+    // que em boa parte já não existem e um comentário dizendo que "a lista
+    // final virá da Spec 08". Ficou lá, inerte, até alguém criar o
+    // `vercel.json` — e a partir daí TODO deploy passou a morrer ANTES de
+    // compilar. Três em sequência, todos `ERROR`, enquanto o domínio seguia
+    // servindo um build velho e devolvendo 500 por outro motivo (as env vars
+    // ausentes). O 500 é o sintoma visível, vem do deploy ANTIGO, e mandou a
+    // investigação inteira para o lado errado.
+    //
+    // Nada local pega isso: `pnpm build` passa, `typecheck` passa, a suíte
+    // passa. Só a API de deployments da Vercel conta a verdade. Então a cerca
+    // é um `existsSync` — e vale para qualquer extensão, porque o conflito é
+    // com o NOME do arquivo, não com o que tem dentro.
+    const rivais = ["vercel.ts", "vercel.js", "vercel.mjs", "vercel.cjs"].filter((f) =>
+      existsSync(join(RAIZ, f)),
+    );
+    expect(
+      rivais,
+      `Além do vercel.json existe(m): ${rivais.join(", ")}. A Vercel reprova o deploy com ` +
+        `"Multiple configuration files found" e o build NÃO RODA — o domínio segue servindo ` +
+        `o deploy anterior, então o sintoma que aparece na tela é o do build velho.`,
+    ).toEqual([]);
+  });
+
   it("nenhum maxDuration passa do teto de 300s do Hobby", () => {
     const v = JSON.parse(readFileSync(VERCEL_JSON, "utf8")) as {
       functions?: Record<string, { maxDuration?: number }>;

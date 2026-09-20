@@ -8450,6 +8450,159 @@ export const DICIONARIO: Traducoes = {
   "Time sem limite": { es: "Equipo sin límite" },
   "API e webhooks liberados": { es: "API y webhooks habilitados" },
   "Suporte prioritário": { es: "Soporte prioritario" },
+
+  // ─── A página que apresenta o produto (app/page.tsx) ──────────────────────
+  //
+  // É a ÚNICA tela que uma pessoa lê antes de ter conta — e por isso a única em
+  // que o idioma não vem de um perfil, e sim do `Accept-Language` do navegador.
+  // Quem chega pedindo espanhol e recebe uma página de vendas em português vai
+  // embora na primeira linha, e não há segunda chance de primeira impressão.
+  //
+  // O espanhol aqui é neutro (`tú`, nunca `vos`) pelo mesmo motivo de
+  // `lib/i18n/datas.ts` escolher `es` e não `es-ES`: o público é a América
+  // Latina inteira, não um país.
+  "Recursos": { es: "Recursos" },
+  "Planos": { es: "Planes" },
+  "Perguntas": { es: "Preguntas" },
+  "Atendimento por WhatsApp com agente de IA": {
+    es: "Atención por WhatsApp con agente de IA",
+  },
+  "Nunca mais perca um cliente por demora na resposta": {
+    es: "Nunca más pierdas un cliente por tardar en responder",
+  },
+  "Todo o WhatsApp da sua empresa em uma tela só. Um atendente de IA responde na hora, com o que você ensinou, e passa a conversa para uma pessoa do time quando o assunto pede.":
+    {
+      es: "Todo el WhatsApp de tu empresa en una sola pantalla. Un agente de IA responde al instante con lo que le enseñaste, y le pasa la conversación a una persona del equipo cuando el asunto lo pide.",
+    },
+  "Começar com": { es: "Empezar con" },
+  "dias grátis": { es: "días gratis" },
+  "Já tenho conta": { es: "Ya tengo cuenta" },
+  "Sem cartão para começar": { es: "Sin tarjeta para empezar" },
+  "Você usa o número que já tem": { es: "Usas el número que ya tienes" },
+  "Cancele quando quiser": { es: "Cancela cuando quieras" },
+  "A venda raramente se perde no preço. Ela se perde no silêncio.": {
+    es: "La venta casi nunca se pierde por el precio. Se pierde en el silencio.",
+  },
+  "A resposta demora": { es: "La respuesta tarda" },
+  "Quem pergunta às 22h só é atendido no dia seguinte. Até lá, já comprou de quem respondeu primeiro.":
+    {
+      es: "Quien pregunta a las 22h recién es atendido al día siguiente. Para entonces ya le compró a quien respondió primero.",
+    },
+  "A conversa se perde": { es: "La conversación se pierde" },
+  "Cada pessoa do time guarda um pedaço da história no próprio celular. Ninguém sabe o que já foi combinado.":
+    {
+      es: "Cada persona del equipo guarda un pedazo de la historia en su propio celular. Nadie sabe qué se acordó.",
+    },
+  "O retorno nunca acontece": { es: "El seguimiento nunca ocurre" },
+  "O cliente disse “depois eu vejo” e ninguém voltou nele. É a venda mais barata da empresa, e ela evapora.":
+    {
+      es: "El cliente dijo “después lo veo” y nadie volvió a buscarlo. Es la venta más barata de la empresa, y se evapora.",
+    },
+  "Três passos, e o atendimento para de depender de memória": {
+    es: "Tres pasos, y la atención deja de depender de la memoria",
+  },
+  "Conecte o seu WhatsApp": { es: "Conecta tu WhatsApp" },
+  "O mesmo número que a sua empresa já usa, por leitura de QR code. Ninguém troca de número e nenhuma conversa se perde.":
+    {
+      es: "El mismo número que tu empresa ya usa, leyendo un código QR. Nadie cambia de número y ninguna conversación se pierde.",
+    },
+  "Ensine o atendente": { es: "Enseña al agente" },
+  "Escreva o que a empresa faz, preço, prazo e as regras. O agente responde a partir disso — e só disso.":
+    {
+      es: "Escribe lo que hace la empresa, precio, plazo y las reglas. El agente responde a partir de eso — y solo de eso.",
+    },
+  "Acompanhe pelo funil": { es: "Haz el seguimiento por el embudo" },
+  "Cada conversa vira um card. Você vê quem está esperando, quem comprou e quem esfriou, sem perguntar a ninguém.":
+    {
+      es: "Cada conversación se vuelve una tarjeta. Ves quién está esperando, quién compró y quién se enfrió, sin preguntarle a nadie.",
+    },
+  "O atendimento inteiro em um lugar só": { es: "Toda la atención en un solo lugar" },
+  "Uma caixa de entrada para o time todo": {
+    es: "Una bandeja de entrada para todo el equipo",
+  },
+  "Todas as conversas em uma tela, com quem está atendendo o quê à vista de todos.": {
+    es: "Todas las conversaciones en una pantalla, con quién atiende qué a la vista de todos.",
+  },
+  "Agente de IA com a sua base de conhecimento": {
+    es: "Agente de IA con tu base de conocimiento",
+  },
+  "Ele responde pelo que você escreveu, não por achismo, e chama uma pessoa quando não sabe.": {
+    es: "Responde por lo que escribiste, no por suposiciones, y llama a una persona cuando no sabe.",
+  },
+  "Funil de vendas colado na conversa": { es: "Embudo de ventas pegado a la conversación" },
+  "Arraste o card, leia o histórico inteiro e pare de perguntar em que pé está cada cliente.": {
+    es: "Arrastra la tarjeta, lee el historial completo y deja de preguntar en qué quedó cada cliente.",
+  },
+  "Retorno automático no tempo certo": { es: "Seguimiento automático en el momento justo" },
+  "Quem parou de responder recebe uma mensagem de volta sem que ninguém precise lembrar disso.": {
+    es: "Quien dejó de responder recibe un mensaje de vuelta sin que nadie tenga que acordarse.",
+  },
+  "Relatórios de atendimento": { es: "Informes de atención" },
+  "Tempo de resposta, volume por pessoa do time e o que de fato virou venda.": {
+    es: "Tiempo de respuesta, volumen por persona del equipo y lo que realmente se convirtió en venta.",
+  },
+  // "LGPD" é lei brasileira e não diz nada a quem lê em espanhol na Colômbia ou
+  // no México: o que essa pessoa precisa entender é a GARANTIA, não a sigla.
+  "LGPD desde o primeiro dia": { es: "Protección de datos desde el primer día" },
+  "Dados isolados por empresa, registro de acesso e exclusão a pedido do titular.": {
+    es: "Datos aislados por empresa, registro de accesos y eliminación a pedido del titular.",
+  },
+  "Comece liberado. Escolha o plano depois.": {
+    es: "Empieza con todo abierto. Elige el plan después.",
+  },
+  "dias com tudo funcionando, sem cartão. Você só escolhe um plano quando decidir ficar.": {
+    es: "días con todo funcionando, sin tarjeta. Eliges un plan solo cuando decidas quedarte.",
+  },
+  "Recomendado": { es: "Recomendado" },
+  "Começar agora": { es: "Empezar ahora" },
+  "O que costumam perguntar antes de assinar": {
+    es: "Lo que suelen preguntar antes de suscribirse",
+  },
+  "Preciso trocar de número?": { es: "¿Tengo que cambiar de número?" },
+  "Não. Você conecta o número que a empresa já usa lendo um QR code, e as conversas seguem de onde pararam.":
+    {
+      es: "No. Conectas el número que la empresa ya usa leyendo un código QR, y las conversaciones siguen donde quedaron.",
+    },
+  "A IA responde sozinha o tempo todo?": { es: "¿La IA responde sola todo el tiempo?" },
+  "Só até onde você deixar. Ela responde o que está na base de conhecimento e entrega a conversa a uma pessoa do time quando o assunto sai dali.":
+    {
+      es: "Solo hasta donde tú la dejes. Responde lo que está en la base de conocimiento y le entrega la conversación a una persona del equipo cuando el asunto se sale de ahí.",
+    },
+  "O time todo consegue usar?": { es: "¿Puede usarlo todo el equipo?" },
+  "Sim. Cada pessoa entra com o próprio acesso e você decide o que cada uma pode ver e fazer.": {
+    es: "Sí. Cada persona entra con su propio acceso y tú decides qué puede ver y hacer cada una.",
+  },
+  "E se eu quiser cancelar?": { es: "¿Y si quiero cancelar?" },
+  "O cancelamento é um clique na própria tela de cobrança, sem falar com ninguém. O acesso continua até o fim do período já pago.":
+    {
+      es: "Cancelar es un clic en la propia pantalla de facturación, sin hablar con nadie. El acceso sigue hasta el final del período ya pagado.",
+    },
+  "Onde ficam os dados dos meus clientes?": { es: "¿Dónde quedan los datos de mis clientes?" },
+  "Em base isolada por empresa, com registro de quem acessou o quê. Você pode exportar ou apagar os seus dados quando quiser.":
+    {
+      es: "En una base aislada por empresa, con registro de quién accedió a qué. Puedes exportar o borrar tus datos cuando quieras.",
+    },
+  "A próxima pessoa que te chamar no WhatsApp merece resposta agora": {
+    es: "La próxima persona que te escriba por WhatsApp merece respuesta ahora",
+  },
+  "Crie a conta, conecte o número e veja o primeiro atendimento acontecer sozinho ainda hoje.": {
+    es: "Crea la cuenta, conecta el número y mira cómo la primera atención ocurre sola hoy mismo.",
+  },
+  "Atendimento e vendas por WhatsApp": { es: "Atención y ventas por WhatsApp" },
+  "Termos de uso": { es: "Términos de uso" },
+  "Novo contato · 22h14": { es: "Nuevo contacto · 22:14" },
+  "IA atendendo": { es: "IA atendiendo" },
+  "Oi! Vocês entregam hoje ainda?": { es: "¡Hola! ¿Todavía entregan hoy?" },
+  "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.":
+    {
+      es: "¡Hola, Mariana! Sí, entregamos. Los pedidos cerrados hasta las 23h salen mañana temprano. Dime tu barrio y te confirmo el plazo.",
+    },
+  "Sou do centro": { es: "Soy del centro" },
+  "No centro chega em até 2 horas. Quer que eu já reserve para você?": {
+    es: "Al centro llega en hasta 2 horas. ¿Quieres que te lo reserve ya?",
+  },
+  "Card criado no funil": { es: "Tarjeta creada en el embudo" },
+  "Respondido na hora": { es: "Respondido al instante" },
 };
 
 /**

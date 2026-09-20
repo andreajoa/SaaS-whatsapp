@@ -219,6 +219,40 @@ const PROVA_PROPRIA: readonly Excecao[] = [
       "da organização viraram venda, e quem o lê é o servidor com o admin client " +
       "filtrando organization_id à mão (a tela `/app/settings/conversoes`).",
   },
+  // ── Cobrança (migration 0239) ──────────────────────────────────────────────
+  //
+  // Duas tabelas, dois regimes OPOSTOS de propósito, e é por isso que nenhuma
+  // das duas cabe em `TABLES`:
+  //
+  //   - `org_subscriptions` é leitura-só do tenant. Tem policy de SELECT e
+  //     NENHUMA de escrita — quem escreve é o webhook do Stripe pelo admin
+  //     client. Em `TABLES` o `writeCountAs` do padrão de lá cobraria escrita
+  //     que aqui é proibida por projeto.
+  //   - `billing_webhook_events` é deny-all: registro de plataforma, sem dono
+  //     no tenant. Em `TABLES` o controle positivo receberia `permission
+  //     denied` em vez de `0` e ficaria vermelho POR ACERTO.
+  {
+    tabela: "org_subscriptions",
+    razao:
+      "tests/invariants/assinatura-stripe-rls.test.ts — dois tenants reais com " +
+      "membro `admin` (o papel mais forte do tenant): leitura positiva local, " +
+      "zero linhas cruzadas com e sem WHERE, e INSERT/UPDATE/DELETE do próprio " +
+      "admin medidos pelo ESTADO da linha (o plano continua `essencial`, a " +
+      "contagem não muda) — quem promove plano é o webhook do Stripe, nunca " +
+      "quem paga. `anon` sem privilégio, `service_role` com escrita, RLS " +
+      "ligada e nenhuma policy de escrita existindo.",
+  },
+  {
+    tabela: "billing_webhook_events",
+    razao:
+      "tests/invariants/assinatura-stripe-rls.test.ts — deny-all provado: " +
+      "privilégio NENHUM para anon e authenticated, `permission denied` medido " +
+      "sob `set role`, RLS ligada e ZERO policies. A linha é a reivindicação de " +
+      "um evento do Stripe (dedupe de reentrega), não dado do tenant: " +
+      "`organization_id` é nullable e só preenchido depois que o evento é " +
+      "atribuído. `service_role` mantém select/insert/delete porque o desfazer " +
+      "da reivindicação depende do delete.",
+  },
 ];
 
 /**

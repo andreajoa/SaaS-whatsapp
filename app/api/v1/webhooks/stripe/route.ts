@@ -12,8 +12,13 @@
  * ─── Verificação ───────────────────────────────────────────────────────────
  *
  * HMAC-SHA256 sobre `<timestamp>.<corpo CRU>` com `timingSafeEqual`, o mesmo
- * padrão do webhook do WAHA. O corpo tem de ser o texto exato — ver
- * `lib/billing/stripe.ts`.
+ * padrão dos demais webhooks de entrada deste repositório. O corpo tem de ser o
+ * texto exato — ver `lib/billing/stripe.ts`.
+ *
+ * (A frase acima nomeava o transporte de mensagens como precedente. Não pode:
+ * `scripts/lint-channels.ts` proíbe nomear provider fora de `lib/channels/`, e
+ * a varredura é textual — vale para comentário também, de propósito, porque é
+ * de comentário que o nome vaza para o próximo arquivo que copia o padrão.)
  *
  * ─── Reentrega ─────────────────────────────────────────────────────────────
  *

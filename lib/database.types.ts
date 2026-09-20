@@ -34,6 +34,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      org_subscriptions: {
+        Row: {
+          organization_id: string;
+          plan: string;
+          status: string;
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          stripe_price_id: string | null;
+          current_period_end: string | null;
+          cancel_at_period_end: boolean;
+          canceled_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          organization_id: string;
+          plan: string;
+          status: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          stripe_price_id?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          canceled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          organization_id?: string;
+          plan?: string;
+          status?: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          stripe_price_id?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          canceled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "org_subscriptions_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: true;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      billing_webhook_events: {
+        Row: {
+          stripe_event_id: string;
+          type: string;
+          organization_id: string | null;
+          received_at: string;
+        };
+        Insert: {
+          stripe_event_id: string;
+          type: string;
+          organization_id?: string | null;
+          received_at?: string;
+        };
+        Update: {
+          stripe_event_id?: string;
+          type?: string;
+          organization_id?: string | null;
+          received_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "billing_webhook_events_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       ai_reply_drafts: {
         Row: {
           id: string;

@@ -23992,6 +23992,122 @@ create trigger trg_org_voice_calls_set_updated_at
 
 notify pgrst, 'reload schema';
 
+-- ---- assinatura mensal por organização, Stripe (migration 0239) ----
+--
+-- Só chega a valer numa instalação que COBRA. `STRIPE_SECRET_KEY` vazia — o
+-- caso normal de quem instala numa VPS — deixa estas duas tabelas de pé e
+-- vazias, sem gate, sem tela e sem consulta: `instalacaoCobra()` em
+-- `lib/billing/planos.ts` desliga tudo do lado da aplicação. A tabela existe
+-- em todo clone para que as migrations sejam as mesmas em todo lugar; ela não
+-- cobra ninguém sozinha.
+--
+-- A AUSÊNCIA de linha é o trial (derivado de `organizations.created_at`), não
+-- um erro — o racional inteiro está no cabeçalho da migration 0239, e é o que
+-- impede o cadastro de novo cliente de acoplar-se à cobrança.
+
+create table if not exists public.org_subscriptions (
+  organization_id uuid primary key references public.organizations(id) on delete cascade,
+  plan text not null,
+  status text not null,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  stripe_price_id text,
+  current_period_end timestamptz,
+  cancel_at_period_end boolean not null default false,
+  canceled_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Colunas adicionadas separadamente também: um clone que já tenha a tabela de
+-- uma versão anterior deste apêndice não recebe nada do `create table`.
+alter table public.org_subscriptions add column if not exists stripe_price_id text;
+alter table public.org_subscriptions add column if not exists canceled_at timestamptz;
+alter table public.org_subscriptions
+  add column if not exists cancel_at_period_end boolean not null default false;
+
+-- As constraints vêm DEPOIS dos dados, e os dados são corrigidos antes: um
+-- clone com valor fora do vocabulário faria o `update.sh` quebrar no meio.
+update public.org_subscriptions
+  set plan = 'essencial'
+  where plan is null or plan not in ('essencial', 'pro', 'ilimitado');
+update public.org_subscriptions
+  set status = 'incomplete'
+  where status is null or status not in (
+    'trialing', 'active', 'past_due', 'canceled',
+    'incomplete', 'incomplete_expired', 'unpaid', 'paused'
+  );
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'org_subscriptions_plan_check'
+  ) then
+    alter table public.org_subscriptions add constraint org_subscriptions_plan_check
+      check (plan = any (array['essencial'::text, 'pro'::text, 'ilimitado'::text]));
+  end if;
+  if not exists (
+    select 1 from pg_constraint where conname = 'org_subscriptions_status_check'
+  ) then
+    alter table public.org_subscriptions add constraint org_subscriptions_status_check
+      check (status = any (array[
+        'trialing'::text, 'active'::text, 'past_due'::text, 'canceled'::text,
+        'incomplete'::text, 'incomplete_expired'::text, 'unpaid'::text, 'paused'::text
+      ]));
+  end if;
+end $$;
+
+create unique index if not exists org_subscriptions_customer_idx
+  on public.org_subscriptions (stripe_customer_id)
+  where stripe_customer_id is not null;
+
+create unique index if not exists org_subscriptions_subscription_idx
+  on public.org_subscriptions (stripe_subscription_id)
+  where stripe_subscription_id is not null;
+
+alter table public.org_subscriptions enable row level security;
+
+drop policy if exists org_subscriptions_select on public.org_subscriptions;
+create policy org_subscriptions_select on public.org_subscriptions
+  for select using (
+    public.fn_is_platform_admin()
+    or organization_id in (select public.fn_user_org_ids())
+  );
+
+-- Sem policy de escrita de propósito: quem grava é o webhook do Stripe
+-- (service_role). Um admin de tenant com UPDATE aqui se daria `ilimitado`.
+revoke all on public.org_subscriptions from anon;
+grant select on public.org_subscriptions to authenticated;
+grant all on public.org_subscriptions to service_role;
+
+drop trigger if exists trg_org_subscriptions_updated_at on public.org_subscriptions;
+create trigger trg_org_subscriptions_updated_at
+  before update on public.org_subscriptions
+  for each row execute function public.fn_set_updated_at();
+
+comment on table public.org_subscriptions is
+  'Assinatura mensal de UMA organização. Linha só nasce do Stripe (checkout/webhook); AUSÊNCIA de linha = trial derivado de organizations.created_at (lib/billing/assinatura.ts). Independente de organizations.status=suspended, que é a suspensão manual do platform admin.';
+
+create table if not exists public.billing_webhook_events (
+  stripe_event_id text primary key,
+  type text not null,
+  organization_id uuid references public.organizations(id) on delete set null,
+  received_at timestamptz not null default now()
+);
+
+create index if not exists billing_webhook_events_received_idx
+  on public.billing_webhook_events (received_at desc);
+
+alter table public.billing_webhook_events enable row level security;
+
+revoke all on public.billing_webhook_events from anon, authenticated;
+grant all on public.billing_webhook_events to service_role;
+
+comment on table public.billing_webhook_events is
+  'Dedupe de webhook do Stripe. O Stripe reentrega o MESMO event.id por até 3 dias quando não recebe 2xx; sem isto, um customer.subscription.deleted reentregue derrubaria o acesso de quem já renovou.';
+
+notify pgrst, 'reload schema';
+
 -- ---- VARREDURA anon: função nova nasce exposta em quem ATUALIZA (migration 0116) ----
 --
 -- ⚠️ ESTE BLOCO É, DE PROPÓSITO, O ÚLTIMO DO ARQUIVO. Apêndice novo entra ANTES

@@ -268,6 +268,42 @@ const schema = z.object({
    */
   SUPPORT_EMAIL: z.string().optional().default(""),
 
+  /**
+   * ─── Assinatura mensal (Stripe, migration 0239) ─────────────────────────
+   *
+   * TODAS opcionais, e isto é a decisão que sustenta o produto inteiro: este
+   * repo é open source e a doutrina dele monetiza por SELF-HOST em VPS, não
+   * por assinatura. Quem clona não tem Stripe e não pode ser obrigado a ter.
+   *
+   * `STRIPE_SECRET_KEY` vazia é o INTERRUPTOR: `instalacaoCobra()`
+   * (lib/billing/planos.ts) devolve `false` e nada de cobrança existe — nem
+   * gate de acesso, nem consulta, nem botão, e as rotas de billing devolvem
+   * 404. Exigir qualquer uma destas aqui derrubaria o boot de todo self-host,
+   * e o gate vive em `app/app/layout.tsx`, que roda em TODA tela: o raio de
+   * um erro deste lado é a instalação inteira.
+   *
+   * Os três `STRIPE_PRICE_*` são independentes entre si — plano sem preço
+   * configurado é plano que esta instalação simplesmente não vende, e a tela
+   * não o oferece. Não é erro.
+   */
+  STRIPE_SECRET_KEY: z.string().optional().default(""),
+  STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
+  STRIPE_PRICE_ESSENCIAL: z.string().optional().default(""),
+  STRIPE_PRICE_PRO: z.string().optional().default(""),
+  STRIPE_PRICE_ILIMITADO: z.string().optional().default(""),
+  /**
+   * A chave PUBLICÁVEL, e ela é `NEXT_PUBLIC_` de propósito — ao contrário de
+   * todas as outras deste bloco. O checkout é EMBUTIDO: o `Stripe.js` monta o
+   * formulário no browser e precisa dela lá. `pk_...` é desenhada para ser
+   * pública (só cria tokens de pagamento; não lê nem cobra nada), e é a
+   * contrapartida exata de o número do cartão nunca tocar o nosso servidor.
+   *
+   * Consequência de ser `NEXT_PUBLIC_`: ela é QUEIMADA NO BUNDLE no `build`.
+   * Trocá-la exige rebuild, não só restart — e é por isso que o componente
+   * degrada com uma mensagem em vez de quebrar quando ela falta.
+   */
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional().default(""),
+
   // EPIC-11 Impersonate cookie HMAC secret. Optional at boot (route returns
   // 503 at runtime if missing/short); required in prod for the feature to
   // function. Min 32 chars when present is enforced at use site.

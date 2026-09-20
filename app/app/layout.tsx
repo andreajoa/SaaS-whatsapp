@@ -1,6 +1,6 @@
 import { InterfaceRefresh } from "@/hooks/auth/InterfaceRefresh";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { isMfaEnrolled, loadAuthUser, requiresMfa, resolveActiveOrg } from "@/lib/auth/server";
 import { DEFAULT_VISIBILITY_MODE, type VisibilityMode } from "@/lib/auth/types";
 import { AuthProvider } from "@/hooks/auth/AuthProvider";
@@ -20,6 +20,11 @@ import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
 import { listarConexoesCaidas, type ConexaoCaida } from "@/lib/channels/health";
 import { VoiceCallProvider } from "@/components/voice/VoiceCallContext";
 import { acessoFoiRevogado } from "@/lib/auth/vinculo-revogado";
+import { estadoDaCobranca } from "@/lib/billing/assinatura";
+import { instalacaoCobra } from "@/lib/billing/planos";
+
+/** A única tela que o gate de cobrança NÃO pode trancar — senão, laço. */
+const TELA_DE_COBRANCA = "/app/settings/billing";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await loadAuthUser();
@@ -58,11 +63,39 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     const admin = createAdminClient();
     const { data: orgRow } = await admin
       .from("organizations")
-      .select("onboarded_at, status, settings")
+      .select("onboarded_at, status, settings, created_at")
       .eq("id", activeOrg.orgId)
       .maybeSingle();
     if (orgRow && !orgRow.onboarded_at && !user.support) redirect("/onboarding");
     if (orgRow?.status === "suspended") redirect("/account-suspended");
+
+    // ─── Gate de cobrança ────────────────────────────────────────────────────
+    //
+    // Três condições, e cada uma evita um desastre diferente:
+    //
+    //  1. `instalacaoCobra()` — sem `STRIPE_SECRET_KEY` nada disto existe. É o
+    //     que impede o clone de VPS de acordar um dia com a tela trancada por
+    //     uma assinatura que ele nunca teve. É a condição mais importante do
+    //     arquivo: este bloco roda em TODA tela de TODA instalação.
+    //  2. a tela de cobrança nunca é trancada — trancá-la seria um laço de
+    //     redirect para a única página que resolve o problema. O caminho vem
+    //     do header que o `proxy.ts` injeta.
+    //  3. `!user.support` — quem dá suporte precisa entrar justamente na conta
+    //     que não pagou. É o cliente que está bloqueado, não quem o atende.
+    //
+    // A consulta extra só acontece quando as três passam — e não na tela de
+    // cobrança, que faz a sua própria.
+    if (instalacaoCobra() && !user.support) {
+      const caminho = (await headers()).get("x-pathname") ?? "";
+      if (!caminho.startsWith(TELA_DE_COBRANCA)) {
+        const cobranca = await estadoDaCobranca(
+          admin,
+          activeOrg.orgId,
+          orgRow?.created_at ?? null,
+        );
+        if (cobranca.acesso === "vencido") redirect(TELA_DE_COBRANCA);
+      }
+    }
     // G4-02: expõe visibility_mode ao client (inbox decide visões visíveis).
     // Fonte confiável (admin client, org do cookie validado) — nunca do body.
     const mode = (orgRow?.settings as { visibility_mode?: VisibilityMode } | null)

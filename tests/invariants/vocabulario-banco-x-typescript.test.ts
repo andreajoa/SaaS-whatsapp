@@ -132,6 +132,33 @@ const PARES: Array<{
     simbolo: "CaseEventKind",
   },
   {
+    tabela: "org_subscriptions",
+    coluna: "plan",
+    // lib/billing/planos.ts → PlanoId.
+    //
+    // Divergência aqui não dá 23514 visível: quem escreve nesta tabela é o
+    // webhook do Stripe, fora de qualquer tela, e a rota devolve 500 para o
+    // STRIPE — que reentrega calado por 3 dias e depois desativa o endpoint.
+    // O sintoma que chega a um humano é "o cliente pagou e não liberou",
+    // semanas depois, sem nada na tela apontando para um plano novo que
+    // alguém acrescentou só do lado do TypeScript.
+    arquivo: "lib/billing/planos.ts",
+    simbolo: "PlanoId",
+  },
+  {
+    tabela: "org_subscriptions",
+    coluna: "status",
+    // lib/billing/planos.ts → StatusAssinatura.
+    //
+    // Esta lista NÃO é nossa: são os nomes de `subscription.status` do Stripe,
+    // copiados de propósito (ver a migration 0239). Justamente por serem de um
+    // terceiro é que o par importa — o dia em que o Stripe acrescentar um
+    // status, os dois lados têm de andar juntos, e o CHECK é o único que
+    // reclama.
+    arquivo: "lib/billing/planos.ts",
+    simbolo: "StatusAssinatura",
+  },
+  {
     tabela: "system_update_runs",
     coluna: "status",
     // lib/system/update-run.ts → RunStatus

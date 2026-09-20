@@ -494,6 +494,16 @@ export const AUDIT_ACTIONS = [
   // um bloqueio não há como saber nem uma coisa nem outra.
   "voice.opt_in_changed",
   "voice.session_unpaired",
+
+  // Assinatura mensal (migration 0239). Dinheiro é o eixo em que "não foi o que
+  // combinamos" vira disputa, e o Stripe guarda só o lado DELE: estas linhas
+  // são o nosso. `subscription_updated` sai do webhook e vai sem ator de
+  // propósito — quem agiu foi o Stripe, não uma pessoa —, e é ela que responde
+  // "quando o acesso caiu, e por qual evento".
+  "billing.checkout_started",
+  "billing.portal_opened",
+  "billing.subscription_updated",
+  "billing.webhook_invalid_signature",
 ] as const;
 
 /** Um código de auditoria. Derivado de `AUDIT_ACTIONS` — não redigite a lista. */

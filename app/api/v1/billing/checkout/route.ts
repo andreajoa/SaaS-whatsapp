@@ -25,6 +25,7 @@ import { estadoDaCobranca } from "@/lib/billing/assinatura";
 import { instalacaoCobra, precoDoPlano } from "@/lib/billing/planos";
 import { criarCheckoutSession, StripeError } from "@/lib/billing/stripe";
 import { env } from "@/lib/env";
+import type { Idioma } from "@/lib/i18n/idiomas";
 import { requireSupportWrite } from "@/lib/impersonate/support";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -34,6 +35,21 @@ export const runtime = "nodejs";
 const corpoSchema = z.object({
   plano: z.enum(["essencial", "pro", "ilimitado"]),
 });
+
+/**
+ * O idioma da interface traduzido para o vocabulário do Stripe.
+ *
+ * É um mapa, e não o código repassado direto, pelo mesmo motivo do
+ * `LOCALE_DE_DATA` em `lib/i18n/datas.ts`: os dois vocabulários coincidem hoje
+ * por acaso, não por contrato. Um idioma novo no produto passa a dar erro de
+ * compilação aqui e obriga quem o acrescentou a decidir o que o Stripe mostra
+ * — em vez de mandar uma tag que o Stripe não conhece e ver o formulário
+ * voltar calado para o inglês.
+ */
+const LOCALE_DO_STRIPE: Record<Idioma, string> = {
+  "pt-BR": "pt-BR",
+  es: "es",
+};
 
 function baseUrl(req: NextRequest): string {
   const configurada = env.NEXT_PUBLIC_APP_URL;
@@ -118,6 +134,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // tela. Ver `redirect_on_completion` em lib/billing/stripe.ts.
       returnUrl: `${base}/app/settings/billing?sessao={CHECKOUT_SESSION_ID}`,
       trialDias: null,
+      locale: LOCALE_DO_STRIPE[authz.user.idioma],
       // Estável por (org, plano, MINUTO): um duplo-clique reaproveita a MESMA
       // sessão do Stripe em vez de abrir duas. Não usa o requestId, que é novo
       // a cada chamada e portanto nunca deduplicaria nada.

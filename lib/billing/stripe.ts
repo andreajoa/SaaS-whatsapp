@@ -210,6 +210,14 @@ export function criarCheckoutSession(params: {
   customerId: string | null;
   returnUrl: string;
   trialDias: number | null;
+  /**
+   * O idioma DO FORMULÁRIO, que é um iframe do Stripe e portanto não é
+   * alcançado pelo nosso dicionário. Sem isto ele cai no inglês: medido em
+   * produção, a moldura estava em português e o miolo dizia "Payment method",
+   * "Cardholder name", "Save my information" — na tela em que a pessoa digita
+   * o número do cartão, que é o pior lugar possível para ela hesitar.
+   */
+  locale: string;
   idempotencyKey: string;
 }): Promise<StripeCheckoutSession> {
   return chamar<StripeCheckoutSession>("/checkout/sessions", {
@@ -218,6 +226,7 @@ export function criarCheckoutSession(params: {
     corpo: {
       mode: "subscription",
       ui_mode: "embedded",
+      locale: params.locale,
       line_items: [{ price: params.priceId, quantity: 1 }],
       redirect_on_completion: "if_required",
       return_url: params.returnUrl,

@@ -118,10 +118,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // tela. Ver `redirect_on_completion` em lib/billing/stripe.ts.
       returnUrl: `${base}/app/settings/billing?sessao={CHECKOUT_SESSION_ID}`,
       trialDias: null,
-      // Estável por (org, plano, hora): um duplo-clique reaproveita a MESMA
+      // Estável por (org, plano, MINUTO): um duplo-clique reaproveita a MESMA
       // sessão do Stripe em vez de abrir duas. Não usa o requestId, que é novo
       // a cada chamada e portanto nunca deduplicaria nada.
-      idempotencyKey: `checkout:${orgId}:${plano}:${new Date().toISOString().slice(0, 13)}`,
+      //
+      // Por que minuto e não hora: o Stripe guarda por 24h a resposta da
+      // chave **inclusive quando ela foi erro**. Com janela de uma hora, um
+      // parâmetro inválido — corrigido e reimplantado — continuaria devolvendo
+      // o erro velho até a hora virar. Foi o que aconteceu com
+      // `customer_creation`, medido em produção. Uma sessão de checkout aberta
+      // e não usada não cobra nada e expira sozinha, então o custo de abrir
+      // duas é zero; o de repetir um erro já consertado é a venda.
+      idempotencyKey: `checkout:${orgId}:${plano}:${new Date().toISOString().slice(0, 16)}`,
     });
     clientSecret = sessao.client_secret;
     sessionId = sessao.id;

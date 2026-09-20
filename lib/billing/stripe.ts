@@ -236,9 +236,14 @@ export function criarCheckoutSession(params: {
       // Reaproveitar o customer quando já existe é o que impede a mesma
       // empresa de virar dois clientes no Stripe (e duas cobranças) ao assinar
       // de novo depois de cancelar.
+      //
+      // Sem `customer_creation` de propósito: em `mode: "subscription"` o
+      // Stripe SEMPRE cria o cliente, e mandar o parâmetro é erro duro
+      // ("`customer_creation` can only be used in `payment` mode") — 502 na
+      // nossa rota e a tela de pagamento nunca monta. Medido em produção.
       ...(params.customerId
         ? { customer: params.customerId }
-        : { customer_email: params.email, customer_creation: "always" }),
+        : { customer_email: params.email }),
       allow_promotion_codes: true,
     },
   });

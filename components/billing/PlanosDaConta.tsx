@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useT } from "@/lib/i18n/IdiomaProvider";
 import { cn } from "@/lib/utils";
 import {
   ORDEM_DOS_PLANOS,
@@ -75,6 +76,7 @@ export function PlanosDaConta({
   temAssinatura,
   sessaoDeRetorno,
 }: Props) {
+  const t = useT();
   const [passo, setPasso] = useState<Passo>(
     sessaoDeRetorno ? { nome: "confirmando", sessionId: sessaoDeRetorno } : { nome: "escolher" },
   );
@@ -98,7 +100,7 @@ export function PlanosDaConta({
         | null;
 
       if (!res.ok) {
-        toast.error(json?.error?.message ?? "Não foi possível confirmar o pagamento.");
+        toast.error(json?.error?.message ?? t("Não foi possível confirmar o pagamento."));
         setPasso({ nome: "escolher" });
         return;
       }
@@ -110,10 +112,10 @@ export function PlanosDaConta({
       }
       setPasso({ nome: "pronto", plano: json.data.plano ?? null });
     } catch {
-      toast.error("Falha de rede ao confirmar o pagamento.");
+      toast.error(t("Falha de rede ao confirmar o pagamento."));
       setPasso({ nome: "escolher" });
     }
-  }, []);
+  }, [t]);
 
   // A volta do boleto/Pix cai direto em `confirmando`.
   const jaConfirmou = useRef(false);
@@ -138,7 +140,7 @@ export function PlanosDaConta({
       if (!res.ok || !json?.data?.clientSecret || !json.data.sessionId) {
         // A mensagem do servidor é escrita para quem lê (ver as rotas); passá-la
         // adiante é melhor que um "algo deu errado" que não diz o que fazer.
-        toast.error(json?.error?.message ?? "Não foi possível abrir o pagamento agora.");
+        toast.error(json?.error?.message ?? t("Não foi possível abrir o pagamento agora."));
         return;
       }
       setPasso({
@@ -149,7 +151,7 @@ export function PlanosDaConta({
       });
       jaConfirmou.current = false;
     } catch {
-      toast.error("Falha de rede. Tente de novo.");
+      toast.error(t("Falha de rede. Tente de novo."));
     } finally {
       setOcupado(null);
     }
@@ -167,7 +169,7 @@ export function PlanosDaConta({
         | { data?: { url?: string }; error?: { message?: string } }
         | null;
       if (!res.ok || !json?.data?.url) {
-        toast.error(json?.error?.message ?? "Não foi possível abrir o portal agora.");
+        toast.error(json?.error?.message ?? t("Não foi possível abrir o portal agora."));
         setOcupado(null);
         return;
       }
@@ -176,7 +178,7 @@ export function PlanosDaConta({
       // baixar nota fiscal são operações do Stripe, não nossas.
       window.location.assign(json.data.url);
     } catch {
-      toast.error("Falha de rede. Tente de novo.");
+      toast.error(t("Falha de rede. Tente de novo."));
       setOcupado(null);
     }
   }
@@ -190,14 +192,16 @@ export function PlanosDaConta({
       <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
         <Card className="flex flex-col gap-4 p-5 lg:sticky lg:top-6">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-medium text-muted-foreground">Você está assinando</h2>
-            <Badge variant="secondary">Mensal</Badge>
+            <h2 className="text-sm font-medium text-muted-foreground">
+              {t("Você está assinando")}
+            </h2>
+            <Badge variant="secondary">{t("Mensal")}</Badge>
           </div>
           <div>
             <p className="text-lg font-semibold">{plano.nome}</p>
             <p className="mt-1 text-3xl font-semibold tracking-tight">
               {precoLegivel(plano)}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">/mês</span>
+              <span className="ml-1 text-sm font-normal text-muted-foreground">{t("/mês")}</span>
             </p>
           </div>
           <Separator />
@@ -205,7 +209,7 @@ export function PlanosDaConta({
             {plano.destaques.map((d) => (
               <li key={d} className="flex gap-2">
                 <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
-                <span>{d}</span>
+                <span>{t(d)}</span>
               </li>
             ))}
           </ul>
@@ -213,8 +217,7 @@ export function PlanosDaConta({
           <p className="flex items-start gap-2 text-xs text-muted-foreground">
             <ShieldCheck aria-hidden className="mt-0.5 size-4 shrink-0" />
             <span>
-              Cancele quando quiser, sem multa. Os dados da sua empresa continuam
-              seus.
+              {t("Cancele quando quiser, sem multa. Os dados da sua empresa continuam seus.")}
             </span>
           </p>
           <Button
@@ -222,7 +225,7 @@ export function PlanosDaConta({
             className="mt-auto"
             onClick={() => setPasso({ nome: "escolher" })}
           >
-            Escolher outro plano
+            {t("Escolher outro plano")}
           </Button>
         </Card>
 
@@ -230,8 +233,9 @@ export function PlanosDaConta({
           <div className="flex items-center gap-2 border-b px-5 py-3 text-xs text-muted-foreground">
             <Lock aria-hidden className="size-3.5" />
             <span>
-              Pagamento processado pelo Stripe. O número do cartão não passa pelos
-              nossos servidores.
+              {t(
+                "Pagamento processado pelo Stripe. O número do cartão não passa pelos nossos servidores.",
+              )}
             </span>
           </div>
           <div className="p-2 sm:p-4">
@@ -250,9 +254,9 @@ export function PlanosDaConta({
     return (
       <Card className="flex flex-col items-center gap-3 p-12 text-center">
         <Loader2 aria-hidden className="size-6 animate-spin text-accent" />
-        <p className="text-sm font-medium">Confirmando o pagamento…</p>
+        <p className="text-sm font-medium">{t("Confirmando o pagamento…")}</p>
         <p className="text-sm text-muted-foreground">
-          Não feche esta página. Leva alguns segundos.
+          {t("Não feche esta página. Leva alguns segundos.")}
         </p>
       </Card>
     );
@@ -267,17 +271,17 @@ export function PlanosDaConta({
           <Check aria-hidden className="size-6 text-accent" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold">Assinatura ativa</h2>
+          <h2 className="text-lg font-semibold">{t("Assinatura ativa")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {nome
-              ? `Seu plano ${nome} já está valendo. O recibo foi para o seu e-mail.`
-              : "Pagamento confirmado. O recibo foi para o seu e-mail."}
+              ? `${t("Seu plano")} ${nome} ${t("já está valendo. O recibo foi para o seu e-mail.")}`
+              : t("Pagamento confirmado. O recibo foi para o seu e-mail.")}
           </p>
         </div>
         {/* Recarrega do SERVIDOR: o gate de acesso é calculado no layout, e só
             um novo render dele solta a trava para o resto do sistema. */}
         <Button onClick={() => window.location.assign("/app/settings/billing")}>
-          Continuar
+          {t("Continuar")}
         </Button>
       </Card>
     );
@@ -289,21 +293,22 @@ export function PlanosDaConta({
       {temAssinatura ? (
         <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
           <div>
-            <h2 className="text-sm font-semibold">Gerenciar assinatura</h2>
+            <h2 className="text-sm font-semibold">{t("Gerenciar assinatura")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Trocar de plano, atualizar o cartão, baixar faturas ou cancelar.
+              {t("Trocar de plano, atualizar o cartão, baixar faturas ou cancelar.")}
             </p>
           </div>
           <Button variant="secondary" disabled={ocupado !== null} onClick={() => void abrirPortal()}>
-            {ocupado === "portal" ? "Abrindo…" : "Abrir portal de cobrança"}
+            {ocupado === "portal" ? t("Abrindo…") : t("Abrir portal de cobrança")}
           </Button>
         </Card>
       ) : null}
 
       {vendidos.length === 0 ? (
         <Card className="p-5 text-sm text-muted-foreground">
-          Nenhum plano está configurado nesta instalação. Quem administra o sistema
-          precisa cadastrar os preços no Stripe.
+          {t(
+            "Nenhum plano está configurado nesta instalação. Quem administra o sistema precisa cadastrar os preços no Stripe.",
+          )}
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
@@ -320,28 +325,28 @@ export function PlanosDaConta({
                 )}
               >
                 {destaque ? (
-                  <Badge className="absolute -top-2.5 left-5">Mais escolhido</Badge>
+                  <Badge className="absolute -top-2.5 left-5">{t("Mais escolhido")}</Badge>
                 ) : null}
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-base font-semibold">{plano.nome}</h3>
-                  {atual ? <Badge variant="success">Seu plano</Badge> : null}
+                  {atual ? <Badge variant="success">{t("Seu plano")}</Badge> : null}
                 </div>
                 <p className="text-2xl font-semibold tracking-tight">
                   {precoLegivel(plano)}
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">/mês</span>
+                  <span className="ml-1 text-sm font-normal text-muted-foreground">{t("/mês")}</span>
                 </p>
                 <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
                   {plano.destaques.map((d) => (
                     <li key={d} className="flex gap-2">
                       <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
-                      <span>{d}</span>
+                      <span>{t(d)}</span>
                     </li>
                   ))}
                 </ul>
                 <div className="mt-auto pt-2">
                   {atual ? (
                     <Button variant="secondary" className="w-full" disabled>
-                      Plano atual
+                      {t("Plano atual")}
                     </Button>
                   ) : (
                     <Button
@@ -356,10 +361,10 @@ export function PlanosDaConta({
                       }
                     >
                       {ocupado === id
-                        ? "Abrindo…"
+                        ? t("Abrindo…")
                         : temAssinatura
-                          ? "Trocar para este plano"
-                          : "Assinar"}
+                          ? t("Trocar para este plano")
+                          : t("Assinar")}
                     </Button>
                   )}
                 </div>
@@ -371,8 +376,9 @@ export function PlanosDaConta({
 
       {semChavePublica && !temAssinatura ? (
         <p className="text-sm text-muted-foreground">
-          O pagamento está indisponível: falta `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-          nesta instalação.
+          {t("O pagamento está indisponível: falta")}{" "}
+          <code className="font-mono text-xs">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code>{" "}
+          {t("nesta instalação.")}
         </p>
       ) : null}
     </div>

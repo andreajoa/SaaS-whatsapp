@@ -26,6 +26,8 @@
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
+import { useT } from "@/lib/i18n/IdiomaProvider";
+
 const PK = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 
 /**
@@ -51,11 +53,12 @@ interface Props {
 }
 
 export function CheckoutEmbutido({ clientSecret, onConcluido }: Props) {
+  const t = useT();
+
   if (!stripePromise) {
     return (
       <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-        O pagamento não está disponível: falta a chave publicável do Stripe nesta
-        instalação.
+        {t("O pagamento não está disponível: falta a chave publicável do Stripe nesta instalação.")}
       </div>
     );
   }

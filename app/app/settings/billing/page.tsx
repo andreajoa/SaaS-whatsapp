@@ -4,6 +4,7 @@ import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { ROLE_RANK } from "@/lib/auth/types";
 import { emailDeSuporte } from "@/lib/branding/saida";
 import { Card } from "@/components/ui/card";
+import { tagDeIdioma } from "@/lib/i18n/datas";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { PlanosDaConta } from "@/components/billing/PlanosDaConta";
 import { estadoDaCobranca } from "@/lib/billing/assinatura";
@@ -107,12 +108,16 @@ export default async function BillingPage({
         <Card className="border-accent/40 bg-accent/5 p-5">
           <h2 className="text-sm font-semibold">
             {estado.diasRestantes === 0
-              ? "Seu período de avaliação termina hoje"
-              : `Faltam ${estado.diasRestantes} dia${estado.diasRestantes === 1 ? "" : "s"} de avaliação`}
+              ? traduzir("Seu período de avaliação termina hoje", idioma)
+              : estado.diasRestantes === 1
+                ? traduzir("Falta 1 dia de avaliação", idioma)
+                : `${traduzir("Faltam", idioma)} ${estado.diasRestantes} ${traduzir("dias de avaliação", idioma)}`}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            São {DIAS_DE_TRIAL} dias com tudo liberado. Escolha um plano antes do fim
-            para não interromper os atendimentos.
+            {`${traduzir("São", idioma)} ${DIAS_DE_TRIAL} ${traduzir(
+              "dias com tudo liberado. Escolha um plano antes do fim para não interromper os atendimentos.",
+              idioma,
+            )}`}
           </p>
         </Card>
       ) : null}
@@ -120,27 +125,34 @@ export default async function BillingPage({
       {estado.acesso === "vencido" ? (
         <Card className="border-destructive/40 bg-destructive/5 p-5">
           <h2 className="text-sm font-semibold">
-            {estado.jaAssinou ? "Sua assinatura está parada" : "Seu período de avaliação acabou"}
+            {estado.jaAssinou
+              ? traduzir("Sua assinatura está parada", idioma)
+              : traduzir("Seu período de avaliação acabou", idioma)}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {estado.jaAssinou
-              ? "O último pagamento não foi concluído. Regularize para voltar a atender."
-              : "Escolha um plano para continuar atendendo pelo WhatsApp."}
+              ? traduzir(
+                  "O último pagamento não foi concluído. Regularize para voltar a atender.",
+                  idioma,
+                )
+              : traduzir("Escolha um plano para continuar atendendo pelo WhatsApp.", idioma)}
           </p>
         </Card>
       ) : null}
 
       {estado.acesso === "em_dia" && estado.cancelaNoFimDoCiclo && estado.expiraEm ? (
         <Card className="border-destructive/40 bg-destructive/5 p-5">
-          <h2 className="text-sm font-semibold">Assinatura cancelada</h2>
+          <h2 className="text-sm font-semibold">{traduzir("Assinatura cancelada", idioma)}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            O acesso continua até{" "}
-            {estado.expiraEm.toLocaleDateString("pt-BR", {
+            {traduzir("O acesso continua até", idioma)}{" "}
+            {/* A data acompanha quem está lendo (lib/i18n/datas.ts): uma tela em
+                espanhol com "20 de setembro" parece bug, não decisão. */}
+            {estado.expiraEm.toLocaleDateString(tagDeIdioma(idioma), {
               day: "2-digit",
               month: "long",
               year: "numeric",
             })}
-            . Você pode reativar no portal de cobrança.
+            {traduzir(". Você pode reativar no portal de cobrança.", idioma)}
           </p>
         </Card>
       ) : null}

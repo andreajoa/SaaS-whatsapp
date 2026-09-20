@@ -8353,6 +8353,103 @@ export const DICIONARIO: Traducoes = {
   },
   "Convite reenviado.": { es: "Invitación reenviada." },
   "Convite revogado.": { es: "Invitación revocada." },
+
+  // ─── Plano e cobrança ─────────────────────────────────────────────────────
+  //
+  // Só o SaaS hospedado vê estas telas (`instalacaoCobra()`), e é a tela em que
+  // a pessoa digita o número do cartão — o pior lugar possível para ela hesitar
+  // por causa de uma frase no idioma errado. O formulário em si é um iframe do
+  // Stripe e NÃO passa por aqui: quem o traduz é o `locale` enviado na criação
+  // da sessão (app/api/v1/billing/checkout/route.ts).
+  "Plano e cobrança": { es: "Plan y facturación" },
+  "Esta instalação não cobra assinatura": { es: "Esta instalación no cobra suscripción" },
+  "Este sistema roda no seu próprio servidor e não tem mensalidade.": {
+    es: "Este sistema funciona en tu propio servidor y no tiene mensualidad.",
+  },
+  "Seu período de avaliação termina hoje": { es: "Tu período de evaluación termina hoy" },
+  "Falta 1 dia de avaliação": { es: "Falta 1 día de evaluación" },
+  "Faltam": { es: "Faltan" },
+  "dias de avaliação": { es: "días de evaluación" },
+  "São": { es: "Son" },
+  "dias com tudo liberado. Escolha um plano antes do fim para não interromper os atendimentos.": {
+    es: "días con todo habilitado. Elige un plan antes del final para no interrumpir la atención.",
+  },
+  "Sua assinatura está parada": { es: "Tu suscripción está detenida" },
+  "Seu período de avaliação acabou": { es: "Tu período de evaluación terminó" },
+  "O último pagamento não foi concluído. Regularize para voltar a atender.": {
+    es: "El último pago no se completó. Regularízalo para volver a atender.",
+  },
+  "Escolha um plano para continuar atendendo pelo WhatsApp.": {
+    es: "Elige un plan para seguir atendiendo por WhatsApp.",
+  },
+  "Assinatura cancelada": { es: "Suscripción cancelada" },
+  "O acesso continua até": { es: "El acceso continúa hasta" },
+  ". Você pode reativar no portal de cobrança.": {
+    es: ". Puedes reactivarla en el portal de facturación.",
+  },
+  "Gerenciar assinatura": { es: "Gestionar suscripción" },
+  "Trocar de plano, atualizar o cartão, baixar faturas ou cancelar.": {
+    es: "Cambiar de plan, actualizar la tarjeta, descargar facturas o cancelar.",
+  },
+  "Abrir portal de cobrança": { es: "Abrir portal de facturación" },
+  "Abrindo…": { es: "Abriendo…" },
+  "Nenhum plano está configurado nesta instalação. Quem administra o sistema precisa cadastrar os preços no Stripe.":
+    {
+      es: "No hay ningún plan configurado en esta instalación. Quien administra el sistema debe registrar los precios en Stripe.",
+    },
+  "Mais escolhido": { es: "Más elegido" },
+  "Seu plano": { es: "Tu plan" },
+  "/mês": { es: "/mes" },
+  "Mensal": { es: "Mensual" },
+  "Plano atual": { es: "Plan actual" },
+  "Trocar para este plano": { es: "Cambiar a este plan" },
+  "Assinar": { es: "Suscribirse" },
+  "Você está assinando": { es: "Estás contratando" },
+  "Cancele quando quiser, sem multa. Os dados da sua empresa continuam seus.": {
+    es: "Cancela cuando quieras, sin penalización. Los datos de tu empresa siguen siendo tuyos.",
+  },
+  "Escolher outro plano": { es: "Elegir otro plan" },
+  "Pagamento processado pelo Stripe. O número do cartão não passa pelos nossos servidores.": {
+    es: "Pago procesado por Stripe. El número de la tarjeta no pasa por nuestros servidores.",
+  },
+  "Confirmando o pagamento…": { es: "Confirmando el pago…" },
+  "Não feche esta página. Leva alguns segundos.": {
+    es: "No cierres esta página. Tarda unos segundos.",
+  },
+  "Assinatura ativa": { es: "Suscripción activa" },
+  "já está valendo. O recibo foi para o seu e-mail.": {
+    es: "ya está activo. El recibo se envió a tu correo.",
+  },
+  "Pagamento confirmado. O recibo foi para o seu e-mail.": {
+    es: "Pago confirmado. El recibo se envió a tu correo.",
+  },
+  "Não foi possível confirmar o pagamento.": { es: "No se pudo confirmar el pago." },
+  "Falha de rede ao confirmar o pagamento.": { es: "Error de red al confirmar el pago." },
+  "Não foi possível abrir o pagamento agora.": { es: "No se pudo abrir el pago ahora." },
+  "Não foi possível abrir o portal agora.": { es: "No se pudo abrir el portal ahora." },
+  "Falha de rede. Tente de novo.": { es: "Error de red. Inténtalo de nuevo." },
+  "O pagamento não está disponível: falta a chave publicável do Stripe nesta instalação.": {
+    es: "El pago no está disponible: falta la clave publicable de Stripe en esta instalación.",
+  },
+  "O pagamento está indisponível: falta": { es: "El pago no está disponible: falta" },
+  "nesta instalação.": { es: "en esta instalación." },
+
+  // Os destaques de `lib/billing/planos.ts`, que a tela renderiza por `t(d)`.
+  // O guarda não os alcança — a chave não é literal na chamada —, então é aqui,
+  // e só aqui, que eles deixam de sair em português para quem lê espanhol.
+  "Até 3 pessoas no time": { es: "Hasta 3 personas en el equipo" },
+  "Atendente de IA com a sua base de conhecimento": {
+    es: "Agente de IA con tu base de conocimiento",
+  },
+  "Funil, contatos e histórico completos": { es: "Embudo, contactos e historial completos" },
+  "Até 3 números de WhatsApp": { es: "Hasta 3 números de WhatsApp" },
+  "Até 10 pessoas no time": { es: "Hasta 10 personas en el equipo" },
+  "Follow-up automático e campanhas": { es: "Seguimiento automático y campañas" },
+  "Relatórios e metas de atendimento": { es: "Informes y metas de atención" },
+  "Números de WhatsApp sem limite": { es: "Números de WhatsApp sin límite" },
+  "Time sem limite": { es: "Equipo sin límite" },
+  "API e webhooks liberados": { es: "API y webhooks habilitados" },
+  "Suporte prioritário": { es: "Soporte prioritario" },
 };
 
 /**

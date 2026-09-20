@@ -81,6 +81,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const { marca } = await marcaResolvida();
   const { name } = marca;
   return {
+    // Sem isto todo `alternates.canonical` vira href relativo, e canonical
+    // relativo é o jeito de declarar a página canônica sem dizer de qual host —
+    // o que num produto que roda em domínio de cliente é exatamente a pergunta
+    // em aberto. É a mesma `NEXT_PUBLIC_APP_URL` do `robots.ts`/`sitemap.ts`.
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     title: {
       default: `${name} — atendimento e vendas por WhatsApp com agentes de IA`,
       template: `%s · ${name}`,

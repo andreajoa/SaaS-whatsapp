@@ -3,7 +3,7 @@
   "framework": "nextjs",
   "buildCommand": "NEXT_PHASE=phase-production-build pnpm build",
   "regions": [
-    "gru1"
+    "iad1"
   ],
   "functions": {
     "app/api/internal/agents/run/route.ts": {

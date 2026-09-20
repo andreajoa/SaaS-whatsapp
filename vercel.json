@@ -1,5 +1,76 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "NEXT_PHASE=phase-production-build pnpm build"
+  "buildCommand": "NEXT_PHASE=phase-production-build pnpm build",
+  "regions": [
+    "gru1"
+  ],
+  "functions": {
+    "app/api/v1/cron/agent-dispatcher/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/followup-flow-worker/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/event-log-drain/route.ts": {
+      "maxDuration": 45
+    },
+    "app/api/v1/cron/routing-worker/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/recover-stuck-messages/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/storage-redaction/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/snooze-watcher/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/attendant-heartbeat/route.ts": {
+      "maxDuration": 25
+    },
+    "app/api/v1/cron/webhook-log-retention/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/channel-health/route.ts": {
+      "maxDuration": 45
+    },
+    "app/api/v1/cron/contact-avatars/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/agenda-google-refresh/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/agenda-google-sync/route.ts": {
+      "maxDuration": 90
+    },
+    "app/api/v1/cron/agenda-google-push/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/agenda-reminder/route.ts": {
+      "maxDuration": 45
+    },
+    "app/api/v1/cron/risk-watcher/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/contact-phones/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/contact-proposals-watcher/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/lgpd-sla-watcher/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/kb-conversations-batch/route.ts": {
+      "maxDuration": 120
+    },
+    "app/api/v1/cron/sync-model-catalog/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/v1/cron/data-retention/route.ts": {
+      "maxDuration": 120
+    }
+  }
 }

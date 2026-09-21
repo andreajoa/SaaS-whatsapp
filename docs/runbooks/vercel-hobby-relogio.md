@@ -86,9 +86,63 @@ Na fila de follow-ups, o status sai de **Aguardando resposta**.
 
 ## O que o tick faz (ordem)
 
+**Até 2026-09-20 o tick cobria QUATRO tarefas. Hoje cobre as 22.** A versão de
+quatro deixava dezoito rotas de `app/api/v1/cron/` sem ninguém para chamá-las no
+deploy hospedado — `agent-dispatcher` inclusive, que é *a IA responder*. Não dava
+erro: as rotas respondiam 200 a quem as chamasse à mão, o build passava, e a
+feature simplesmente não acontecia sozinha.
+
+Primeiro, **em processo** (chamada de função, sem rede — são baratas e rodam a
+cada minuto):
+
 1. `event-log-drain` — consome `message.received` (reatividade do follow-up)
 2. `followup-flow-worker` — aplica texto inbound + claim de enrollments + envio fixo
 3. `routing-worker`
 4. `recover-stuck-messages`
 
-Definição canônica: `lib/relogio/tarefas.ts` + `lib/relogio/executar.ts`.
+Depois, **por HTTP**, as demais rotas que estiverem **vencidas** — cada uma na
+própria função, com o próprio `maxDuration` (o tick tem 60 s;
+`kb-conversations-batch` precisa de 120).
+
+### O que "vencida" quer dizer, e por que não é "o minuto casou"
+
+Quem bate o relógio de graça **atrasa**: 5 a 15 minutos é normal no GitHub
+Actions. Se o tick perguntasse *"o minuto atual casa com a cadência?"*, quase
+tudo passaria batido e `contact-proposals-watcher` (`17 * * * *`) não rodaria
+praticamente nunca.
+
+A pergunta é outra: **"esta tarefa rodou depois da última hora em que deveria
+ter rodado?"** A resposta vem de `relogio_execucoes` (migration 0241), uma linha
+por tarefa. Consequências que importam:
+
+- atraso do agendador é **inofensivo** — a janela continua valendo;
+- depois de uma queda, cada tarefa se recupera **uma vez**, não uma por batida;
+- bater de minuto em minuto (Opção B) **não** faz a varredura de 5 min rodar
+  cinco vezes mais — ela continua rodando de 5 em 5;
+- o que não couber no orçamento de 40 s do tick **não se perde**: fica vencido e
+  o próximo tick o pega primeiro, porque a fila é ordenada pelo mais atrasado.
+
+### Ver o que está parado
+
+```sql
+select tarefa, ultima_execucao, ultimo_status, falhas_seguidas, duracao_ms
+  from public.relogio_execucoes
+ order by ultima_execucao asc;
+```
+
+`falhas_seguidas` zera no primeiro sucesso — é o que distingue "falhou agora" de
+"está quebrada há 40 rodadas". Uma rota que falha **ainda assim avança**
+`ultima_execucao`, de propósito: sem isso, uma rota diária quebrada seria
+rechamada a cada batida durante 24 h. Rota quebrada tem de doer no painel, não
+na conta.
+
+### Duas coisas que precisam existir na Vercel
+
+O despacho por HTTP precisa de `NEXT_PUBLIC_APP_URL` e de
+`INTERNAL_CRON_SECRET` (ou `INTERNAL_SECRET`). Faltando qualquer um, o tick
+responde 200 **dizendo isso** numa tarefa chamada `despacho-http` — um tick que
+devolvesse 200 calado sobre as dezoito seria indistinguível de um tick saudável.
+
+Definição canônica: `lib/relogio/agenda.ts` (as 22 rotas e suas cadências,
+espelho do crontab do self-host, com paridade cobrada em
+`tests/unit/relogio-agenda-bate-com-scheduler.test.ts`) + `lib/relogio/executar.ts`.

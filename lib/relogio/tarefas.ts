@@ -1,9 +1,16 @@
 /**
- * Trabalhos de MINUTO que o Hobby da Vercel não agenda.
+ * Trabalhos de MINUTO que o tick faz DENTRO do próprio processo.
  *
- * No self-host o contêiner `scheduler` já chama cada rota. Esta lista é o
- * que o relógio HTTP (GitHub Actions, cron-job.org, botão na tela) precisa
- * cobrir para follow-up, fila e dreno de eventos não pararem.
+ * ⚠️ **Esta NÃO é a lista do que o relógio cobre.** A lista completa — as 22
+ * rotas de `app/api/v1/cron/` com suas cadências — é `lib/relogio/agenda.ts`,
+ * e é ela que tem paridade cobrada contra o crontab do self-host. Estas quatro
+ * são apenas as que rodam por chamada de função, sem rede, porque são baratas
+ * e rodam a cada minuto de qualquer forma.
+ *
+ * Por meses esta lista FOI a cobertura inteira, e dezoito rotas — incluindo o
+ * `agent-dispatcher`, que é a IA responder — não tinham quem as chamasse no
+ * deploy hospedado. O texto acima existe para que ninguém volte a ler estas
+ * quatro como se fossem a história completa.
  */
 export const TAREFAS_DO_RELOGIO = [
   {

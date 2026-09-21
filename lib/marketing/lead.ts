@@ -5,9 +5,20 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *
  * ─── Por que isto não é um `upsert` de uma linha ───────────────────────────
  *
- * `site_leads` tem `unique (lower(email))`, então a tentação é
- * `upsert({ onConflict: "email" })` e pronto. Isso está errado de três jeitos
- * diferentes, e os três só aparecem semanas depois:
+ * `site_leads` tem `unique (lower(email))`, então a tentação é um `upsert()`
+ * com o alvo de conflito apontado para a coluna `email`, e pronto. Isso está
+ * errado de QUATRO jeitos diferentes. O quarto é imediato e foi medido: o
+ * índice é FUNCIONAL, e o Postgres casa `ON CONFLICT` por expressão — `(email)`
+ * não é `(lower(email))`, então a instrução é recusada e NADA é gravado. Era
+ * o estado do formulário de contato até 21/09/2026, achado por
+ * `tests/invariants/on-conflict-aponta-para-constraint-real.test.ts`.
+ *
+ * (A citação do alvo vai em prosa, e não no formato real, porque esse
+ * invariante varre o repo por regex e leria um exemplo em comentário como um
+ * uso de verdade.)
+ *
+ * Os outros três só apareceriam semanas depois, e são o motivo de nem um
+ * `upsert` CERTO servir aqui:
  *
  *  1. **Reiniciaria a sequência.** `proximo_passo` é o cursor dos 15 e-mails.
  *     Um `upsert` que grava o default `0` faz quem já recebeu os quinze

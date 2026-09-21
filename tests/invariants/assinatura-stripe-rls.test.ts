@@ -242,27 +242,53 @@ describe("org_subscriptions: quem paga não enxerga a conta do vizinho", () => {
 
   it("a RLS está LIGADA", () => {
     expect(
-      sql("select relrowsecurity from pg_class where oid = 'public.org_subscriptions'::regclass;").trim(),
+      sql(
+        "select relrowsecurity from pg_class where oid = 'public.org_subscriptions'::regclass;",
+      ).trim(),
       "RLS desligada: a policy de leitura vira decoração",
     ).toBe("t");
   });
 
-  it("não existe policy de ESCRITA — a ausência é a decisão, não um esquecimento", () => {
+  it("não existe policy PERMISSIVA de escrita — a ausência é a decisão, não um esquecimento", () => {
     // Os casos de escrita acima medem o efeito; este mede a CAUSA. Sem ele, o
     // dia em que alguém criar uma policy de update permissiva quebraria três
     // casos com mensagens sobre plano e trial, e nenhuma delas diria onde
     // mexer.
+    //
+    // `permissive = 'PERMISSIVE'` não é detalhe: esta versão do caso cobrava
+    // policy NENHUMA e ficou vermelha contra o baseline real, que tem
+    // `support_write_insert/update/delete` em org_subscriptions — três
+    // RESTRICTIVE que o laço de suporte temporário (migration 0220) põe em
+    // TODA tabela com `organization_id`. Uma RESTRICTIVE só ESTREITA: ela não
+    // concede escrita a ninguém, e sem uma permissiva ao lado o resultado
+    // continua sendo zero linhas escritas. Cobrar a ausência das duas
+    // naturezas confundia "o suporte não pode escrever aqui" com "o tenant
+    // pode" — e teria obrigado a abrir uma exceção no laço de suporte para
+    // calar um teste que media a coisa errada.
     const escrita = sql(`
       select coalesce(string_agg(policyname || ':' || cmd, ',' order by policyname), 'NENHUMA')
         from pg_policies
        where schemaname = 'public' and tablename = 'org_subscriptions'
-         and cmd <> 'SELECT';
+         and cmd <> 'SELECT'
+         and permissive = 'PERMISSIVE';
     `).trim();
     expect(
       escrita,
-      "apareceu policy de escrita em org_subscriptions: quem escreve aqui é o webhook do Stripe (service_role), " +
-        "e uma policy para `authenticated` devolve ao tenant a caneta que assina o próprio plano",
+      "apareceu policy PERMISSIVA de escrita em org_subscriptions: quem escreve aqui é o webhook do Stripe " +
+        "(service_role), e uma policy para `authenticated` devolve ao tenant a caneta que assina o próprio plano",
     ).toBe("NENHUMA");
+  });
+
+  it("CONTROLE: a sonda ENXERGA as restritivas que existem", () => {
+    // Sem esta metade, um `permissive = 'PERMISSIVE'` digitado errado (ou um
+    // `pg_policies` sem a coluna) devolveria 'NENHUMA' para tudo e o caso
+    // acima passaria por não medir nada.
+    const restritivas = sql(`
+      select count(*) from pg_policies
+       where schemaname = 'public' and tablename = 'org_subscriptions'
+         and cmd <> 'SELECT' and permissive = 'RESTRICTIVE';
+    `).trim();
+    expect(Number(restritivas), "o laço de suporte da 0220 deveria ter posto 3 aqui").toBe(3);
   });
 });
 
@@ -288,7 +314,10 @@ describe("billing_webhook_events: registro de plataforma, de ninguém", () => {
   });
 
   it("`authenticated` é BARRADO ao ler — permission denied, não zero linhas", () => {
-    const erro = erroSob("authenticated", "select stripe_event_id from public.billing_webhook_events");
+    const erro = erroSob(
+      "authenticated",
+      "select stripe_event_id from public.billing_webhook_events",
+    );
     expect(erro, "`authenticated` leu a fila de webhooks sem erro").not.toBeNull();
     expect(erro).toContain("permission denied");
   });

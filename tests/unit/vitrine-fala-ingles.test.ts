@@ -46,6 +46,11 @@ const TELAS_DA_VITRINE = [
   "app/legal/page.tsx",
   "app/legal/[documento]/page.tsx",
   "app/contato/page.tsx",
+  // A saída da lista. Ela não vende — vende o contrário —, e mesmo assim é
+  // vitrine pela definição que importa aqui: é vista por estranho, nos três
+  // idiomas, e é a ÚLTIMA tela que ele lê. Meia-tradução na porta de saída é
+  // a frase final antes de a pessoa escolher entre sair e marcar como spam.
+  "app/descadastrar/[token]/page.tsx",
 ];
 
 /** Toda chave literal passada a `t()` / `textoDoSite()` nas telas da vitrine. */

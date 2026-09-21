@@ -34,7 +34,7 @@ import { authRateLimited } from "@/lib/auth/rate-limit";
 import { env } from "@/lib/env";
 import { fail, ok } from "@/lib/api/wrappers";
 import { sendEmail } from "@/lib/email/resend";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { registrarLead } from "@/lib/marketing/lead";
 import { paisDosCabecalhos } from "@/lib/mercado/visitante";
 
 export const dynamic = "force-dynamic";
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
   }
 
-  await registrarLead(dados.nome, dados.email, dados.mensagem, pais);
+  await registrarNoFunil(dados.nome, dados.email, dados.mensagem, pais);
   return ok({ enviado: true }, { requestId });
 }
 
@@ -137,32 +137,39 @@ export async function POST(req: NextRequest): Promise<Response> {
  * a escrita falhar, devolver erro faria o visitante mandar tudo de novo e o
  * suporte receber duas vezes. Falha aqui é perda de registro, não de mensagem.
  *
- * `onConflict: "email"` porque a tabela tem uma linha por pessoa: quem escreve
- * pela segunda vez atualiza a própria linha em vez de duplicá-la, e
- * `ignoreDuplicates` preserva o `created_at` e o passo da sequência de quem já
- * estava lá — sobrescrevê-los faria um contato de suporte reiniciar a campanha
- * de marketing de um cliente.
+ * ─── O `upsert` que estava aqui NUNCA gravou uma linha ────────────────────
+ *
+ * Era um `.upsert()` com o alvo de conflito apontado para a coluna `email`
+ * (e `ignoreDuplicates`), e o índice da tabela é `unique (lower(email))` —
+ * FUNCIONAL. (A citação vai em prosa, e não no formato real, porque o próprio
+ * invariante abaixo varre o repo por regex e leria um exemplo em comentário
+ * como um uso de verdade.) O Postgres casa
+ * `ON CONFLICT` por expressão, e `(email)` não é `(lower(email))`: toda
+ * chamada voltava com "there is no unique or exclusion constraint matching the
+ * ON CONFLICT specification". Como o retorno era ignorado e o `catch` só pega
+ * throw (o supabase-js devolve o erro, não lança), a falha era total e
+ * silenciosa: cada mensagem do formulário saía por e-mail e sumia do funil.
+ *
+ * Quem achou não foi teste de unidade nem revisão — foi
+ * `tests/invariants/on-conflict-aponta-para-constraint-real.test.ts`, que
+ * confere todo `onConflict` do repo contra os índices do banco de verdade.
+ *
+ * A troca não é por um `onConflict` certo: é por `registrarLead()`, que faz
+ * busca-e-insere justamente porque um `upsert` aqui reiniciaria a sequência de
+ * e-mails e ressuscitaria quem se descadastrou — o raciocínio inteiro está no
+ * cabeçalho de `lib/marketing/lead.ts`.
  */
-async function registrarLead(
+async function registrarNoFunil(
   nome: string,
   email: string,
   mensagem: string,
   pais: string,
 ): Promise<void> {
-  try {
-    const admin = createAdminClient();
-    await admin.from("site_leads").upsert(
-      {
-        email: email.toLowerCase(),
-        nome,
-        mensagem,
-        origem: "contato",
-        country: pais === "?" ? null : pais,
-      },
-      { onConflict: "email", ignoreDuplicates: true },
-    );
-  } catch {
-    // Sem service role configurada (self-host), ou tabela ausente num clone
-    // antigo. Nenhum dos dois é motivo para o visitante ver um erro.
-  }
+  await registrarLead({
+    email,
+    nome,
+    mensagem,
+    origem: "contato",
+    country: pais === "?" ? null : pais,
+  });
 }

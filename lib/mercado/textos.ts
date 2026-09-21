@@ -208,6 +208,25 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
     "Before you go: want to see how this works in practice?",
   "Deixe seu e-mail e receba, em poucas mensagens, o que um atendimento automático de verdade responde — e o que ele nunca deve responder sozinho.":
     "Leave your email and get, in a handful of messages, what real automated support answers — and what it should never answer on its own.",
+
+  // ── A saída da lista ───────────────────────────────────────────────────
+  // Esta tela é a ÚLTIMA que o estrangeiro lê. Meia-tradução aqui é a frase
+  // final antes de a pessoa decidir se sai pela porta ou pelo botão de spam —
+  // e o botão de spam não atinge o e-mail, atinge o domínio.
+  "Sair da lista": "Leave the list",
+  "Ao confirmar, seu e-mail deixa de receber as nossas mensagens. Não é preciso entrar em conta nenhuma.":
+    "Once you confirm, your email stops receiving our messages. No account sign-in needed.",
+  "Confirmar saída": "Confirm",
+  "Pronto, você saiu.": "Done, you are out.",
+  "Seu e-mail foi removido da lista. Nenhuma mensagem nova será enviada para ele.":
+    "Your email was removed from the list. No new message will be sent to it.",
+  "Este link não vale mais.": "This link is no longer valid.",
+  "Pode ter sido cortado pelo seu programa de e-mail. Abra o link mais recente que recebeu, ou escreva para a gente que tiramos você da lista à mão.":
+    "Your email app may have cut it short. Open the most recent link you received, or write to us and we will take you off the list by hand.",
+  "Não deu para concluir agora.": "We could not finish right now.",
+  "Você continua na lista. Tente de novo em instantes — e se insistir em falhar, escreva para a gente.":
+    "You are still on the list. Try again in a moment — and if it keeps failing, write to us.",
+  "Tentar de novo": "Try again",
 };
 
 /**

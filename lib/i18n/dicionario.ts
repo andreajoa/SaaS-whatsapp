@@ -9979,6 +9979,29 @@ export const DICIONARIO: Traducoes = {
     {
       es: "Esta instalación todavía no tiene dirección de soporte configurada. Busca a quien administra el sistema.",
     },
+
+  // ── A saída da lista (`/descadastrar/<token>`) ───────────────────────────
+  // "Tentar de novo" já existe acima, no vocabulário do produto.
+  "Sair da lista": { es: "Salir de la lista" },
+  "Ao confirmar, seu e-mail deixa de receber as nossas mensagens. Não é preciso entrar em conta nenhuma.":
+    {
+      es: "Al confirmar, tu correo deja de recibir nuestros mensajes. No hace falta iniciar sesión en ninguna cuenta.",
+    },
+  "Confirmar saída": { es: "Confirmar salida" },
+  "Pronto, você saiu.": { es: "Listo, ya saliste." },
+  "Seu e-mail foi removido da lista. Nenhuma mensagem nova será enviada para ele.": {
+    es: "Tu correo fue eliminado de la lista. No se enviará ningún mensaje nuevo a esa dirección.",
+  },
+  "Este link não vale mais.": { es: "Este enlace ya no es válido." },
+  "Pode ter sido cortado pelo seu programa de e-mail. Abra o link mais recente que recebeu, ou escreva para a gente que tiramos você da lista à mão.":
+    {
+      es: "Puede que tu programa de correo lo haya cortado. Abre el enlace más reciente que recibiste, o escríbenos y te sacamos de la lista a mano.",
+    },
+  "Não deu para concluir agora.": { es: "No se pudo completar ahora." },
+  "Você continua na lista. Tente de novo em instantes — e se insistir em falhar, escreva para a gente.":
+    {
+      es: "Sigues en la lista. Inténtalo de nuevo en unos instantes — y si sigue fallando, escríbenos.",
+    },
 };
 
 /**

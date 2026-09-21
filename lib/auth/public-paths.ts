@@ -99,6 +99,21 @@ export const PUBLIC_PATHS: RegExp[] = [
   // autenticação (Zod, limite por IP, campo-armadilha) está no cabeçalho da
   // rota, e a instalação que não cobra responde 404.
   /^\/api\/v1\/site\/lead$/,
+  // A SAÍDA DA LISTA — a tela e a rota que dá baixa.
+  //
+  // Quem clica para sair de uma lista de e-mails nunca teve sessão, e nunca
+  // vai ter: exigir login para SAIR é exatamente o que faz a pessoa clicar em
+  // "marcar como spam" — e esse clique não atinge o e-mail, atinge o DOMÍNIO,
+  // para sempre e para todos os destinatários seguintes.
+  //
+  // A autenticação aqui é o próprio token (32 hex, aleatório, índice único),
+  // conferido dentro de `lib/marketing/descadastro.ts`. Mesma natureza de
+  // `/team/accept-invite/` acima: a credencial está no caminho, não no cookie.
+  //
+  // A rota é a que o cabeçalho `List-Unsubscribe` anuncia ao Gmail (RFC 8058),
+  // e o Gmail faz POST dela dos datacenters dele, sem cookie nenhum.
+  /^\/descadastrar\/.+$/,
+  /^\/api\/v1\/site\/descadastrar$/,
   // O PAINEL DO FUNIL e a sua porta.
   //
   // "Público" aqui quer dizer "o proxy não decide", como em `/api/v1/cron/` e

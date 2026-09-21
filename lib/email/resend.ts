@@ -40,6 +40,17 @@ interface SendArgs {
    * Ausente usa o endereço puro: quem não passa marca não ganha a nossa.
    */
   fromName?: string;
+  /**
+   * Cabeçalhos SMTP crus. Existe por UM motivo concreto: `List-Unsubscribe` e
+   * `List-Unsubscribe-Post` (RFC 8058), os dois que fazem o Gmail desenhar o
+   * botão nativo de "Cancelar inscrição" ao lado do remetente.
+   *
+   * Sem esse botão, quem quer sair de uma sequência de propaganda usa o que
+   * está à mão — "marcar como spam" —, e esse clique não atinge a mensagem:
+   * atinge a reputação do DOMÍNIO, para todos os destinatários seguintes.
+   * `lib/marketing/descadastro.ts` monta o par; aqui é só o cano.
+   */
+  headers?: Record<string, string>;
 }
 
 interface SendResult {
@@ -116,6 +127,7 @@ export async function sendEmail(args: SendArgs): Promise<SendResult> {
       text: args.text,
       replyTo: args.replyTo,
       tags: args.tags,
+      headers: args.headers,
     });
 
     if (error) {

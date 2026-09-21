@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { nomeDoOperador, resolverOperador } from "@/lib/legal/operador";
 import { createClient } from "@/lib/supabase/server";
@@ -20,9 +21,7 @@ export default async function TermsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const idioma = normalizarIdioma(
-    (user?.user_metadata?.locale as string | undefined) ?? null,
-  );
+  const idioma = normalizarIdioma((user?.user_metadata?.locale as string | undefined) ?? null);
   const t = (texto: string) => traduzir(texto, idioma);
 
   return (
@@ -75,11 +74,15 @@ export default async function TermsPage() {
         <h2 className="text-base font-semibold">{t("4. Uso aceitável")}</h2>
         <p>{t("Ao usar este sistema, você concorda em não:")}</p>
         <ul className="list-disc space-y-1 pl-5">
-          <li>{t("enviar mensagens não solicitadas em massa, nem burlar pedidos de descadastro;")}</li>
+          <li>
+            {t("enviar mensagens não solicitadas em massa, nem burlar pedidos de descadastro;")}
+          </li>
           <li>{t("usar os dados de clientes para finalidade diferente da que os originou;")}</li>
           <li>{t("tentar acessar dados de outra organização hospedada nesta instalação;")}</li>
           <li>
-            {t("violar os termos dos serviços conectados, como as regras da plataforma de mensagens.")}
+            {t(
+              "violar os termos dos serviços conectados, como as regras da plataforma de mensagens.",
+            )}
           </li>
         </ul>
         <p>
@@ -95,9 +98,9 @@ export default async function TermsPage() {
           {t(
             "Os dados inseridos aqui — contatos, conversas, negócios, arquivos — pertencem ao operador e às pessoas a que se referem. O tratamento desses dados é descrito na",
           )}{" "}
-          <a className="underline underline-offset-2" href="/legal/privacy">
+          <Link className="underline underline-offset-2" href="/legal/privacy">
             {t("Política de Privacidade")}
-          </a>
+          </Link>
           .
         </p>
         <p>

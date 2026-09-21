@@ -28,9 +28,7 @@ const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
  * pra permitir setup parcial (ex: dev sem WAHA quando trabalhando só na UI).
  */
 const required = (name: string) =>
-  isProd
-    ? z.string().min(1, `${name} é obrigatória em produção`)
-    : z.string().default("");
+  isProd ? z.string().min(1, `${name} é obrigatória em produção`) : z.string().default("");
 
 const requiredAlways = (name: string) => z.string().min(1, `${name} é obrigatória`);
 
@@ -269,6 +267,22 @@ const schema = z.object({
   SUPPORT_EMAIL: z.string().optional().default(""),
 
   /**
+   * A senha única do painel do funil (`/dashboard`, migration 0240).
+   *
+   * Vazia = **a tela não existe**, 404, e nenhuma rota do painel responde. Isso
+   * é o padrão e é o que todo clone self-host recebe: as cinco tabelas do funil
+   * nascem vazias em toda instalação para que as migrations sejam as mesmas em
+   * todo lugar, mas uma segunda tela de login exposta na internet de todo
+   * clone seria alvo de força bruta em instalações que nunca vão usá-la.
+   *
+   * Ela é também a CHAVE do HMAC do cookie — por isso o piso de 24 caracteres
+   * é conferido em `painelHabilitado()` e não aqui: uma senha curta demais
+   * derrubaria o boot em vez de apenas não ligar o painel, e derrubar o boot
+   * por causa de um painel opcional é o oposto do que se quer.
+   */
+  PAINEL_SENHA: z.string().optional().default(""),
+
+  /**
    * ─── Assinatura mensal (Stripe, migration 0239) ─────────────────────────
    *
    * TODAS opcionais, e isto é a decisão que sustenta o produto inteiro: este
@@ -355,14 +369,8 @@ const schema = z.object({
     .transform((v) => v === "true"),
 
   // App URLs
-  NEXT_PUBLIC_APP_URL: z
-    .string()
-    .url()
-    .default("http://localhost:3000"),
-  NEXT_PUBLIC_ADMIN_URL: z
-    .string()
-    .url()
-    .default("http://localhost:3000"),
+  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_ADMIN_URL: z.string().url().default("http://localhost:3000"),
 
   // Marca da instalação (white-label) — ver lib/branding.ts.
   // Sem prefixo NEXT_PUBLIC_ de propósito: essas seriam queimadas no bundle

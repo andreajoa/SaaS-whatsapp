@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
+import { Medidor } from "@/components/site/Medidor";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
@@ -114,6 +115,11 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <Medidor
+        idioma={visitante.idioma}
+        moeda={mercado.moeda}
+        dispositivo={visitante.dispositivo}
+      />
       <header className="sticky top-0 z-30 border-b border-border/70 bg-bg/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-6">
           <Marca marca={marca} />

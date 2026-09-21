@@ -68,6 +68,17 @@ const PASTAS_IGNORADAS = new Set(["api", "node_modules"]);
 const FORA_DO_PRODUTO: Record<string, string> = {
   "app/design": "vitrine do design system: rota noindex, sem porta na navegação",
   "app/vitrine-agenda": "vitrine do kit visual da Agenda: dado de mentira, noindex",
+  // O PAINEL DO FUNIL e a sua porta. Mesmo argumento das duas linhas acima, e
+  // mais forte: não é só "sem porta na navegação" — é uma tela que NENHUM
+  // cliente pode abrir. Ela vive fora de `app/app/`, fora da sessão do
+  // produto, é `robots: noindex`, e a única chave é `PAINEL_SENHA`, que só o
+  // operador tem (sem ela a rota responde 404, nem como tela de senha).
+  //
+  // O que se lê ali é o livro-razão do operador sobre os visitantes DELE —
+  // não pertence a organização nenhuma, e não há segundo idioma porque não há
+  // segundo leitor. Traduzi-la seria manutenção para ninguém.
+  "app/dashboard": "painel do funil do operador: atrás de PAINEL_SENHA, noindex, fora de app/app/",
+  "components/painel": "a porta do painel do funil: mesma tela, mesmo leitor único",
 };
 
 /**
@@ -82,7 +93,8 @@ const EM_PORTUGUES_DE_PROPOSITO: { arquivo: string; texto: string; motivo: strin
   {
     arquivo: "app/app/settings/profile/_form.tsx",
     texto: "Português (BR)",
-    motivo: "nome de idioma se escreve no próprio idioma — quem lê espanhol precisa reconhecer a opção portuguesa",
+    motivo:
+      "nome de idioma se escreve no próprio idioma — quem lê espanhol precisa reconhecer a opção portuguesa",
   },
   {
     arquivo: "app/app/settings/tenant/_form.tsx",
@@ -91,8 +103,7 @@ const EM_PORTUGUES_DE_PROPOSITO: { arquivo: string; texto: string; motivo: strin
   },
   {
     arquivo: "app/global-error.tsx",
-    texto:
-      "Tente novamente em instantes. Se persistir, contate o suporte com o ID abaixo.",
+    texto: "Tente novamente em instantes. Se persistir, contate o suporte com o ID abaixo.",
     motivo:
       "é o error boundary da RAIZ: renderiza fora de qualquer provider, quando o app já falhou. Chamar um hook de contexto ali é justamente o que não pode falhar de novo",
   },
@@ -174,7 +185,10 @@ function ehPadraoDeData(texto: string): boolean {
 
 /** Um placeholder pode listar VÁRIOS endereços, um por linha. Todos têm de ser. */
 function soEnderecosDeRede(texto: string): boolean {
-  const linhas = texto.split(/[\n,;]/).map((l) => l.trim()).filter(Boolean);
+  const linhas = texto
+    .split(/[\n,;]/)
+    .map((l) => l.trim())
+    .filter(Boolean);
   return linhas.length > 0 && linhas.every((l) => ENDERECO_DE_REDE.test(l));
 }
 

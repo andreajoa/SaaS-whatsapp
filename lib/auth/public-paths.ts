@@ -89,6 +89,27 @@ export const PUBLIC_PATHS: RegExp[] = [
   // descrito no cabeçalho da própria rota.
   /^\/contato$/,
   /^\/api\/v1\/site\/contato$/,
+  // A medição da visita. O beacon roda na página de vendas, que é vista por
+  // quem não tem sessão — é o caso inteiro dela. Nada aqui identifica ninguém
+  // (sem IP, sem e-mail) e a rota devolve 404 quando a instalação não cobra.
+  /^\/api\/v1\/site\/visita$/,
+  // O PAINEL DO FUNIL e a sua porta.
+  //
+  // "Público" aqui quer dizer "o proxy não decide", como em `/api/v1/cron/` e
+  // `/api/mcp` acima — e nunca esteve tão carregado: quem atravessa esta linha
+  // sem a segunda porta lê o e-mail e o plano de TODOS os leads. A porta é
+  // `lib/painel/sessao.ts`, conferida na primeira linha das duas peças, e ela
+  // falha fechada em três degraus (sem `PAINEL_SENHA` a tela nem existe).
+  //
+  // Está fora da sessão do produto de propósito: o que se lê não pertence a
+  // organização nenhuma, e pendurá-lo no login do produto daria a lista de
+  // clientes a quem vier a ser platform admin por engano.
+  //
+  // Âncora dupla, como em `/legal`: `/^\/dashboard/` e `/^\/api\/v1\/painel\//`
+  // deixariam qualquer sub-path futuro do painel nascer público de carona —
+  // aqui isso não seria uma tela a mais exposta, seria a lista inteira.
+  /^\/dashboard$/,
+  /^\/api\/v1\/painel\/entrar$/,
 ];
 
 export function isPublicPath(pathname: string): boolean {

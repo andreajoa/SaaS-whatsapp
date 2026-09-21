@@ -42,10 +42,24 @@ describe("isPublicPath", () => {
     expect(isPublicPath("/legal/privacy")).toBe(true);
   });
 
-  it("e só esses dois: /legal não é um portão aberto", () => {
-    // Entrada larga aqui é furo de auth em toda a aplicação, não só nesta tela.
-    expect(isPublicPath("/legal")).toBe(false);
+  /**
+   * `/legal` passou a ser público, e a mudança é de FATO, não de política.
+   *
+   * Esta linha afirmava `false`, e estava certa: `/legal` não era página
+   * nenhuma — era só um prefixo, e prefixo aberto sem tela por trás é
+   * superfície de graça. Hoje `/legal` é o índice dos contratos, escrito para
+   * quem ainda não tem conta; mantê-lo fechado daria 307 para o login
+   * exatamente na página que existe para ser lida antes de haver login.
+   *
+   * O que NÃO mudou é o que este caso realmente protege: cada documento é
+   * liberado pelo NOME, com `$` no fim. Trocar a lista por `/^\/legal/` abriria
+   * qualquer `/legal/<coisa>` futura — inclusive um rascunho — sem que ninguém
+   * precisasse decidir isso.
+   */
+  it("mas por nome, um a um: /legal não vira prefixo aberto", () => {
+    expect(isPublicPath("/legal")).toBe(true);
     expect(isPublicPath("/legal/terms/interno")).toBe(false);
     expect(isPublicPath("/legal/qualquer-outra")).toBe(false);
+    expect(isPublicPath("/legal/cookies/rascunho")).toBe(false);
   });
 });

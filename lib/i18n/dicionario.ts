@@ -9914,6 +9914,42 @@ export const DICIONARIO: Traducoes = {
   },
   "Card criado no funil": { es: "Tarjeta creada en el embudo" },
   "Respondido na hora": { es: "Respondido al instante" },
+
+  // ── Documentos legais e contato ──────────────────────────────────────────
+  //
+  // Só a MOLDURA mora aqui. O corpo dos documentos vive em
+  // `lib/legal/documentos.ts`, já trilíngue, porque este dicionário só conhece
+  // espanhol e um contrato meio traduzido é pior que nenhum.
+  Documentos: { es: "Documentos" },
+  Assunto: { es: "Asunto" },
+  "Fale com a gente": { es: "Habla con nosotros" },
+  "Todos os documentos": { es: "Todos los documentos" },
+  "o operador desta instalação": { es: "el operador de esta instalación" },
+  "As regras de uso do sistema.": { es: "Las reglas de uso del sistema." },
+  "Quais dados são tratados, por quanto tempo e quais são os seus direitos.": {
+    es: "Qué datos se tratan, por cuánto tiempo y cuáles son tus derechos.",
+  },
+  "Transparência sobre como este sistema trata o seu dinheiro, os seus dados e o número da sua empresa.":
+    {
+      es: "Transparencia sobre cómo este sistema trata tu dinero, tus datos y el número de tu empresa.",
+    },
+  "Ficou com dúvida sobre qualquer um destes pontos?": {
+    es: "¿Te quedó alguna duda sobre cualquiera de estos puntos?",
+  },
+  "Dúvida sobre planos, pedido de demonstração, problema com a conta ou relato de falha de segurança — tudo chega no mesmo lugar e é lido por gente.":
+    {
+      es: "Duda sobre planes, pedido de demostración, problema con la cuenta o reporte de una falla de seguridad: todo llega al mismo lugar y lo lee una persona.",
+    },
+  "Mensagem recebida. A resposta vai para o e-mail que você informou.": {
+    es: "Mensaje recibido. La respuesta irá al correo que indicaste.",
+  },
+  "Não foi possível enviar agora. Tente de novo em instantes.": {
+    es: "No fue posible enviar ahora. Inténtalo de nuevo en unos instantes.",
+  },
+  "Esta instalação ainda não tem endereço de suporte configurado. Procure quem administra o sistema.":
+    {
+      es: "Esta instalación todavía no tiene dirección de soporte configurada. Busca a quien administra el sistema.",
+    },
 };
 
 /**

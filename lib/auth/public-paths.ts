@@ -77,6 +77,18 @@ export const PUBLIC_PATHS: RegExp[] = [
   // dois nomes de propósito: `/^\/legal/` deixaria qualquer sub-path futuro
   // nascer público de carona.
   /^\/legal\/(terms|privacy)$/,
+  // O índice dos documentos e os seis de `lib/legal/documentos.ts`. Mesma
+  // âncora, mesmo motivo — e a lista não pode divergir do arquivo de dados em
+  // silêncio: `tests/unit/legal-documentos.test.ts` reprova documento novo que
+  // nasça atrás do login sem ninguém perceber.
+  /^\/legal$/,
+  /^\/legal\/(cookies|reembolso|uso-aceitavel|subprocessadores|seguranca|dpa)$/,
+  // A página de contato e a rota que recebe o formulário dela. Quem escreve
+  // por aqui ainda NÃO é cliente — exigir sessão tornaria a página inútil. O
+  // que substitui a autenticação (Zod, limite por IP, campo-armadilha) está
+  // descrito no cabeçalho da própria rota.
+  /^\/contato$/,
+  /^\/api\/v1\/site\/contato$/,
 ];
 
 export function isPublicPath(pathname: string): boolean {

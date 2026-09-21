@@ -41,7 +41,12 @@ const RAIZ = join(__dirname, "..", "..");
  * "tudo que é público" — porque o que define vitrine não é a rota ser pública
  * e sim a página estar tentando vender: `/login` é pública e não vende nada.
  */
-const TELAS_DA_VITRINE = ["app/page.tsx"];
+const TELAS_DA_VITRINE = [
+  "app/page.tsx",
+  "app/legal/page.tsx",
+  "app/legal/[documento]/page.tsx",
+  "app/contato/page.tsx",
+];
 
 /** Toda chave literal passada a `t()` / `textoDoSite()` nas telas da vitrine. */
 function chavesDaVitrine(): Map<string, string> {
@@ -97,7 +102,9 @@ describe("a vitrine fala inglês inteiro", () => {
   it("nenhuma tradução sobra sem dono na vitrine", () => {
     const usadas = new Set(chavesDaVitrine().keys());
     const orfas = Object.keys(INGLES_DA_VITRINE).filter((k) => !usadas.has(k));
-    expect(orfas, `${orfas.length} tradução(ões) para frase que a vitrine não usa mais`).toEqual([]);
+    expect(orfas, `${orfas.length} tradução(ões) para frase que a vitrine não usa mais`).toEqual(
+      [],
+    );
   });
 
   it("nenhuma tradução repete o português", () => {
@@ -118,6 +125,9 @@ describe("o inglês é servido a quem a tabela de mercados promete", () => {
     // manutenção paga por ninguém — e é aqui que isso aparece, em vez de o
     // dicionário seguir sendo mantido por hábito.
     const emIngles = MERCADOS.filter((m) => m.idioma === "en").map((m) => m.pais);
-    expect(emIngles.length, "nenhum mercado usa inglês — INGLES_DA_VITRINE virou órfão").toBeGreaterThan(0);
+    expect(
+      emIngles.length,
+      "nenhum mercado usa inglês — INGLES_DA_VITRINE virou órfão",
+    ).toBeGreaterThan(0);
   });
 });

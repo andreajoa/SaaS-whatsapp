@@ -156,6 +156,36 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
     "Downtown it arrives within 2 hours. Want me to reserve it for you?",
   "Card criado no funil": "Card created on the pipeline",
   "Respondido na hora": "Answered instantly",
+
+  // ── Documentos legais e contato ────────────────────────────────────────
+  //
+  // Só a MOLDURA. O corpo dos documentos já nasce trilíngue em
+  // `lib/legal/documentos.ts` — ele não passa por aqui nem pelo dicionário.
+  Documentos: "Documents",
+  Assunto: "Subject",
+  Mensagem: "Message",
+  "Seu nome": "Your name",
+  "Seu e-mail": "Your email",
+  "Enviar mensagem": "Send message",
+  "Enviando...": "Sending...",
+  "Atualizado em": "Updated on",
+  "Fale com a gente": "Talk to us",
+  "Todos os documentos": "All documents",
+  "o operador desta instalação": "the operator of this installation",
+  "As regras de uso do sistema.": "The rules for using the system.",
+  "Quais dados são tratados, por quanto tempo e quais são os seus direitos.":
+    "Which data is processed, for how long, and what your rights are.",
+  "Transparência sobre como este sistema trata o seu dinheiro, os seus dados e o número da sua empresa.":
+    "Transparency about how this system handles your money, your data and your company's number.",
+  "Ficou com dúvida sobre qualquer um destes pontos?": "Still unsure about any of this?",
+  "Dúvida sobre planos, pedido de demonstração, problema com a conta ou relato de falha de segurança — tudo chega no mesmo lugar e é lido por gente.":
+    "A question about pricing, a demo request, an account problem or a security report — it all lands in the same place and a person reads it.",
+  "Mensagem recebida. A resposta vai para o e-mail que você informou.":
+    "Message received. The reply will go to the email address you gave us.",
+  "Não foi possível enviar agora. Tente de novo em instantes.":
+    "We could not send it right now. Please try again in a moment.",
+  "Esta instalação ainda não tem endereço de suporte configurado. Procure quem administra o sistema.":
+    "This installation has no support address configured yet. Contact whoever administers the system.",
 };
 
 /**

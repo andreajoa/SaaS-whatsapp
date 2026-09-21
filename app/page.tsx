@@ -162,13 +162,13 @@ export default async function HomePage() {
                 "radial-gradient(70% 60% at 72% 0%, var(--color-accent-100), transparent 70%)",
             }}
           />
-          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-14 px-6 pb-20 pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-28 lg:pt-24">
+          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-14 px-6 pt-16 pb-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-24 lg:pb-28">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-soft px-3 py-1 text-xs font-medium text-accent-700">
                 <Sparkles className="size-3.5" />
                 {t("Atendimento por WhatsApp com agente de IA")}
               </span>
-              <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight text-text sm:text-5xl lg:text-6xl">
+              <h1 className="mt-6 text-4xl leading-[1.05] font-semibold tracking-tight text-text sm:text-5xl lg:text-6xl">
                 {t("Nunca mais perca um cliente por demora na resposta")}
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
@@ -270,10 +270,7 @@ export default async function HomePage() {
         {/* ── Recursos ─────────────────────────────────────────────────── */}
         <section id="recursos" className="scroll-mt-20 border-y border-border bg-surface-elevated">
           <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
-            <Titulo
-              olho={t("Recursos")}
-              titulo={t("O atendimento inteiro em um lugar só")}
-            />
+            <Titulo olho={t("Recursos")} titulo={t("O atendimento inteiro em um lugar só")} />
             <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
               <Recurso
                 Icone={Inbox}
@@ -348,7 +345,7 @@ export default async function HomePage() {
                           {t("Recomendado")}
                         </span>
                       ) : null}
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-text-subtle">
+                      <h3 className="text-sm font-semibold tracking-wide text-text-subtle uppercase">
                         {plano.nome}
                       </h3>
                       <p className="mt-3 flex items-baseline gap-1">
@@ -391,10 +388,7 @@ export default async function HomePage() {
         ) : null}
 
         {/* ── Perguntas ────────────────────────────────────────────────── */}
-        <section
-          id="perguntas"
-          className="scroll-mt-20 border-y border-border bg-surface-elevated"
-        >
+        <section id="perguntas" className="scroll-mt-20 border-y border-border bg-surface-elevated">
           <div className="mx-auto w-full max-w-3xl px-6 py-20 lg:py-24">
             <Titulo olho={t("Perguntas")} titulo={t("O que costumam perguntar antes de assinar")} />
             <div className="mt-10 divide-y divide-border border-y border-border">
@@ -477,6 +471,12 @@ export default async function HomePage() {
             <Link className="transition-colors hover:text-text" href="/legal/privacy">
               {t("Política de Privacidade")}
             </Link>
+            <Link className="transition-colors hover:text-text" href="/legal">
+              {t("Documentos")}
+            </Link>
+            <Link className="transition-colors hover:text-text" href="/contato">
+              {t("Fale com a gente")}
+            </Link>
             {suporte ? (
               <a className="transition-colors hover:text-text" href={`mailto:${suporte}`}>
                 {suporte}
@@ -536,7 +536,7 @@ function ItemDeConfianca({ texto }: { texto: string }) {
 function Titulo({ olho, titulo, apoio }: { olho: string; titulo: string; apoio?: string }) {
   return (
     <div className="max-w-2xl">
-      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">{olho}</span>
+      <span className="text-xs font-semibold tracking-[0.12em] text-accent uppercase">{olho}</span>
       <h2 className="mt-3 text-2xl font-semibold tracking-tight text-text sm:text-3xl">{titulo}</h2>
       {apoio ? <p className="mt-3 text-base text-text-muted">{apoio}</p> : null}
     </div>
@@ -616,10 +616,7 @@ function Pergunta({ pergunta, resposta }: { pergunta: string; resposta: string }
 function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
   return (
     <div className="relative">
-      <div
-        aria-hidden
-        className="absolute -inset-4 rounded-xl bg-accent-100/40 blur-2xl"
-      />
+      <div aria-hidden className="absolute -inset-4 rounded-xl bg-accent-100/40 blur-2xl" />
       <div className="relative overflow-hidden rounded-xl border border-border bg-surface shadow-xl">
         <div className="flex items-center gap-3 border-b border-border bg-surface-elevated px-5 py-3.5">
           <span className="flex size-9 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-700">
@@ -667,15 +664,7 @@ function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
   );
 }
 
-function Balao({
-  lado,
-  texto,
-  hora,
-}: {
-  lado: "cliente" | "agente";
-  texto: string;
-  hora: string;
-}) {
+function Balao({ lado, texto, hora }: { lado: "cliente" | "agente"; texto: string; hora: string }) {
   const doAgente = lado === "agente";
   return (
     <div className={doAgente ? "flex justify-end" : "flex justify-start"}>

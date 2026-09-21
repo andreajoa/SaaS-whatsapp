@@ -9915,6 +9915,35 @@ export const DICIONARIO: Traducoes = {
   "Card criado no funil": { es: "Tarjeta creada en el embudo" },
   "Respondido na hora": { es: "Respondido al instante" },
 
+  // ── Captação de e-mail: rodapé e convite da vitrine ──────────────────────
+  "seu@email.com": { es: "tu@correo.com" },
+  "Quero receber": { es: "Quiero recibir" },
+  // "Seu e-mail", "Enviando..." e "Fechar" já existem acima, no vocabulário do
+  // produto — a mesma frase, a mesma tradução. Repeti-los aqui seria chave
+  // duplicada no mesmo objeto: a segunda vence em silêncio, e a divergência
+  // entre as duas só apareceria quando alguém editasse a errada.
+  "Sem spam. Um clique para sair, em qualquer e-mail.": {
+    es: "Sin spam. Un clic para salir, en cualquier correo.",
+  },
+  "Não foi possível inscrever agora. Tente de novo em instantes.": {
+    es: "No fue posible suscribirte ahora. Inténtalo de nuevo en unos instantes.",
+  },
+  "Pronto. Se houver novidade que valha o seu tempo, ela chega por e-mail.": {
+    es: "Listo. Si hay alguna novedad que valga tu tiempo, llegará por correo.",
+  },
+  "Ainda pensando?": { es: "¿Todavía lo estás pensando?" },
+  "Deixe seu e-mail. Mandamos o que aprendemos sobre atender por WhatsApp sem perder o cliente — e nada além disso.":
+    {
+      es: "Déjanos tu correo. Te enviamos lo que aprendimos sobre atender por WhatsApp sin perder al cliente — y nada más.",
+    },
+  "Antes de ir: quer ver como isto funciona na prática?": {
+    es: "Antes de irte: ¿quieres ver cómo funciona esto en la práctica?",
+  },
+  "Deixe seu e-mail e receba, em poucas mensagens, o que um atendimento automático de verdade responde — e o que ele nunca deve responder sozinho.":
+    {
+      es: "Déjanos tu correo y recibe, en unos pocos mensajes, lo que una atención automática de verdad responde — y lo que nunca debe responder sola.",
+    },
+
   // ── Documentos legais e contato ──────────────────────────────────────────
   //
   // Só a MOLDURA mora aqui. O corpo dos documentos vive em

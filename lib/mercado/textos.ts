@@ -186,6 +186,28 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
     "We could not send it right now. Please try again in a moment.",
   "Esta instalação ainda não tem endereço de suporte configurado. Procure quem administra o sistema.":
     "This installation has no support address configured yet. Contact whoever administers the system.",
+
+  // ── Captação de e-mail: rodapé e convite ───────────────────────────────
+  // "Seu e-mail" e "Enviando..." já estão acima, no formulário de contato — a
+  // mesma frase, a mesma tradução. Repeti-las aqui seria chave duplicada no
+  // mesmo objeto: a segunda vence em silêncio, e a divergência entre as duas
+  // só apareceria quando alguém editasse a errada.
+  "seu@email.com": "you@email.com",
+  "Quero receber": "Sign me up",
+  "Sem spam. Um clique para sair, em qualquer e-mail.":
+    "No spam. One click to leave, in every email.",
+  "Não foi possível inscrever agora. Tente de novo em instantes.":
+    "We could not sign you up right now. Please try again in a moment.",
+  "Pronto. Se houver novidade que valha o seu tempo, ela chega por e-mail.":
+    "Done. If there is news worth your time, it will arrive by email.",
+  "Ainda pensando?": "Still thinking it over?",
+  "Deixe seu e-mail. Mandamos o que aprendemos sobre atender por WhatsApp sem perder o cliente — e nada além disso.":
+    "Leave your email. We send what we have learned about answering on WhatsApp without losing the customer — and nothing else.",
+  Fechar: "Close",
+  "Antes de ir: quer ver como isto funciona na prática?":
+    "Before you go: want to see how this works in practice?",
+  "Deixe seu e-mail e receba, em poucas mensagens, o que um atendimento automático de verdade responde — e o que ele nunca deve responder sozinho.":
+    "Leave your email and get, in a handful of messages, what real automated support answers — and what it should never answer on its own.",
 };
 
 /**

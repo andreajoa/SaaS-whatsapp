@@ -39,6 +39,20 @@ const GEO = {
   longitude: ["x-vercel-ip-longitude"],
 } as const;
 
+/**
+ * O cookie que reconhece quem volta — um opaco, nunca um e-mail.
+ *
+ * Mora aqui e não na rota que o grava porque QUEM O LÊ é outra rota: a de
+ * inscrição, para ligar o e-mail deixado hoje às visitas de ontem. Um arquivo
+ * de rota do App Router deve exportar handlers e configuração, e mais nada —
+ * importar uma constante de dentro dele arrastaria o módulo da rota (com o
+ * `force-dynamic` e as dependências dela) para dentro da outra.
+ */
+export const COOKIE_DO_VISITANTE = "vsid";
+
+/** 180 dias. O bastante para reconhecer quem volta depois de pensar. */
+export const VALIDADE_DO_VISITANTE_SEG = 180 * 24 * 60 * 60;
+
 export interface Visitante {
   readonly pais: string | null;
   readonly regiao: string | null;

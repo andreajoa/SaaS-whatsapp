@@ -38,13 +38,14 @@ import { authRateLimited } from "@/lib/auth/rate-limit";
 import { fail, ok } from "@/lib/api/wrappers";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { hostDaOrigem, utmDaUrl } from "@/lib/mercado/visitante";
+import {
+  COOKIE_DO_VISITANTE,
+  VALIDADE_DO_VISITANTE_SEG,
+  hostDaOrigem,
+  utmDaUrl,
+} from "@/lib/mercado/visitante";
 
 export const dynamic = "force-dynamic";
-
-export const COOKIE_DO_VISITANTE = "vsid";
-/** 180 dias. O bastante para reconhecer quem volta depois de pensar. */
-const VALIDADE_VISITANTE = 180 * 24 * 60 * 60;
 
 const schema = z.object({
   /** O caminho VISITADO, não o desta rota. */
@@ -152,7 +153,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     [
       `${COOKIE_DO_VISITANTE}=${visitorId}`,
       "Path=/",
-      `Max-Age=${VALIDADE_VISITANTE}`,
+      `Max-Age=${VALIDADE_DO_VISITANTE_SEG}`,
       "SameSite=Lax",
       "HttpOnly",
       ...(req.nextUrl.protocol === "https:" ? ["Secure"] : []),

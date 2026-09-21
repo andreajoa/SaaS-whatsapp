@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
+import { CapturaDeLead } from "@/components/site/CapturaDeLead";
+import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { Medidor } from "@/components/site/Medidor";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
@@ -113,12 +115,44 @@ export default async function HomePage() {
   // um checkout que não existe.
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
 
+  // Os textos do campo de e-mail são montados AQUI, e não dentro dos
+  // componentes que os mostram. Duas razões, nesta ordem:
+  //
+  //  - `CapturaDeLead` e `ConviteDeLead` são `"use client"`. `textoDoSite`
+  //    conhece três idiomas e o dicionário do cliente conhece dois — chamado
+  //    lá dentro, um visitante indiano veria a página em inglês e o campo em
+  //    português. É a mesma razão escrita em `FormularioDeContato`.
+  //  - `tests/unit/vitrine-fala-ingles.test.ts` varre ESTE arquivo, não os
+  //    componentes. Frase nova escrita aqui nasce dentro do alcance do guarda;
+  //    escrita lá dentro, nasce fora dele.
+  const textosDaCaptura = {
+    rotulo: t("Seu e-mail"),
+    exemplo: t("seu@email.com"),
+    enviar: t("Quero receber"),
+    enviando: t("Enviando..."),
+    promessa: t("Sem spam. Um clique para sair, em qualquer e-mail."),
+    sucesso: t("Pronto. Se houver novidade que valha o seu tempo, ela chega por e-mail."),
+    erro: t("Não foi possível inscrever agora. Tente de novo em instantes."),
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Medidor
         idioma={visitante.idioma}
         moeda={mercado.moeda}
         dispositivo={visitante.dispositivo}
+      />
+      <ConviteDeLead
+        textos={{
+          titulo: t("Antes de ir: quer ver como isto funciona na prática?"),
+          corpo: t(
+            "Deixe seu e-mail e receba, em poucas mensagens, o que um atendimento automático de verdade responde — e o que ele nunca deve responder sozinho.",
+          ),
+          fechar: t("Fechar"),
+        }}
+        captura={textosDaCaptura}
+        idioma={visitante.idioma}
+        moeda={mercado.moeda}
       />
       <header className="sticky top-0 z-30 border-b border-border/70 bg-bg/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-6">
@@ -463,6 +497,26 @@ export default async function HomePage() {
       </main>
 
       <footer className="border-t border-border bg-surface">
+        {/* A segunda porta de entrada, e a calma: quem chegou ao rodapé leu a
+            página inteira e não clicou em "criar conta". Pedir o e-mail aqui
+            é perguntar a alguém que já decidiu que ainda não decidiu. */}
+        <div className="mx-auto w-full max-w-6xl border-b border-border/60 px-6 py-10">
+          <div className="max-w-xl">
+            <h2 className="text-base font-semibold tracking-tight">{t("Ainda pensando?")}</h2>
+            <p className="mt-1 text-sm text-text-muted">
+              {t(
+                "Deixe seu e-mail. Mandamos o que aprendemos sobre atender por WhatsApp sem perder o cliente — e nada além disso.",
+              )}
+            </p>
+            <CapturaDeLead
+              textos={textosDaCaptura}
+              idioma={visitante.idioma}
+              moeda={mercado.moeda}
+              origem="rodape"
+              className="mt-4"
+            />
+          </div>
+        </div>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Marca marca={marca} />

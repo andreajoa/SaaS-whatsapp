@@ -93,6 +93,12 @@ export const PUBLIC_PATHS: RegExp[] = [
   // quem não tem sessão — é o caso inteiro dela. Nada aqui identifica ninguém
   // (sem IP, sem e-mail) e a rota devolve 404 quando a instalação não cobra.
   /^\/api\/v1\/site\/visita$/,
+  // O e-mail deixado no rodapé ou no pop-up. Pela mesma razão de `/contato`
+  // logo acima: quem digita ainda NÃO é cliente, e exigir sessão para entrar
+  // numa lista de e-mails torna a lista impossível. O que substitui a
+  // autenticação (Zod, limite por IP, campo-armadilha) está no cabeçalho da
+  // rota, e a instalação que não cobra responde 404.
+  /^\/api\/v1\/site\/lead$/,
   // O PAINEL DO FUNIL e a sua porta.
   //
   // "Público" aqui quer dizer "o proxy não decide", como em `/api/v1/cron/` e

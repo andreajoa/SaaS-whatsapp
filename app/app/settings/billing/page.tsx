@@ -15,6 +15,7 @@ import {
   precoDoPlano,
   type PlanoId,
 } from "@/lib/billing/planos";
+import { mercadoDaOrganizacao } from "@/lib/mercado/organizacao";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -86,11 +87,17 @@ export default async function BillingPage({
   const admin = createAdminClient();
   const { data: org } = await admin
     .from("organizations")
-    .select("created_at")
+    .select("created_at, settings")
     .eq("id", activeOrg.orgId)
     .maybeSingle();
 
   const estado = await estadoDaCobranca(admin, activeOrg.orgId, org?.created_at ?? null);
+
+  // Moeda e preço saem do mercado que a ORGANIZAÇÃO declarou no cadastro, não
+  // do IP de agora — ver o cabeçalho de `lib/mercado/organizacao.ts`. Org sem
+  // mercado gravado (toda org criada antes desta linha existir) cai no padrão,
+  // que é exatamente o que ela sempre viu.
+  const mercado = mercadoDaOrganizacao(org?.settings);
 
   // Só oferece o que esta instalação de fato vende — plano sem `price_...`
   // configurado não é erro, é plano que não existe aqui.
@@ -160,6 +167,7 @@ export default async function BillingPage({
       <PlanosDaConta
         planoAtual={estado.plano}
         planosVendidos={vendidos}
+        mercado={mercado}
         temAssinatura={Boolean(estado.stripeCustomerId)}
         sessaoDeRetorno={sessao}
       />

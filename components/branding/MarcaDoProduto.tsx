@@ -1,4 +1,4 @@
-import { LOGOTIPO, SIMBOLO } from "@/lib/branding/desenho";
+import { LOGOTIPO, SIMBOLO, simboloDaMarca } from "@/lib/branding/desenho";
 import { cn } from "@/lib/utils";
 
 /**
@@ -61,6 +61,52 @@ export function SimboloDoProduto({ nome, className, decorativo = false }: Props)
     </svg>
   );
 }
+
+/**
+ * O símbolo da marca CONFIGURADA, quando ela tem arte própria neste repositório.
+ *
+ * Devolve `null` — e não um placeholder — quando o nome não está no registro
+ * de `lib/branding/desenho.ts`. Quem chama decide o que fazer com o vazio: a
+ * fachada mostra só o nome em texto, que é o comportamento que todo revendedor
+ * sem logo já tinha. Um desenho genérico no lugar seria a nossa marca vazando
+ * para a tela de outra empresa.
+ *
+ * As três tintas vêm da paleta de destaque em vigor, não de hexes escritos
+ * aqui: `currentColor` para a camada principal e duas opacidades para as
+ * outras. Assim a marca acompanha o tema claro/escuro e — no dia em que o
+ * accent mudar — acompanha o accent, sem ninguém lembrar deste arquivo.
+ */
+export function SimboloDaMarca({ nome, className, decorativo = false }: Props) {
+  const desenho = simboloDaMarca(nome);
+  if (!desenho) return null;
+  return (
+    <svg
+      viewBox={desenho.viewBox}
+      className={cn("shrink-0 text-accent", className)}
+      {...acessibilidade(nome, decorativo)}
+    >
+      {desenho.camadas.map((camada) => (
+        <path
+          key={camada.d}
+          d={camada.d}
+          fill="currentColor"
+          fillOpacity={OPACIDADE_DA_TINTA[camada.tinta]}
+          fillRule={camada.regra}
+        />
+      ))}
+    </svg>
+  );
+}
+
+/**
+ * A hierarquia das três camadas, em opacidade sobre o accent.
+ *
+ * Opacidade e não três hexes: o accent é configurável por instalação
+ * (`/admin/marca`), e uma paleta fixa descolaria da cor escolhida no primeiro
+ * cliente que trocasse. `0.55` mantém o balão claro legível sobre o creme do
+ * tema claro sem desaparecer sobre o grafite do escuro — medido nos dois.
+ */
+const OPACIDADE_DA_TINTA = { clara: 0.55, principal: 1, detalhe: 1 } as const;
 
 /** Símbolo + nome — para a barra aberta e a fachada de entrada. */
 export function LogotipoDoProduto({ nome, className, decorativo = false }: Props) {

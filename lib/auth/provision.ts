@@ -1,3 +1,5 @@
+import { settingsDoMercado } from "@/lib/mercado/organizacao";
+import type { Mercado } from "@/lib/mercado/paises";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { audit } from "@/lib/audit";
 
@@ -27,6 +29,18 @@ type ProvisionUser = {
  */
 type ProvisionOptions = {
   source?: "signup" | "recovery";
+  /**
+   * O mercado de quem está se cadastrando — moeda e preço da assinatura.
+   *
+   * Chega de FORA porque só quem atende a requisição sabe o país: ele vem do
+   * cabeçalho da borda, e ler `headers()` aqui dentro amarraria esta função ao
+   * runtime do Next, que é justamente o que permite testá-la.
+   *
+   * Ausente é um estado legítimo, não um erro: no self-host não há cobrança,
+   * não há mercado e não há o que gravar. Nesse caso `settings` nasce `{}`,
+   * como sempre nasceu, e a tela de cobrança cai no mercado padrão.
+   */
+  mercado?: Mercado;
 };
 
 /**
@@ -76,6 +90,10 @@ export async function ensureTenantForUser(
         legal_name: orgName,
         status: "active",
         created_by: user.id,
+        // Gravado UMA vez, no nascimento da organização. Não há caminho que o
+        // reescreva depois — mudar de mercado é mudar de preço, e isso não
+        // pode acontecer porque o dono viajou. Ver `lib/mercado/organizacao.ts`.
+        ...(options.mercado ? { settings: settingsDoMercado(options.mercado) } : {}),
       })
       .select("id, slug")
       .single();

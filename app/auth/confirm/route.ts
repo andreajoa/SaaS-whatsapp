@@ -3,6 +3,8 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
 import { ensureTenantForUser } from "@/lib/auth/provision";
+import { mercadoDoPais } from "@/lib/mercado/paises";
+import { paisDosCabecalhos } from "@/lib/mercado/visitante";
 import { decidirConviteDoSignup } from "@/lib/auth/convite-no-signup";
 import { aplicarConvite } from "@/lib/auth/aplicar-convite";
 import { audit } from "@/lib/audit";
@@ -186,7 +188,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    await ensureTenantForUser(usuario);
+    // A organização nasce com o mercado de onde a pessoa confirmou o e-mail —
+    // moeda e preço da assinatura, gravados de uma vez. Este é o ÚLTIMO
+    // momento em que o país ainda está à mão: da próxima tela em diante quem
+    // responde é o banco. Ver `lib/mercado/organizacao.ts`.
+    const mercado = mercadoDoPais(paisDosCabecalhos(request.headers));
+    await ensureTenantForUser(usuario, { mercado });
   } catch (e) {
     await audit({
       action: "auth.signup_provision_failed",

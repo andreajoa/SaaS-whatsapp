@@ -253,6 +253,43 @@ const PROVA_PROPRIA: readonly Excecao[] = [
       "atribuído. `service_role` mantém select/insert/delete porque o desfazer " +
       "da reivindicação depende do delete.",
   },
+  // ── Funil do site (migration 0240) ─────────────────────────────────────────
+  //
+  // Duas das cinco tabelas da 0240 carregam `organization_id` e por isso caem
+  // nesta varredura. Elas NÃO cabem em `TABLES` pelo mesmo motivo das três de
+  // anúncios: sem privilégio, o `countAs` de lá recebe `permission denied` em
+  // vez de `0`, o caso fica vermelho POR ACERTO, e a "correção" natural seria
+  // criar uma policy — servindo pelo PostgREST justamente a carteira de
+  // prospectos do operador.
+  //
+  // O `organization_id` aqui é PONTEIRO, não dono: existe para fechar o funil
+  // ("quem virou cliente, e de que organização") e é nullable porque a maioria
+  // das linhas nunca terá uma — o lead que não assinou é o caso comum. Uma
+  // policy por tenant deixaria de fora exatamente essas linhas e serviria as
+  // outras a quem não devia vê-las.
+  {
+    tabela: "site_leads",
+    razao:
+      "tests/invariants/funil-do-site-rls.test.ts — deny-all provado no " +
+      "`describe.each` das cinco tabelas do funil: privilégio NENHUM para anon " +
+      "e authenticated, `permission denied` medido sob `set role` na LEITURA e " +
+      "na ESCRITA, RLS ligada, ZERO policies, `service_role` com " +
+      "select/insert/update. A linha é a PESSOA do funil público do operador " +
+      "(e-mail, telefone, cidade, plano assinado), não dado de tenant: um " +
+      "`admin` de organização que a lesse veria a carteira de prospectos e " +
+      "clientes inteira, contato incluído, com a anon key que está no browser.",
+  },
+  {
+    tabela: "checkout_tentativas",
+    razao:
+      "tests/invariants/funil-do-site-rls.test.ts — mesmo `describe.each`. " +
+      "Guarda o estado de UMA sessão de checkout do Stripe (quem começou a " +
+      "pagar, plano, moeda e valor). Não cabe em `org_subscriptions`, que é a " +
+      "assinatura VIGENTE: a tentativa que falhou não é assinatura, e " +
+      "escrevê-la lá daria acesso a quem não pagou. O mesmo arquivo prova o " +
+      "unique de `stripe_session_id`, sem o qual a reentrega do webhook criaria " +
+      "linha nova e o lembrete de carrinho sairia para quem já pagou.",
+  },
 ];
 
 /**

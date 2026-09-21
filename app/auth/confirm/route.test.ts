@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { aplicarConvite } from "@/lib/auth/aplicar-convite";
 import { decidirConviteDoSignup } from "@/lib/auth/convite-no-signup";
 import { ensureTenantForUser } from "@/lib/auth/provision";
+import { MERCADO_INTERNACIONAL } from "@/lib/mercado/paises";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -164,7 +165,14 @@ describe("GET /auth/confirm", () => {
     const { GET } = await import("./route");
     const res = await GET(requisicao("type=signup&token_hash=abc"));
 
-    expect(vi.mocked(ensureTenantForUser)).toHaveBeenCalledWith(USUARIO);
+    // O segundo argumento carrega o mercado de onde a pessoa confirmou. Aqui
+    // não há cabeçalho de geolocalização — como em `next dev`, em teste e em
+    // self-host atrás de proxy próprio —, então cai no internacional. É
+    // exatamente o caminho que precisa continuar funcionando: cadastro não
+    // pode depender da borda.
+    expect(vi.mocked(ensureTenantForUser)).toHaveBeenCalledWith(USUARIO, {
+      mercado: MERCADO_INTERNACIONAL,
+    });
     expect(vi.mocked(aplicarConvite)).not.toHaveBeenCalled();
     expect(destino(res)).toBe("/onboarding/welcome");
   });

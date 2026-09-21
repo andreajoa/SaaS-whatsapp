@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
@@ -15,7 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
+import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
@@ -24,11 +23,11 @@ import {
   PLANOS,
   instalacaoCobra,
   precoDoPlano,
-  precoLegivel,
   type PlanoId,
 } from "@/lib/billing/planos";
-import { traduzir } from "@/lib/i18n/dicionario";
-import { IDIOMA_PADRAO, type Idioma } from "@/lib/i18n/idiomas";
+import { precoLegivelNoMercado } from "@/lib/mercado/paises";
+import { textoDoSite } from "@/lib/mercado/textos";
+import { visitanteAtual } from "@/lib/mercado/visitante";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -55,13 +54,18 @@ import { createClient } from "@/lib/supabase/server";
  * fora; entregá-la a quem já paga seria pedir que ele passe pela portaria toda
  * vez que digita o domínio.
  *
- * ─── O idioma, aqui, não vem de um perfil ──────────────────────────────────
+ * ─── O idioma e o PREÇO, aqui, vêm do país ─────────────────────────────────
  *
  * Nas telas de dentro o idioma sai de `AuthUser.idioma`. Aqui não há usuário:
- * quem lê é um visitante anônimo. Então vale o `Accept-Language` do navegador,
- * que é a única declaração de idioma que essa pessoa fez. Espanhol é metade do
- * mercado que este produto atende, e mandar a página de vendas em português
- * para quem pede espanhol é perder a venda na primeira linha.
+ * quem lê é um visitante anônimo, e o que se sabe dele é de onde ele chegou.
+ * `lib/mercado/visitante.ts` lê o país do cabeçalho da borda e
+ * `lib/mercado/paises.ts` converte isso em idioma, moeda e preço de uma vez —
+ * as três coisas são a MESMA decisão, e separá-las produziria a combinação
+ * absurda de uma página em espanhol cobrando em real.
+ *
+ * O país vence o `Accept-Language`, e o motivo está no cabeçalho de
+ * `visitante.ts`: o cabeçalho do navegador diz que idioma a pessoa configurou
+ * uma vez; o país diz onde ela vai passar o cartão.
  *
  * ─── `robots` ──────────────────────────────────────────────────────────────
  *
@@ -71,19 +75,6 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 export const dynamic = "force-dynamic";
-
-/**
- * O idioma de quem nunca se identificou.
- *
- * Só olha a primeira preferência: `Accept-Language` vem ordenado por peso, e o
- * segundo item é quase sempre o inglês que o sistema operacional põe sozinho.
- * Qualquer variante de espanhol (`es`, `es-419`, `es-AR`) cai em `es` — a
- * tradução é uma só, pensada para a América Latina (ver `lib/i18n/datas.ts`).
- */
-function idiomaDoNavegador(cabecalho: string | null): Idioma {
-  const primeiro = (cabecalho ?? "").split(",")[0]?.trim().toLowerCase() ?? "";
-  return primeiro.startsWith("es") ? "es" : IDIOMA_PADRAO;
-}
 
 export async function generateMetadata(): Promise<Metadata> {
   const marca = await marcaDaSaida(null);
@@ -110,8 +101,9 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
   if (user) redirect("/app");
 
-  const idioma = idiomaDoNavegador((await headers()).get("accept-language"));
-  const t = (texto: string) => traduzir(texto, idioma);
+  const visitante = await visitanteAtual();
+  const { mercado } = visitante;
+  const t = (texto: string) => textoDoSite(texto, visitante.idioma);
 
   const marca = await marcaDaSaida(null);
   const suporte = emailDeSuporte();
@@ -361,7 +353,7 @@ export default async function HomePage() {
                       </h3>
                       <p className="mt-3 flex items-baseline gap-1">
                         <span className="text-4xl font-semibold tracking-tight text-text">
-                          {precoLegivel(plano)}
+                          {precoLegivelNoMercado(id, mercado)}
                         </span>
                         <span className="text-sm text-text-muted">{t("/mês")}</span>
                       </p>
@@ -521,7 +513,15 @@ function Marca({ marca }: { marca: MarcaDeSaida }) {
   if (marcaEhADoProduto({ name: marca.nome, logoUrl: null })) {
     return <LogotipoDoProduto nome={marca.nome} className="h-7 w-auto" />;
   }
-  return <span className="text-base font-semibold tracking-tight text-text">{marca.nome}</span>;
+  // Marca de terceiro sem logo: se ela tem arte no registro de desenhos, o
+  // símbolo entra ao lado do nome. Sem arte, segue só o nome — que é o que
+  // todo revendedor já via, sem regressão.
+  return (
+    <span className="flex items-center gap-2">
+      <SimboloDaMarca nome={marca.nome} className="size-7" decorativo />
+      <span className="text-base font-semibold tracking-tight text-text">{marca.nome}</span>
+    </span>
+  );
 }
 
 function ItemDeConfianca({ texto }: { texto: string }) {

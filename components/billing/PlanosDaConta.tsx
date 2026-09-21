@@ -40,9 +40,9 @@ import { cn } from "@/lib/utils";
 import {
   ORDEM_DOS_PLANOS,
   PLANOS,
-  precoLegivel,
   type PlanoId,
 } from "@/lib/billing/planos";
+import { precoLegivelNoMercado, type Mercado } from "@/lib/mercado/paises";
 
 import { CheckoutEmbutido, chavePublicavelAusente } from "./CheckoutEmbutido";
 
@@ -51,6 +51,16 @@ interface Props {
   planoAtual: PlanoId | null;
   /** Quais planos esta instalação realmente vende (tem `price_...` no env). */
   planosVendidos: PlanoId[];
+  /**
+   * O mercado da ORGANIZAÇÃO — moeda, `locale` e a régua de preço.
+   *
+   * Vem do servidor, resolvido de `organizations.settings.mercado`, e não do
+   * IP de quem está olhando: um cliente brasileiro abrindo esta tela de um
+   * hotel no México veria o próprio plano em pesos, e num número diferente do
+   * que ele paga. Preço que muda com viagem é a pior surpresa possível na tela
+   * de dinheiro. Ver `lib/mercado/organizacao.ts`.
+   */
+  mercado: Mercado;
   /** Já existe customer no Stripe? Decide se o portal é oferecido. */
   temAssinatura: boolean;
   /**
@@ -73,6 +83,7 @@ const PLANO_EM_DESTAQUE: PlanoId = "pro";
 export function PlanosDaConta({
   planoAtual,
   planosVendidos,
+  mercado,
   temAssinatura,
   sessaoDeRetorno,
 }: Props) {
@@ -200,7 +211,7 @@ export function PlanosDaConta({
           <div>
             <p className="text-lg font-semibold">{plano.nome}</p>
             <p className="mt-1 text-3xl font-semibold tracking-tight">
-              {precoLegivel(plano)}
+              {precoLegivelNoMercado(passo.plano, mercado)}
               <span className="ml-1 text-sm font-normal text-muted-foreground">{t("/mês")}</span>
             </p>
           </div>
@@ -332,7 +343,7 @@ export function PlanosDaConta({
                   {atual ? <Badge variant="success">{t("Seu plano")}</Badge> : null}
                 </div>
                 <p className="text-2xl font-semibold tracking-tight">
-                  {precoLegivel(plano)}
+                  {precoLegivelNoMercado(id, mercado)}
                   <span className="ml-1 text-sm font-normal text-muted-foreground">{t("/mês")}</span>
                 </p>
                 <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
@@ -345,7 +356,12 @@ export function PlanosDaConta({
                 </ul>
                 <div className="mt-auto pt-2">
                   {atual ? (
-                    <Button variant="secondary" className="w-full" disabled>
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      disabled
+                      title={t("Este já é o plano da sua conta — não há o que trocar aqui.")}
+                    >
                       {t("Plano atual")}
                     </Button>
                   ) : (

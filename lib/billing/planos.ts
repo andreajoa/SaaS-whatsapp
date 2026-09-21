@@ -39,12 +39,21 @@ export type StatusAssinatura =
   | "unpaid"
   | "paused";
 
+/**
+ * O que um plano É: nome, tetos e o que ele promete.
+ *
+ * O PREÇO não está aqui, e a ausência é deliberada. Ele depende do mercado de
+ * quem lê — `lib/mercado/paises.ts` tem uma linha por país, com moeda, `locale`
+ * e a régua de três degraus — e um `precoMensalCents: 9700` fixo neste arquivo
+ * seria uma SEGUNDA fonte da verdade sobre o preço brasileiro. Ele já foi isso:
+ * a tabela de mercados dizia R$ 197 enquanto esta linha dizia R$ 97, e as duas
+ * telas que mostram preço mostrariam números diferentes conforme o import.
+ *
+ * Quem quer preço chama `precoLegivelNoMercado(id, mercado)`.
+ */
 export interface Plano {
   id: PlanoId;
   nome: string;
-  /** Preço mensal em centavos (doutrina: dinheiro é `_cents` + ISO-4217). */
-  precoMensalCents: number;
-  moeda: "BRL";
   /** `null` = sem teto. */
   canais: number | null;
   membros: number | null;
@@ -56,8 +65,6 @@ export const PLANOS: Record<PlanoId, Plano> = {
   essencial: {
     id: "essencial",
     nome: "Essencial",
-    precoMensalCents: 9700,
-    moeda: "BRL",
     canais: 1,
     membros: 3,
     destaques: [
@@ -70,8 +77,6 @@ export const PLANOS: Record<PlanoId, Plano> = {
   pro: {
     id: "pro",
     nome: "Pro",
-    precoMensalCents: 29700,
-    moeda: "BRL",
     canais: 3,
     membros: 10,
     destaques: [
@@ -84,8 +89,6 @@ export const PLANOS: Record<PlanoId, Plano> = {
   ilimitado: {
     id: "ilimitado",
     nome: "Ilimitado",
-    precoMensalCents: 69700,
-    moeda: "BRL",
     canais: null,
     membros: null,
     destaques: [
@@ -152,12 +155,3 @@ export function planoDoPreco(priceId: string): PlanoId | null {
   return null;
 }
 
-/** Formata centavos em BRL para a tela. */
-export function precoLegivel(plano: Plano): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: plano.moeda,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(plano.precoMensalCents / 100);
-}

@@ -24108,6 +24108,402 @@ comment on table public.billing_webhook_events is
 
 notify pgrst, 'reload schema';
 
+-- ---- funil do site: visita, lead, e-mail e checkout (migration 0240) ----
+--
+-- Cinco tabelas do funil PÚBLICO da instalação que cobra. Todas deny-all — RLS
+-- ligada, ZERO policies, privilégio revogado de `anon` e de `authenticated`,
+-- tudo para `service_role`: são o livro-razão do OPERADOR DA PLATAFORMA sobre o
+-- próprio funil de vendas, e um `admin` de organização que as lesse veria o
+-- e-mail, a cidade e o plano de TODOS OS OUTROS CLIENTES.
+--
+-- Num self-host elas ficam VAZIAS, e isso é o correto: a página pública só
+-- existe quando `instalacaoCobra()` é verdadeiro (`lib/billing/planos.ts`), e
+-- nada escreve aqui sem ela. Nascem em todo clone para que as migrations sejam
+-- as mesmas em todo lugar. Tabela vazia não cobra, não envia e não rastreia
+-- ninguém.
+--
+-- As constraints vêm em `do $$` guardado por `pg_constraint` e depois da
+-- correção dos dados: `add constraint` não aceita `if not exists`, e o
+-- `update.sh` de um clone roda SEM `ON_ERROR_STOP` — um erro aqui passaria
+-- despercebido e deixaria o RESTO do apêndice por aplicar.
+--
+-- O racional de por que são cinco tabelas e não uma, e de por que o conteúdo
+-- dos 15 e-mails é código e não linha de banco, está no cabeçalho da migration
+-- 0240.
+
+-- ── 1. A visita ────────────────────────────────────────────────────────────
+--
+-- Sem e-mail, sem nome e sem IP. O `visitor_id` é um opaco de cookie primário;
+-- o mais perto de endereço que se guarda é `postal_code`, que é o que o
+-- roteamento de borda entrega. GUARDAR IP seria dado pessoal por definição da
+-- LGPD, com retenção e direito de acesso atrelados, para responder a uma
+-- pergunta ("de que cidade?") que `city` já responde.
+
+create table if not exists public.site_visits (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  visitor_id text not null,
+  session_id text,
+  path text not null,
+  referrer text,
+  referrer_host text,
+  utm_source text,
+  utm_medium text,
+  utm_campaign text,
+  utm_content text,
+  utm_term text,
+  country text,
+  region text,
+  city text,
+  postal_code text,
+  latitude text,
+  longitude text,
+  device text,
+  idioma text,
+  moeda text
+);
+
+create index if not exists site_visits_created_idx
+  on public.site_visits (created_at desc);
+create index if not exists site_visits_visitor_idx
+  on public.site_visits (visitor_id, created_at desc);
+create index if not exists site_visits_origem_idx
+  on public.site_visits (referrer_host, created_at desc)
+  where referrer_host is not null;
+create index if not exists site_visits_campanha_idx
+  on public.site_visits (utm_campaign, created_at desc)
+  where utm_campaign is not null;
+
+alter table public.site_visits enable row level security;
+revoke all on public.site_visits from anon, authenticated;
+grant all on public.site_visits to service_role;
+
+comment on table public.site_visits is
+  'Uma linha por visita à página pública. Deny-all: livro-razão do operador da plataforma, não dado de tenant. Sem IP e sem e-mail de propósito — o vínculo com a pessoa só existe quando ela deixa o e-mail e vira site_leads, pelo visitor_id.';
+comment on column public.site_visits.postal_code is
+  'O mais perto de "bairro" que a borda entrega — ela não devolve bairro. Aproximação honesta, não o bairro.';
+
+-- ── 2. A pessoa ────────────────────────────────────────────────────────────
+--
+-- Uma linha por e-mail, `citext` não existe aqui: o e-mail é normalizado para
+-- minúsculas na aplicação ANTES do insert e o índice único é sobre a coluna
+-- crua. Ligar a extensão por causa de uma coluna custaria ao `install.sh` de
+-- todo clone uma dependência que só esta tabela usa.
+--
+-- `token_descadastro` é `not null` com default: o descadastro de um clique é
+-- exigência de CAN-SPAM/LGPD e do próprio Gmail (`List-Unsubscribe`), e um
+-- token nullable produziria, no primeiro lead semeado sem ele, um link de
+-- descadastro quebrado — o defeito que mais custa reputação de domínio.
+
+create table if not exists public.site_leads (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  email text not null,
+  nome text,
+  telefone text,
+  empresa text,
+  mensagem text,
+  origem text not null default 'popup',
+  visitor_id text,
+  country text,
+  region text,
+  city text,
+  idioma text,
+  moeda text,
+  status text not null default 'inscrito',
+  confirmado_em timestamptz,
+  descadastrado_em timestamptz,
+  token_descadastro text not null default replace(uuid_generate_v4()::text, '-', ''),
+  ultimo_envio_em timestamptz,
+  proximo_passo integer not null default 0,
+  user_id uuid references auth.users(id) on delete set null,
+  organization_id uuid references public.organizations(id) on delete set null,
+  virou_usuario_em timestamptz,
+  assinou_em timestamptz,
+  plano text
+);
+
+-- Dados antes da constraint: o `update.sh` de um clone roda sem ON_ERROR_STOP,
+-- e uma constraint que falha deixa o resto do apêndice por aplicar.
+update public.site_leads
+  set origem = 'popup'
+  where origem is null or origem not in ('popup', 'rodape', 'contato', 'checkout', 'signup');
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'site_leads_origem_check'
+  ) then
+    alter table public.site_leads add constraint site_leads_origem_check
+      check (origem = any (array['popup'::text, 'rodape'::text, 'contato'::text, 'checkout'::text, 'signup'::text]));
+  end if;
+end $$;
+
+-- Dados antes da constraint: o `update.sh` de um clone roda sem ON_ERROR_STOP,
+-- e uma constraint que falha deixa o resto do apêndice por aplicar.
+update public.site_leads
+  set status = 'inscrito'
+  where status is null or status not in ('inscrito', 'confirmado', 'descadastrado', 'bounce', 'reclamou');
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'site_leads_status_check'
+  ) then
+    alter table public.site_leads add constraint site_leads_status_check
+      check (status = any (array['inscrito'::text, 'confirmado'::text, 'descadastrado'::text, 'bounce'::text, 'reclamou'::text]));
+  end if;
+end $$;
+
+create unique index if not exists site_leads_email_idx on public.site_leads (lower(email));
+create unique index if not exists site_leads_token_idx on public.site_leads (token_descadastro);
+create index if not exists site_leads_status_idx on public.site_leads (status, created_at desc);
+create index if not exists site_leads_passo_idx
+  on public.site_leads (proximo_passo, ultimo_envio_em)
+  where status in ('inscrito', 'confirmado');
+
+alter table public.site_leads enable row level security;
+revoke all on public.site_leads from anon, authenticated;
+grant all on public.site_leads to service_role;
+
+drop trigger if exists trg_site_leads_updated_at on public.site_leads;
+create trigger trg_site_leads_updated_at
+  before update on public.site_leads
+  for each row execute function public.fn_set_updated_at();
+
+comment on table public.site_leads is
+  'A PESSOA do funil público: uma linha por e-mail. Deny-all — um admin de tenant que a lesse veria o e-mail e o plano de todos os outros clientes. proximo_passo é o cursor da sequência de 15 e-mails; ausência de avanço é o que a torna reentrante.';
+comment on column public.site_leads.proximo_passo is
+  'Índice do PRÓXIMO e-mail da sequência (lib/marketing/sequencia.ts). Avança só depois do envio gravado em email_envios — cron que morre no meio reenvia o mesmo passo, e o unique de lá o barra.';
+
+-- ── 3. O envio ─────────────────────────────────────────────────────────────
+--
+-- `unique (lead_id, mensagem)` é a peça central: ele é o que permite ao cron
+-- ser burro e correto ao mesmo tempo. O disparo tenta INSERT; `23505` significa
+-- "já foi enviado" e o passo é pulado sem consultar nada antes. Sem ele, duas
+-- rodadas concorrentes (ou uma rodada que expirou depois do Resend aceitar,
+-- antes de gravar) mandam o mesmo e-mail duas vezes para a mesma pessoa.
+
+create table if not exists public.email_envios (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  lead_id uuid not null references public.site_leads(id) on delete cascade,
+  mensagem text not null,
+  assunto text,
+  provider_id text,
+  status text not null default 'agendado',
+  agendado_para timestamptz,
+  enviado_em timestamptz,
+  entregue_em timestamptz,
+  aberto_em timestamptz,
+  clicado_em timestamptz,
+  aberturas integer not null default 0,
+  cliques integer not null default 0,
+  erro text
+);
+
+-- Dados antes da constraint: o `update.sh` de um clone roda sem ON_ERROR_STOP,
+-- e uma constraint que falha deixa o resto do apêndice por aplicar.
+update public.email_envios
+  set status = 'agendado'
+  where status is null or status not in ('agendado', 'enviado', 'falhou', 'entregue', 'aberto', 'clicado', 'bounce', 'reclamou', 'descadastrou');
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'email_envios_status_check'
+  ) then
+    alter table public.email_envios add constraint email_envios_status_check
+      check (status = any (array['agendado'::text, 'enviado'::text, 'falhou'::text, 'entregue'::text, 'aberto'::text, 'clicado'::text, 'bounce'::text, 'reclamou'::text, 'descadastrou'::text]));
+  end if;
+end $$;
+
+create unique index if not exists email_envios_lead_mensagem_idx
+  on public.email_envios (lead_id, mensagem);
+create unique index if not exists email_envios_provider_idx
+  on public.email_envios (provider_id)
+  where provider_id is not null;
+create index if not exists email_envios_status_idx
+  on public.email_envios (status, created_at desc);
+
+alter table public.email_envios enable row level security;
+revoke all on public.email_envios from anon, authenticated;
+grant all on public.email_envios to service_role;
+
+drop trigger if exists trg_email_envios_updated_at on public.email_envios;
+create trigger trg_email_envios_updated_at
+  before update on public.email_envios
+  for each row execute function public.fn_set_updated_at();
+
+comment on table public.email_envios is
+  'Uma linha por (lead, mensagem). O unique é a IDEMPOTÊNCIA do disparo: o cron tenta o INSERT e trata 23505 como "já enviado", sem consulta prévia. provider_id é o id do Resend — é por ele que o webhook reencontra a linha.';
+
+-- ── 4. O evento ────────────────────────────────────────────────────────────
+--
+-- Append-only, e `provider_event_id` único porque o Resend reentrega webhook
+-- quando não recebe 2xx — mesmo motivo de `billing_webhook_events` (0239).
+-- Duas tabelas em vez de contadores só em `email_envios` porque a pergunta
+-- "quando ele abriu" tem mais de uma resposta, e a resposta agregada
+-- (`aberturas`) não permite reconstruir a série se a contagem errar.
+
+create table if not exists public.email_eventos (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  envio_id uuid references public.email_envios(id) on delete cascade,
+  lead_id uuid references public.site_leads(id) on delete cascade,
+  tipo text not null,
+  provider_event_id text,
+  dados jsonb not null default '{}'::jsonb
+);
+
+create unique index if not exists email_eventos_provider_idx
+  on public.email_eventos (provider_event_id)
+  where provider_event_id is not null;
+create index if not exists email_eventos_envio_idx
+  on public.email_eventos (envio_id, created_at desc);
+create index if not exists email_eventos_tipo_idx
+  on public.email_eventos (tipo, created_at desc);
+
+alter table public.email_eventos enable row level security;
+revoke all on public.email_eventos from anon, authenticated;
+grant all on public.email_eventos to service_role;
+
+comment on table public.email_eventos is
+  'Append-only, um por evento do provedor de e-mail. provider_event_id único porque o Resend reentrega webhook não confirmado — sem isto uma abertura viraria três no painel.';
+
+-- ── 5. O checkout que não terminou ─────────────────────────────────────────
+--
+-- `stripe_session_id` é a chave natural e é único: o webhook encontra a linha
+-- por ele. `status` começa `aberto` e só sai daí por evento do Stripe
+-- (`checkout.session.completed` / `.expired`) — nunca por relógio nosso, que
+-- discordaria do deles e mandaria "você esqueceu algo" a quem acabou de pagar.
+-- `lembrete_enviado_em` é o que impede o lembrete de sair duas vezes.
+
+create table if not exists public.checkout_tentativas (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  organization_id uuid references public.organizations(id) on delete set null,
+  lead_id uuid references public.site_leads(id) on delete set null,
+  stripe_session_id text not null,
+  email text,
+  plano text,
+  moeda text,
+  valor_cents integer,
+  status text not null default 'aberto',
+  concluido_em timestamptz,
+  lembrete_enviado_em timestamptz
+);
+
+-- Dados antes da constraint: o `update.sh` de um clone roda sem ON_ERROR_STOP,
+-- e uma constraint que falha deixa o resto do apêndice por aplicar.
+update public.checkout_tentativas
+  set status = 'aberto'
+  where status is null or status not in ('aberto', 'concluido', 'expirado', 'abandonado');
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'checkout_tentativas_status_check'
+  ) then
+    alter table public.checkout_tentativas add constraint checkout_tentativas_status_check
+      check (status = any (array['aberto'::text, 'concluido'::text, 'expirado'::text, 'abandonado'::text]));
+  end if;
+end $$;
+
+create unique index if not exists checkout_tentativas_sessao_idx
+  on public.checkout_tentativas (stripe_session_id);
+create index if not exists checkout_tentativas_status_idx
+  on public.checkout_tentativas (status, created_at desc);
+create index if not exists checkout_tentativas_lembrete_idx
+  on public.checkout_tentativas (created_at)
+  where status = 'aberto' and lembrete_enviado_em is null;
+
+alter table public.checkout_tentativas enable row level security;
+revoke all on public.checkout_tentativas from anon, authenticated;
+grant all on public.checkout_tentativas to service_role;
+
+drop trigger if exists trg_checkout_tentativas_updated_at on public.checkout_tentativas;
+create trigger trg_checkout_tentativas_updated_at
+  before update on public.checkout_tentativas
+  for each row execute function public.fn_set_updated_at();
+
+comment on table public.checkout_tentativas is
+  'Estado de UMA sessão de checkout do Stripe. Deny-all: organization_id existe para fechar o funil (quem virou cliente), não para dar leitura ao tenant. status só muda por evento do Stripe — relógio nosso discordaria do deles e mandaria "esqueceu algo" a quem já pagou.';
+
+notify pgrst, 'reload schema';
+
+-- ---- memória do relógio: quando cada cron rodou (migration 0241) ----
+--
+-- Existe para o deploy HOSPEDADO. No self-host o contêiner `deskcomm-scheduler`
+-- tem `crond` de verdade e esta tabela fica vazia — o que é correto e barato.
+--
+-- No hospedado não há esse contêiner, e o plano Hobby da Vercel só aceita cron
+-- DIÁRIO (cron sub-diário no `vercel.json` fora do Pro reprova o deploy, não
+-- degrada). Quem bate o relógio por HTTP de graça atrasa 5 a 15 minutos, então
+-- o tick não pode perguntar "o minuto casa com a cadência?" — ele pergunta
+-- "esta tarefa rodou depois da última hora em que deveria?", e para isso
+-- precisa LEMBRAR. Memória em processo não serve: função serverless perde o
+-- `Map` no primeiro deploy ou na primeira hora ociosa, e acerta no teste
+-- errando de madrugada.
+--
+-- Deny-all: é livro-razão do OPERADOR sobre a própria máquina, não dado de
+-- tenant — uma rodada do `data-retention` atravessa todas as organizações.
+-- Uma linha por tarefa e não append-only: a pergunta tem uma resposta, e o
+-- histórico completo seriam ~32 mil linhas/dia numa instalação que não atende
+-- ninguém (o mesmo defeito que o audit log de cron já pagou).
+
+create table if not exists public.relogio_execucoes (
+  tarefa text primary key,
+  ultima_execucao timestamptz not null default now(),
+  ultimo_status text not null default 'ok',
+  ultimo_detalhe text,
+  duracao_ms integer,
+  falhas_seguidas integer not null default 0,
+  atualizado_em timestamptz not null default now()
+);
+
+-- Correção de dados ANTES da constraint: o `update.sh` do clone roda sem
+-- ON_ERROR_STOP, e um erro aqui deixaria o resto do apêndice por aplicar.
+update public.relogio_execucoes
+   set ultimo_status = 'ok'
+ where ultimo_status is null
+    or ultimo_status not in ('ok', 'falhou', 'pulou');
+
+update public.relogio_execucoes
+   set falhas_seguidas = 0
+ where falhas_seguidas is null
+    or falhas_seguidas < 0;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'relogio_execucoes_status_chk'
+  ) then
+    alter table public.relogio_execucoes
+      add constraint relogio_execucoes_status_chk
+      check (ultimo_status in ('ok', 'falhou', 'pulou'));
+  end if;
+end $$;
+
+create index if not exists relogio_execucoes_ultima_idx
+  on public.relogio_execucoes (ultima_execucao asc);
+
+alter table public.relogio_execucoes enable row level security;
+revoke all on public.relogio_execucoes from anon, authenticated;
+grant all on public.relogio_execucoes to service_role;
+
+comment on table public.relogio_execucoes is
+  'Quando cada rota de app/api/v1/cron rodou pela última vez. Existe para o deploy HOSPEDADO, onde não há crond: o tick de /api/v1/system/relogio/tick compara esta marca com a última ocorrência devida da cadência (lib/relogio/agenda.ts) e roda o que está vencido. Deny-all: livro-razão do operador, não dado de tenant.';
+comment on column public.relogio_execucoes.tarefa is
+  'Nome do diretório em app/api/v1/cron/. Chave natural — uma rota, no máximo uma linha.';
+comment on column public.relogio_execucoes.falhas_seguidas is
+  'Zera no primeiro sucesso. É o que distingue "falhou agora" de "está quebrada há 40 rodadas".';
+
+notify pgrst, 'reload schema';
+
 -- ---- VARREDURA anon: função nova nasce exposta em quem ATUALIZA (migration 0116) ----
 --
 -- ⚠️ ESTE BLOCO É, DE PROPÓSITO, O ÚLTIMO DO ARQUIVO. Apêndice novo entra ANTES

@@ -170,18 +170,60 @@ async function marcarExecucao(
  * declara 120 s no `vercel.json`. Pela rede, cada rota roda na PRÓPRIA função,
  * com o PRÓPRIO limite de tempo, a própria auditoria e o próprio isolamento de
  * falha: uma rota que estoure memória derruba a si mesma, não o relógio.
+ *
+ * ─── Por que o redirecionamento é tratado À MÃO ─────────────────────────────
+ *
+ * `fetch` segue redirecionamento sozinho, mas a especificação manda **apagar o
+ * `Authorization`** quando o destino é outra ORIGEM — e `atenza.online` →
+ * `www.atenza.online` são origens diferentes. Com `redirect: "follow"`, uma
+ * `NEXT_PUBLIC_APP_URL` sem o `www` produziria dezoito chamadas 401 de um jeito
+ * perfeitamente silencioso: o tick devolve 200, o painel enche de `falhou`, e a
+ * causa (uma variável de ambiente com três letras a menos) não aparece em lugar
+ * nenhum.
+ *
+ * Então seguimos à mão, uma vez só, e **apenas dentro do mesmo domínio
+ * registrável** — reanexar o bearer num destino que o servidor escolheu é
+ * entregar o segredo a quem controlar o `Location`. Redirecionamento para fora
+ * do domínio vira falha com o endereço escrito, que é o que permite consertar.
  */
+function mesmoDominio(a: URL, b: URL): boolean {
+  const apex = (h: string) => h.split(".").slice(-2).join(".");
+  return apex(a.hostname) === apex(b.hostname);
+}
+
 async function chamarRota(t: TarefaAgendada, base: string, segredo: string): Promise<{ ok: boolean; detalhe: string }> {
   const url = `${base}${caminhoDaTarefa(t)}`;
   const controlador = new AbortController();
   const corte = setTimeout(() => controlador.abort(), t.timeoutS * 1000);
-  try {
-    const resposta = await fetch(url, {
+  const pedir = (alvo: string) =>
+    fetch(alvo, {
       method: "GET",
       headers: { authorization: `Bearer ${segredo}`, "x-relogio": "tick" },
       signal: controlador.signal,
       cache: "no-store",
+      redirect: "manual",
     });
+  try {
+    let resposta = await pedir(url);
+    if (resposta.status >= 300 && resposta.status < 400) {
+      const destino = resposta.headers.get("location");
+      if (!destino) return { ok: false, detalhe: `${resposta.status} sem Location` };
+      const alvo = new URL(destino, url);
+      if (!mesmoDominio(alvo, new URL(url))) {
+        return {
+          ok: false,
+          detalhe: `${resposta.status} redireciona para fora do domínio (${alvo.origin}) — o bearer não vai junto`,
+        };
+      }
+      resposta = await pedir(alvo.toString());
+      if (!resposta.ok) {
+        const corpo = (await resposta.text()).slice(0, 200);
+        return {
+          ok: false,
+          detalhe: `${resposta.status} ${corpo} — ajuste NEXT_PUBLIC_APP_URL para ${alvo.origin}`,
+        };
+      }
+    }
     const corpo = (await resposta.text()).slice(0, 300);
     return { ok: resposta.ok, detalhe: `${resposta.status} ${corpo}` };
   } catch (err) {

@@ -75,6 +75,54 @@ curl -fsS -X POST \
   "https://crm-gabrielle.vercel.app/api/v1/system/relogio/tick"
 ```
 
+## Opção C — `pg_cron` no próprio Supabase (grátis, a cada 1 minuto, sem conta nova)
+
+**Por que existe:** o `*/5` da Opção A é um pedido, não uma garantia. Medido em
+2026-09-22 num repositório público: o GitHub disparou o `schedule` às 06:49,
+12:08, 16:56 e 20:03 — uma batida a cada **4–5 horas**. Um lead que responde
+"SIM" espera esse tempo todo pelo passo seguinte do follow-up. A Opção A serve
+de rede de segurança; o relógio de verdade precisa de outro lugar.
+
+O Supabase hospedado já traz `pg_cron` (agenda) e `pg_net` (HTTP assíncrono —
+o `net.http_post` só enfileira, então nenhuma transação espera a rede). O
+segredo fica no **Vault**, cifrado, e não em texto puro na definição do job
+(que qualquer um com leitura em `cron.job` veria).
+
+No painel do Supabase → **SQL Editor**, troque `<INTERNAL_SECRET>` e
+`<APP_URL>` (ex.: `https://www.seudominio.com`, com o host FINAL — um
+redirecionamento 308 de domínio apex para `www` derruba o `Authorization`) e rode:
+
+```sql
+create extension if not exists pg_cron with schema pg_catalog;
+grant usage on schema cron to postgres;
+create extension if not exists pg_net with schema extensions;
+
+select vault.create_secret('<INTERNAL_SECRET>', 'relogio_tick_secret',
+  'Bearer do POST /api/v1/system/relogio/tick (= INTERNAL_SECRET da Vercel)');
+
+select cron.schedule('relogio-tick', '* * * * *', $$
+  select net.http_post(
+    url := '<APP_URL>/api/v1/system/relogio/tick',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets
+                                     where name = 'relogio_tick_secret')),
+    body := '{}'::jsonb,
+    timeout_milliseconds := 60000)
+$$);
+```
+
+Conferir (as respostas HTTP ficam em `net._http_response` por algumas horas):
+
+```sql
+select status, start_time from cron.job_run_details order by start_time desc limit 5;
+select status_code, left(content, 120) from net._http_response order by created desc limit 5;
+```
+
+Desligar: `select cron.unschedule('relogio-tick');`. Trocou o `INTERNAL_SECRET`
+na Vercel? Troque também no Vault: `select vault.update_secret((select id from
+vault.secrets where name = 'relogio_tick_secret'), '<NOVO>');`.
+
 ## Como saber que está funcionando
 
 Nos logs da Vercel (produção), a cada batida:

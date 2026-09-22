@@ -23,6 +23,7 @@ import { z } from "zod";
 
 import { fail, ok } from "@/lib/api/wrappers";
 import { requireRole } from "@/lib/auth/require-role";
+import { cabeMaisUm, frasePrimeiraPessoa } from "@/lib/billing/tetos";
 import {
   PARTNER_CHANNEL_LABEL,
   findPartnerSession,
@@ -139,6 +140,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   const existente = await findPartnerSession(admin, orgId);
+  // O teto só pesa quando esta chamada ACRESCENTA um canal — reconectar por
+  // cima do que a organização já tinha não aumenta a conta (lib/billing/tetos.ts).
+  if (!existente) {
+    const cabe = await cabeMaisUm(admin, orgId, "canais");
+    if (!cabe.permitido) {
+      return fail("teto_do_plano", t(frasePrimeiraPessoa("canais", cabe)), 402, { requestId });
+    }
+  }
   // Reconectar por cima de um canal excluído RESSUSCITA a linha, e o token de
   // webhook é preservado para não invalidar o que já está colado do outro lado.
   const token = existente?.webhookPathToken ?? randomBytes(16).toString("hex");

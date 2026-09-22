@@ -10,6 +10,7 @@ import { requireSupportWrite } from "@/lib/impersonate/support";
 import { randomUUID } from "node:crypto";
 import type { NextRequest } from "next/server";
 
+import { cabeMaisUm, frasePrimeiraPessoa } from "@/lib/billing/tetos";
 import { connectWahaChannel, ChannelConnectionError } from "@/lib/channels/connect-waha";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mfaEmDivida } from "@/lib/auth/server";
@@ -79,13 +80,16 @@ export async function POST(req: NextRequest): Promise<Response> {
   if (!authz.ok) return authz.response;
   const t = (texto: string) => traduzir(texto, authz.user.idioma);
   const { user, org: activeOrg } = authz;
-  if (await mfaEmDivida()) return fail("mfa_required", t("Confirme a verificação em duas etapas."), 403, { requestId });
+  if (await mfaEmDivida())
+    return fail("mfa_required", t("Confirme a verificação em duas etapas."), 403, { requestId });
 
   const waha = getWahaClient();
   if (!waha) {
     return fail(
       "waha_not_configured",
-      t("O WhatsApp (WAHA) não está configurado neste ambiente: faltam WAHA_API_BASE_URL e/ou WAHA_API_KEY. Configure-as e tente de novo."),
+      t(
+        "O WhatsApp (WAHA) não está configurado neste ambiente: faltam WAHA_API_BASE_URL e/ou WAHA_API_KEY. Configure-as e tente de novo.",
+      ),
       503,
       { requestId },
     );
@@ -105,16 +109,38 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
   }
 
+  // O teto do plano vem ANTES de falar com o transporte: pedir um QR, criar a
+  // sessão lá e só então recusar deixaria uma sessão órfã do outro lado e um
+  // código de país queimado. Numa instalação que não cobra, isto é um `return`
+  // imediato e nem chega a consultar o banco (lib/billing/tetos.ts).
+  const cabe = await cabeMaisUm(createAdminClient(), activeOrg.orgId, "canais");
+  if (!cabe.permitido) {
+    return fail("teto_do_plano", t(frasePrimeiraPessoa("canais", cabe)), 402, { requestId });
+  }
+
   try {
     const result = await connectWahaChannel(await createClient(), createAdminClient(), waha, {
-      organizationId: activeOrg.orgId, idempotencyKey: req.headers.get("Idempotency-Key") ?? "",
-      userId: user.id, requestId, displayName: parsed.data.display_name,
+      organizationId: activeOrg.orgId,
+      idempotencyKey: req.headers.get("Idempotency-Key") ?? "",
+      userId: user.id,
+      requestId,
+      displayName: parsed.data.display_name,
     });
     return ok(result.channel, { requestId, status: result.replay ? 200 : 201 });
   } catch (error) {
-    if (error instanceof ChannelConnectionError) return fail(error.code,
-      error.code === "connection_in_progress" ? t("A conexão ainda está sendo preparada. Aguarde e tente novamente.") : t("Não foi possível concluir a conexão. Abra Conexões para tentar novamente ou reparar o número."),
-      error.status, { requestId, details: error.technical });
-    return fail("internal_error", t("Não foi possível concluir a conexão. Tente novamente."), 500, { requestId });
+    if (error instanceof ChannelConnectionError)
+      return fail(
+        error.code,
+        error.code === "connection_in_progress"
+          ? t("A conexão ainda está sendo preparada. Aguarde e tente novamente.")
+          : t(
+              "Não foi possível concluir a conexão. Abra Conexões para tentar novamente ou reparar o número.",
+            ),
+        error.status,
+        { requestId, details: error.technical },
+      );
+    return fail("internal_error", t("Não foi possível concluir a conexão. Tente novamente."), 500, {
+      requestId,
+    });
   }
 }

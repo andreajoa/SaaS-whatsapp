@@ -23,6 +23,8 @@ import { ok, fail } from "@/lib/api/wrappers";
 import { ApiError } from "@/lib/api/types";
 
 import { requireRole } from "@/lib/auth/require-role";
+import { cabeMaisUm, frasePrimeiraPessoa } from "@/lib/billing/tetos";
+import { traduzir } from "@/lib/i18n/dicionario";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inviteMemberSchema, validateRequest } from "@/lib/schemas";
 
@@ -38,6 +40,13 @@ interface SentItem {
 interface FailedItem {
   email: string;
   reason: string;
+  /**
+   * A frase pronta, quando o `reason` sozinho não diz o que fazer. Opcional
+   * porque `already_member` se explica; `teto_do_plano` não — ele precisa dizer
+   * quantas vagas o plano inclui e onde se muda de plano, ou a recusa vira um
+   * nome de código na tela.
+   */
+  message?: string;
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -85,6 +94,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
   }
 
+  // Convites emitidos NESTA chamada. A pergunta do teto é feita por e-mail, e
+  // não uma vez antes do laço, porque este endpoint emite até 20 de uma vez: as
+  // linhas recém-escritas ainda não voltam na contagem a cada volta, e sem este
+  // contador os 20 passariam por uma única vaga (lib/billing/tetos.ts).
+  let emitidosAqui = 0;
+
   for (const inv of input.invitations) {
     const email = inv.email.trim().toLowerCase();
 
@@ -95,6 +110,20 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 
     if (admin) {
+      // Recusa POR E-MAIL, e não a chamada inteira: quem mandou 5 nomes com 2
+      // vagas fica com os 2 primeiros convidados e lê no corpo por que os
+      // outros 3 não saíram. Derrubar a requisição inteira desfaria trabalho
+      // que já estava dentro do que a pessoa comprou.
+      const cabe = await cabeMaisUm(admin, activeOrg.orgId, "membros", emitidosAqui);
+      if (!cabe.permitido) {
+        failed.push({
+          email,
+          reason: "teto_do_plano",
+          message: traduzir(frasePrimeiraPessoa("membros", cabe), authUser.idioma),
+        });
+        continue;
+      }
+      emitidosAqui += 1;
       const { convite, accept_url, email_dispatched } = await emitirConvite(admin, {
         email,
         role: inv.role,

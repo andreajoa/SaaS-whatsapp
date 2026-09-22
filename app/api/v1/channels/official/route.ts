@@ -31,6 +31,7 @@ import { ARCHIVED_AT, queryTolerantToMissingArchived } from "@/lib/channels/arch
 import { CHANNEL_PROVIDER_META } from "@/lib/channels/capabilities";
 import { validateMetaCredentials } from "@/lib/channels/meta/validate-credentials";
 import { reactivateChannelSession } from "@/lib/channels/reactivate";
+import { cabeMaisUm, frasePrimeiraPessoa } from "@/lib/billing/tetos";
 import { env } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { metadataInicialDoCanal } from "@/lib/ai/elegibilidade/pre-go-live";
@@ -58,9 +59,7 @@ const conectarSchema = z.object({
 function publicBase(req: NextRequest): string {
   const configurada = env.NEXT_PUBLIC_APP_URL;
   const usavel = configurada && !configurada.includes("placeholder.invalid") ? configurada : null;
-  return (
-    usavel ?? req.headers.get("origin") ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
-  );
+  return usavel ?? req.headers.get("origin") ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`;
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
@@ -79,7 +78,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const consultar = () =>
     admin
       .from("channel_sessions")
-      .select("id, meta_phone_number_id, meta_waba_id, meta_token_encrypted, phone_number, display_name, webhook_path_token, status")
+      .select(
+        "id, meta_phone_number_id, meta_waba_id, meta_token_encrypted, phone_number, display_name, webhook_path_token, status",
+      )
       .eq("organization_id", orgId)
       .eq("provider", CHANNEL_PROVIDER_META);
   const { data } = await queryTolerantToMissingArchived(
@@ -143,7 +144,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // recusar. O operador precisa saber que falta uma configuração de servidor.
     return fail(
       "invalid_request",
-      t("cifra indisponível nesta instalação (GUC app.nuvemshop_oauth_key ausente) — o token não foi gravado"),
+      t(
+        "cifra indisponível nesta instalação (GUC app.nuvemshop_oauth_key ausente) — o token não foi gravado",
+      ),
       422,
       { requestId },
     );
@@ -166,13 +169,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   );
   const existente = existenteRaw as { id: string; archived_at?: string | null } | null;
 
+  // O teto só pesa quando esta chamada ACRESCENTA um canal. Trocar a credencial
+  // do canal que já está aqui, ou ressuscitar o que foi excluído, não aumenta
+  // a conta — e recusar a volta de um canal que a organização já tinha seria
+  // tirar, não deixar de dar (lib/billing/tetos.ts).
+  if (!existente) {
+    const cabe = await cabeMaisUm(admin, orgId, "canais");
+    if (!cabe.permitido) {
+      return fail("teto_do_plano", t(frasePrimeiraPessoa("canais", cabe)), 402, { requestId });
+    }
+  }
+
   const linha = {
     organization_id: orgId,
     provider: CHANNEL_PROVIDER_META,
     meta_phone_number_id: phone_number_id,
     meta_waba_id: waba_id,
     meta_token_encrypted: cifrado,
-    phone_number: validacao.displayPhoneNumber ? `+${validacao.displayPhoneNumber.replace(/\D/g, "")}` : null,
+    phone_number: validacao.displayPhoneNumber
+      ? `+${validacao.displayPhoneNumber.replace(/\D/g, "")}`
+      : null,
     display_name: validacao.verifiedName ?? "Canal oficial",
     status: "WORKING",
   };

@@ -76,6 +76,16 @@ export const ApiErrorCodes = {
   // 413
   payload_too_large: "payload_too_large",
 
+  // 402 — o plano assinado não inclui mais um deste recurso.
+  //
+  // Código PRÓPRIO, e 402 em vez de 403, porque a AÇÃO que ele pede é diferente
+  // de toda recusa vizinha. `forbidden` manda a pessoa procurar um admin — e
+  // aqui o admin é ela, e nada que ele clique em permissões resolve. O caminho
+  // é mudar de plano, e o cliente precisa conseguir distinguir este caso para
+  // oferecer esse caminho em vez de um "sem permissão" que não é verdade.
+  // A regra e a frase vivem em lib/billing/tetos.ts.
+  teto_do_plano: "teto_do_plano",
+
   // 429
   rate_limited: "rate_limited",
 

@@ -39,6 +39,8 @@ import type { NextRequest } from "next/server";
 import { ok, fail } from "@/lib/api/wrappers";
 import { audit } from "@/lib/audit";
 import { requireRole } from "@/lib/auth/require-role";
+import { cabeMaisUm, frasePrimeiraPessoa } from "@/lib/billing/tetos";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { traduzir } from "@/lib/i18n/dicionario";
 
@@ -74,6 +76,15 @@ export async function POST(
   // cliques seguidos não podem virar erro na cara de quem administra.
   if (!target.revoked_at) {
     return ok({ user_id: targetUserId, already_active: true }, { requestId });
+  }
+
+  // Reativar OCUPA uma vaga — a linha revogada não contava, e a reativada conta.
+  // Sem esta pergunta o teto teria uma porta dos fundos: revogar três pessoas e
+  // reativá-las depois devolveria o time inteiro sem passar pelo convite, que é
+  // onde o teto de membros mora (lib/billing/tetos.ts).
+  const cabe = await cabeMaisUm(createAdminClient(), activeOrg.orgId, "membros");
+  if (!cabe.permitido) {
+    return fail("teto_do_plano", t(frasePrimeiraPessoa("membros", cabe)), 402, { requestId });
   }
 
   const nowIso = new Date().toISOString();

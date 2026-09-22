@@ -190,6 +190,10 @@ const schema = z.object({
   // Os dois juntos, ou nenhum — ver `lib/ai/llm-de-nascimento.ts`.
   AI_PROVIDER: z.string().optional().default(""),
   AI_DEFAULT_MODEL: z.string().optional().default(""),
+  // Jev (TypeSafe System One), o segundo portão do opt-out. Opcional: sem ela
+  // o Jev vai pelo espelho da OpenRouter (OPENROUTER_API_KEY); sem as duas,
+  // vale só o portão determinístico. Ver `lib/opt-out/jev.ts`.
+  TYPESAFE_API_KEY: z.string().optional().default(""),
 
   // Fusão (Fase 4): DONO ÚNICO dos eventos ai_agent.dispatch_requested.
   // 'engine' (default) = o worker agent-engine é o único consumidor (o cron

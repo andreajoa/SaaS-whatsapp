@@ -43,6 +43,7 @@ import { garantirLeadDaConversa } from "@/lib/leads/nascimento-do-lead";
 import { logger } from "@/lib/logger";
 import type { createAdminClient } from "@/lib/supabase/admin";
 import { ehPedidoDeOptOut } from "@/lib/opt-out/deteccao";
+import { LIMIAR_DE_BLOQUEIO, merecePerguntarAoJev, probabilidadeDeOptOut } from "@/lib/opt-out/jev";
 import { acelerarPipelineDeEventos } from "@/lib/dev/kick-local-pipeline";
 import { autorizarContatoParaIA } from "@/lib/ai/elegibilidade/autorizacao";
 import { casarCampanha, lerCampanhas } from "@/lib/ai/elegibilidade/campanha";
@@ -201,13 +202,24 @@ async function avaliarCampanha(admin: Admin, entrada: EntradaDeMensagem): Promis
  * é justamente o que prova, depois, que o pedido chegou e foi respeitado.
  */
 async function aplicarOptOut(admin: Admin, entrada: EntradaDeMensagem): Promise<void> {
-  if (!ehPedidoDeOptOut(entrada.texto)) return;
+  // Portão 1, determinístico: palavra isolada ou frase inequívoca. Portão 2, só
+  // para a frase que o 1 não alcançou: a intenção, julgada pelo Jev. Jev fora
+  // do ar devolve null e fica valendo o portão 1 — ver `lib/opt-out/jev.ts`.
+  let motivo: "stop_keyword" | "stop_intencao" | null = ehPedidoDeOptOut(entrada.texto)
+    ? "stop_keyword"
+    : null;
+  let probabilidade: number | null = null;
+  if (!motivo && entrada.texto && merecePerguntarAoJev(entrada.texto)) {
+    probabilidade = await probabilidadeDeOptOut(entrada.texto);
+    if (probabilidade !== null && probabilidade >= LIMIAR_DE_BLOQUEIO) motivo = "stop_intencao";
+  }
+  if (!motivo) return;
 
   try {
     const agora = new Date().toISOString();
     const { error } = await admin
       .from("contacts")
-      .update({ is_blocked: true, blocked_reason: "stop_keyword", blocked_at: agora })
+      .update({ is_blocked: true, blocked_reason: motivo, blocked_at: agora })
       .eq("organization_id", entrada.organizationId)
       .eq("id", entrada.contactId);
 
@@ -229,7 +241,13 @@ async function aplicarOptOut(admin: Admin, entrada: EntradaDeMensagem): Promise<
       organizationId: entrada.organizationId,
       resourceType: "contact",
       requestId: entrada.requestId,
-      metadata: { reason: "stop_keyword", contact_id: entrada.contactId, origem: entrada.origem },
+      metadata: {
+        reason: motivo,
+        contact_id: entrada.contactId,
+        origem: entrada.origem,
+        // A probabilidade, e não o texto: o texto é PII e não vai a audit.
+        ...(probabilidade !== null ? { probabilidade } : {}),
+      },
     });
   } catch (err) {
     logger.error("pos-entrada: opt-out NAO gravado — o contato segue recebendo", {

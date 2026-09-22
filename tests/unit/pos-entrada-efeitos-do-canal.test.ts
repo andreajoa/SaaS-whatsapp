@@ -42,6 +42,14 @@ vi.mock("@/lib/dev/kick-local-pipeline", () => ({
   acelerarPipelineDeEventos: vi.fn(async () => {}),
   kickLocalPipeline: vi.fn(async () => {}),
 }));
+// O segundo portão do opt-out vai à rede. Aqui ele responde o que cada caso
+// mandar; o padrão é "não deu para perguntar" — o estado de uma instalação sem
+// chave, em que só o portão determinístico vale.
+const probabilidadeDeOptOut = vi.fn(async (_texto: string): Promise<number | null> => null);
+vi.mock("@/lib/opt-out/jev", async (original) => ({
+  ...(await original<typeof import("@/lib/opt-out/jev")>()),
+  probabilidadeDeOptOut: (texto: string) => probabilidadeDeOptOut(texto),
+}));
 
 /** A sequência do que ACONTECEU — é o que os casos de ordem inspecionam. */
 let sequencia: string[] = [];
@@ -108,6 +116,8 @@ beforeEach(() => {
   ultimoUpdate = null;
   ultimaRpc = null;
   audit.mockClear();
+  probabilidadeDeOptOut.mockReset();
+  probabilidadeDeOptOut.mockResolvedValue(null);
   garantirLeadDaConversa.mockClear();
   garantirLeadDaConversa.mockResolvedValue({ criado: true, leadId: "lead-1" } as never);
   vi.mocked(acelerarPipelineDeEventos).mockClear();
@@ -152,6 +162,26 @@ describe("opt-out", () => {
   it("bloqueia o contato quando a mensagem pede para sair", async () => {
     await rodar({ texto: "quero PARAR de receber" });
     expect(ultimoUpdate).toMatchObject({ is_blocked: true, blocked_reason: "stop_keyword" });
+    // O portão determinístico decidiu: o Jev nem é perguntado.
+    expect(probabilidadeDeOptOut).not.toHaveBeenCalled();
+  });
+
+  it("⭐ frase que o portão 1 não alcança: o Jev acima do limiar bloqueia, com motivo próprio", async () => {
+    probabilidadeDeOptOut.mockResolvedValue(0.93);
+    await rodar({ texto: "vocês estão me incomodando, não aguento mais isso" });
+    expect(ultimoUpdate).toMatchObject({ is_blocked: true, blocked_reason: "stop_intencao" });
+    expect(audit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "contact.blocked",
+        metadata: expect.objectContaining({ reason: "stop_intencao", probabilidade: 0.93 }),
+      }),
+    );
+  });
+
+  it("⭐ o Jev abaixo do limiar NÃO bloqueia — bloquear é o erro caro", async () => {
+    probabilidadeDeOptOut.mockResolvedValue(0.56);
+    await rodar({ texto: "vocês estão me incomodando, não aguento mais isso" });
+    expect(sequencia).not.toContain("update:contacts");
   });
 
   it("NÃO bloqueia quem só escreveu uma palavra parecida", async () => {

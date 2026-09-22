@@ -117,6 +117,11 @@ DeskcommCRM é um sistema operacional de vendas open source com agentes de IA na
   em vigor sem confiar nesta linha:
   `grep -n 'PALAVRAS_DE_OPT_OUT' -A20 lib/opt-out/deteccao.ts`, e as frases de controle em
   `tests/unit/opt-out-deteccao.test.ts`.
+  **Na ingestão há um SEGUNDO portão, e só lá:** a frase que a regra acima não alcança vai
+  ao Jev (`lib/opt-out/jev.ts`), que devolve uma probabilidade; `≥ LIMIAR_DE_BLOQUEIO`
+  bloqueia com `blocked_reason = 'stop_intencao'`. O portão determinístico continua
+  primeiro e decide sozinho quando casa. Sem chave (`TYPESAFE_API_KEY` ou
+  `OPENROUTER_API_KEY`), ou com o Jev fora do ar, vale só ele — falha nunca vira bloqueio.
 - Mídia: subir pro Supabase Storage primeiro, passar URL ao WAHA (não inline base64)
 - Multi-device: assinar `message.any` (não só `message`); tratar `fromMe=true` sem duplicar
 - Grupos: SKIP CRM binding se `chatId.endsWith('@g.us')`. Sender é `p.author`, não `p.from`

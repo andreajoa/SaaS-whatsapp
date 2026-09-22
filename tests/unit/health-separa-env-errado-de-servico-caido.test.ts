@@ -43,12 +43,20 @@ function comEnv(redisUrl: string, redisToken: string) {
       INTERNAL_SECRET: "",
     },
   }));
+  // A rota pergunta ao banco quais transportes estão em uso ANTES dos checks.
+  // Aqui o banco é um endereço de mentira: sem esta resposta fixa, a pergunta
+  // vai à rede e o cronômetro abaixo passa a medir ela, não o Redis.
+  vi.doMock("@/lib/channels/transportes-em-uso", () => ({
+    transportesEmUso: async () => ({ providers: new Set<string>(), houveLeitura: true }),
+    temTransporteProprio: () => false,
+  }));
 }
 
 describe("GET /api/v1/health — o motivo aponta para o que precisa ser feito", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.doUnmock("@/lib/env");
+    vi.doUnmock("@/lib/channels/transportes-em-uso");
   });
 
   it("⭐ `.env` com as aspas sobrando: o motivo é a CONFIGURAÇÃO, e o serviço nem é procurado", async () => {

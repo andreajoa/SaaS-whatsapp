@@ -175,7 +175,7 @@ function Ranking({
             <li key={l.chave} className="relative flex items-center justify-between gap-3 text-sm">
               <span
                 aria-hidden
-                className="absolute inset-y-0 left-0 rounded bg-text/5"
+                className="absolute inset-y-0 left-0 rounded-md bg-text/5"
                 style={{ width: `${Math.round((l.total / maior) * 100)}%` }}
               />
               <span className="relative truncate px-1">{l.chave}</span>

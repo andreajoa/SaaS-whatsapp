@@ -13,8 +13,9 @@ faz nada.
 
 O que estava quebrado era o deploy **hospedado**. Ali não existe esse
 contêiner, e o plano Hobby da Vercel só aceita cron diário — declarar cron
-sub-diário no `vercel.json` fora do Pro não degrada, **reprova o deploy
-inteiro**. A saída era o relógio HTTP (`/api/v1/system/relogio/tick`), batido
+sub-diário no `vercel.json` fora do Pro não degrada:
+**reprova o deploy inteiro**.
+A saída era o relógio HTTP (`/api/v1/system/relogio/tick`), batido
 de fora por GitHub Actions ou cron-job.org. Só que ele cobria **quatro**
 tarefas: dreno de eventos, follow-up, roteamento e envio travado. As outras
 dezoito rotas — `agent-dispatcher` inclusive, que é *a IA responder* — não

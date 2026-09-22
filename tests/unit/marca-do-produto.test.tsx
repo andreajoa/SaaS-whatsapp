@@ -4,7 +4,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import { Sidebar } from "@/components/shell/Sidebar";
-import { CLASSES_DE_COR, LogotipoDoProduto, SimboloDoProduto } from "@/components/branding/MarcaDoProduto";
+import {
+  CLASSES_DE_COR,
+  LogotipoDoProduto,
+  SimboloDoProduto,
+} from "@/components/branding/MarcaDoProduto";
 import type { ActiveOrg, AuthUser } from "@/lib/auth/types";
 import { DEFAULT_APP_NAME, marcaEhADoProduto, type Branding } from "@/lib/branding";
 import { MarcaDaInstalacaoProvider } from "@/lib/branding/contexto";
@@ -113,8 +117,14 @@ describe("as cores do desenho", () => {
   it("as classes do componente cobrem exatamente a paleta declarada, nos dois temas", () => {
     // O Tailwind só gera utilitário para hex LITERAL no fonte, então o
     // componente repete os valores. Isto é o que impede os dois de divergirem.
-    const nasClasses = Object.values(CLASSES_DE_COR).join(" ").match(/#[0-9a-f]{6}/g) ?? [];
-    const naPaleta = [...Object.values(CORES_DA_MARCA.claro), ...Object.values(CORES_DA_MARCA.escuro)];
+    const nasClasses =
+      Object.values(CLASSES_DE_COR)
+        .join(" ")
+        .match(/#[0-9a-f]{6}/g) ?? [];
+    const naPaleta = [
+      ...Object.values(CORES_DA_MARCA.claro),
+      ...Object.values(CORES_DA_MARCA.escuro),
+    ];
     expect([...nasClasses].sort()).toEqual([...naPaleta].sort());
   });
 
@@ -136,11 +146,28 @@ describe("as cores do desenho", () => {
 });
 
 describe("o favicon segue a mesma regra", () => {
+  // O desenho saiu de `app/icon.tsx` e virou `LadrilhoDaMarca`, porque três
+  // rotas precisam do MESMO ladrilho: `/icon` (aba), `/apple-icon` (tela de
+  // início do iPhone) e o cabeçalho do e-mail. Enquanto a regra morava dentro
+  // do `icon.tsx`, cada nova rota a copiava — e a cópia é onde a marca de um
+  // revendedor vaza, porque só uma delas recebe o conserto.
+  //
+  // Por isso o par de casos abaixo, e não um só: um mede a REGRA onde ela
+  // agora vive, o outro mede que a aba de fato CHEGA nela. Medir só o primeiro
+  // deixaria o favicon voltar a desenhar por conta própria com o teste verde.
+  const ladrilho = fs.readFileSync(path.join(process.cwd(), "lib/branding/ladrilho.tsx"), "utf8");
   const icone = fs.readFileSync(path.join(process.cwd(), "app/icon.tsx"), "utf8");
 
   it("desenha o símbolo quando a marca é a do produto, e a inicial quando não é", () => {
-    expect(icone).toMatch(/marcaEhADoProduto\(\{ name: marca\.nome, logoUrl: marca\.logoUrl \}\)/);
-    expect(icone).toMatch(/<path d=\{SIMBOLO\.d\}/);
-    expect(icone).toMatch(/letraDoIcone\(marca\.nome\)/);
+    expect(ladrilho).toMatch(
+      /marcaEhADoProduto\(\{ name: marca\.nome, logoUrl: marca\.logoUrl \}\)/,
+    );
+    expect(ladrilho).toMatch(/<path d=\{SIMBOLO\.d\}/);
+    expect(ladrilho).toMatch(/letraDoIcone\(marca\.nome\)/);
+  });
+
+  it("a aba usa esse ladrilho, em vez de desenhar o seu", () => {
+    expect(icone).toMatch(/<LadrilhoDaMarca marca=\{marca\}/);
+    expect(icone).not.toMatch(/<path d=/);
   });
 });

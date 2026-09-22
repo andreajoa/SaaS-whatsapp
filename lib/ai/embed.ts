@@ -2,8 +2,8 @@
  * Embedding do RAG — indexação e busca, o mesmo modelo dos dois lados.
  *
  * A chave vem de `lib/ai/embeddings/chave.ts`, que resolve pela organização:
- * binding do ponto → credencial OpenAI da org → gateway da instalação → chave
- * da instalação. Até a 0181 este arquivo lia SÓ `process.env`, e o efeito era o
+ * binding do ponto → credencial OpenAI da org → gateway da instalação →
+ * OpenRouter da instalação → chave da instalação. Até a 0181 este arquivo lia SÓ `process.env`, e o efeito era o
  * pior possível para quem instala: cadastrar a chave da OpenAI pela tela não
  * habilitava a base de conhecimento, enquanto duas telas do produto prometiam
  * que sim.
@@ -50,7 +50,7 @@ export class SemChaveDeEmbeddingError extends Error {
   constructor(readonly organizationId: string) {
     super(
       "Esta organização não tem chave da OpenAI para indexar nem consultar o material. " +
-        "Cadastre uma em Credenciais, ou defina OPENAI_API_KEY na instalação.",
+        "Cadastre uma em Credenciais, ou defina OPENAI_API_KEY (ou OPENROUTER_API_KEY) na instalação.",
     );
     this.name = "SemChaveDeEmbeddingError";
   }

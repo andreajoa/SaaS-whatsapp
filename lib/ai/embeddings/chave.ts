@@ -30,6 +30,8 @@
  *     virar verdade sem exigir que ninguém entenda o que é um binding.
  *  3. **Gateway da Vercel** (`AI_GATEWAY_API_KEY`) — quando a instalação roteia
  *     tudo por ele.
+ *  3b. **OpenRouter da instalação** (`OPENROUTER_API_KEY`) — o mesmo modelo, pela
+ *     API compatível com a da OpenAI.
  *  4. **Chave da instalação** (`OPENAI_API_KEY`) — o que o `install.sh` pede.
  *  5. Nada. E "nada" é uma resposta legítima que o chamador precisa saber
  *     mostrar, não um erro para engolir.
@@ -62,14 +64,19 @@ export type OrigemDaChave =
   | "binding_do_ponto"
   | "credencial_da_organizacao"
   | "gateway_da_instalacao"
+  | "openrouter_da_instalacao"
   | "chave_da_instalacao";
 
 export const EXPLICACAO_DA_ORIGEM: Record<OrigemDaChave, string> = {
   binding_do_ponto: "Escolhida por você no painel de Provedores.",
   credencial_da_organizacao: "Usando a chave OpenAI cadastrada em Credenciais.",
   gateway_da_instalacao: "Usando o gateway de IA configurado nesta instalação.",
+  openrouter_da_instalacao: "Usando a chave da OpenRouter configurada nesta instalação.",
   chave_da_instalacao: "Usando a chave que veio na instalação.",
 };
+
+/** Endpoint OpenAI-compatível da OpenRouter — o mesmo default de `OPENROUTER_BASE_URL`. */
+const OPENROUTER_BASE_URL_PADRAO = "https://openrouter.ai/api/v1";
 
 export interface ChaveDeEmbedding {
   /** Plaintext. Vive só no escopo de quem chamou — nunca logada nem persistida. */
@@ -152,6 +159,22 @@ export async function resolverChaveDeEmbedding(
       baseUrl: env.AI_GATEWAY_BASE_URL || null,
       viaGateway: true,
       origem: "gateway_da_instalacao",
+      rotulo: null,
+      avisos,
+    };
+  }
+
+  // 3b · A OpenRouter da instalação. Ela serve o MESMO modelo
+  // (`text-embedding-3-small`, 1536 dimensões) pela API compatível com a da
+  // OpenAI — medido em 2026-09-22 —, então os vetores saem no mesmo mapa que o
+  // resto do acervo. Sem este degrau, a instalação que escolheu só a OpenRouter
+  // oferecia a base de conhecimento na tela e nunca indexava nada.
+  if (env.OPENROUTER_API_KEY) {
+    return {
+      apiKey: env.OPENROUTER_API_KEY,
+      baseUrl: env.OPENROUTER_BASE_URL || OPENROUTER_BASE_URL_PADRAO,
+      viaGateway: false,
+      origem: "openrouter_da_instalacao",
       rotulo: null,
       avisos,
     };

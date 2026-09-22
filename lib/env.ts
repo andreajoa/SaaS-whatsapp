@@ -186,6 +186,10 @@ const schema = z.object({
   OPENROUTER_APP_TITLE: z.string().optional().default(""),
   ANTHROPIC_API_KEY: z.string().optional().default(""),
   OPENAI_API_KEY: z.string().optional().default(""),
+  // O provedor e o modelo com que a organização NASCE no cadastro do site.
+  // Os dois juntos, ou nenhum — ver `lib/ai/llm-de-nascimento.ts`.
+  AI_PROVIDER: z.string().optional().default(""),
+  AI_DEFAULT_MODEL: z.string().optional().default(""),
 
   // Fusão (Fase 4): DONO ÚNICO dos eventos ai_agent.dispatch_requested.
   // 'engine' (default) = o worker agent-engine é o único consumidor (o cron

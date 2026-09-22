@@ -1,3 +1,4 @@
+import { llmDeNascimento } from "@/lib/ai/llm-de-nascimento";
 import { settingsDoMercado } from "@/lib/mercado/organizacao";
 import type { Mercado } from "@/lib/mercado/paises";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -76,6 +77,15 @@ export async function ensureTenantForUser(
     "Minha empresa";
   const base = slugify(orgName);
 
+  // O provedor de IA escolhido pela instalação entra NO insert, e não depois:
+  // o trigger `fn_seed_org_llm_defaults` só respeita um `llm` que já chegue com
+  // modelo. Ver `lib/ai/llm-de-nascimento.ts`.
+  const llm = llmDeNascimento();
+  const settings = {
+    ...(options.mercado ? settingsDoMercado(options.mercado) : {}),
+    ...(llm ? { llm } : {}),
+  };
+
   // ponytail: check-then-insert tem janela de corrida se o mesmo link for
   // confirmado 2x em paralelo (pior caso: org duplicada órfã). Advisory lock
   // por user_id se isso aparecer na prática.
@@ -90,10 +100,11 @@ export async function ensureTenantForUser(
         legal_name: orgName,
         status: "active",
         created_by: user.id,
-        // Gravado UMA vez, no nascimento da organização. Não há caminho que o
-        // reescreva depois — mudar de mercado é mudar de preço, e isso não
-        // pode acontecer porque o dono viajou. Ver `lib/mercado/organizacao.ts`.
-        ...(options.mercado ? { settings: settingsDoMercado(options.mercado) } : {}),
+        // O mercado é gravado UMA vez, no nascimento da organização. Não há
+        // caminho que o reescreva depois — mudar de mercado é mudar de preço, e
+        // isso não pode acontecer porque o dono viajou. Ver
+        // `lib/mercado/organizacao.ts`. O `llm` a tela de Provedores troca.
+        ...(Object.keys(settings).length > 0 ? { settings } : {}),
       })
       .select("id, slug")
       .single();

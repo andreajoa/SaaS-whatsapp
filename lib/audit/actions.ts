@@ -504,6 +504,14 @@ export const AUDIT_ACTIONS = [
   "billing.portal_opened",
   "billing.subscription_updated",
   "billing.webhook_invalid_signature",
+
+  // Funil público do site (migration 0240). Só a RODADA que teve efeito, e não
+  // cada e-mail: uma linha por envio daria ~15 por lead numa tabela que a
+  // doutrina manda manter enxuta, e a pergunta "quando ele recebeu o quê" já
+  // tem dono — `email_envios`, com assunto, id do provedor, abertura e clique.
+  // O que esta linha responde é outra coisa: "quem disparou a série, e quanto
+  // saiu" — a pergunta de quem investiga um pico de reclamação de spam.
+  "marketing.sequencia_run",
 ] as const;
 
 /** Um código de auditoria. Derivado de `AUDIT_ACTIONS` — não redigite a lista. */

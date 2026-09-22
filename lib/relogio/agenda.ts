@@ -81,6 +81,7 @@ export const AGENDA: readonly TarefaAgendada[] = [
   { rota: "risk-watcher", cadencia: "*/15 * * * *", timeoutS: 60 },
   { rota: "contact-phones", cadencia: "*/30 * * * *", timeoutS: 60 },
   { rota: "contact-proposals-watcher", cadencia: "17 * * * *", timeoutS: 60 },
+  { rota: "marketing-sequencia", cadencia: "37 * * * *", timeoutS: 120 },
   { rota: "lgpd-sla-watcher", cadencia: "0 12 * * *", timeoutS: 60 },
   { rota: "kb-conversations-batch", cadencia: "30 3 * * *", timeoutS: 120 },
   { rota: "sync-model-catalog", cadencia: "15 4 * * *", timeoutS: 60 },
@@ -165,7 +166,11 @@ export function estaVencida(cadencia: string, ultimaExecucao: Date | null, agora
 }
 
 /** Há quantos minutos esta tarefa deveria ter rodado. Ordena o mais atrasado primeiro. */
-export function atrasoEmMinutos(cadencia: string, ultimaExecucao: Date | null, agora: Date): number {
+export function atrasoEmMinutos(
+  cadencia: string,
+  ultimaExecucao: Date | null,
+  agora: Date,
+): number {
   const devido = ultimaOcorrencia(cadencia, agora).getTime();
   const base = ultimaExecucao === null ? devido : Math.max(ultimaExecucao.getTime(), devido);
   return Math.max(0, Math.round((agora.getTime() - base) / 60_000));

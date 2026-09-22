@@ -28,6 +28,7 @@ import {
   precoDoPlano,
   type PlanoId,
 } from "@/lib/billing/planos";
+import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 import { precoLegivelNoMercado } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
 import { visitanteAtual } from "@/lib/mercado/visitante";
@@ -165,7 +166,7 @@ export default async function HomePage() {
               {t("Recursos")}
             </a>
             {vendidos.length > 0 ? (
-              <a className="transition-colors hover:text-text" href="#planos">
+              <a className="transition-colors hover:text-text" href={`#${ID_DA_SECAO_DE_PLANOS}`}>
                 {t("Planos")}
               </a>
             ) : null}
@@ -360,7 +361,7 @@ export default async function HomePage() {
 
         {/* ── Planos ───────────────────────────────────────────────────── */}
         {vendidos.length > 0 ? (
-          <section id="planos" className="scroll-mt-20">
+          <section id={ID_DA_SECAO_DE_PLANOS} className="scroll-mt-20">
             <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
               <Titulo
                 olho={t("Planos")}

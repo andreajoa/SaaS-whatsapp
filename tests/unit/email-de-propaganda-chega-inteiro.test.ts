@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 import { montarEmail, montarEmailTransacional } from "@/lib/marketing/molde";
 import { MENSAGENS, mensagemPorId, proximaMensagem } from "@/lib/marketing/sequencia";
 import { TRANSACIONAIS } from "@/lib/marketing/transacionais";
@@ -215,7 +218,51 @@ describe("o conteúdo das vinte", () => {
       }
     }
   });
+
+  it("todo botão com âncora aponta para uma seção que EXISTE", () => {
+    // O bug que motivou esta medida: doze CTAs, nos três idiomas, apontavam
+    // para `/#precos` enquanto a seção da tabela de preço se chamava `planos`.
+    //
+    // Nada quebrava. O navegador não reclama de fragmento que não casa — ele
+    // abre a página no topo e segue. Quem clicasse em "Ver os planos" veria a
+    // dobra inicial, não o preço, e a única evidência seria a venda que não
+    // aconteceu. É o modo de falha que esta suíte inteira existe para pegar:
+    // silencioso, invisível em revisão, e caro exatamente no e-mail que tinha
+    // a maior chance de converter.
+    //
+    // A leitura é do ARQUIVO da página, e não de uma lista de âncoras mantida
+    // à mão: uma lista à mão é só o mesmo erro escrito num segundo lugar.
+    const pagina = readFileSync(resolve(process.cwd(), "app/page.tsx"), "utf8");
+
+    for (const m of [...MENSAGENS, ...TRANSACIONAIS]) {
+      for (const idioma of IDIOMAS_DO_SITE) {
+        const caminho = m.texto[idioma as IdiomaDoSite]?.corpo.acao?.caminho;
+        if (!caminho) continue;
+        const corte = caminho.indexOf("#");
+        if (corte === -1) continue;
+
+        const ancora = caminho.slice(corte + 1);
+        expect(ancora, `${m.id}/${idioma}: âncora vazia`).not.toBe("");
+
+        // Aceita tanto a forma literal (`id="planos"`) quanto a forma por
+        // constante (`id={ID_DA_SECAO_DE_PLANOS}`), que é como a página passou
+        // a escrevê-la justamente para os dois lados não divergirem de novo.
+        const literal = pagina.includes(`id="${ancora}"`);
+        const porConstante =
+          new RegExp(`id=\\{[A-Z_]+\\}`).test(pagina) && ehAncoraConhecida(ancora);
+        expect(
+          literal || porConstante,
+          `${m.id}/${idioma}: "#${ancora}" não existe em app/page.tsx`,
+        ).toBe(true);
+      }
+    }
+  });
 });
+
+/** As âncoras que a página declara por constante, e não por literal. */
+function ehAncoraConhecida(ancora: string): boolean {
+  return ancora === ID_DA_SECAO_DE_PLANOS;
+}
 
 describe("o cursor da série", () => {
   it("sem nada enviado, começa pela primeira", () => {

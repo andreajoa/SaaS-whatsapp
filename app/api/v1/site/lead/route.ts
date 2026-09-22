@@ -27,6 +27,7 @@ import { z } from "zod";
 import { authRateLimited } from "@/lib/auth/rate-limit";
 import { fail, ok } from "@/lib/api/wrappers";
 import { instalacaoCobra } from "@/lib/billing/planos";
+import { dispararTransacional } from "@/lib/marketing/disparo";
 import { registrarLead } from "@/lib/marketing/lead";
 import { COOKIE_DO_VISITANTE } from "@/lib/mercado/visitante";
 
@@ -122,6 +123,28 @@ export async function POST(req: NextRequest): Promise<Response> {
   // a pessoa vai embora esperando um e-mail que nunca vem.
   if (resultado.tipo === "sem_banco") {
     return fail("service_unavailable", "Não foi possível inscrever agora.", 503, { requestId });
+  }
+
+  // O "bem-vindo" sai SÓ para quem é novo, e sem segurar a resposta.
+  //
+  // Só para o novo porque quem já estava na lista não se inscreveu de novo —
+  // ele digitou o e-mail outra vez, e responder a isso com um "bem-vindo" é
+  // contar a ele que já estava cadastrado, que é justamente o oráculo de
+  // enumeração que esta rota evita em todo o resto.
+  //
+  // Sem `await` porque o Resend é rede: prendê-lo aqui faz o formulário do site
+  // demorar o que a API de e-mail demorar, e uma inscrição que já está GRAVADA
+  // não pode falhar por causa do aviso que a anuncia. O `catch` existe porque
+  // promessa solta que rejeita derruba o processo no Node.
+  if (resultado.tipo === "novo") {
+    void dispararTransacional({
+      email: dados.email,
+      transacionalId: "boas-vindas",
+      nome: dados.nome,
+      idioma: dados.idioma || null,
+      moeda: dados.moeda || null,
+      origem: dados.origem,
+    }).catch(() => {});
   }
 
   return ok({ inscrito: true }, { requestId });

@@ -88,6 +88,10 @@ CRONS="
 # escorregaria para sempre com cadencia diaria. Numa VPS a varredura devolve
 # zero linhas -- site_leads so tem gente onde a instalacao vende assinatura.
 37 * * * *|120|api/v1/cron/marketing-sequencia
+# QUEM PAROU NO MEIO. Dez minutos depois da sequencia, e nao junto: as duas
+# escrevem para a mesma lista e disputariam o limite de 2 req/s do Resend.
+# Numa VPS as duas consultas voltam vazias pelo mesmo motivo da de cima.
+47 * * * *|90|api/v1/cron/checkout-abandonado
 0 12 * * *|60|api/v1/cron/lgpd-sla-watcher
 30 3 * * *|120|api/v1/cron/kb-conversations-batch
 15 4 * * *|60|api/v1/cron/sync-model-catalog

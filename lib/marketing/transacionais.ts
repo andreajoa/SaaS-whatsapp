@@ -1,3 +1,4 @@
+import { CAMINHO_DOS_PLANOS } from "@/lib/marketing/caminhos";
 import type { CorpoDoEmail } from "@/lib/marketing/molde";
 import type { IdiomaDoSite } from "@/lib/mercado/paises";
 
@@ -118,7 +119,7 @@ export const TRANSACIONAIS: readonly EmailTransacional[] = [
             "Dá para cancelar? A qualquer momento, pela própria tela de cobrança, sem falar com ninguém e sem multa.",
             "E se eu não gostar da IA atendendo? Ela pode ficar só sugerindo a resposta para uma pessoa aprovar. É uma chave, não uma reinstalação.",
           ],
-          acao: { rotulo: "Ver os planos de novo", caminho: "/#precos" },
+          acao: { rotulo: "Ver os planos de novo", caminho: CAMINHO_DOS_PLANOS },
           posEscrito:
             "Se a sua dúvida não for nenhuma dessas, responda este e-mail — ele chega numa caixa de verdade.",
         },
@@ -136,7 +137,7 @@ export const TRANSACIONAIS: readonly EmailTransacional[] = [
             "Can I cancel? Any time, from the billing screen itself, without talking to anyone and without a penalty.",
             "What if I don't like AI answering? It can just suggest the reply for a person to approve. It's a switch, not a reinstall.",
           ],
-          acao: { rotulo: "See the plans again", caminho: "/#precos" },
+          acao: { rotulo: "See the plans again", caminho: CAMINHO_DOS_PLANOS },
           posEscrito:
             "If your question isn't one of those, reply to this email — it lands in a real inbox.",
         },
@@ -154,7 +155,7 @@ export const TRANSACIONAIS: readonly EmailTransacional[] = [
             "¿Se puede cancelar? En cualquier momento, desde la propia pantalla de cobro, sin hablar con nadie y sin multa.",
             "¿Y si no me gusta que la IA atienda? Puede quedarse solo sugiriendo la respuesta para que una persona la apruebe. Es una llave, no una reinstalación.",
           ],
-          acao: { rotulo: "Ver los planes otra vez", caminho: "/#precos" },
+          acao: { rotulo: "Ver los planes otra vez", caminho: CAMINHO_DOS_PLANOS },
           posEscrito:
             "Si su duda no es ninguna de esas, responda este correo — llega a una casilla de verdad.",
         },
@@ -179,7 +180,7 @@ export const TRANSACIONAIS: readonly EmailTransacional[] = [
             "Você abriu a tela de pagamento e não concluiu. Acontece — a maior parte das vezes é o celular tocando, não uma mudança de ideia.",
             "O link abaixo devolve você ao mesmo lugar. Nada foi cobrado, e nada fica pendente se você não quiser seguir.",
           ],
-          acao: { rotulo: "Terminar o cadastro", caminho: "/#precos" },
+          acao: { rotulo: "Terminar o cadastro", caminho: CAMINHO_DOS_PLANOS },
           posEscrito:
             "Se algo na tela de pagamento não funcionou, me conte respondendo aqui — isso eu quero saber.",
         },
@@ -192,7 +193,7 @@ export const TRANSACIONAIS: readonly EmailTransacional[] = [
             "You opened the payment screen and didn't finish. It happens — most of the time it's the phone ringing, not a change of mind.",
             "The link below takes you back to the same place. Nothing was charged, and nothing stays pending if you'd rather not continue.",
           ],
-          acao: { rotulo: "Finish signing up", caminho: "/#precos" },
+          acao: { rotulo: "Finish signing up", caminho: CAMINHO_DOS_PLANOS },
           posEscrito:
             "If something on the payment screen didn't work, tell me by replying here — that I want to know.",
         },
@@ -205,7 +206,7 @@ export const TRANSACIONAIS: readonly EmailTransacional[] = [
             "Abrió la pantalla de pago y no concluyó. Pasa — la mayoría de las veces es el teléfono sonando, no un cambio de opinión.",
             "El enlace de abajo lo devuelve al mismo lugar. No se cobró nada, y nada queda pendiente si prefiere no seguir.",
           ],
-          acao: { rotulo: "Terminar el registro", caminho: "/#precos" },
+          acao: { rotulo: "Terminar el registro", caminho: CAMINHO_DOS_PLANOS },
           posEscrito:
             "Si algo en la pantalla de pago no funcionó, cuéntemelo respondiendo aquí — eso sí quiero saberlo.",
         },

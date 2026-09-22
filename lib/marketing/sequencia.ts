@@ -1,3 +1,4 @@
+import { CAMINHO_DOS_PLANOS } from "@/lib/marketing/caminhos";
 import type { CorpoDoEmail } from "@/lib/marketing/molde";
 import type { IdiomaDoSite } from "@/lib/mercado/paises";
 
@@ -609,7 +610,7 @@ export const MENSAGENS: readonly MensagemDaSequencia[] = [
             "É assinatura mensal, sem taxa de instalação e sem fidelidade. Três planos, pelo número de WhatsApp conectados e pelo tamanho do time. O preço aparece na moeda do seu país — não é dólar convertido na hora do cartão.",
             "A conta que importa não é o valor da mensalidade: é ela comparada com uma venda. Se o seu ticket médio for maior que a mensalidade, o sistema se paga com um cliente por mês que hoje desistiria no silêncio. Se for menor, a conta é por volume, e vale fazer antes de assinar — posso ajudar a fazer, sem compromisso.",
           ],
-          acao: { rotulo: "Ver os planos", caminho: "/#precos" },
+          acao: { rotulo: "Ver os planos", caminho: CAMINHO_DOS_PLANOS },
         },
       },
       en: {
@@ -621,7 +622,7 @@ export const MENSAGENS: readonly MensagemDaSequencia[] = [
             "It's a monthly subscription, no setup fee, no lock-in. Three plans, by how many WhatsApp numbers you connect and how big the team is. The price shows in your country's currency — not dollars converted at card time.",
             "The maths that matters isn't the monthly figure: it's the monthly figure against one sale. If your average order is bigger than the subscription, the system pays for itself with one customer a month who would otherwise give up in the silence. If it's smaller, it's a volume calculation, and it's worth doing before you buy — I'm happy to do it with you, no strings.",
           ],
-          acao: { rotulo: "See the plans", caminho: "/#precos" },
+          acao: { rotulo: "See the plans", caminho: CAMINHO_DOS_PLANOS },
         },
       },
       es: {
@@ -633,7 +634,7 @@ export const MENSAGENS: readonly MensagemDaSequencia[] = [
             "Es una suscripción mensual, sin costo de instalación y sin permanencia. Tres planes, según cuántos números de WhatsApp conecte y el tamaño del equipo. El precio aparece en la moneda de su país — no es dólar convertido al momento de la tarjeta.",
             "La cuenta que importa no es el valor de la mensualidad: es la mensualidad comparada con una venta. Si su ticket promedio es mayor que la mensualidad, el sistema se paga con un cliente al mes que hoy desistiría en el silencio. Si es menor, la cuenta es por volumen, y vale hacerla antes de contratar — puedo ayudarle, sin compromiso.",
           ],
-          acao: { rotulo: "Ver los planes", caminho: "/#precos" },
+          acao: { rotulo: "Ver los planes", caminho: CAMINHO_DOS_PLANOS },
         },
       },
     },
@@ -698,7 +699,7 @@ export const MENSAGENS: readonly MensagemDaSequencia[] = [
             "Fica o que interessa: o custo de uma resposta atrasada é uma venda que não aparece em relatório; um robô que insiste é pior que nenhum; e o histórico das suas conversas é seu, independente de quem você contratar.",
             "Se um dia fizer sentido, a porta está aberta e o preço está no site. E se quiser me contar por que não fez sentido, responda este e-mail — leio todas.",
           ],
-          acao: { rotulo: "Ver os planos", caminho: "/#precos" },
+          acao: { rotulo: "Ver os planos", caminho: CAMINHO_DOS_PLANOS },
           posEscrito: "Obrigado pelo tempo.",
         },
       },
@@ -711,7 +712,7 @@ export const MENSAGENS: readonly MensagemDaSequencia[] = [
             "What's worth keeping: a late reply costs a sale that shows up in no report; a bot that insists is worse than no bot; and your conversation history is yours, whoever you end up hiring.",
             "If it ever makes sense, the door is open and the price is on the site. And if you want to tell me why it didn't make sense, reply to this email — I read all of them.",
           ],
-          acao: { rotulo: "See the plans", caminho: "/#precos" },
+          acao: { rotulo: "See the plans", caminho: CAMINHO_DOS_PLANOS },
           posEscrito: "Thanks for the time.",
         },
       },
@@ -724,7 +725,7 @@ export const MENSAGENS: readonly MensagemDaSequencia[] = [
             "Queda lo que importa: el costo de una respuesta tardía es una venta que no aparece en ningún informe; un robot que insiste es peor que ninguno; y el historial de sus conversaciones es suyo, contrate a quien contrate.",
             "Si algún día tiene sentido, la puerta está abierta y el precio está en el sitio. Y si quiere contarme por qué no tuvo sentido, responda este correo — los leo todos.",
           ],
-          acao: { rotulo: "Ver los planes", caminho: "/#precos" },
+          acao: { rotulo: "Ver los planes", caminho: CAMINHO_DOS_PLANOS },
           posEscrito: "Gracias por el tiempo.",
         },
       },

@@ -27,6 +27,7 @@ import { criarCheckoutSession, StripeError } from "@/lib/billing/stripe";
 import { env } from "@/lib/env";
 import type { Idioma } from "@/lib/i18n/idiomas";
 import { requireSupportWrite } from "@/lib/impersonate/support";
+import { registrarTentativa } from "@/lib/marketing/funil";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -66,12 +67,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const requestId = randomUUID();
 
   if (!instalacaoCobra()) {
-    return fail(
-      "not_found",
-      "Esta instalação não cobra assinatura.",
-      404,
-      { requestId },
-    );
+    return fail("not_found", "Esta instalação não cobra assinatura.", 404, { requestId });
   }
 
   const authz = await requireRole("admin", { requestId, resource: "billing" });
@@ -86,12 +82,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const priceId = precoDoPlano(plano);
   if (!priceId) {
-    return fail(
-      "invalid_request",
-      `O plano ${plano} não está configurado nesta instalação.`,
-      422,
-      { requestId },
-    );
+    return fail("invalid_request", `O plano ${plano} não está configurado nesta instalação.`, 422, {
+      requestId,
+    });
   }
 
   const admin = createAdminClient();
@@ -175,6 +168,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     requestId,
     metadata: { plano, sessao: sessionId },
   });
+
+  // A anotação do funil. Sem ela não existe "carrinho largado": uma sessão que
+  // a pessoa abandona não produz evento nenhum no Stripe — expira calada 24 h
+  // depois —, então quem não anotou a ABERTURA não tem como saber que houve
+  // uma. Solta e sem `await` pelo mesmo motivo do audit: anotar não pode
+  // atrasar nem derrubar a tela de pagamento.
+  void registrarTentativa({
+    sessionId,
+    organizationId: orgId,
+    email: authz.user.email,
+    plano,
+  }).catch(() => {});
 
   return ok({ clientSecret, sessionId }, { requestId });
 }

@@ -82,6 +82,7 @@ export const AGENDA: readonly TarefaAgendada[] = [
   { rota: "contact-phones", cadencia: "*/30 * * * *", timeoutS: 60 },
   { rota: "contact-proposals-watcher", cadencia: "17 * * * *", timeoutS: 60 },
   { rota: "marketing-sequencia", cadencia: "37 * * * *", timeoutS: 120 },
+  { rota: "checkout-abandonado", cadencia: "47 * * * *", timeoutS: 90 },
   { rota: "lgpd-sla-watcher", cadencia: "0 12 * * *", timeoutS: 60 },
   { rota: "kb-conversations-batch", cadencia: "30 3 * * *", timeoutS: 120 },
   { rota: "sync-model-catalog", cadencia: "15 4 * * *", timeoutS: 60 },

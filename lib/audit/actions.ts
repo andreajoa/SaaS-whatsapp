@@ -512,6 +512,11 @@ export const AUDIT_ACTIONS = [
   // O que esta linha responde é outra coisa: "quem disparou a série, e quanto
   // saiu" — a pergunta de quem investiga um pico de reclamação de spam.
   "marketing.sequencia_run",
+  // Mesma regra, outra rodada: a varredura de quem abriu o pagamento e não
+  // terminou. Também só audita quando MANDOU alguma coisa — numa VPS as duas
+  // consultas voltam vazias de hora em hora, e auditar isso encheria a tabela
+  // com a prova de que nada aconteceu.
+  "marketing.abandono_run",
 ] as const;
 
 /** Um código de auditoria. Derivado de `AUDIT_ACTIONS` — não redigite a lista. */

@@ -37,6 +37,8 @@ import { audit } from "@/lib/audit";
 import { instalacaoCobra, type PlanoId, type StatusAssinatura } from "@/lib/billing/planos";
 import { sincronizarAssinatura } from "@/lib/billing/sincronizar";
 import { lerAssinatura, verificarWebhook, type StripeSubscription } from "@/lib/billing/stripe";
+import { dispararTransacional } from "@/lib/marketing/disparo";
+import { concluirTentativa, marcarAssinatura } from "@/lib/marketing/funil";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -129,6 +131,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       });
     }
 
+    // ─── O funil e os dois avisos ────────────────────────────────────────
+    //
+    // Depois de `aplicar`, e não no lugar dele: o acesso da pessoa não pode
+    // depender de o e-mail sair. Soltos e sem `await` porque o Stripe conta
+    // segundos até o 200 — um webhook lento é reentregue, e reentrega é
+    // trabalho em dobro que só o índice único de `email_envios` segura.
+    void avisar(evento.type, evento.data.object, resultado).catch(() => {});
+
     return ok({ recebido: true, aplicado: Boolean(resultado.organizationId) }, { requestId });
   } catch (e) {
     await desfazerClaim();
@@ -145,6 +155,73 @@ interface Aplicado {
   organizationId: string | null;
   status: StatusAssinatura | null;
   plano: PlanoId | null;
+}
+
+/**
+ * Os dois e-mails que o dinheiro provoca, e a chave que os deixa repetir.
+ *
+ * `assinatura-ativa` sai no `checkout.session.completed` e é chaveada pela
+ * ASSINATURA — uma vez por assinatura, não uma por fatura. Pendurá-la em
+ * `invoice.paid` mandaria "sua assinatura está ativa" todo santo mês a quem já
+ * sabe disso há um ano; quem cancela e volta ganha assinatura nova, chave nova,
+ * e é avisado outra vez, que é o certo.
+ *
+ * `pagamento-falhou` é chaveado pela FATURA. O Stripe tenta o mesmo cartão até
+ * quatro vezes ao longo de duas semanas e emite `invoice.payment_failed` a cada
+ * tentativa, sempre com a mesma fatura: sem chave, seriam quatro e-mails
+ * idênticos; com a fatura como chave, é um. E a fatura do mês seguinte é outra
+ * chave, então o aviso volta a sair quando o problema volta a existir.
+ */
+async function avisar(
+  tipo: string,
+  objeto: Record<string, unknown>,
+  resultado: Aplicado,
+): Promise<void> {
+  const email = emailDoEvento(objeto);
+  if (!email) return;
+
+  if (tipo === "checkout.session.completed") {
+    const sessao = typeof objeto.id === "string" ? objeto.id : null;
+    if (sessao) await concluirTentativa(sessao);
+    await marcarAssinatura({
+      email,
+      plano: resultado.plano,
+      organizationId: resultado.organizationId,
+    });
+    await dispararTransacional({
+      email,
+      transacionalId: "assinatura-ativa",
+      chave: idDaAssinatura(tipo, objeto) ?? sessao,
+      origem: "checkout",
+    });
+    return;
+  }
+
+  if (tipo === "invoice.payment_failed") {
+    await dispararTransacional({
+      email,
+      transacionalId: "pagamento-falhou",
+      chave: typeof objeto.id === "string" ? objeto.id : null,
+      origem: "checkout",
+    });
+  }
+}
+
+/**
+ * O endereço de quem o evento descreve.
+ *
+ * Três lugares porque são três formatos: a sessão de checkout guarda em
+ * `customer_details`, a fatura em `customer_email`, e `customer_email` também
+ * aparece na sessão quando o comprador foi pré-preenchido. Nenhum é garantido
+ * — sem endereço não há o que mandar, e não mandar é melhor que adivinhar.
+ */
+function emailDoEvento(objeto: Record<string, unknown>): string | null {
+  const detalhes = objeto.customer_details as { email?: unknown } | undefined;
+  const candidatos = [detalhes?.email, objeto.customer_email];
+  for (const c of candidatos) {
+    if (typeof c === "string" && c.includes("@")) return c;
+  }
+  return null;
 }
 
 /**

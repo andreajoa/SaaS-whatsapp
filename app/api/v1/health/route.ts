@@ -14,6 +14,18 @@
  * `reason` é a classificação (ver `lib/net/alcance`), e é o que basta para saber
  * ONDE mexer.
  *
+ * ─── Por que a lista de checks MUDA de instalação para instalação ────────────
+ * O transporte de mensagem só é sondado onde a instalação de fato o usa, e quem
+ * responde isso é `channel_sessions`, não o `.env` (o argumento inteiro está em
+ * `lib/channels/transportes-em-uso.ts`). Enquanto a sonda era incondicional, a
+ * instalação serverless — que não tem contêiner de WAHA nenhum — respondia 503
+ * para sempre, com Supabase e Redis verdes. Um health check que sempre responde
+ * a mesma coisa não avisa de nada: ele treina quem o lê a não olhar.
+ *
+ * `transportes` sai no corpo justamente para que a AUSÊNCIA do check seja
+ * visível. Lista vazia quer dizer "esta instalação ainda não transporta nada", e
+ * é uma frase melhor do que uma luz vermelha sobre um serviço que ninguém pareou.
+ *
  * ─── Por que o ENDEREÇO só sai autenticado ───────────────────────────────────
  * Esta rota é pública — é o que permite um monitor externo bater nela. O endereço
  * do Redis e do WAHA é superfície de ataque: publicá-lo entrega a quem varre a
@@ -24,6 +36,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { transportesEmUso, temTransporteProprio } from "@/lib/channels/transportes-em-uso";
 import { env } from "@/lib/env";
 import { alvoDe, classificarFalhaDeAlcance, type FalhaDeAlcance } from "@/lib/net/alcance";
 import { validarConfigRedisRest } from "@/lib/redis-config";
@@ -55,9 +68,7 @@ const TIMEOUT_MS = 3_000;
 async function withTimeout<T>(p: Promise<T>, ms = TIMEOUT_MS): Promise<T> {
   return Promise.race([
     p,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`timeout after ${ms}ms`)), ms),
-    ),
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`timeout after ${ms}ms`)), ms)),
   ]);
 }
 
@@ -126,7 +137,12 @@ async function checkRedis(): Promise<Check> {
   const config = validarConfigRedisRest(url, token);
   if (!config.ok) {
     if (config.reason === "nao_configurado") {
-      return { status: "degraded", latency_ms: 0, error: "not_configured", reason: "nao_configurado" };
+      return {
+        status: "degraded",
+        latency_ms: 0,
+        error: "not_configured",
+        reason: "nao_configurado",
+      };
     }
     return {
       status: "down",
@@ -172,7 +188,12 @@ async function checkWaha(): Promise<Check> {
   const t0 = Date.now();
   const base = env.WAHA_API_BASE_URL;
   if (!base) {
-    return { status: "degraded", latency_ms: 0, error: "not_configured", reason: "nao_configurado" };
+    return {
+      status: "degraded",
+      latency_ms: 0,
+      error: "not_configured",
+      reason: "nao_configurado",
+    };
   }
   try {
     // /api/sessions valida conectividade E autenticação num tiro só. O WAHA Core não
@@ -262,15 +283,33 @@ function semAlvo(check: Check): Check {
 }
 
 export async function GET(req: NextRequest) {
+  const transportes = await transportesEmUso();
+
+  /**
+   * Sondar o transporte só quando ele é usado — e, quando não deu para
+   * perguntar ao banco, sondar mesmo assim.
+   *
+   * O `|| !houveLeitura` é o que separa "não uso" de "não sei". Sem ele, um
+   * banco momentaneamente inalcançável faria a sonda do transporte sumir do
+   * corpo — e a ausência de um check lê como "está tudo bem com ele", que é a
+   * conclusão exatamente oposta à disponível. Falha para o lado de informar
+   * demais, que aqui é o lado barato.
+   */
+  const sondarTransporteProprio = temTransporteProprio(transportes) || !transportes.houveLeitura;
+
   const [supabase, redis, waha] = await Promise.all([
     checkSupabase(),
     checkRedis(),
-    checkWaha(),
+    sondarTransporteProprio ? checkWaha() : Promise.resolve(null),
   ]);
 
   const verboso = req.nextUrl.searchParams.get("verbose") === "1" && segredoInternoConfere(req);
   const filtrar = verboso ? (c: Check) => c : semAlvo;
-  const checks = { supabase: filtrar(supabase), redis: filtrar(redis), waha: filtrar(waha) };
+  const checks = {
+    supabase: filtrar(supabase),
+    redis: filtrar(redis),
+    ...(waha ? { waha: filtrar(waha) } : {}),
+  };
 
   const anyDown = Object.values(checks).some((c) => c.status === "down");
   const anyDegraded = Object.values(checks).some((c) => c.status === "degraded");
@@ -297,6 +336,11 @@ export async function GET(req: NextRequest) {
         // Por isso o fallback agora é "desconhecido", e não um número plausível.
         version: process.env.APP_VERSION || "desconhecido",
         timestamp: new Date().toISOString(),
+        // Os transportes com conexão viva. Lista vazia é uma AFIRMAÇÃO ("esta
+        // instalação ainda não transporta nada"), e é ela que explica por que
+        // não há check de transporte em `checks`. Não carrega endereço nenhum —
+        // é o nome do provider —, então não passa por `semAlvo`.
+        transportes: [...transportes.providers].sort(),
         checks,
       },
     },

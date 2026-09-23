@@ -63,6 +63,12 @@ check "as $ROTAS_CODIGO rotas do código estão no crontab (achei $ROTAS_CRONTAB
 check "uma linha por cron, nenhuma vazia" \
   test "$(grep -c . "$TMP/crontab")" -eq "$(wc -l < "$TMP/crontab" | tr -d ' ')"
 
+echo "scheduler: pode chamar o app hospedado fora do compose"
+RC="$(SCHEDULER_APP_ORIGIN='https://saas-whatsapp.vercel.app/' rodar 'segredo-simples')"
+check "o override externo termina com sucesso" test "$RC" -eq 0
+check "remove a barra final e usa a origem externa" \
+  grep -q '"'"'"https://saas-whatsapp.vercel.app/api/v1/cron/agent-dispatcher"'"'"' "$TMP/crontab"
+
 echo "scheduler: o segredo atravessa o sh do crond intacto"
 # Os três caracteres que quebram interpolação ingênua, de uma vez só.
 HOSTIL='seg`whoami`redo$HOME-com'\''aspa-e-"aspas"'

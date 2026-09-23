@@ -1,0 +1,24 @@
+{
+  email {$ACME_EMAIL}
+}
+
+# WAHA público somente pela API. Dashboard e demais superfícies não são expostos.
+{$WAHA_DOMAIN} {
+  encode gzip
+
+  @waha_api path /api/*
+  handle @waha_api {
+    reverse_proxy waha:3000
+  }
+
+  handle {
+    respond 404
+  }
+}
+
+# Redis HTTP compatível com Upstash para o app serverless da Vercel.
+# O SRH exige o token configurado em SRH_TOKEN/UPSTASH_REDIS_REST_TOKEN.
+{$REDIS_DOMAIN} {
+  encode gzip
+  reverse_proxy srh:80
+}

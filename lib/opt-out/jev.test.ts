@@ -52,7 +52,8 @@ describe("probabilidadeDeOptOut — nunca lança, e falha para o lado de não bl
   });
 
   it("a chave nativa da TypeSafe vence a da OpenRouter", async () => {
-    const fetch = vi.fn(async () => respostaDoJev(0.5));
+    // Parâmetros declarados: sem eles `mock.calls` é tipado como tupla vazia.
+    const fetch = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) => respostaDoJev(0.5));
     await probabilidadeDeOptOut("x y", { fetch, env: { ...env, TYPESAFE_API_KEY: "nativa" } });
     expect(fetch.mock.calls[0]?.[0]).toBe("https://api.typesafe.ai/v1/systemone");
   });

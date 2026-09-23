@@ -34,6 +34,11 @@ for key in "${required[@]}"; do
   fi
 done
 
+if [ -z "${OPENROUTER_API_KEY:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -z "${OPENAI_API_KEY:-}" ]; then
+  echo "Configure pelo menos uma chave de IA: OPENROUTER_API_KEY, ANTHROPIC_API_KEY ou OPENAI_API_KEY." >&2
+  exit 1
+fi
+
 if [ -n "${UPSTASH_REDIS_REST_TOKEN:-}" ] && [ "${UPSTASH_REDIS_REST_TOKEN}" != "${SRH_TOKEN}" ]; then
   echo "UPSTASH_REDIS_REST_TOKEN precisa ser igual a SRH_TOKEN." >&2
   exit 1

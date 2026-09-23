@@ -40,15 +40,26 @@ mkdir -p "$TMP/bin"
 printf '#!/bin/sh\nexit 0\n' > "$TMP/bin/crond"
 chmod +x "$TMP/bin/crond"
 
-rodar() { # $1 = valor de INTERNAL_SECRET ("" = ausente)
+rodar() { # $1 = INTERNAL_SECRET; $2 opcional = SCHEDULER_APP_ORIGIN
   local out="$TMP/crontab"
+  local origin="${2:-}"
   : > "$out"
   if [ -z "$1" ]; then
-    env -u INTERNAL_SECRET PATH="$TMP/bin:$PATH" CRONTAB_PATH="$out" \
-      sh "$ENTRYPOINT" >"$TMP/saida" 2>&1
+    if [ -n "$origin" ]; then
+      env -u INTERNAL_SECRET SCHEDULER_APP_ORIGIN="$origin" PATH="$TMP/bin:$PATH" CRONTAB_PATH="$out" \
+        sh "$ENTRYPOINT" >"$TMP/saida" 2>&1
+    else
+      env -u INTERNAL_SECRET -u SCHEDULER_APP_ORIGIN PATH="$TMP/bin:$PATH" CRONTAB_PATH="$out" \
+        sh "$ENTRYPOINT" >"$TMP/saida" 2>&1
+    fi
   else
-    env INTERNAL_SECRET="$1" PATH="$TMP/bin:$PATH" CRONTAB_PATH="$out" \
-      sh "$ENTRYPOINT" >"$TMP/saida" 2>&1
+    if [ -n "$origin" ]; then
+      env INTERNAL_SECRET="$1" SCHEDULER_APP_ORIGIN="$origin" PATH="$TMP/bin:$PATH" CRONTAB_PATH="$out" \
+        sh "$ENTRYPOINT" >"$TMP/saida" 2>&1
+    else
+      env -u SCHEDULER_APP_ORIGIN INTERNAL_SECRET="$1" PATH="$TMP/bin:$PATH" CRONTAB_PATH="$out" \
+        sh "$ENTRYPOINT" >"$TMP/saida" 2>&1
+    fi
   fi
   echo $?
 }
@@ -64,10 +75,10 @@ check "uma linha por cron, nenhuma vazia" \
   test "$(grep -c . "$TMP/crontab")" -eq "$(wc -l < "$TMP/crontab" | tr -d ' ')"
 
 echo "scheduler: pode chamar o app hospedado fora do compose"
-RC="$(SCHEDULER_APP_ORIGIN='https://saas-whatsapp.vercel.app/' rodar 'segredo-simples')"
+RC="$(rodar 'segredo-simples' 'https://saas-whatsapp.vercel.app/')"
 check "o override externo termina com sucesso" test "$RC" -eq 0
 check "remove a barra final e usa a origem externa" \
-  grep -q '"'"'"https://saas-whatsapp.vercel.app/api/v1/cron/agent-dispatcher"'"'"' "$TMP/crontab"
+  grep -q '"https://saas-whatsapp.vercel.app/api/v1/cron/agent-dispatcher"' "$TMP/crontab"
 
 echo "scheduler: o segredo atravessa o sh do crond intacto"
 # Os três caracteres que quebram interpolação ingênua, de uma vez só.

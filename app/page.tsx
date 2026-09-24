@@ -18,6 +18,7 @@ import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDo
 import { BarraDeBeneficios } from "@/components/site/BarraDeBeneficios";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { CartaoComLuz } from "@/components/site/CartaoComLuz";
+import { ComESem } from "@/components/site/ComESem";
 import {
   Balao as BalaoDeSecao,
   CorpoDaConversa,
@@ -434,6 +435,59 @@ export default async function HomePage() {
             </EntraEmSequencia>
           </BalaoDeSecao>
         </CorpoDaConversa>
+
+        {/* ── Com a Atenza / Sem a Atenza ──────────────────────────────── */}
+        {/*
+          Fica imediatamente ANTES dos planos, e a posição é o argumento: a
+          comparação é o que transforma o preço em conta. Depois da tabela ela
+          seria consolo para quem já decidiu; antes, ela é a régua com que a
+          pessoa lê o número.
+
+          É CARTÃO, e não balão de conversa — mesma regra do resto da página:
+          conversa onde o conteúdo é fala, cartão onde é decisão. Comparar duas
+          colunas dentro de balões tortos seria bonito e ilegível.
+        */}
+        <section className="border-y border-border bg-bg">
+          <div className="mx-auto w-full max-w-5xl px-6 py-16 lg:py-20">
+            <h2 className="mb-8 max-w-2xl text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+              {t("O que muda no dia seguinte")}
+            </h2>
+            <ComESem
+              tituloSem={t("Sem a Atenza")}
+              tituloCom={t("Com a Atenza")}
+              pares={[
+                {
+                  sem: t("A pessoa pergunta às 22h e é atendida no dia seguinte."),
+                  com: t("Responde em segundos, a qualquer hora, com o que você ensinou."),
+                },
+                {
+                  sem: t(
+                    "Cada pessoa do time guarda um pedaço da conversa no próprio celular.",
+                  ),
+                  com: t(
+                    "Todas as conversas numa tela só, com o histórico inteiro à vista do time.",
+                  ),
+                },
+                {
+                  sem: t("Quem disse “depois eu vejo” nunca mais é procurado."),
+                  com: t("O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar."),
+                },
+                {
+                  sem: t("Ninguém sabe quantas conversas viraram venda, nem onde elas param."),
+                  com: t(
+                    "Cada conversa vira um card no funil, e o relatório mostra o que converteu.",
+                  ),
+                },
+                {
+                  sem: t(
+                    "Usar um sistema novo significa trocar o número que os clientes já conhecem.",
+                  ),
+                  com: t("O mesmo número de sempre, conectado por um QR code em um minuto."),
+                },
+              ]}
+            />
+          </div>
+        </section>
 
         {/* ── Planos ───────────────────────────────────────────────────── */}
         {vendidos.length > 0 ? (

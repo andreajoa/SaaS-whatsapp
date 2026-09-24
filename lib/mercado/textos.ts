@@ -61,6 +61,20 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
   "dias sem cobrança": "days with no charge",
   "O problema": "The problem",
+  // ── Com a Atenza / Sem a Atenza ────────────────────────────────────────
+  "Sem a Atenza": "Without Atenza",
+  "Com a Atenza": "With Atenza",
+  "O que muda no dia seguinte": "What changes the next day",
+  "A pessoa pergunta às 22h e é atendida no dia seguinte.": "Someone asks at 10pm and is answered the next day.",
+  "Responde em segundos, a qualquer hora, com o que você ensinou.": "Answers in seconds, at any hour, with what you taught it.",
+  "Cada pessoa do time guarda um pedaço da conversa no próprio celular.": "Each teammate keeps a piece of the conversation on their own phone.",
+  "Todas as conversas numa tela só, com o histórico inteiro à vista do time.": "Every conversation on one screen, with the full history visible to the team.",
+  "Quem disse “depois eu vejo” nunca mais é procurado.": "Whoever said “I'll think about it” is never contacted again.",
+  "O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar.": "The follow-up goes out on its own, at the right time, with nobody having to remember.",
+  "Ninguém sabe quantas conversas viraram venda, nem onde elas param.": "Nobody knows how many conversations became sales, or where they stall.",
+  "Cada conversa vira um card no funil, e o relatório mostra o que converteu.": "Every conversation becomes a card on the pipeline, and the report shows what converted.",
+  "Usar um sistema novo significa trocar o número que os clientes já conhecem.": "Using a new system means changing the number your customers already know.",
+  "O mesmo número de sempre, conectado por um QR code em um minuto.": "The same number as always, connected by a QR code in one minute.",
   Voltar: "Back",
   // ── O olho do hero, com o nicho que alterna ───────────────────────────
   "Atendimento por WhatsApp para": "WhatsApp support for",

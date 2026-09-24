@@ -19,21 +19,17 @@ A saída era o relógio HTTP (`/api/v1/system/relogio/tick`), batido
 de fora por GitHub Actions ou cron-job.org. Só que ele cobria **quatro**
 tarefas: dreno de eventos, follow-up, roteamento e envio travado. As outras
 dezoito rotas — `agent-dispatcher` inclusive, que é *a IA responder* — não
-tinham quem as chamasse.
-
-E o modo de falha era o pior que existe: não dava erro. As rotas respondiam
-200 para quem as chamasse à mão, o build passava, os testes passavam — e a
-feature simplesmente não acontecia sozinha. "A IA não respondeu ainda" é
-indistinguível de "a IA nunca vai responder".
+tinham quem as chamasse, e sem dar erro: as rotas respondiam 200 a quem as
+chamasse à mão, o build passava, os testes passavam, e a feature simplesmente
+não acontecia sozinha.
 
 O tick agora conhece a agenda inteira (`lib/relogio/agenda.ts`, espelho do
 crontab do self-host com paridade cobrada no CI nas duas direções) e despacha
-o que estiver **vencido**. Vencido não é "o minuto casou com a cadência" — quem
-bate o relógio de graça atrasa 5 a 15 minutos, e essa régua perderia quase
-tudo. É **"rodou depois da última hora em que deveria ter rodado?"**, lida de
-`relogio_execucoes`. Com isso o atraso do agendador fica inofensivo, cada
-tarefa se recupera sozinha uma única vez depois de uma queda, e bater de
-minuto em minuto não faz a varredura de 5 minutos rodar cinco vezes mais.
+o que estiver **vencido** — lido de `relogio_execucoes`, e não do minuto que
+casou com a cadência, porque quem bate o relógio de graça atrasa 5 a 15
+minutos. Com isso o atraso do agendador fica inofensivo, cada tarefa se
+recupera sozinha uma única vez depois de uma queda, e bater de minuto em minuto
+não faz a varredura de 5 minutos rodar cinco vezes mais.
 
 Para conferir o que está parado, e por quanto tempo:
 

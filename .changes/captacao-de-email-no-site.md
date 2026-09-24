@@ -15,26 +15,13 @@ O que entrou são duas portas para a mesma pergunta — um bloco no rodapé e um
 convite que aparece uma vez — e uma função, `registrarLead`, que é a única a
 escrever em `site_leads`.
 
-**Por que `registrarLead` não é um `upsert`.** A tabela tem
-`unique (lower(email))`, então a linha óbvia seria um `upsert` e pronto. Ela
-quebra três coisas, e as três só dariam sinal semanas depois:
-
-- **reiniciaria a sequência** — `proximo_passo` é o cursor dos e-mails, e
-  gravá-lo de volta em zero faz quem já recebeu tudo receber tudo de novo, por
-  ter digitado o próprio endereço duas vezes. É o caminho mais curto para virar
-  spam aos olhos do Gmail;
-- **ressuscitaria quem saiu** — descadastro é ato legal, e um formulário em que
-  qualquer pessoa digita qualquer endereço não pode desfazê-lo: bastaria um
-  estranho digitar o e-mail de quem pediu para parar;
-- **apagaria o que já se sabe** — quem chegou pelo checkout tem nome; quem
-  volta pelo rodapé manda só o e-mail, e o `upsert` gravaria `nome: null` por
-  cima do nome.
-
-O que vale é enriquecimento: dado novo preenche lacuna, nunca escreve por cima.
-As colunas que contam a história da pessoa — `status`, `proximo_passo`,
-`descadastrado_em`, `origem`, `token_descadastro` — ficam fora do alcance do
-formulário, e `tests/unit/lead-do-site-nao-reescreve-historia.test.ts` mede
-isso pelo que a função NÃO escreveu.
+**Digitar o e-mail duas vezes não reescreve a história de ninguém.**
+O formulário só enriquece: dado novo preenche lacuna e nunca escreve por cima.
+Reenviar não reinicia a sequência de e-mails, não ressuscita quem pediu para
+sair e não apaga o nome de quem chegou pelo checkout. As colunas que contam a
+história da pessoa ficam fora do alcance do formulário, e
+`tests/unit/lead-do-site-nao-reescreve-historia.test.ts` mede isso pelo que a
+função NÃO escreveu.
 
 **A resposta é a mesma para novo, conhecido e descadastrado.** Um formulário
 aberto que diga "este e-mail já está na lista" é um oráculo de enumeração: com
@@ -43,9 +30,8 @@ vira erro visível — dizer "pronto" a quem não foi inscrito o manda embora
 esperando um e-mail que nunca chega.
 
 O teto é de **5 inscrições por IP a cada 10 minutos**, bem mais apertado que o
-beacon de visita. Não é o banco que se protege: cada linha criada aqui vira
-destinatário de uma sequência, e reputação de domínio queimada não volta com um
-deploy.
+beacon de visita: cada linha criada aqui vira destinatário de uma sequência, e
+reputação de domínio queimada não volta com um deploy.
 
 **O convite não aparece na chegada.** Ele espera metade da página rolada ou a
 intenção de sair — os dois significam interesse. Quem se inscreveu nunca mais o

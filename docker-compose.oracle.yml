@@ -1,0 +1,136 @@
+# Runtime persistente do SaaS-whatsapp na Oracle Cloud.
+# O front/API Next.js permanece na Vercel.
+#
+# Serviços aqui:
+#   - WAHA 24/7 + volumes de sessão/mídia
+#   - agent-worker 24/7
+#   - Redis + SRH
+#   - scheduler chamando a API hospedada na Vercel
+#   - Caddy expondo WAHA e SRH por HTTPS
+#
+# Uso:
+#   docker compose -f docker-compose.oracle.yml --env-file .env.oracle up -d
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  waha:
+    image: ${WAHA_IMAGE:-devlikeapro/waha:noweb-arm-2026.7.2}
+    restart: unless-stopped
+    mem_limit: 1536m
+    environment:
+      WAHA_API_KEY: "sha512:${WAHA_API_KEY_SHA512}"
+      WHATSAPP_HOOK_URL: ${WAHA_WEBHOOK_BASE_URL}/api/v1/webhooks/waha
+      WHATSAPP_HOOK_EVENTS: "message.any,message.ack,message.edited,message.revoked,session.status,state.change"
+      WHATSAPP_HOOK_HMAC: ${WAHA_HMAC_SECRET}
+      WHATSAPP_DEFAULT_ENGINE: NOWEB
+      WAHA_DASHBOARD_ENABLED: "false"
+      WHATSAPP_RESTART_ALL_SESSIONS: "${WHATSAPP_RESTART_ALL_SESSIONS:-True}"
+    volumes:
+      - waha-data:/app/.sessions
+      - waha-media:/app/.media
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging: *default-logging
+    networks: [runtime]
+
+  worker:
+    image: ${WORKER_IMAGE:-ghcr.io/andreajoa/deskcomm-worker:latest}
+    pull_policy: always
+    restart: unless-stopped
+    mem_limit: 768m
+    env_file:
+      - .env.oracle
+    environment:
+      WAHA_API_BASE_URL: http://waha:3000
+      UPSTASH_REDIS_REST_URL: http://srh:80
+      UPSTASH_REDIS_REST_TOKEN: ${SRH_TOKEN}
+    depends_on:
+      waha:
+        condition: service_healthy
+      srh:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8787/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging: *default-logging
+    networks: [runtime]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    logging: *default-logging
+    networks: [runtime]
+
+  srh:
+    image: hiett/serverless-redis-http:0.0.10
+    restart: unless-stopped
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: ${SRH_TOKEN}
+      SRH_CONNECTION_STRING: "redis://redis:6379"
+    depends_on:
+      redis:
+        condition: service_healthy
+    logging: *default-logging
+    networks: [runtime]
+
+  scheduler:
+    image: ${SCHEDULER_IMAGE:-ghcr.io/andreajoa/deskcomm-scheduler:latest}
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      TZ: UTC
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+      SCHEDULER_APP_ORIGIN: ${NEXT_PUBLIC_APP_URL}
+    logging: *default-logging
+    networks: [runtime]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL}
+      WAHA_DOMAIN: ${WAHA_DOMAIN}
+      REDIS_DOMAIN: ${REDIS_DOMAIN}
+    volumes:
+      - ./Caddyfile.oracle:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      waha:
+        condition: service_healthy
+      srh:
+        condition: service_started
+    logging: *default-logging
+    networks: [runtime]
+
+volumes:
+  waha-data:
+  waha-media:
+  caddy-data:
+  caddy-config:
+
+networks:
+  runtime:
+    driver: bridge

@@ -657,5 +657,20 @@ export function getWahaClient(): WahaClient | null {
   const url = process.env.WAHA_API_BASE_URL;
   const key = process.env.WAHA_API_KEY;
   if (!url || !key || key === "dev_plaintext_change_me") return null;
+
+  // A URL precisa SER uma URL. `lib/env.ts` exige a variável presente, não
+  // válida — e um deploy hospedado nasce com um valor de espera escrito à
+  // mão. Em produção, em 2026-09-24, o valor era literalmente
+  // `PENDENTE_onde_o_waha_vai_rodar`: passava na checagem de vazio, virava
+  // um `new WahaClient("PENDENTE_...")` e só falhava lá na frente, no
+  // `fetch` — onde a tela de onboarding só sabe dizer *o serviço não
+  // respondeu agora*.
+  //
+  // A distância entre as duas frases é um dia de trabalho de quem lê: *não
+  // respondeu* manda reiniciar um contêiner que não existe; *não foi
+  // configurado* manda instalá-lo. Devolver `null` aqui põe a tela no
+  // caminho de “falta configurar”, que é a verdade.
+  if (!/^https?:\/\//i.test(url)) return null;
+
   return new WahaClient(url, key);
 }

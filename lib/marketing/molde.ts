@@ -222,9 +222,7 @@ function montar(
   <tr><td align="center" style="padding:32px 12px">
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%">
 
-      <tr><td bgcolor="${TINTA.acento}" style="background-color:${TINTA.acento};border-radius:10px 10px 0 0;padding:20px 28px">
-        <span style="font-size:17px;font-weight:700;letter-spacing:-0.2px;color:${TINTA.acentoFg}">${esc(nomeDoProduto)}</span>
-      </td></tr>
+      ${cabecalho(nomeDoProduto, base)}
 
       <tr><td bgcolor="${TINTA.papel}" style="background-color:${TINTA.papel};border:1px solid ${TINTA.borda};border-top:0;border-radius:0 0 10px 10px;padding:32px 28px">
         <h1 style="margin:0 0 20px;font-size:24px;line-height:1.3;font-weight:700;color:${TINTA.texto}">${esc(corpo.titulo)}</h1>
@@ -234,9 +232,7 @@ function montar(
         ${posEscrito}
       </td></tr>
 
-      <tr><td style="padding:20px 28px 0">
-        ${rodape.html}
-      </td></tr>
+      ${pesDePagina(base, rodape.html)}
 
     </table>
   </td></tr>
@@ -256,6 +252,79 @@ function montar(
   ].join("\n");
 
   return { html, text, headers: rodape.headers };
+}
+
+/**
+ * O CABEÇALHO, com o menu.
+ *
+ * ─── Por que um menu num e-mail ────────────────────────────────────────────
+ *
+ * Quem abre o quinto e-mail de uma sequência não quer necessariamente o que
+ * aquele e-mail oferece — quer, muitas vezes, uma coisa que ele leu no
+ * segundo. Sem menu, o único caminho de volta ao site é o botão da ação, que
+ * leva a UM lugar. Com menu, o e-mail vira uma porta em vez de um beco.
+ *
+ * ─── Por que `<a>` dentro de `<td>`, e não uma `<nav>` ────────────────────
+ *
+ * Cliente de e-mail não é navegador. O Outlook para Windows renderiza com o
+ * motor do Word, que ignora flexbox, ignora `gap` e trata `<nav>` como
+ * desconhecido. Uma linha de `<a>` separados por um caractere, dentro de um
+ * `<td>`, é o que funciona nos três que importam — Gmail, Outlook e Apple
+ * Mail — sem fallback e sem hack condicional.
+ */
+function cabecalho(nomeDoProduto: string, base: string): string {
+  const item = (href: string, texto: string) =>
+    `<a href="${esc(base + href)}" style="color:${TINTA.acentoFg};text-decoration:none;opacity:0.85">${esc(texto)}</a>`;
+
+  return `<tr><td bgcolor="${TINTA.acento}" style="background-color:${TINTA.acento};border-radius:10px 10px 0 0;padding:18px 28px">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td align="left" style="font-size:17px;font-weight:700;letter-spacing:-0.2px;color:${TINTA.acentoFg}">${esc(nomeDoProduto)}</td>
+            <td align="right" style="font-size:13px;line-height:1.4;color:${TINTA.acentoFg}">
+              ${item("/#como-funciona", "Como funciona")}
+              &nbsp;·&nbsp;
+              ${item("/#precos", "Planos")}
+              &nbsp;·&nbsp;
+              ${item("/contato", "Falar com a gente")}
+            </td>
+          </tr>
+        </table>
+      </td></tr>`;
+}
+
+/**
+ * O RODAPÉ — os links do site, e depois o bloco legal.
+ *
+ * ─── Por que os dois blocos são separados ──────────────────────────────────
+ *
+ * O de cima são links úteis; o de baixo é o "por que você está recebendo" com
+ * o descadastro, que vem de `rodape.html` e é obrigatório. Misturá-los
+ * esconderia o descadastro no meio de uma lista de links — e descadastro
+ * escondido é o que faz a pessoa marcar como spam em vez de sair, o que custa
+ * reputação de domínio inteira em troca de um contato que já tinha ido embora.
+ *
+ * O separador é uma `<td>` com altura e cor de fundo, não um `<hr>`: o
+ * Outlook desenha `<hr>` com uma borda 3D dos anos noventa que nenhum CSS
+ * remove.
+ */
+function pesDePagina(base: string, legal: string): string {
+  const link = (href: string, texto: string) =>
+    `<a href="${esc(base + href)}" style="color:${TINTA.leve};text-decoration:underline">${esc(texto)}</a>`;
+
+  return `<tr><td style="padding:20px 28px 0">
+        <p style="margin:0 0 10px;font-size:12px;line-height:1.9;color:${TINTA.leve}">
+          ${link("/", "Site")} &nbsp;·&nbsp;
+          ${link("/#precos", "Planos")} &nbsp;·&nbsp;
+          ${link("/contato", "Contato")} &nbsp;·&nbsp;
+          ${link("/legal", "Documentos")} &nbsp;·&nbsp;
+          ${link("/legal/privacy", "Privacidade")} &nbsp;·&nbsp;
+          ${link("/legal/terms", "Termos")}
+        </p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr><td height="1" bgcolor="${TINTA.borda}" style="background-color:${TINTA.borda};height:1px;line-height:1px;font-size:0">&nbsp;</td></tr>
+        </table>
+        <div style="padding-top:12px">${legal}</div>
+      </td></tr>`;
 }
 
 /**

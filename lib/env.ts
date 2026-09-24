@@ -496,6 +496,28 @@ if (!env.IMPERSONATE_COOKIE_SECRET || env.IMPERSONATE_COOKIE_SECRET.length < 32)
  * modos. Um preço de teste numa instalação live só aparece ao abrir o
  * checkout — e é por isso que o primeiro assinante precisa ser você.
  */
+/**
+ * O ENDEREÇO DO WHATSAPP PRECISA SER UM ENDEREÇO.
+ *
+ * `WAHA_API_BASE_URL` é obrigatória no boot, então ela "sempre existe" — mas a
+ * exigência é de PRESENÇA, não de validade. Um deploy hospedado nasce com um
+ * valor de espera escrito à mão, e foi o que aconteceu aqui: o valor em
+ * produção era `PENDENTE_onde_o_waha_vai_rodar`.
+ *
+ * O sintoma não aponta para a causa. A tela de onboarding diz "o serviço não
+ * respondeu agora" — que manda a pessoa reiniciar um contêiner que nunca
+ * existiu —, e o operador perde o dia procurando um serviço caído em vez de
+ * instalar um que falta.
+ */
+if (env.WAHA_API_BASE_URL && !/^https?:\/\//i.test(env.WAHA_API_BASE_URL)) {
+  console.warn(
+    "[env] WAHA_API_BASE_URL não é uma URL " +
+      `(${JSON.stringify(env.WAHA_API_BASE_URL)}) — o WhatsApp não vai conectar. ` +
+      "O WAHA é um contêiner Docker e precisa rodar em algum servidor: ponha aqui " +
+      "o endereço dele (https://...). Num deploy serverless ele NÃO roda junto com o app.",
+  );
+}
+
 const modoSecreta = env.STRIPE_SECRET_KEY.startsWith("sk_live_")
   ? "live"
   : env.STRIPE_SECRET_KEY.startsWith("sk_test_")

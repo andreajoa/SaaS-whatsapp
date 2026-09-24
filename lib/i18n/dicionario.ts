@@ -38,6 +38,14 @@ type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>
 
 export const DICIONARIO: Traducoes = {
   // ── Foto do perfil (upload) ───────────────────────────────────────────────
+  // As duas abaixo continuam vivas porque `app/app/settings/profile/_form.tsx`
+  // AINDA as usa na versão commitada. Elas saem no mesmo commit que trocar a
+  // tela — tirar a tradução antes de tirar o uso derruba
+  // `i18n-espanhol-cobre-a-tela`, que é o que aconteceu em 2026-09-24.
+  "Avatar URL": { es: "URL de avatar" },
+  "Upload de arquivo — em breve. Cole uma URL pública.": {
+    es: "Subida de archivo — próximamente. Pega una URL pública.",
+  },
   "Foto do perfil": { es: "Foto del perfil" },
   "Escolher imagem": { es: "Elegir imagen" },
   "Trocar foto": { es: "Cambiar foto" },

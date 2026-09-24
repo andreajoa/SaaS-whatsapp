@@ -150,14 +150,14 @@ export function CheckoutEmbutido({ clientSecret, onConcluido }: Props) {
 function EsqueletoDoFormulario() {
   return (
     <div aria-hidden className="animate-pulse space-y-4 rounded-lg border border-border p-6">
-      <div className="h-4 w-32 rounded bg-surface-elevated" />
-      <div className="h-11 w-full rounded bg-surface-elevated" />
+      <div className="h-4 w-32 rounded-md bg-surface-elevated" />
+      <div className="h-11 w-full rounded-md bg-surface-elevated" />
       <div className="flex gap-3">
-        <div className="h-11 flex-1 rounded bg-surface-elevated" />
-        <div className="h-11 flex-1 rounded bg-surface-elevated" />
+        <div className="h-11 flex-1 rounded-md bg-surface-elevated" />
+        <div className="h-11 flex-1 rounded-md bg-surface-elevated" />
       </div>
-      <div className="h-11 w-full rounded bg-surface-elevated" />
-      <div className="h-11 w-full rounded bg-accent/20" />
+      <div className="h-11 w-full rounded-md bg-surface-elevated" />
+      <div className="h-11 w-full rounded-md bg-accent/20" />
     </div>
   );
 }

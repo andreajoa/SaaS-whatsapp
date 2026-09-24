@@ -46,19 +46,16 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Criar conta": "Create account",
   "Já tenho conta": "I already have an account",
   "Começar com": "Start with",
-  "dias grátis": "days free",
   "Começar agora": "Get started",
   Recomendado: "Recommended",
   "/mês": "/month",
   São: "That's",
 
   // ── Topo ───────────────────────────────────────────────────────────────
-  "Atendimento por WhatsApp com agente de IA": "WhatsApp support with an AI agent",
   "Nunca mais perca um cliente por demora na resposta":
     "Never lose another customer to a slow reply",
   "Todo o WhatsApp da sua empresa em uma tela só. Um atendente de IA responde na hora, com o que você ensinou, e passa a conversa para uma pessoa do time quando o assunto pede.":
     "Your whole company's WhatsApp on a single screen. An AI agent answers instantly, using what you taught it, and hands the conversation to a teammate when the subject calls for it.",
-  "Sem cartão para começar": "No card to start",
   // ── O trial passou a pedir cartão (7 dias sem cobrança) ───────────────
   // A chave acima atende telas que ainda a usam; a vitrine fala pelas de
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
@@ -131,9 +128,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
     "Data isolated per company, access logging and deletion at the data subject's request.",
 
   // ── Planos ─────────────────────────────────────────────────────────────
-  "Comece liberado. Escolha o plano depois.": "Start with everything on. Pick a plan later.",
-  "dias com tudo funcionando, sem cartão. Você só escolhe um plano quando decidir ficar.":
-    "days with everything working, no card. You only pick a plan when you decide to stay.",
 
   // ── Perguntas ──────────────────────────────────────────────────────────
   "O que costumam perguntar antes de assinar": "What people ask before subscribing",

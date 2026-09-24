@@ -59,6 +59,15 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Todo o WhatsApp da sua empresa em uma tela só. Um atendente de IA responde na hora, com o que você ensinou, e passa a conversa para uma pessoa do time quando o assunto pede.":
     "Your whole company's WhatsApp on a single screen. An AI agent answers instantly, using what you taught it, and hands the conversation to a teammate when the subject calls for it.",
   "Sem cartão para começar": "No card to start",
+  // ── O trial passou a pedir cartão (7 dias sem cobrança) ───────────────
+  // A chave acima atende telas que ainda a usam; a vitrine fala pelas de
+  // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
+  "dias sem cobrança": "days with no charge",
+  "Nada é cobrado nos primeiros dias": "Nothing is charged in the first days",
+  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.":
+    "days with everything working. We ask for a card to start, and the subscription only begins after that — cancel with one click whenever you want.",
+  "Escolha o plano e comece hoje. A cobrança só depois.":
+    "Pick a plan and start today. The charge comes later.",
   "Você usa o número que já tem": "Keep the number you already use",
   "Cancele quando quiser": "Cancel anytime",
 

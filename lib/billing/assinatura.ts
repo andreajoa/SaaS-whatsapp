@@ -10,7 +10,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
-  DIAS_DE_TRIAL,
   ehPlanoConhecido,
   instalacaoCobra,
   type PlanoId,
@@ -27,7 +26,15 @@ const DIA_MS = 86_400_000;
  * organização está em dia". A segunda ofereceria botão de gerenciar assinatura
  * a quem não tem assinatura nenhuma.
  */
-export type AcessoDeCobranca = "nao_cobra" | "trial" | "em_dia" | "vencido";
+export type AcessoDeCobranca =
+  /** Esta instalação não cobra (self-host, sem STRIPE_SECRET_KEY). */
+  | "nao_cobra"
+  /** Cartão ainda não entrou — o trial do Stripe nem começou. */
+  | "sem_cartao"
+  /** Dentro dos dias sem cobrança do Stripe (status `trialing`). */
+  | "trial"
+  | "em_dia"
+  | "vencido";
 
 export interface EstadoDeCobranca {
   acesso: AcessoDeCobranca;
@@ -92,7 +99,13 @@ function diasAte(quando: Date | null, agora: Date): number | null {
 export async function estadoDaCobranca(
   admin: SupabaseClient,
   organizationId: string,
-  orgCriadaEm: string | Date | null,
+  /**
+   * Quando a organização nasceu. NÃO decide mais acesso — o trial é o do
+   * Stripe desde 2026-09-24 (ver o cabeçalho de `DIAS_DE_TRIAL`). Continua na
+   * assinatura porque os quatro chamadores já o passam e porque a tela de
+   * cobrança mostra desde quando a conta existe.
+   */
+  _orgCriadaEm: string | Date | null,
   agora: Date = new Date(),
 ): Promise<EstadoDeCobranca> {
   const vazio: EstadoDeCobranca = {
@@ -123,32 +136,43 @@ export async function estadoDaCobranca(
     return { ...vazio, acesso: "em_dia" };
   }
 
-  // ─── Sem linha: trial derivado da criação da organização ──────────────────
+  // ─── Sem linha: ainda não há cartão ───────────────────────────────────────
   //
-  // Ver o cabeçalho da migration 0239 sobre por que a ausência de linha é o
-  // trial, e não uma linha 'trialing' semeada no cadastro.
+  // Até 2026-09-24 a ausência de linha ERA o trial: 14 dias derivados de
+  // `organizations.created_at`, sem cartão. O cabeçalho de `DIAS_DE_TRIAL`
+  // conta por que isso mudou. Hoje o trial é o do Stripe — ele só existe
+  // depois do cartão, e chega aqui como uma linha com status `trialing`, que
+  // `STATUS_COM_ACESSO` já reconhece.
+  //
+  // Então "sem linha" passou a significar uma coisa só: falta o cartão. É
+  // estado próprio, e não `vencido`, porque as duas telas que o leem dizem
+  // frases diferentes — "comece seus 7 dias sem cobrança" não é "sua
+  // assinatura venceu", e mostrar a segunda a quem nunca assinou é acusar a
+  // pessoa de um atraso que ela não teve.
+  //
+  // `orgCriadaEm` deixou de decidir acesso. O parâmetro fica porque as telas
+  // ainda mostram desde quando a conta existe.
   if (!linha) {
-    const nascimento = orgCriadaEm ? new Date(orgCriadaEm) : null;
-    if (!nascimento || Number.isNaN(nascimento.getTime())) {
-      // Não sei quando nasceu → não tranco. Mesmo princípio de falha aberta.
-      return { ...vazio, acesso: "trial" };
-    }
-    const fim = new Date(nascimento.getTime() + DIAS_DE_TRIAL * DIA_MS);
-    const acabou = fim.getTime() <= agora.getTime();
-    return {
-      ...vazio,
-      acesso: acabou ? "vencido" : "trial",
-      diasRestantes: acabou ? 0 : diasAte(fim, agora),
-      expiraEm: fim,
-    };
+    return { ...vazio, acesso: "sem_cartao" };
   }
 
   const fimDoCiclo = linha.current_period_end ? new Date(linha.current_period_end) : null;
   const plano = ehPlanoConhecido(linha.plan) ? linha.plan : null;
   const status = linha.status as StatusAssinatura;
 
+  // `trialing` é acesso liberado, mas NÃO é o mesmo que pagar: a tela precisa
+  // saber a diferença para dizer "seu teste termina em X dias, e aí a cobrança
+  // começa" em vez de tratar quem ainda não pagou como assinante em dia.
+  // Esconder essa diferença é o que transforma um trial honesto em surpresa na
+  // fatura — exatamente o que a promessa "7 dias sem cobrança" promete não ser.
+  const acesso: AcessoDeCobranca = !STATUS_COM_ACESSO.has(linha.status)
+    ? "vencido"
+    : linha.status === "trialing"
+      ? "trial"
+      : "em_dia";
+
   return {
-    acesso: STATUS_COM_ACESSO.has(linha.status) ? "em_dia" : "vencido",
+    acesso,
     plano,
     status,
     diasRestantes: diasAte(fimDoCiclo, agora),

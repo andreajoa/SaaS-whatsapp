@@ -93,7 +93,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           activeOrg.orgId,
           orgRow?.created_at ?? null,
         );
-        if (cobranca.acesso === "vencido") redirect(TELA_DE_COBRANCA);
+        // `sem_cartao` entra junto com `vencido`, e os dois mandam para a MESMA
+        // tela — que é quem sabe dizer a frase certa para cada um. O gate só
+        // decide "pode passar?"; qual texto a pessoa lê é problema da tela.
+        //
+        // Este bloco roda DEPOIS do redirect de onboarding, algumas linhas
+        // acima, e a ordem é deliberada: quem ainda não terminou o wizard vai
+        // para o wizard, não para o preço. É o que permite configurar o agente
+        // inteiro antes de ver cobrança — trocar a ordem poria o cartão na
+        // frente de alguém que ainda não sabe o que está comprando.
+        if (cobranca.acesso === "vencido" || cobranca.acesso === "sem_cartao") {
+          redirect(TELA_DE_COBRANCA);
+        }
       }
     }
     // G4-02: expõe visibility_mode ao client (inbox decide visões visíveis).

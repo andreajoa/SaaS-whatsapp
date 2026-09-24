@@ -65,45 +65,61 @@ describe("estadoDaCobranca — o interruptor do self-host", () => {
   });
 });
 
-describe("estadoDaCobranca — trial derivado, sem linha no banco", () => {
-  it("organização recém-criada está em trial", async () => {
+describe("estadoDaCobranca — sem linha no banco: falta o cartão", () => {
+  /**
+   * Este bloco media o TRIAL DERIVADO: 14 dias contados de
+   * `organizations.created_at`, sem cartão, com a ausência de linha
+   * significando "está avaliando". Desde 2026-09-24 o trial é o do Stripe e só
+   * existe depois do cartão — a ausência de linha passou a significar uma
+   * coisa só, e é outra.
+   *
+   * O que os casos abaixo protegem é a DISTINÇÃO: `sem_cartao` não pode voltar
+   * a ser `trial` (liberaria o produto de graça para sempre) nem virar
+   * `vencido` (acusaria de atraso quem nunca assinou, e a tela diria a frase
+   * errada no primeiro minuto do cliente novo).
+   */
+  it("⭐ organização recém-criada NÃO tem acesso — falta o cartão", async () => {
     const estado = await estadoDaCobranca(
       bancoQueDevolve(null),
       ORG,
-      "2026-02-25T12:00:00Z", // 4 dias atrás, trial é de 14
+      "2026-02-25T12:00:00Z",
       AGORA,
     );
-    expect(estado.acesso).toBe("trial");
-    expect(estado.diasRestantes).toBe(10);
+    expect(estado.acesso).toBe("sem_cartao");
     expect(estado.jaAssinou).toBe(false);
   });
 
-  it("passados os 14 dias sem assinar, vence", async () => {
-    const estado = await estadoDaCobranca(
+  it("a data de criação deixou de decidir: antiga ou recente, é o mesmo estado", async () => {
+    // Enquanto o trial era derivado, estas duas datas davam respostas opostas.
+    // Se alguém reintroduzir a conta por `created_at`, este caso reprova.
+    const recente = await estadoDaCobranca(
       bancoQueDevolve(null),
       ORG,
-      "2026-02-01T12:00:00Z",
+      "2026-02-25T12:00:00Z",
       AGORA,
     );
-    expect(estado.acesso).toBe("vencido");
-    expect(estado.diasRestantes).toBe(0);
-    expect(estado.jaAssinou).toBe(false);
-  });
-
-  it("no instante exato do fim já está vencido (não há empate a favor)", async () => {
-    const estado = await estadoDaCobranca(
+    const antiga = await estadoDaCobranca(
       bancoQueDevolve(null),
       ORG,
-      "2026-02-15T12:00:00Z", // 14 dias cravados
+      "2020-01-01T00:00:00Z",
       AGORA,
     );
-    expect(estado.acesso).toBe("vencido");
+    expect(recente.acesso).toBe("sem_cartao");
+    expect(antiga.acesso).toBe("sem_cartao");
   });
 
-  it("sem saber quando a organização nasceu, NÃO tranca", async () => {
-    // `created_at` nulo é bug de leitura, não inadimplência. Falha aberta.
+  it("sem saber quando a organização nasceu, o estado é o mesmo", async () => {
     const estado = await estadoDaCobranca(bancoQueDevolve(null), ORG, null, AGORA);
-    expect(estado.acesso).toBe("trial");
+    expect(estado.acesso).toBe("sem_cartao");
+  });
+
+  it("⭐ quem nunca assinou não é tratado como inadimplente nem como avaliando", async () => {
+    // `vencido` fala de assinatura parada. Mostrá-lo a quem nunca assinou é
+    // acusar a pessoa de um atraso que ela não teve, no primeiro minuto dela.
+    // `trial` seria pior: liberaria o produto sem cartão nenhum.
+    const estado = await estadoDaCobranca(bancoQueDevolve(null), ORG, null, AGORA);
+    expect(estado.acesso).not.toBe("vencido");
+    expect(estado.acesso).not.toBe("trial");
   });
 });
 
@@ -125,14 +141,14 @@ describe("estadoDaCobranca — com assinatura", () => {
     expect(estado.jaAssinou).toBe(true);
   });
 
-  it("trialing libera — é o trial gerenciado pelo próprio Stripe", async () => {
+  it("trialing libera, e se anuncia como trial — nao como assinatura em dia", async () => {
     const estado = await estadoDaCobranca(
       bancoQueDevolve({ ...base, status: "trialing" }),
       ORG,
       null,
       AGORA,
     );
-    expect(estado.acesso).toBe("em_dia");
+    expect(estado.acesso).toBe("trial");
   });
 
   it("past_due CONTINUA liberado", async () => {

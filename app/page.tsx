@@ -224,7 +224,7 @@ export default async function HomePage() {
                   href="/signup"
                   className="inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-6 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
                 >
-                  {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias grátis")}`}
+                  {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`}
                   <ArrowRight className="size-4" />
                 </Link>
                 <Link
@@ -235,7 +235,7 @@ export default async function HomePage() {
                 </Link>
               </div>
               <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-subtle">
-                <ItemDeConfianca texto={t("Sem cartão para começar")} />
+                <ItemDeConfianca texto={t("Nada é cobrado nos primeiros dias")} />
                 <ItemDeConfianca texto={t("Você usa o número que já tem")} />
                 <ItemDeConfianca texto={t("Cancele quando quiser")} />
               </ul>
@@ -369,8 +369,8 @@ export default async function HomePage() {
             <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
               <Titulo
                 olho={t("Planos")}
-                titulo={t("Comece liberado. Escolha o plano depois.")}
-                apoio={`${t("São")} ${DIAS_DE_TRIAL} ${t("dias com tudo funcionando, sem cartão. Você só escolhe um plano quando decidir ficar.")}`}
+                titulo={t("Escolha o plano e comece hoje. A cobrança só depois.")}
+                apoio={`${t("São")} ${DIAS_DE_TRIAL} ${t("dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.")}`}
               />
               <div className="mt-12 grid gap-6 lg:grid-cols-3">
                 {vendidos.map((id) => {
@@ -494,7 +494,7 @@ export default async function HomePage() {
               href="/signup"
               className="mt-8 inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-7 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
             >
-              {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias grátis")}`}
+              {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`}
               <ArrowRight className="size-4" />
             </Link>
           </div>

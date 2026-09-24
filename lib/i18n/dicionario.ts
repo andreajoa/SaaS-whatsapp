@@ -37,6 +37,18 @@ import type { Idioma } from "./idiomas";
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  // ── Foto do perfil (upload) ───────────────────────────────────────────────
+  "Foto do perfil": { es: "Foto del perfil" },
+  "Escolher imagem": { es: "Elegir imagen" },
+  "Trocar foto": { es: "Cambiar foto" },
+  Remover: { es: "Quitar" },
+  "Foto atualizada.": { es: "Foto actualizada." },
+  "Foto removida.": { es: "Foto eliminada." },
+  "Não foi possível enviar a foto.": { es: "No se pudo enviar la foto." },
+  "Não foi possível remover a foto.": { es: "No se pudo quitar la foto." },
+  "PNG ou JPG, até 256 KB. A foto é enviada na hora — não precisa salvar.": {
+    es: "PNG o JPG, hasta 256 KB. La foto se envía al instante — no hace falta guardar.",
+  },
   "números de teste autorizados": { es: "números de prueba autorizados" },
   "1 número de teste autorizado": { es: "1 número de prueba autorizado" },
   "Nenhum número autorizado — a IA não responde ninguém neste canal.": {
@@ -704,10 +716,6 @@ export const DICIONARIO: Traducoes = {
   "Nome completo": { es: "Nombre completo" },
   "Trocar email — em breve.": { es: "Cambiar email — próximamente." },
   "Fuso horário": { es: "Huso horario" },
-  "Avatar URL": { es: "URL de avatar" },
-  "Upload de arquivo — em breve. Cole uma URL pública.": {
-    es: "Subida de archivo — próximamente. Pega una URL pública.",
-  },
   "Nome de exibição": { es: "Nombre para mostrar" },
   "Razão social": { es: "Razón social" },
   "DPO email": { es: "Email del DPO" },
@@ -9673,6 +9681,31 @@ export const DICIONARIO: Traducoes = {
   "Esta instalação não cobra assinatura": { es: "Esta instalación no cobra suscripción" },
   "Este sistema roda no seu próprio servidor e não tem mensalidade.": {
     es: "Este sistema funciona en tu propio servidor y no tiene mensualidad.",
+  },
+  // ── Cobrança: o trial passou a ser do Stripe (7 dias, com cartão) ───────
+  // As quatro chaves acima desta linha atendem o texto ANTIGO, de quando a
+  // avaliação era derivada da criação da conta e não pedia cartão. Ficam
+  // porque outras telas ainda as usam; quem fala do teste hoje é o bloco
+  // abaixo. Ver o cabeçalho de `DIAS_DE_TRIAL` em lib/billing/planos.ts.
+  "Comece seus": { es: "Comienza tus" },
+  "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
+  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {
+    es: "días con todo funcionando. Pedimos la tarjeta para empezar y la suscripción solo comienza después de ese período — cancela con un clic cuando quieras.",
+  },
+  "Escolha o plano e comece hoje. A cobrança só depois.": {
+    es: "Elige el plan y empieza hoy. El cobro viene después.",
+  },
+  "dias sem cobrança": { es: "días sin cobro" },
+  "Escolha um plano e o seu atendente entra no ar agora. Pedimos o cartão para começar, e nada é cobrado nos primeiros": {
+    es: "Elige un plan y tu agente entra en funcionamiento ahora. Pedimos la tarjeta para empezar, y no se cobra nada durante los primeros",
+  },
+  "dias — a assinatura só começa depois disso, e você cancela em um clique quando quiser.": {
+    es: "días — la suscripción solo empieza después de eso, y la cancelas con un clic cuando quieras.",
+  },
+  "Hoje é o último dia sem cobrança": { es: "Hoy es el último día sin cobro" },
+  "Falta 1 dia sem cobrança": { es: "Falta 1 día sin cobro" },
+  "Tudo liberado. Quando o período terminar, a assinatura começa automaticamente no cartão cadastrado. Você pode cancelar antes disso, em um clique, sem falar com ninguém.": {
+    es: "Todo habilitado. Cuando termine el período, la suscripción comienza automáticamente en la tarjeta registrada. Puedes cancelar antes de eso, con un clic, sin hablar con nadie.",
   },
   "Seu período de avaliação termina hoje": { es: "Tu período de evaluación termina hoy" },
   "Falta 1 dia de avaliação": { es: "Falta 1 día de evaluación" },

@@ -111,20 +111,46 @@ export default async function BillingPage({
     <div className="flex h-full flex-col gap-6 overflow-y-auto p-6">
       <Cabecalho idioma={idioma} />
 
+      {/*
+        O PRIMEIRO CARTÃO QUE UM CLIENTE NOVO VÊ.
+        Ele chega aqui ao terminar o onboarding, com o agente já configurado —
+        o gate de `app/app/layout.tsx` o manda para cá justamente neste ponto.
+        Por isso o texto fala do que ele GANHA, e não do que vai pagar.
+        E diz, na mesma frase, que há cartão e que a cobrança começa sozinha no
+        sétimo dia. Guardar isso só para os documentos legais seria a letra
+        miúda que este produto existe para não ter.
+      */}
+      {estado.acesso === "sem_cartao" ? (
+        <Card className="border-accent/40 bg-accent/5 p-5">
+          <h2 className="text-sm font-semibold">
+            {`${traduzir("Comece seus", idioma)} ${DIAS_DE_TRIAL} ${traduzir("dias sem cobrança", idioma)}`}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {`${traduzir("Escolha um plano e o seu atendente entra no ar agora. Pedimos o cartão para começar, e nada é cobrado nos primeiros", idioma)} ${DIAS_DE_TRIAL} ${traduzir("dias — a assinatura só começa depois disso, e você cancela em um clique quando quiser.", idioma)}`}
+          </p>
+        </Card>
+      ) : null}
+
       {estado.acesso === "trial" ? (
         <Card className="border-accent/40 bg-accent/5 p-5">
           <h2 className="text-sm font-semibold">
             {estado.diasRestantes === 0
-              ? traduzir("Seu período de avaliação termina hoje", idioma)
+              ? traduzir("Hoje é o último dia sem cobrança", idioma)
               : estado.diasRestantes === 1
-                ? traduzir("Falta 1 dia de avaliação", idioma)
-                : `${traduzir("Faltam", idioma)} ${estado.diasRestantes} ${traduzir("dias de avaliação", idioma)}`}
+                ? traduzir("Falta 1 dia sem cobrança", idioma)
+                : `${traduzir("Faltam", idioma)} ${estado.diasRestantes} ${traduzir("dias sem cobrança", idioma)}`}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {`${traduzir("São", idioma)} ${DIAS_DE_TRIAL} ${traduzir(
-              "dias com tudo liberado. Escolha um plano antes do fim para não interromper os atendimentos.",
+            {/*
+              Nada de "escolha um plano antes do fim para não interromper os
+              atendimentos": o plano já foi escolhido e o cartão já está lá. A
+              frase antiga assustava sem motivo e escondia o que de fato vai
+              acontecer — que a cobrança começa sozinha.
+            */}
+            {traduzir(
+              "Tudo liberado. Quando o período terminar, a assinatura começa automaticamente no cartão cadastrado. Você pode cancelar antes disso, em um clique, sem falar com ninguém.",
               idioma,
-            )}`}
+            )}
           </p>
         </Card>
       ) : null}

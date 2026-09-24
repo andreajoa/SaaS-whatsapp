@@ -107,14 +107,40 @@ export function ehPlanoConhecido(valor: string): valor is PlanoId {
 }
 
 /**
- * Dias de avaliação antes de a cobrança valer, contados de
- * `organizations.created_at`.
+ * Dias de avaliação SEM COBRANÇA, contados de quando o cartão entra.
+ *
+ * ─── Mudou de significado em 2026-09-24, e a diferença é toda ──────────────
+ *
+ * Eram 14 dias contados de `organizations.created_at`, sem cartão nenhum: a
+ * ausência de linha em `org_subscriptions` ERA o trial. Duas coisas estavam
+ * erradas nisso, e a segunda é a cara:
+ *
+ *  1. O relógio corria durante o nosso próprio onboarding. Quem levava três
+ *     dias para parear o WhatsApp chegava ao produto com 11 — pagando, em
+ *     tempo de avaliação, pela fricção que é nossa.
+ *  2. A conversão dependia de um ato que ninguém faz: no fim do trial a pessoa
+ *     tinha de LEMBRAR de voltar e digitar um cartão. Trial que exige ação
+ *     para virar assinatura converte uma fração do que converte o que renova
+ *     sozinho.
+ *
+ * Agora o cartão entra ANTES e o trial é o do Stripe (`trial_period_days`):
+ * sete dias sem cobrança nenhuma, e no sétimo o Stripe cobra sozinho e segue
+ * mensal até alguém cancelar. O onboarding inteiro continua aberto sem cartão
+ * — o gate de `app/app/layout.tsx` roda DEPOIS do gate de onboarding, de
+ * propósito, para que a pessoa configure o agente antes de ver preço.
+ *
+ * ⚠️ A PROMESSA NA TELA É "7 DIAS SEM COBRANÇA", NUNCA "SEM CARTÃO".
+ * Há cartão, e dizer o contrário é a letra miúda que este produto existe para
+ * não ter. Perto de todo botão que leva ao checkout tem de estar escrito que
+ * pede cartão e que renova sozinho no sétimo dia — nos documentos legais
+ * também, mas não SÓ neles: promessa que depende do contrato para ser
+ * verdadeira já é propaganda enganosa na tela.
  *
  * Constante e não env: um número de trial diferente por instalação não tem
  * quem o leia (o self-host não cobra), e um knob sem leitor é superfície que
  * envelhece.
  */
-export const DIAS_DE_TRIAL = 14;
+export const DIAS_DE_TRIAL = 7;
 
 /**
  * Esta instalação cobra assinatura?

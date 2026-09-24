@@ -22,7 +22,7 @@ import { fail, ok } from "@/lib/api/wrappers";
 import { audit } from "@/lib/audit";
 import { requireRole } from "@/lib/auth/require-role";
 import { estadoDaCobranca } from "@/lib/billing/assinatura";
-import { instalacaoCobra, precoDoPlano } from "@/lib/billing/planos";
+import { DIAS_DE_TRIAL, instalacaoCobra, precoDoPlano } from "@/lib/billing/planos";
 import { criarCheckoutSession, StripeError } from "@/lib/billing/stripe";
 import { env } from "@/lib/env";
 import type { Idioma } from "@/lib/i18n/idiomas";
@@ -100,7 +100,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // Quem já pagou não abre checkout novo — trocar de plano é no PORTAL, que
   // faz o rateio do que já foi pago. Um segundo checkout criaria uma SEGUNDA
   // assinatura no mesmo customer, e o cliente seria cobrado duas vezes.
-  if (estado.acesso === "em_dia") {
+  //
+  // `trial` ENTRA nesta guarda, e a inclusão não é zelo: desde que `trialing`
+  // deixou de ser reportado como `em_dia` (ver `assinatura.ts`), checar só
+  // `em_dia` deixaria quem está nos sete dias abrir um segundo checkout e
+  // terminar com duas assinaturas no mesmo customer — cobrança em dobro a
+  // partir do sétimo dia, sem que nada reclamasse.
+  if (estado.acesso === "em_dia" || estado.acesso === "trial") {
     return fail(
       "conflict",
       "Já existe uma assinatura ativa. Use 'Gerenciar assinatura' para trocar de plano.",
@@ -109,9 +115,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // O trial já corre desde a criação da organização (derivado). Não somamos um
-  // segundo trial no Stripe: quem chega aqui no fim da avaliação ganharia mais
-  // 14 dias de graça toda vez que abrisse o checkout.
+  // ─── O trial mora AQUI desde 2026-09-24 ───────────────────────────────────
+  //
+  // Antes era derivado de `organizations.created_at` e este campo ia `null`,
+  // com o comentário de que somar um segundo trial daria dias de graça a cada
+  // abertura do checkout. Esse risco não existe mais, e a razão é do Stripe:
+  // `trial_period_days` vale para a assinatura que NASCE nesta sessão, e o
+  // passo acima já recusa com 409 quem tem assinatura ativa. Não há como
+  // acumular — quem já assinou não chega a esta linha.
+  //
+  // `jaAssinou` é o que separa o primeiro teste de uma volta: quem cancelou e
+  // está voltando não ganha outros sete dias. O trial é boas-vindas, não um
+  // desconto recorrente para quem aprendeu a cancelar antes da cobrança.
+  const trialDias = estado.jaAssinou ? null : DIAS_DE_TRIAL;
+
   const base = baseUrl(req);
 
   let clientSecret: string | null;
@@ -126,7 +143,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // de pagamento que redireciona (boleto/Pix) — cartão fecha sem sair da
       // tela. Ver `redirect_on_completion` em lib/billing/stripe.ts.
       returnUrl: `${base}/app/settings/billing?sessao={CHECKOUT_SESSION_ID}`,
-      trialDias: null,
+      trialDias,
       locale: LOCALE_DO_STRIPE[authz.user.idioma],
       // Estável por (org, plano, MINUTO): um duplo-clique reaproveita a MESMA
       // sessão do Stripe em vez de abrir duas. Não usa o requestId, que é novo

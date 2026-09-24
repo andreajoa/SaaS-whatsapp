@@ -17,10 +17,12 @@ import {
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
 import { BarraDeBeneficios } from "@/components/site/BarraDeBeneficios";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
+import { CartaoComLuz } from "@/components/site/CartaoComLuz";
 import { ConversaAoVivo } from "@/components/site/ConversaAoVivo";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { EntraEmSequencia } from "@/components/site/EntraEmSequencia";
 import { Medidor } from "@/components/site/Medidor";
+import { PalavraQueAlterna } from "@/components/site/PalavraQueAlterna";
 import { TextoQuePreenche } from "@/components/site/TextoQuePreenche";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
@@ -183,18 +185,18 @@ export default async function HomePage() {
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-6">
           <Marca marca={marca} />
           <nav className="hidden items-center gap-7 text-sm text-text-muted md:flex">
-            <a className="transition-colors hover:text-text" href="#como-funciona">
+            <a className="link-sublinha transition-colors hover:text-text" href="#como-funciona">
               {t("Como funciona")}
             </a>
-            <a className="transition-colors hover:text-text" href="#recursos">
+            <a className="link-sublinha transition-colors hover:text-text" href="#recursos">
               {t("Recursos")}
             </a>
             {vendidos.length > 0 ? (
-              <a className="transition-colors hover:text-text" href={`#${ID_DA_SECAO_DE_PLANOS}`}>
+              <a className="link-sublinha transition-colors hover:text-text" href={`#${ID_DA_SECAO_DE_PLANOS}`}>
                 {t("Planos")}
               </a>
             ) : null}
-            <a className="transition-colors hover:text-text" href="#perguntas">
+            <a className="link-sublinha transition-colors hover:text-text" href="#perguntas">
               {t("Perguntas")}
             </a>
           </nav>
@@ -231,7 +233,22 @@ export default async function HomePage() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-soft px-3 py-1 text-xs font-medium text-accent-700">
                 <Sparkles className="size-3.5" />
-                {t("Atendimento por WhatsApp com agente de IA")}
+                {/*
+                  O nicho alterna aqui, e não um adjetivo: quem chega
+                  procurando "CRM para clínica" vê a própria palavra na
+                  primeira linha, e a promessa deixa de ser genérica sem que a
+                  página precise de uma versão por segmento.
+                */}
+                {t("Atendimento por WhatsApp para")}{" "}
+                <PalavraQueAlterna
+                  className="font-semibold text-accent"
+                  palavras={[
+                    t("clínicas"),
+                    t("imobiliárias"),
+                    t("e-commerce"),
+                    t("prestadores de serviço"),
+                  ]}
+                />
               </span>
               <h1 className="mt-6 text-4xl leading-[1.05] font-semibold tracking-tight text-text sm:text-5xl lg:text-6xl">
                 {t("Nunca mais perca um cliente por demora na resposta")}
@@ -552,24 +569,24 @@ export default async function HomePage() {
             </span>
           </div>
           <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted">
-            <Link className="transition-colors hover:text-text" href="/legal/terms">
+            <Link className="link-sublinha transition-colors hover:text-text" href="/legal/terms">
               {t("Termos de uso")}
             </Link>
-            <Link className="transition-colors hover:text-text" href="/legal/privacy">
+            <Link className="link-sublinha transition-colors hover:text-text" href="/legal/privacy">
               {t("Política de Privacidade")}
             </Link>
-            <Link className="transition-colors hover:text-text" href="/legal">
+            <Link className="link-sublinha transition-colors hover:text-text" href="/legal">
               {t("Documentos")}
             </Link>
-            <Link className="transition-colors hover:text-text" href="/contato">
+            <Link className="link-sublinha transition-colors hover:text-text" href="/contato">
               {t("Fale com a gente")}
             </Link>
             {suporte ? (
-              <a className="transition-colors hover:text-text" href={`mailto:${suporte}`}>
+              <a className="link-sublinha transition-colors hover:text-text" href={`mailto:${suporte}`}>
                 {suporte}
               </a>
             ) : null}
-            <Link className="transition-colors hover:text-text" href="/login">
+            <Link className="link-sublinha transition-colors hover:text-text" href="/login">
               {t("Entrar")}
             </Link>
           </nav>

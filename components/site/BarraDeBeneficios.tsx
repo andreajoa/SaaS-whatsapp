@@ -31,11 +31,11 @@ export function BarraDeBeneficios({ itens }: { readonly itens: readonly string[]
   const fita = (escondida: boolean) => (
     <ul
       aria-hidden={escondida || undefined}
-      className="flex shrink-0 items-center gap-8 pr-8 text-sm text-text-muted"
+      className="flex shrink-0 items-center gap-8 pr-8 text-sm font-medium"
     >
       {itens.map((item, i) => (
         <li key={`${i}-${item}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap">
-          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
+          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent-700/60" />
           {item}
         </li>
       ))}
@@ -43,7 +43,11 @@ export function BarraDeBeneficios({ itens }: { readonly itens: readonly string[]
   );
 
   return (
-    <div className="border-b border-border bg-surface-elevated">
+    // A faixa usa a cor de DESTAQUE da marca, não o cinza do painel. Ela é a
+    // primeira coisa acima de tudo na página: em `bg-surface-elevated` ela se
+    // confundia com o cabeçalho logo abaixo e passava despercebida — uma faixa
+    // que ninguém vê é peso morto no topo da página.
+    <div className="border-b border-accent-200 bg-accent-soft text-accent-700">
       {/*
         As máscaras nas pontas existem para o texto não ser DECEPADO na borda.
         Sem elas, uma frase some no meio de uma palavra e o olho tenta lê-la —

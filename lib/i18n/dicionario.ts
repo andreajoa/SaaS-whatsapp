@@ -9701,6 +9701,12 @@ export const DICIONARIO: Traducoes = {
   "Cancele em um clique, sem falar com ninguém": { es: "Cancela con un clic, sin hablar con nadie" },
   "Conversas, funil e histórico em uma tela só": { es: "Conversaciones, embudo e historial en una sola pantalla" },
   "Dados isolados por empresa, LGPD desde o primeiro dia": { es: "Datos aislados por empresa, protección de datos desde el primer día" },
+  // ── O olho do hero, com o nicho que alterna ─────────────────────────────
+  "Atendimento por WhatsApp para": { es: "Atención por WhatsApp para" },
+  "clínicas": { es: "clínicas" },
+  "imobiliárias": { es: "inmobiliarias" },
+  "e-commerce": { es: "e-commerce" },
+  "prestadores de serviço": { es: "prestadores de servicios" },
   "Comece seus": { es: "Comienza tus" },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
   "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {

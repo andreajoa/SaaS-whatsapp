@@ -63,6 +63,12 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // A chave acima atende telas que ainda a usam; a vitrine fala pelas de
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
   "dias sem cobrança": "days with no charge",
+  // ── O olho do hero, com o nicho que alterna ───────────────────────────
+  "Atendimento por WhatsApp para": "WhatsApp support for",
+  "clínicas": "clinics",
+  "imobiliárias": "real estate",
+  "e-commerce": "online stores",
+  "prestadores de serviço": "service providers",
   // ── A faixa de benefícios do topo ──────────────────────────────────────
   "Seu número de WhatsApp continua o mesmo": "Your WhatsApp number stays the same",
   "A IA responde em segundos, 24 horas por dia": "The AI answers in seconds, 24 hours a day",

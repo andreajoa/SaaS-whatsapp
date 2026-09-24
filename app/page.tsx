@@ -19,6 +19,7 @@ import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { EntraEmSequencia } from "@/components/site/EntraEmSequencia";
 import { Medidor } from "@/components/site/Medidor";
+import { TextoQuePreenche } from "@/components/site/TextoQuePreenche";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
@@ -248,9 +249,11 @@ export default async function HomePage() {
         <section className="border-y border-border bg-surface-elevated">
           <div className="mx-auto w-full max-w-6xl px-6 py-16 lg:py-20">
             <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-text sm:text-3xl">
-              {t("A venda raramente se perde no preço. Ela se perde no silêncio.")}
+              <TextoQuePreenche
+                texto={t("A venda raramente se perde no preço. Ela se perde no silêncio.")}
+              />
             </h2>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <EntraEmSequencia ritmo="cascata" className="mt-10 grid gap-6 md:grid-cols-3">
               <Dor
                 titulo={t("A resposta demora")}
                 texto={t(
@@ -269,7 +272,7 @@ export default async function HomePage() {
                   "O cliente disse “depois eu vejo” e ninguém voltou nele. É a venda mais barata da empresa, e ela evapora.",
                 )}
               />
-            </div>
+            </EntraEmSequencia>
           </div>
         </section>
 
@@ -280,7 +283,7 @@ export default async function HomePage() {
               olho={t("Como funciona")}
               titulo={t("Três passos, e o atendimento para de depender de memória")}
             />
-            <div className="mt-12 grid gap-8 md:grid-cols-3">
+            <EntraEmSequencia ritmo="cascata" className="mt-12 grid gap-8 md:grid-cols-3">
               <Passo
                 numero="1"
                 Icone={QrCode}
@@ -305,7 +308,7 @@ export default async function HomePage() {
                   "Cada conversa vira um card. Você vê quem está esperando, quem comprou e quem esfriou, sem perguntar a ninguém.",
                 )}
               />
-            </div>
+            </EntraEmSequencia>
           </div>
         </section>
 
@@ -313,7 +316,7 @@ export default async function HomePage() {
         <section id="recursos" className="scroll-mt-20 border-y border-border bg-surface-elevated">
           <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
             <Titulo olho={t("Recursos")} titulo={t("O atendimento inteiro em um lugar só")} />
-            <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+            <EntraEmSequencia ritmo="cascata" className="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
               <Recurso
                 Icone={Inbox}
                 titulo={t("Uma caixa de entrada para o time todo")}
@@ -356,7 +359,7 @@ export default async function HomePage() {
                   "Dados isolados por empresa, registro de acesso e exclusão a pedido do titular.",
                 )}
               />
-            </div>
+            </EntraEmSequencia>
           </div>
         </section>
 

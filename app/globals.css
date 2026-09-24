@@ -981,7 +981,12 @@
 
 /* Quatro balões é o que a conversa tem; os dois extras existem para que
    acrescentar uma linha ao diálogo não deixe o quinto balão invisível — o modo
-   de falha seria um balão que some, com build verde. */
+   de falha seria um balão que some, com build verde.
+
+   Os atrasos abaixo são do ritmo `conversa`. O ritmo `cascata` (grades de
+   card) vem logo depois e sobrescreve só os números — a mesma animação, o
+   mesmo destino, outra cadência. Por que dois ritmos: o cabeçalho do
+   componente. */
 .sequencia-viva[data-em-cena="true"] > *:nth-child(1) {
   animation-delay: 0ms;
 }
@@ -997,6 +1002,17 @@
 .sequencia-viva[data-em-cena="true"] > *:nth-child(n + 5) {
   animation-delay: 1520ms;
 }
+
+/* Ritmo `cascata`: grade de cards. Rápido o bastante para ler como "a seção
+   inteira entrou", devagar o bastante para a ordem ser perceptível. Seis
+   degraus porque a grade de Recursos tem seis itens; do sétimo em diante todos
+   entram junto, que é melhor que um sétimo card invisível. */
+.sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(1) { animation-delay: 0ms; }
+.sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(2) { animation-delay: 90ms; }
+.sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(3) { animation-delay: 180ms; }
+.sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(4) { animation-delay: 270ms; }
+.sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(5) { animation-delay: 360ms; }
+.sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(n + 6) { animation-delay: 450ms; }
 
 @keyframes deskcomm-balao-entra {
   from {

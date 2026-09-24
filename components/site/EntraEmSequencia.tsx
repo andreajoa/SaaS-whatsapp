@@ -40,12 +40,27 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
  */
 const useEfeitoAntesDaPintura = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
+/**
+ * A CADÊNCIA, e por que ela não é uma só.
+ *
+ * `conversa` é lenta de propósito — 420 ms entre balões é o tempo de alguém
+ * digitando do outro lado, e é isso que a demonstração precisa encenar.
+ * A MESMA cadência numa grade de cards vira espera: o olho já leu o primeiro
+ * e fica parado esperando o terceiro chegar.
+ *
+ * `cascata` é o ritmo de grade — rápido o bastante para ler como "a seção
+ * inteira entrou", devagar o bastante para a ordem ser perceptível.
+ */
+export type Ritmo = "conversa" | "cascata";
+
 export function EntraEmSequencia({
   children,
   className,
+  ritmo = "conversa",
 }: {
   readonly children: ReactNode;
   readonly className?: string;
+  readonly ritmo?: Ritmo;
 }) {
   const alvo = useRef<HTMLDivElement>(null);
   const [vivo, setVivo] = useState(false);
@@ -96,6 +111,7 @@ export function EntraEmSequencia({
     <div
       ref={alvo}
       className={vivo ? `${className ?? ""} sequencia-viva`.trim() : className}
+      data-ritmo={ritmo}
       data-em-cena={emCena ? "true" : undefined}
     >
       {children}

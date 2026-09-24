@@ -41,7 +41,12 @@ export const DICIONARIO: Traducoes = {
   "Foto do perfil": { es: "Foto del perfil" },
   "Escolher imagem": { es: "Elegir imagen" },
   "Trocar foto": { es: "Cambiar foto" },
-  Remover: { es: "Quitar" },
+  // "Remover" NÃO entra aqui: a chave já existe mais abaixo, com a mesma
+  // tradução ("Quitar"), e chave repetida no mesmo objeto é erro de compilação
+  // (TS1117) — foi o que derrubou o deploy em 2026-09-24. O dicionário é um
+  // objeto só: quem acrescenta um bloco temático precisa procurar a palavra
+  // antes, porque as genéricas ("Remover", "Salvar", "Cancelar") quase sempre
+  // já estão lá.
   "Foto atualizada.": { es: "Foto actualizada." },
   "Foto removida.": { es: "Foto eliminada." },
   "Não foi possível enviar a foto.": { es: "No se pudo enviar la foto." },

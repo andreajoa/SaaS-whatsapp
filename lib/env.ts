@@ -477,4 +477,47 @@ if (!env.IMPERSONATE_COOKIE_SECRET || env.IMPERSONATE_COOKIE_SECRET.length < 32)
   );
 }
 
+/**
+ * AS DUAS CHAVES DO STRIPE TÊM DE ESTAR NO MESMO MODO.
+ *
+ * `sk_live_` com `pk_test_` (ou o contrário) não falha no boot, não falha no
+ * build e não falha em nenhum teste: falha no CHECKOUT, com uma mensagem do
+ * Stripe sobre a sessão não pertencer à chave — na frente de um cliente com o
+ * cartão na mão. É o pior lugar possível para descobrir um erro de
+ * configuração, e o mais fácil de cometer: as duas chaves são copiadas de
+ * abas diferentes do painel, e o seletor de modo é um botãozinho no canto.
+ *
+ * É AVISO, e não erro fatal, de propósito. Derrubar o boot por causa disto
+ * tiraria do ar um produto inteiro — inbox, agente, funil — por um problema
+ * que só afeta quem vai assinar. O gate de verdade é o olho de quem lê o log
+ * no primeiro deploy.
+ *
+ * Os `price_...` NÃO são conferíveis aqui: eles têm o mesmo formato nos dois
+ * modos. Um preço de teste numa instalação live só aparece ao abrir o
+ * checkout — e é por isso que o primeiro assinante precisa ser você.
+ */
+const modoSecreta = env.STRIPE_SECRET_KEY.startsWith("sk_live_")
+  ? "live"
+  : env.STRIPE_SECRET_KEY.startsWith("sk_test_")
+    ? "test"
+    : null;
+const modoPublicavel = env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.startsWith("pk_live_")
+  ? "live"
+  : env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.startsWith("pk_test_")
+    ? "test"
+    : null;
+
+if (modoSecreta && modoPublicavel && modoSecreta !== modoPublicavel) {
+  console.warn(
+    `[env] STRIPE EM MODOS DIFERENTES — a chave secreta é '${modoSecreta}' e a publicável é ` +
+      `'${modoPublicavel}'. O checkout VAI falhar na frente do cliente. Copie as duas da mesma ` +
+      "aba do painel do Stripe (o seletor de modo fica no canto superior).",
+  );
+} else if (env.STRIPE_SECRET_KEY && !modoSecreta) {
+  console.warn(
+    "[env] STRIPE_SECRET_KEY não começa com sk_live_ nem sk_test_ — se for uma chave restrita " +
+      "(rk_...), confira se ela tem permissão de escrita em Checkout Sessions e Subscriptions.",
+  );
+}
+
 export type Env = typeof env;

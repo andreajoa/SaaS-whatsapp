@@ -172,8 +172,12 @@ function montar(
   nomeDoProduto: string,
   rodape: Rodape,
 ): MontagemDoEmail {
+  // A mesma base que o botão da ação usa: o menu e o rodapé apontam para o
+  // MESMO host, senão um e-mail levaria a dois sites diferentes.
+  const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+
   const alvo = corpo.acao
-    ? `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}${corpo.acao.caminho}`
+    ? `${base}${corpo.acao.caminho}`
     : "";
 
   const paragrafos = corpo.paragrafos

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CAMINHO_DO_PRECO, ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 
@@ -33,6 +33,9 @@ export function Medidor({
 }) {
   const jaMandou = useRef(false);
   const jaViuPreco = useRef(false);
+  /** O id da linha de `site_visits`, devolvido pela rota. Sem ele não há
+   *  como dizer, na saída, a QUAL visita a duração pertence. */
+  const [visitaId, setVisitaId] = useState<string | null>(null);
 
   /**
    * A SEGUNDA medida: a pessoa chegou até a tabela de preço.
@@ -101,11 +104,103 @@ export function Medidor({
       // A resposta não interessa; o que interessa é o `Set-Cookie` dela, e
       // `keepalive` faz a chamada sobreviver a quem clica e sai na mesma hora.
       keepalive: true,
-    }).catch(() => {
-      // Rede caiu, rota 404 num self-host, bloqueador exótico. Medição que
-      // falha não pode aparecer no console de quem só queria ler a página.
-    });
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        const id = j?.data?.visita;
+        if (typeof id === "string") setVisitaId(id);
+      })
+      .catch(() => {
+        // Rede caiu, rota 404 num self-host, bloqueador exótico. Medição que
+        // falha não pode aparecer no console de quem só queria ler a página.
+      });
   }, [idioma, moeda, dispositivo]);
+
+  /**
+   * O PULSO DE SAÍDA — quanto tempo ficou, e onde clicou.
+   *
+   * ─── Por que o relógio conta só a aba VISÍVEL ──────────────────────────
+   *
+   * Uma aba esquecida em segundo plano acumularia horas e envenenaria a
+   * média — e média envenenada é pior que dado ausente, porque parece
+   * confiável. O cronômetro para em `visibilitychange` e volta a correr
+   * quando a aba reaparece, então o número descreve leitura, não abandono.
+   *
+   * ─── Por que `sendBeacon`, e não `fetch` ───────────────────────────────
+   *
+   * É a única API que o navegador promete entregar DEPOIS de a aba fechar.
+   * Um `fetch` no `pagehide` é cancelado junto com a página na maioria dos
+   * casos, e o dado de quem leu a página inteira e saiu — justamente o mais
+   * valioso — seria o que mais se perderia.
+   *
+   * ─── O clique guarda RÓTULO, nunca o elemento ──────────────────────────
+   *
+   * Lê-se `data-medir` do ancestral mais próximo, que é um valor que NÓS
+   * escrevemos no JSX. Nada do texto, do valor ou da posição do elemento é
+   * lido. O servidor ainda valida contra um vocabulário fechado — duas
+   * cercas, porque esta roda no navegador e pode ser burlada.
+   */
+  useEffect(() => {
+    if (!visitaId) return;
+
+    let segundos = 0;
+    let desde = document.visibilityState === "visible" ? Date.now() : null;
+    const cliques: string[] = [];
+    let entregue = false;
+
+    const acumular = () => {
+      if (desde === null) return;
+      segundos += Math.round((Date.now() - desde) / 1000);
+      desde = null;
+    };
+
+    const aoClicar = (ev: MouseEvent) => {
+      const alvo = (ev.target as HTMLElement | null)?.closest?.("[data-medir]");
+      const rotulo = alvo?.getAttribute("data-medir");
+      // Teto de 40: é o que a rota aceita, e um laço de clique acidental não
+      // pode crescer sem limite na memória de quem está só navegando.
+      if (rotulo && cliques.length < 40) cliques.push(rotulo);
+    };
+
+    const entregar = () => {
+      if (entregue) return;
+      entregue = true;
+      acumular();
+      const corpo = JSON.stringify({
+        visita: visitaId,
+        segundos,
+        path: window.location.pathname,
+        cliques,
+      });
+      // `sendBeacon` devolve false quando o corpo excede a cota do navegador.
+      // Aí não há segunda chance: um `fetch` neste ponto seria cancelado.
+      navigator.sendBeacon?.("/api/v1/site/pulso", new Blob([corpo], { type: "application/json" }));
+    };
+
+    const aoTrocarVisibilidade = () => {
+      if (document.visibilityState === "hidden") {
+        // Entrega AQUI, e não só no `pagehide`: em celular, trocar de app ou
+        // bloquear a tela dispara `visibilitychange` e muitas vezes NUNCA
+        // dispara `pagehide` — o sistema mata a aba sem avisar a página. Quem
+        // só escuta `pagehide` perde a maior parte do tráfego móvel.
+        entregar();
+      } else {
+        desde = Date.now();
+      }
+    };
+
+    document.addEventListener("click", aoClicar, true);
+    document.addEventListener("visibilitychange", aoTrocarVisibilidade);
+    window.addEventListener("pagehide", entregar);
+
+    return () => {
+      document.removeEventListener("click", aoClicar, true);
+      document.removeEventListener("visibilitychange", aoTrocarVisibilidade);
+      window.removeEventListener("pagehide", entregar);
+    };
+  }, [visitaId]);
+
+
 
   return null;
 }

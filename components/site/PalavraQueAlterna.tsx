@@ -35,8 +35,16 @@ import { useEffect, useLayoutEffect, useState } from "react";
  */
 const useEfeitoAntesDaPintura = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-/** Quanto tempo cada palavra fica parada, legível, antes de subir. */
-const PAUSA_MS = 2200;
+/**
+ * Quanto tempo cada palavra fica PARADA, legível, antes de subir.
+ *
+ * Eram 2,2 s e estava rápido demais: o olho precisa terminar de ler a frase
+ * inteira ANTES de a palavra trocar, senão a troca rouba a leitura em vez de
+ * acrescentar a ela. "Atendimento por WhatsApp para clínicas" leva cerca de
+ * 1,5 s para ser lida; com a subida de 0,52 s, 3,6 s de pausa deixam mais de
+ * dois segundos de frase parada — tempo de ler e ainda reparar que mudou.
+ */
+const PAUSA_MS = 3600;
 
 /** Precisa bater com a duração da transição no CSS (`.alterna-fita`). */
 const SUBIDA_MS = 520;

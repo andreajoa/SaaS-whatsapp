@@ -66,6 +66,20 @@ export interface Painel {
   readonly porOrigem: readonly LinhaContada[];
   readonly porCampanha: readonly LinhaContada[];
   readonly porPagina: readonly LinhaContada[];
+  /**
+   * Segundos MEDIANOS com a aba visível. Mediana e não média: uma aba
+   * esquecida por vinte minutos puxa a média para cima e passa a descrever
+   * leitor nenhum. `null` = ninguém saiu de um jeito que o navegador
+   * conseguisse avisar, o que é o estado normal com tráfego pequeno.
+   */
+  readonly segundosMedios: number | null;
+  /**
+   * Pessoas que voltaram — visitantes com mais de uma visita na janela. É o
+   * número que separa "interesse" de "passagem": quem volta leu e pensou.
+   */
+  readonly revisitantes: number;
+  /** Cliques por rótulo, do vocabulário fechado de `/api/v1/site/pulso`. */
+  readonly porClique: readonly LinhaContada[];
   readonly ultimasVisitas: readonly VisitaResumida[];
   readonly ultimosLeads: readonly LeadResumido[];
   /** Verdadeiro quando NENHUMA consulta respondeu — tabela ausente, service role ausente. */
@@ -87,6 +101,9 @@ const VAZIO: Painel = {
   porPagina: [],
   ultimasVisitas: [],
   ultimosLeads: [],
+  segundosMedios: null,
+  revisitantes: 0,
+  porClique: [],
   semBanco: true,
 };
 
@@ -141,7 +158,7 @@ export async function lerPainel({ dias }: Janela): Promise<Painel> {
     admin
       .from("site_visits")
       .select(
-        "created_at, visitor_id, path, referrer_host, utm_campaign, country, city, postal_code, device",
+        "created_at, visitor_id, path, referrer_host, utm_campaign, country, city, postal_code, device, segundos_na_pagina",
       )
       .gte("created_at", desde)
       .order("created_at", { ascending: false })
@@ -164,6 +181,12 @@ export async function lerPainel({ dias }: Janela): Promise<Painel> {
     admin.from("email_envios").select("lead_id, status, aberto_em").limit(20000),
   );
 
+  // `tentar` devolve null num clone sem a migration 0243 — o painel inteiro
+  // não pode sumir por causa de uma tabela que talvez ainda não exista.
+  const cliques = await tentar(() =>
+    admin.from("site_clicks").select("alvo").gte("created_at", desde).limit(20000),
+  );
+
   if (visitas === null && leads === null && checkouts === null && envios === null) {
     return VAZIO;
   }
@@ -172,6 +195,27 @@ export async function lerPainel({ dias }: Janela): Promise<Painel> {
   const l = leads ?? [];
   const c = checkouts ?? [];
   const e = envios ?? [];
+  const cl = cliques ?? [];
+
+  // ── Mediana do tempo na página ────────────────────────────────────────────
+  //
+  // Só as visitas que TÊM o número entram. Contar as nulas como zero diria que
+  // metade das pessoas saiu instantaneamente, quando na verdade o navegador
+  // delas não conseguiu avisar — inventar um zero é pior que não ter o dado.
+  const duracoes = v
+    .map((x) => x.segundos_na_pagina)
+    .filter((x): x is number => typeof x === "number")
+    .sort((a, b) => a - b);
+  const segundosMedios =
+    duracoes.length > 0 ? (duracoes[Math.floor(duracoes.length / 2)] ?? null) : null;
+
+  // ── Quem voltou ───────────────────────────────────────────────────────────
+  const porVisitante = new Map<string, number>();
+  for (const x of v) {
+    const id = String(x.visitor_id);
+    porVisitante.set(id, (porVisitante.get(id) ?? 0) + 1);
+  }
+  const revisitantes = [...porVisitante.values()].filter((n) => n > 1).length;
 
   const porLead = new Map<string, { enviados: number; abertos: number }>();
   for (const envio of e) {
@@ -196,6 +240,9 @@ export async function lerPainel({ dias }: Janela): Promise<Painel> {
     porOrigem: contar(v, "referrer_host"),
     porCampanha: contar(v, "utm_campaign"),
     porPagina: contar(v, "path"),
+    segundosMedios,
+    revisitantes,
+    porClique: contar(cl, "alvo"),
     ultimasVisitas: v.slice(0, 50).map((x) => ({
       quando: String(x.created_at),
       path: String(x.path ?? "/"),

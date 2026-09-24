@@ -124,9 +124,15 @@ export async function POST(req: NextRequest): Promise<Response> {
   const utm = utmDaUrl(urlSegura(dados.url));
   const referrer = dados.referrer.slice(0, 2000) || null;
 
+  // O id da linha volta para o cliente, e é ele que o beacon de saída usa para
+  // dizer quanto tempo a pessoa ficou (POST /api/v1/site/pulso). Sem devolvê-lo,
+  // a única forma de achar a visita seria adivinhar pela mais recente do mesmo
+  // visitante — que erra em quem abre duas abas, justamente o leitor mais
+  // interessado.
+  let visitaId: string | null = null;
   try {
     const admin = createAdminClient();
-    await admin.from("site_visits").insert({
+    const { data: linha } = await admin.from("site_visits").insert({
       visitor_id: visitorId,
       path: dados.path.slice(0, 300),
       referrer,
@@ -141,13 +147,14 @@ export async function POST(req: NextRequest): Promise<Response> {
       device: dados.dispositivo ?? null,
       idioma: dados.idioma || null,
       moeda: dados.moeda || null,
-    });
+    }).select("id").single();
+    visitaId = (linha as { id: string } | null)?.id ?? null;
   } catch {
     // Sem service role, ou clone sem a migration 0240. O visitante não tem
     // nada a ver com isso e a página dele não pode piscar por causa disto.
   }
 
-  const resposta = ok({ registrado: true }, { requestId });
+  const resposta = ok({ registrado: true, visita: visitaId }, { requestId });
   resposta.headers.append(
     "set-cookie",
     [

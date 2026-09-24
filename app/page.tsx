@@ -215,6 +215,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/signup"
+                  data-medir="cta-menu"
               className="inline-flex h-9 items-center gap-1.5 rounded-sm bg-accent px-4 text-sm font-medium text-accent-foreground shadow-xs transition-colors hover:bg-accent-hover"
             >
               {t("Criar conta")}
@@ -267,6 +268,7 @@ export default async function HomePage() {
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link
                   href="/signup"
+                  data-medir="cta-hero"
                   className="inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-6 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
                 >
                   {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`}
@@ -546,6 +548,7 @@ export default async function HomePage() {
                       </ul>
                       <Link
                         href="/signup"
+                  data-medir={`plano-${id}`}
                         className={
                           destaque
                             ? "mt-8 inline-flex h-11 w-full items-center justify-center rounded-sm bg-accent text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
@@ -622,6 +625,7 @@ export default async function HomePage() {
             </p>
             <Link
               href="/signup"
+              data-medir="cta-final"
               className="mt-8 inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-7 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
             >
               {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`}

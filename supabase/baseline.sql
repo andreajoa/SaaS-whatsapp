@@ -24578,3 +24578,36 @@ grant execute on function public.fn_decrypt_oauth(bytea) to service_role;
 grant execute on function public.fn_encrypt_oauth(text) to service_role;
 grant execute on function public.fn_lgpd_cascade_redact_contact(uuid, uuid, uuid) to service_role;
 grant execute on function public.fn_update_budget_consumption() to service_role;
+
+-- ---- tempo na página e cliques (migration 0243) ----
+--
+-- `segundos_na_pagina` responde o que a 0240 não respondia: o que acontece
+-- ENTRE chegar e sair. Página que ninguém lê e página lida inteira sem clique
+-- têm a mesma conversão e conserto oposto.
+--
+-- Nem IP, nem e-mail, nem coordenada de clique: o que se grava é o RÓTULO do
+-- elemento, de um vocabulário fechado que o código define. Ler o texto do DOM
+-- gravaria, um dia, o que alguém digitou num campo cujo rótulo mudou.
+alter table public.site_visits
+  add column if not exists segundos_na_pagina integer;
+
+create table if not exists public.site_clicks (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  -- Sem foreign key de propósito: o clique pode chegar depois de a visita ter
+  -- sido expurgada por idade, e uma FK o RECUSARIA — perdendo o dado por causa
+  -- da ordem de limpeza.
+  visitor_id text not null,
+  session_id text not null,
+  path text not null,
+  alvo text not null
+);
+
+create index if not exists site_clicks_created_idx
+  on public.site_clicks (created_at desc);
+create index if not exists site_clicks_alvo_idx
+  on public.site_clicks (alvo, created_at desc);
+
+alter table public.site_clicks enable row level security;
+revoke all on public.site_clicks from anon, authenticated;
+grant all on public.site_clicks to service_role;

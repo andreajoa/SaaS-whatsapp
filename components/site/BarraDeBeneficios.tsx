@@ -35,7 +35,7 @@ export function BarraDeBeneficios({ itens }: { readonly itens: readonly string[]
     >
       {itens.map((item, i) => (
         <li key={`${i}-${item}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap">
-          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent-700/60" />
+          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent-foreground/50" />
           {item}
         </li>
       ))}
@@ -43,11 +43,13 @@ export function BarraDeBeneficios({ itens }: { readonly itens: readonly string[]
   );
 
   return (
-    // A faixa usa a cor de DESTAQUE da marca, não o cinza do painel. Ela é a
-    // primeira coisa acima de tudo na página: em `bg-surface-elevated` ela se
-    // confundia com o cabeçalho logo abaixo e passava despercebida — uma faixa
-    // que ninguém vê é peso morto no topo da página.
-    <div className="border-b border-accent-200 bg-accent-soft text-accent-700">
+    // Fundo CHEIO da marca com texto sobre ele, e não o tom claro de antes.
+    // `bg-accent-soft` com `text-accent-700` são duas variações da mesma cor:
+    // o contraste entre elas é baixo demais para texto de 14px, e a faixa ficava
+    // ilegível justamente por ser discreta. `accent-foreground` existe para ser
+    // lido sobre `accent` — é o par que o sistema de cores garante, em qualquer
+    // marca que o revendedor escolher.
+    <div className="border-b border-accent-hover bg-accent text-accent-foreground">
       {/*
         As máscaras nas pontas existem para o texto não ser DECEPADO na borda.
         Sem elas, uma frase some no meio de uma palavra e o olho tenta lê-la —

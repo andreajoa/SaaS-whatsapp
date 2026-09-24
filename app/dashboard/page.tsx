@@ -106,6 +106,13 @@ export default async function DashboardPage({
             <Numero titulo="E-mails enviados" valor={painel.emailsEnviados} />
             <Numero titulo="E-mails abertos" valor={painel.emailsAbertos} />
             <Numero
+              titulo="Tempo na página"
+              valor={painel.segundosMedios ?? 0}
+              sufixo="s"
+              nota="mediana de quem avisou"
+            />
+            <Numero titulo="Voltaram" valor={painel.revisitantes} nota="visitaram mais de uma vez" />
+            <Numero
               titulo="Conversão"
               valor={
                 painel.visitantes > 0 ? Math.round((painel.leads / painel.visitantes) * 100) : 0
@@ -121,6 +128,7 @@ export default async function DashboardPage({
             <Ranking titulo="De onde vieram" linhas={painel.porOrigem} vazio="Tráfego direto" />
             <Ranking titulo="Campanhas" linhas={painel.porCampanha} vazio="Nenhuma campanha" />
             <Ranking titulo="Páginas" linhas={painel.porPagina} />
+            <Ranking titulo="Onde clicaram" linhas={painel.porClique} vazio="Nenhum clique medido" />
           </section>
 
           <UltimasVisitas painel={painel} />

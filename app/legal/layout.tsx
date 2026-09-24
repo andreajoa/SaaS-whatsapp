@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { LinksLegais } from "@/components/site/LinksLegais";
 import { branding } from "@/lib/branding";
-import { traduzir } from "@/lib/i18n/dicionario";
 import { DOCUMENTOS_LEGAIS, frase } from "@/lib/legal/documentos";
 import { resolverOperador } from "@/lib/legal/operador";
 import { textoDoSite } from "@/lib/mercado/textos";
@@ -77,7 +76,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
             href="/"
             className="link-sublinha text-sm text-text-muted transition-colors hover:text-text"
           >
-            {traduzir("Voltar", idioma)}
+            {t("Voltar")}
           </Link>
         </div>
       </header>

@@ -51,6 +51,14 @@ const TELAS_DA_VITRINE = [
   // idiomas, e é a ÚLTIMA tela que ele lê. Meia-tradução na porta de saída é
   // a frase final antes de a pessoa escolher entre sair e marcar como spam.
   "app/descadastrar/[token]/page.tsx",
+  // O layout dos documentos legais. Ele não é "uma tela", é a MOLDURA de nove
+  // — cabeçalho, coluna de navegação com os oito títulos e rodapé. Pela
+  // definição que este arquivo usa, é vitrine: vista por estranho, nos três
+  // idiomas. Ficou de fora até 2026-09-24 porque o layout antigo resolvia o
+  // idioma por `traduzir()`, que só conhece dois — e um "Voltar" em português
+  // no topo de um contrato em inglês é a meia-tradução que este gate existe
+  // para impedir.
+  "app/legal/layout.tsx",
 ];
 
 /** Toda chave literal passada a `t()` / `textoDoSite()` nas telas da vitrine. */

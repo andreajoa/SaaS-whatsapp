@@ -61,6 +61,7 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
   "dias sem cobrança": "days with no charge",
   "O problema": "The problem",
+  Voltar: "Back",
   // ── O olho do hero, com o nicho que alterna ───────────────────────────
   "Atendimento por WhatsApp para": "WhatsApp support for",
   "clínicas": "clinics",

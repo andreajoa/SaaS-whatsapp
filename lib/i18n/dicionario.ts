@@ -9690,6 +9690,12 @@ export const DICIONARIO: Traducoes = {
   "Pagamento processado pelo Stripe. Os dados do cartão não passam por nós.": {
     es: "Pago procesado por Stripe. Los datos de la tarjeta no pasan por nosotros.",
   },
+  // ── A faixa de benefícios do topo da vitrine ───────────────────────────
+  "Seu número de WhatsApp continua o mesmo": { es: "Tu número de WhatsApp sigue siendo el mismo" },
+  "A IA responde em segundos, 24 horas por dia": { es: "La IA responde en segundos, 24 horas al día" },
+  "Cancele em um clique, sem falar com ninguém": { es: "Cancela con un clic, sin hablar con nadie" },
+  "Conversas, funil e histórico em uma tela só": { es: "Conversaciones, embudo e historial en una sola pantalla" },
+  "Dados isolados por empresa, LGPD desde o primeiro dia": { es: "Datos aislados por empresa, protección de datos desde el primer día" },
   "Comece seus": { es: "Comienza tus" },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
   "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {
@@ -9939,12 +9945,15 @@ export const DICIONARIO: Traducoes = {
   "Termos de uso": { es: "Términos de uso" },
   "Novo contato · 22h14": { es: "Nuevo contacto · 22:14" },
   "IA atendendo": { es: "IA atendiendo" },
-  "Oi! Vocês entregam hoje ainda?": { es: "¡Hola! ¿Todavía entregan hoy?" },
+  // O emoji fica do lado do CLIENTE nos três idiomas: é assim que gente
+  // escreve para uma empresa no WhatsApp. A empresa responde sem — e é o
+  // contraste que faz a conversa parecer real em vez de roteirizada.
+  "Oi! Vocês entregam hoje ainda? 😊": { es: "¡Hola! ¿Todavía entregan hoy? 😊" },
   "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.":
     {
       es: "¡Hola, Mariana! Sí, entregamos. Los pedidos cerrados hasta las 23h salen mañana temprano. Dime tu barrio y te confirmo el plazo.",
     },
-  "Sou do centro": { es: "Soy del centro" },
+  "Sou do centro 🙏": { es: "Soy del centro 🙏" },
   "No centro chega em até 2 horas. Quer que eu já reserve para você?": {
     es: "Al centro llega en hasta 2 horas. ¿Quieres que te lo reserve ya?",
   },

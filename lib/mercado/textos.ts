@@ -63,6 +63,12 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // A chave acima atende telas que ainda a usam; a vitrine fala pelas de
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
   "dias sem cobrança": "days with no charge",
+  // ── A faixa de benefícios do topo ──────────────────────────────────────
+  "Seu número de WhatsApp continua o mesmo": "Your WhatsApp number stays the same",
+  "A IA responde em segundos, 24 horas por dia": "The AI answers in seconds, 24 hours a day",
+  "Cancele em um clique, sem falar com ninguém": "Cancel with one click, no phone call",
+  "Conversas, funil e histórico em uma tela só": "Conversations, pipeline and history on one screen",
+  "Dados isolados por empresa, LGPD desde o primeiro dia": "Data isolated per company, privacy compliance from day one",
   "Nada é cobrado nos primeiros dias": "Nothing is charged in the first days",
   "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.":
     "days with everything working. We ask for a card to start, and the subscription only begins after that — cancel with one click whenever you want.",
@@ -157,10 +163,10 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // brasileiro a um comprador indiano está mostrando o cliente de outra pessoa.
   "Novo contato · 22h14": "New contact · 10:14 PM",
   "IA atendendo": "AI replying",
-  "Oi! Vocês entregam hoje ainda?": "Hi! Are you still delivering today?",
+  "Oi! Vocês entregam hoje ainda? 😊": "Hi! Are you still delivering today? 😊",
   "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.":
     "Hi Mariana! We are. Orders placed by 11 PM go out first thing tomorrow. Tell me your neighbourhood and I'll confirm the time.",
-  "Sou do centro": "I'm downtown",
+  "Sou do centro 🙏": "I'm downtown 🙏",
   "No centro chega em até 2 horas. Quer que eu já reserve para você?":
     "Downtown it arrives within 2 hours. Want me to reserve it for you?",
   "Card criado no funil": "Card created on the pipeline",

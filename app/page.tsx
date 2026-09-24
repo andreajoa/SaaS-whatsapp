@@ -15,7 +15,9 @@ import {
 } from "lucide-react";
 
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
+import { BarraDeBeneficios } from "@/components/site/BarraDeBeneficios";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
+import { ConversaAoVivo } from "@/components/site/ConversaAoVivo";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { EntraEmSequencia } from "@/components/site/EntraEmSequencia";
 import { Medidor } from "@/components/site/Medidor";
@@ -156,6 +158,26 @@ export default async function HomePage() {
         captura={textosDaCaptura}
         idioma={visitante.idioma}
         moeda={mercado.moeda}
+      />
+      {/*
+        A faixa fica ACIMA do cabeçalho e FORA do `sticky`: ela é apoio, não
+        navegação. Grudada no topo junto com o menu, roubaria altura útil da
+        tela em toda rolagem — e num celular isso é caro. Assim ela cumpre o
+        papel na chegada e sai do caminho.
+
+        Os textos são montados aqui, e não dentro do componente, pelo mesmo
+        motivo dos textos da captura de e-mail algumas linhas acima:
+        `tests/unit/vitrine-fala-ingles.test.ts` varre ESTE arquivo.
+      */}
+      <BarraDeBeneficios
+        itens={[
+          t("Seu número de WhatsApp continua o mesmo"),
+          `${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`,
+          t("A IA responde em segundos, 24 horas por dia"),
+          t("Cancele em um clique, sem falar com ninguém"),
+          t("Conversas, funil e histórico em uma tela só"),
+          t("Dados isolados por empresa, LGPD desde o primeiro dia"),
+        ]}
       />
       <header className="sticky top-0 z-30 border-b border-border/70 bg-bg/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-6">
@@ -704,22 +726,56 @@ function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
           </span>
         </div>
 
-        <EntraEmSequencia className="space-y-3 px-5 py-6">
-          <Balao lado="cliente" texto={t("Oi! Vocês entregam hoje ainda?")} hora="22:14" />
-          <Balao
-            lado="agente"
-            texto={t(
-              "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.",
-            )}
-            hora="22:14"
-          />
-          <Balao lado="cliente" texto={t("Sou do centro")} hora="22:15" />
-          <Balao
-            lado="agente"
-            texto={t("No centro chega em até 2 horas. Quer que eu já reserve para você?")}
-            hora="22:15"
-          />
-        </EntraEmSequencia>
+        <ConversaAoVivo
+          className="space-y-3 px-5 py-6"
+          falas={[
+            // A primeira fala não tem "digitando": ninguém vê o cliente
+            // escrevendo antes de a conversa existir. Ela simplesmente chega,
+            // que é como uma mensagem de WhatsApp chega.
+            {
+              lado: "cliente",
+              digitandoMs: 0,
+              balao: (
+                <Balao lado="cliente" texto={t("Oi! Vocês entregam hoje ainda? 😊")} hora="22:14" />
+              ),
+            },
+            // 1,1 s é o que o agente de fato leva. Fingir mais venderia um
+            // produto mais lento do que o que se entrega — e a faixa ao pé
+            // deste quadro promete "Respondido na hora".
+            {
+              lado: "agente",
+              digitandoMs: 1100,
+              balao: (
+                <Balao
+                  lado="agente"
+                  texto={t(
+                    "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.",
+                  )}
+                  hora="22:14"
+                />
+              ),
+            },
+            // Gente digitando no celular demora mais que uma IA. Dar ao
+            // cliente o mesmo 1,1 s do agente faria os dois parecerem a mesma
+            // coisa — e o que este quadro mostra é justamente a diferença.
+            {
+              lado: "cliente",
+              digitandoMs: 1600,
+              balao: <Balao lado="cliente" texto={t("Sou do centro 🙏")} hora="22:15" />,
+            },
+            {
+              lado: "agente",
+              digitandoMs: 1100,
+              balao: (
+                <Balao
+                  lado="agente"
+                  texto={t("No centro chega em até 2 horas. Quer que eu já reserve para você?")}
+                  hora="22:15"
+                />
+              ),
+            },
+          ]}
+        />
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border bg-surface-elevated px-5 py-3.5 text-xs text-text-muted">
           <span className="inline-flex items-center gap-1.5">

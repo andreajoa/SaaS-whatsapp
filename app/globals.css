@@ -1036,3 +1036,105 @@
     transform: none;
   }
 }
+
+/* ── A conversa acontecendo: a fala que chega e os pontos de "digitando" ─────
+   Companheiro de `components/site/ConversaAoVivo.tsx`. O raciocínio inteiro —
+   por que encenar, e por que o HTML do servidor não esconde nada — está no
+   cabeçalho de lá. Aqui só o movimento.
+
+   A fala entra do lado de quem falou: a do cliente vem da esquerda, a do
+   agente da direita. Entrar todas do mesmo lugar apagaria a única informação
+   que o movimento carrega de graça — quem está falando. */
+.conversa-fala {
+  animation: deskcomm-fala-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes deskcomm-fala-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Os três pontos sobem em ondas, 160 ms de defasagem entre eles. É o ritmo do
+   indicador que todo mundo já viu em mensageiro — copiá-lo é o que faz o olho
+   reconhecer "alguém está digitando" sem ler legenda nenhuma. */
+.conversa-ponto {
+  animation: deskcomm-ponto-pula 1200ms ease-in-out infinite;
+}
+.conversa-ponto[data-ponto="1"] {
+  animation-delay: 160ms;
+}
+.conversa-ponto[data-ponto="2"] {
+  animation-delay: 320ms;
+}
+
+@keyframes deskcomm-ponto-pula {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* O componente nem encena neste caso — ele entrega as quatro falas de uma
+     vez e nunca mostra "digitando". Estas regras são o segundo degrau, para a
+     mídia que muda com a página já aberta. */
+  .conversa-fala,
+  .conversa-ponto {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── A faixa de benefícios que anda ──────────────────────────────────────────
+   Companheiro de `components/site/BarraDeBeneficios.tsx`, que explica por que
+   a lista vem duplicada. Aqui, o movimento e as duas guardas.
+
+   `w-max` no trilho e `translateX(-50%)` no fim: como as duas cópias são
+   idênticas, o quadro final é pixel a pixel igual ao inicial e o laço não tem
+   emenda visível. */
+.barra-beneficios {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+.barra-beneficios-trilho {
+  animation: deskcomm-beneficios 38s linear infinite;
+  will-change: transform;
+}
+
+/* Parar ao passar o mouse não é enfeite: é o que permite LER um item que
+   chamou a atenção. Faixa que só anda obriga a pessoa a perseguir a frase. */
+.barra-beneficios:hover .barra-beneficios-trilho,
+.barra-beneficios:focus-within .barra-beneficios-trilho {
+  animation-play-state: paused;
+}
+
+@keyframes deskcomm-beneficios {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Movimento perpétuo é o caso mais claro de `prefers-reduced-motion`: para
+     quem tem sensibilidade vestibular, uma faixa que nunca para atrapalha a
+     leitura da página INTEIRA, não só dela. Parada, ela continua dizendo o que
+     tem a dizer — os primeiros itens ficam visíveis, e nenhum é perdido porque
+     a mesma lista se repete logo abaixo no corpo da página. */
+  .barra-beneficios-trilho {
+    animation: none;
+  }
+}

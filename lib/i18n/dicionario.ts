@@ -9687,6 +9687,9 @@ export const DICIONARIO: Traducoes = {
   // avaliação era derivada da criação da conta e não pedia cartão. Ficam
   // porque outras telas ainda as usam; quem fala do teste hoje é o bloco
   // abaixo. Ver o cabeçalho de `DIAS_DE_TRIAL` em lib/billing/planos.ts.
+  "Pagamento processado pelo Stripe. Os dados do cartão não passam por nós.": {
+    es: "Pago procesado por Stripe. Los datos de la tarjeta no pasan por nosotros.",
+  },
   "Comece seus": { es: "Comienza tus" },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
   "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {

@@ -60,6 +60,7 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // A chave acima atende telas que ainda a usam; a vitrine fala pelas de
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
   "dias sem cobrança": "days with no charge",
+  "O problema": "The problem",
   // ── O olho do hero, com o nicho que alterna ───────────────────────────
   "Atendimento por WhatsApp para": "WhatsApp support for",
   "clínicas": "clinics",
@@ -94,8 +95,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
     "The customer said “I'll think about it” and nobody went back. It is the cheapest sale in the company, and it evaporates.",
 
   // ── Como funciona ──────────────────────────────────────────────────────
-  "Três passos, e o atendimento para de depender de memória":
-    "Three steps, and support stops depending on memory",
   "Conecte o seu WhatsApp": "Connect your WhatsApp",
   "O mesmo número que a sua empresa já usa, por leitura de QR code. Ninguém troca de número e nenhuma conversa se perde.":
     "The same number your company already uses, by scanning a QR code. Nobody changes numbers and no conversation is lost.",

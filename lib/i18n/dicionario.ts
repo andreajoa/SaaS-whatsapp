@@ -9715,6 +9715,7 @@ export const DICIONARIO: Traducoes = {
   "imobiliárias": { es: "inmobiliarias" },
   "e-commerce": { es: "e-commerce" },
   "prestadores de serviço": { es: "prestadores de servicios" },
+  "O problema": { es: "El problema" },
   "Comece seus": { es: "Comienza tus" },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
   "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {

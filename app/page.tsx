@@ -18,6 +18,11 @@ import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDo
 import { BarraDeBeneficios } from "@/components/site/BarraDeBeneficios";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { CartaoComLuz } from "@/components/site/CartaoComLuz";
+import {
+  Balao as BalaoDeSecao,
+  CorpoDaConversa,
+  EtiquetaDeAssunto,
+} from "@/components/site/Conversa";
 import { ConversaAoVivo } from "@/components/site/ConversaAoVivo";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { EntraEmSequencia } from "@/components/site/EntraEmSequencia";
@@ -284,46 +289,58 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ── O problema ───────────────────────────────────────────────── */}
-        <section className="border-y border-border bg-surface-elevated">
-          <div className="mx-auto w-full max-w-6xl px-6 py-16 lg:py-20">
-            <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+        {/* ── A conversa: o problema, o que muda, e como funciona ───────── */}
+        <CorpoDaConversa>
+          <EtiquetaDeAssunto>{t("O problema")}</EtiquetaDeAssunto>
+
+          {/*
+            Estas três são as ÚNICAS falas do lado esquerdo da página, e a razão
+            é de papel: aqui quem fala é o visitante, na boca dele. "A resposta
+            demora" é a queixa dele, não a nossa afirmação. Todo o resto da
+            página é a empresa respondendo, e por isso vai para a direita.
+          */}
+          <EntraEmSequencia ritmo="cascata" className="space-y-3">
+            <BalaoDeSecao lado="cliente">
+              <p className="text-sm font-semibold text-text">{t("A resposta demora")}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
+                {t(
+                  "Quem pergunta às 22h só é atendido no dia seguinte. Até lá, já comprou de quem respondeu primeiro.",
+                )}
+              </p>
+            </BalaoDeSecao>
+            <BalaoDeSecao lado="cliente">
+              <p className="text-sm font-semibold text-text">{t("A conversa se perde")}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
+                {t(
+                  "Cada pessoa do time guarda um pedaço da história no próprio celular. Ninguém sabe o que já foi combinado.",
+                )}
+              </p>
+            </BalaoDeSecao>
+            <BalaoDeSecao lado="cliente">
+              <p className="text-sm font-semibold text-text">{t("O retorno nunca acontece")}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
+                {t(
+                  "O cliente disse “depois eu vejo” e ninguém voltou nele. É a venda mais barata da empresa, e ela evapora.",
+                )}
+              </p>
+            </BalaoDeSecao>
+          </EntraEmSequencia>
+
+          {/* A resposta da empresa às três queixas, do lado direito. */}
+          <BalaoDeSecao lado="empresa">
+            <h2 className="text-xl leading-snug font-semibold tracking-tight text-text sm:text-2xl">
               <TextoQuePreenche
                 texto={t("A venda raramente se perde no preço. Ela se perde no silêncio.")}
               />
             </h2>
-            <EntraEmSequencia ritmo="cascata" className="mt-10 grid gap-6 md:grid-cols-3">
-              <Dor
-                titulo={t("A resposta demora")}
-                texto={t(
-                  "Quem pergunta às 22h só é atendido no dia seguinte. Até lá, já comprou de quem respondeu primeiro.",
-                )}
-              />
-              <Dor
-                titulo={t("A conversa se perde")}
-                texto={t(
-                  "Cada pessoa do time guarda um pedaço da história no próprio celular. Ninguém sabe o que já foi combinado.",
-                )}
-              />
-              <Dor
-                titulo={t("O retorno nunca acontece")}
-                texto={t(
-                  "O cliente disse “depois eu vejo” e ninguém voltou nele. É a venda mais barata da empresa, e ela evapora.",
-                )}
-              />
-            </EntraEmSequencia>
-          </div>
-        </section>
+          </BalaoDeSecao>
 
-        {/* ── Como funciona ────────────────────────────────────────────── */}
-        <section id="como-funciona" className="scroll-mt-20">
-          <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
-            <Titulo
-              olho={t("Como funciona")}
-              titulo={t("Três passos, e o atendimento para de depender de memória")}
-            />
-            <EntraEmSequencia ritmo="cascata" className="mt-12 grid gap-8 md:grid-cols-3">
-              <Passo
+          <EtiquetaDeAssunto>{t("Como funciona")}</EtiquetaDeAssunto>
+
+          <div id="como-funciona" className="scroll-mt-20" />
+          <EntraEmSequencia ritmo="cascata" className="space-y-3">
+            <BalaoDeSecao lado="empresa">
+              <PassoNaConversa
                 numero="1"
                 Icone={QrCode}
                 titulo={t("Conecte o seu WhatsApp")}
@@ -331,7 +348,9 @@ export default async function HomePage() {
                   "O mesmo número que a sua empresa já usa, por leitura de QR code. Ninguém troca de número e nenhuma conversa se perde.",
                 )}
               />
-              <Passo
+            </BalaoDeSecao>
+            <BalaoDeSecao lado="empresa">
+              <PassoNaConversa
                 numero="2"
                 Icone={Bot}
                 titulo={t("Ensine o atendente")}
@@ -339,7 +358,9 @@ export default async function HomePage() {
                   "Escreva o que a empresa faz, preço, prazo e as regras. O agente responde a partir disso — e só disso.",
                 )}
               />
-              <Passo
+            </BalaoDeSecao>
+            <BalaoDeSecao lado="empresa">
+              <PassoNaConversa
                 numero="3"
                 Icone={SquareKanban}
                 titulo={t("Acompanhe pelo funil")}
@@ -347,51 +368,63 @@ export default async function HomePage() {
                   "Cada conversa vira um card. Você vê quem está esperando, quem comprou e quem esfriou, sem perguntar a ninguém.",
                 )}
               />
-            </EntraEmSequencia>
-          </div>
-        </section>
+            </BalaoDeSecao>
+          </EntraEmSequencia>
 
-        {/* ── Recursos ─────────────────────────────────────────────────── */}
-        <section id="recursos" className="scroll-mt-20 border-y border-border bg-surface-elevated">
-          <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
-            <Titulo olho={t("Recursos")} titulo={t("O atendimento inteiro em um lugar só")} />
-            <EntraEmSequencia ritmo="cascata" className="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-              <Recurso
+          <EtiquetaDeAssunto>{t("Recursos")}</EtiquetaDeAssunto>
+
+          <div id="recursos" className="scroll-mt-20" />
+          {/*
+            Os seis recursos cabem em UM balão, e não em seis: seis balões
+            seguidos do mesmo lado viram uma parede, e a conversa perde o ritmo
+            que os três passos acabaram de estabelecer. Dentro do balão eles
+            voltam a ser grade — que é a forma certa para uma lista que se
+            compara em vez de se ler em ordem.
+          */}
+          <BalaoDeSecao lado="empresa" className="w-full max-w-3xl">
+            <p className="text-sm font-semibold text-text">
+              {t("O atendimento inteiro em um lugar só")}
+            </p>
+            <EntraEmSequencia
+              ritmo="cascata"
+              className="mt-4 grid gap-x-6 gap-y-5 sm:grid-cols-2"
+            >
+              <RecursoNaConversa
                 Icone={Inbox}
                 titulo={t("Uma caixa de entrada para o time todo")}
                 texto={t(
                   "Todas as conversas em uma tela, com quem está atendendo o quê à vista de todos.",
                 )}
               />
-              <Recurso
+              <RecursoNaConversa
                 Icone={Bot}
                 titulo={t("Agente de IA com a sua base de conhecimento")}
                 texto={t(
                   "Ele responde pelo que você escreveu, não por achismo, e chama uma pessoa quando não sabe.",
                 )}
               />
-              <Recurso
+              <RecursoNaConversa
                 Icone={SquareKanban}
                 titulo={t("Funil de vendas colado na conversa")}
                 texto={t(
                   "Arraste o card, leia o histórico inteiro e pare de perguntar em que pé está cada cliente.",
                 )}
               />
-              <Recurso
+              <RecursoNaConversa
                 Icone={Clock}
                 titulo={t("Retorno automático no tempo certo")}
                 texto={t(
                   "Quem parou de responder recebe uma mensagem de volta sem que ninguém precise lembrar disso.",
                 )}
               />
-              <Recurso
+              <RecursoNaConversa
                 Icone={ChartColumn}
                 titulo={t("Relatórios de atendimento")}
                 texto={t(
                   "Tempo de resposta, volume por pessoa do time e o que de fato virou venda.",
                 )}
               />
-              <Recurso
+              <RecursoNaConversa
                 Icone={ShieldCheck}
                 titulo={t("LGPD desde o primeiro dia")}
                 texto={t(
@@ -399,8 +432,8 @@ export default async function HomePage() {
                 )}
               />
             </EntraEmSequencia>
-          </div>
-        </section>
+          </BalaoDeSecao>
+        </CorpoDaConversa>
 
         {/* ── Planos ───────────────────────────────────────────────────── */}
         {vendidos.length > 0 ? (
@@ -416,7 +449,11 @@ export default async function HomePage() {
                   const plano = PLANOS[id];
                   const destaque = id === "pro";
                   return (
-                    <div
+                    // A luz segue o mouse AQUI, e só aqui: é o lugar da página em
+                    // que a pessoa compara, hesita e passa o ponteiro de um
+                    // cartão para o outro. O brilho confirma qual ela está
+                    // olhando. Espalhado por todo cartão viraria ruído.
+                    <CartaoComLuz
                       key={id}
                       className={
                         destaque
@@ -463,7 +500,7 @@ export default async function HomePage() {
                       >
                         {t("Começar agora")}
                       </Link>
-                    </div>
+                    </CartaoComLuz>
                   );
                 })}
               </div>
@@ -647,16 +684,14 @@ function Titulo({ olho, titulo, apoio }: { olho: string; titulo: string; apoio?:
   );
 }
 
-function Dor({ titulo, texto }: { titulo: string; texto: string }) {
-  return (
-    <div className="rounded-lg border border-border bg-surface p-6 shadow-xs">
-      <h3 className="text-base font-semibold text-text">{titulo}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-text-muted">{texto}</p>
-    </div>
-  );
-}
-
-function Passo({
+/**
+ * O passo, dentro de um balão.
+ *
+ * O número virou um selo redondo sobre o ícone, e não uma linha à parte: num
+ * balão o espaço vertical é caro, e "1" solto acima do título lia como se
+ * fosse parte do texto da mensagem.
+ */
+function PassoNaConversa({
   numero,
   Icone,
   titulo,
@@ -668,20 +703,23 @@ function Passo({
   texto: string;
 }) {
   return (
-    <div>
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 items-center justify-center rounded-full bg-accent-soft text-accent">
-          <Icone className="size-5" />
+    <div className="flex gap-4">
+      <span className="relative flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+        <Icone className="size-5" />
+        <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full border border-accent-200 bg-surface font-mono text-[10px] text-text-subtle">
+          {numero}
         </span>
-        <span className="font-mono text-sm text-text-subtle">{numero}</span>
+      </span>
+      <div className="min-w-0">
+        <h3 className="text-base font-semibold text-text">{titulo}</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{texto}</p>
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-text">{titulo}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-text-muted">{texto}</p>
     </div>
   );
 }
 
-function Recurso({
+/** Um recurso dentro do balão que reúne os seis. */
+function RecursoNaConversa({
   Icone,
   titulo,
   texto,
@@ -691,10 +729,12 @@ function Recurso({
   texto: string;
 }) {
   return (
-    <div className="bg-surface p-6">
-      <Icone className="size-5 text-accent" />
-      <h3 className="mt-4 text-base font-semibold text-text">{titulo}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-text-muted">{texto}</p>
+    <div className="flex gap-3">
+      <Icone className="mt-0.5 size-5 shrink-0 text-accent" />
+      <div className="min-w-0">
+        <h3 className="text-sm font-semibold text-text">{titulo}</h3>
+        <p className="mt-1 text-sm leading-relaxed text-text-muted">{texto}</p>
+      </div>
     </div>
   );
 }

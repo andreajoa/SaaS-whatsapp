@@ -1220,3 +1220,60 @@
     transition: none;
   }
 }
+
+/* ── O papel de parede da conversa ───────────────────────────────────────────
+   Companheiro de `components/site/Conversa.tsx`, que explica por que a página
+   inteira toma a forma de uma tela de mensagens.
+
+   O padrão é NOSSO: pontos numa grade diagonal, desenhados com dois
+   `radial-gradient`. Nada aqui imita os rabiscos do WhatsApp — além de ser
+   problema jurídico, o produto é white-label e um revendedor não deve receber
+   a identidade de outra empresa na própria página.
+
+   A cor sai de `--color-accent` com `color-mix`, então o padrão acompanha a
+   marca de quem instalou e some sozinho no tema escuro — sem uma segunda
+   regra e sem um hex escrito em lugar nenhum. */
+.fundo-de-conversa {
+  background-color: var(--color-surface-elevated);
+  background-image:
+    radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklab, var(--color-accent) 14%, transparent) 1px,
+      transparent 0
+    ),
+    radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklab, var(--color-accent) 9%, transparent) 1px,
+      transparent 0
+    );
+  background-size:
+    28px 28px,
+    28px 28px;
+  /* O deslocamento do segundo plano é o que tira a cara de grade quadriculada:
+     com os dois em fase, o olho lê colunas; fora de fase, lê textura. */
+  background-position:
+    0 0,
+    14px 14px;
+}
+
+/* Um véu que clareia o meio da coluna, para o texto dos balões nunca disputar
+   contorno com o padrão. Sem ele, o padrão continua legível ATRÁS das letras
+   nas bordas dos balões translúcidos, e a leitura cansa sem que se saiba por
+   quê. */
+.fundo-de-conversa::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    60% 50% at 50% 40%,
+    color-mix(in oklab, var(--color-bg) 55%, transparent),
+    transparent 75%
+  );
+}
+.fundo-de-conversa {
+  position: relative;
+}
+.fundo-de-conversa > * {
+  position: relative;
+}

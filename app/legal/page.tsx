@@ -39,24 +39,26 @@ export default async function LegalIndexPage() {
 
   return (
     <>
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("Documentos")}</h1>
-        <p className="text-muted-foreground">
+      <header className="space-y-3 border-b border-border pb-8">
+        <h1 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">
+          {t("Documentos")}
+        </h1>
+        <p className="text-base leading-relaxed text-text-muted">
           {t(
             "Transparência sobre como este sistema trata o seu dinheiro, os seus dados e o número da sua empresa.",
           )}
         </p>
       </header>
 
-      <ul className="space-y-3">
+      <ul className="grid gap-3 sm:grid-cols-2">
         {antigos.map((doc) => (
           <li key={doc.href}>
             <Link
               href={doc.href}
-              className="block rounded-md border p-4 transition-colors hover:bg-muted/50"
+              className="block rounded-md border border-border p-4 transition-colors hover:border-accent hover:bg-surface-elevated"
             >
-              <span className="font-medium">{doc.titulo}</span>
-              <span className="mt-1 block text-muted-foreground">{doc.resumo}</span>
+              <span className="font-medium text-text">{doc.titulo}</span>
+              <span className="mt-1 block text-sm text-text-muted">{doc.resumo}</span>
             </Link>
           </li>
         ))}
@@ -64,10 +66,10 @@ export default async function LegalIndexPage() {
           <li key={doc.slug}>
             <Link
               href={`/legal/${doc.slug}`}
-              className="block rounded-md border p-4 transition-colors hover:bg-muted/50"
+              className="block rounded-md border border-border p-4 transition-colors hover:border-accent hover:bg-surface-elevated"
             >
-              <span className="font-medium">{frase(doc.titulo, idioma, nomes)}</span>
-              <span className="mt-1 block text-muted-foreground">
+              <span className="font-medium text-text">{frase(doc.titulo, idioma, nomes)}</span>
+              <span className="mt-1 block text-sm text-text-muted">
                 {frase(doc.resumo, idioma, nomes)}
               </span>
             </Link>
@@ -75,7 +77,7 @@ export default async function LegalIndexPage() {
         ))}
       </ul>
 
-      <p className="text-muted-foreground">
+      <p className="text-text-muted">
         {t("Ficou com dúvida sobre qualquer um destes pontos?")}{" "}
         <Link href="/contato" className="underline underline-offset-2">
           {t("Fale com a gente")}

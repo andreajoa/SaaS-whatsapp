@@ -26,23 +26,35 @@ export default async function ContatoPage() {
   const temDestino = env.SUPPORT_EMAIL.trim().length > 0;
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="text-xs tracking-wider text-muted-foreground uppercase">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href="/" className="text-sm font-semibold tracking-tight text-text">
             {marca.name}
           </Link>
-          <Link href="/login" className="text-sm underline underline-offset-2">
+          <Link
+            href="/login"
+            className="link-sublinha text-sm text-text-muted transition-colors hover:text-text"
+          >
             {t("Entrar")}
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl px-6 py-10">
-        <div className="space-y-6 rounded-lg border bg-background p-8 text-sm leading-relaxed">
-          <header className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{t("Fale com a gente")}</h1>
-            <p className="text-muted-foreground">
+      {/*
+        Duas colunas no desktop: à esquerda o que esta página PROMETE (quem lê,
+        em quanto tempo, e o endereço direto para quem prefere o próprio
+        e-mail); à direita o formulário. Antes era tudo numa coluna de 768px, e
+        o contexto empurrava o formulário para baixo da dobra — numa página
+        cujo único objetivo é ser preenchida.
+      */}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:py-16">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <header className="space-y-4">
+            <h1 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">
+              {t("Fale com a gente")}
+            </h1>
+            <p className="text-base leading-relaxed text-text-muted">
               {t(
                 "Dúvida sobre planos, pedido de demonstração, problema com a conta ou relato de falha de segurança — tudo chega no mesmo lugar e é lido por gente.",
               )}
@@ -63,20 +75,22 @@ export default async function ContatoPage() {
               }}
             />
           ) : (
-            <p className="rounded-md border p-4 text-muted-foreground">
+            <p className="rounded-md border border-border p-4 text-sm text-text-muted">
               {t(
                 "Esta instalação ainda não tem endereço de suporte configurado. Procure quem administra o sistema.",
               )}
             </p>
           )}
-
-          <footer className="border-t pt-4 text-muted-foreground">
-            <Link href="/legal" className="underline underline-offset-2">
-              {t("Documentos")}
-            </Link>
-          </footer>
         </div>
       </main>
+
+      <footer className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap gap-x-6 gap-y-2 px-4 py-6 text-sm sm:px-6">
+          <Link href="/legal" className="link-sublinha text-text-muted hover:text-text">
+            {t("Documentos")}
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }

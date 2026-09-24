@@ -36,8 +36,8 @@ export default async function PrivacyPage() {
   return (
     <>
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("Política de Privacidade")}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">{t("Política de Privacidade")}</h1>
+        <p className="text-text-muted">
           {t("Como esta instalação do")} {op.sistema} {t("trata dados pessoais.")}
         </p>
       </header>

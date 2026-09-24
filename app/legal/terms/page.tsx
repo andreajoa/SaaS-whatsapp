@@ -27,8 +27,8 @@ export default async function TermsPage() {
   return (
     <>
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("Termos de Uso")}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">{t("Termos de Uso")}</h1>
+        <p className="text-text-muted">
           {t("As regras de uso desta instalação do")} {op.sistema}.
         </p>
       </header>

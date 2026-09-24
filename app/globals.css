@@ -954,3 +954,69 @@
     transform: none;
   }
 }
+
+/* ── A conversa de exemplo chega, em vez de já estar lá ──────────────────────
+   A página de vendas afirma "Respondido na hora" ao lado de quatro balões
+   estáticos — um diálogo que terminou antes de a pessoa chegar. Encenar a
+   chegada é a afirmação demonstrada em vez de escrita, e é a única prova que a
+   página tem.
+
+   O ESTADO INICIAL DESTE ARQUIVO NÃO ESCONDE NADA. `.sequencia-viva` só entra
+   no elemento pelo `EntraEmSequencia`, depois de ele confirmar navegador,
+   `IntersectionObserver` e ausência de `prefers-reduced-motion`. Quem chega sem
+   JavaScript recebe a conversa inteira — que é o que o Googlebot no primeiro
+   passe e a prévia de link do WhatsApp recebem. O raciocínio inteiro está no
+   cabeçalho do componente.
+
+   O atraso é por `:nth-child` e não por variável inline porque assim o DOM que
+   o servidor emite é EXATAMENTE o de antes: nenhum `<div>` de embrulho entrou
+   no meio do `space-y-*`, e nada além de uma classe mudou. */
+.sequencia-viva > * {
+  opacity: 0;
+}
+
+.sequencia-viva[data-em-cena="true"] > * {
+  animation: deskcomm-balao-entra 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Quatro balões é o que a conversa tem; os dois extras existem para que
+   acrescentar uma linha ao diálogo não deixe o quinto balão invisível — o modo
+   de falha seria um balão que some, com build verde. */
+.sequencia-viva[data-em-cena="true"] > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.sequencia-viva[data-em-cena="true"] > *:nth-child(2) {
+  animation-delay: 420ms;
+}
+.sequencia-viva[data-em-cena="true"] > *:nth-child(3) {
+  animation-delay: 840ms;
+}
+.sequencia-viva[data-em-cena="true"] > *:nth-child(4) {
+  animation-delay: 1180ms;
+}
+.sequencia-viva[data-em-cena="true"] > *:nth-child(n + 5) {
+  animation-delay: 1520ms;
+}
+
+@keyframes deskcomm-balao-entra {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* O destino é o MESMO — só chega sem o percurso. O componente já nem põe a
+     classe neste caso; esta regra é o segundo degrau, para a mídia que muda
+     DEPOIS do mount (a pessoa liga "reduzir movimento" com a página aberta). */
+  .sequencia-viva > *,
+  .sequencia-viva[data-em-cena="true"] > * {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+}

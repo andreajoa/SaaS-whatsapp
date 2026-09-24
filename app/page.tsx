@@ -17,6 +17,7 @@ import {
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
+import { EntraEmSequencia } from "@/components/site/EntraEmSequencia";
 import { Medidor } from "@/components/site/Medidor";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
@@ -673,6 +674,13 @@ function Pergunta({ pergunta, resposta }: { pergunta: string; resposta: string }
  * que ela precisa entender em três segundos é o que este produto faz de
  * diferente — responder na hora e virar um card no funil —, e isso cabe em
  * quatro balões e uma faixa.
+ *
+ * Os balões CHEGAM, um depois do outro, quando a seção entra na tela. A faixa
+ * ao pé afirma "Respondido na hora" ao lado de um diálogo que, estático, já
+ * terminou antes de a pessoa chegar — encenar a chegada é a única forma de a
+ * afirmação ser demonstrada em vez de escrita. Quem esconde e revela é
+ * `EntraEmSequencia`; o HTML que sai do servidor continua trazendo os quatro
+ * balões visíveis, e o porquê disso está no cabeçalho de lá.
  */
 function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
   return (
@@ -693,7 +701,7 @@ function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
           </span>
         </div>
 
-        <div className="space-y-3 px-5 py-6">
+        <EntraEmSequencia className="space-y-3 px-5 py-6">
           <Balao lado="cliente" texto={t("Oi! Vocês entregam hoje ainda?")} hora="22:14" />
           <Balao
             lado="agente"
@@ -708,7 +716,7 @@ function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
             texto={t("No centro chega em até 2 horas. Quer que eu já reserve para você?")}
             hora="22:15"
           />
-        </div>
+        </EntraEmSequencia>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border bg-surface-elevated px-5 py-3.5 text-xs text-text-muted">
           <span className="inline-flex items-center gap-1.5">

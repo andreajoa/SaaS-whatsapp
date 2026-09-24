@@ -49,6 +49,29 @@ const PAUSA_MS = 3600;
 /** Precisa bater com a duração da transição no CSS (`.alterna-fita`). */
 const SUBIDA_MS = 520;
 
+/**
+ * A ALTURA DE UMA LINHA, e por que ela é `em` e não porcentagem.
+ *
+ * ─── O defeito que isto conserta ───────────────────────────────────────────
+ *
+ * A primeira versão movia a fita com `translateY(-i * 100%)`. Em CSS, a
+ * porcentagem de `translateY` é relativa à altura DO PRÓPRIO ELEMENTO — e o
+ * elemento é a fita inteira, com as cinco palavras empilhadas. Então o
+ * primeiro passo subia CINCO linhas de uma vez: a janela ficava vazia a partir
+ * da segunda palavra, e o que se via era "clínicas" e depois nada.
+ *
+ * A receita de onde o efeito veio dividia pelo número de itens
+ * (`-i * 100 / itens`). Dividir funciona, mas amarra a conta à contagem: um
+ * nicho novo na lista muda o passo de todos os outros, e quem acrescentar não
+ * tem como saber disso.
+ *
+ * Em `em` o passo é absoluto — uma linha é uma linha, com quatro palavras ou
+ * com quarenta. O número tem de ser o MESMO da altura da janela em
+ * `app/globals.css` (`.alterna-janela`), e é por isso que ele é uma constante
+ * com nome em vez de um literal solto nos dois arquivos.
+ */
+const ALTURA_DA_LINHA_EM = 1.25;
+
 export function PalavraQueAlterna({
   palavras,
   className,
@@ -102,13 +125,21 @@ export function PalavraQueAlterna({
       <span
         className="alterna-fita"
         style={{
-          transform: `translateY(-${i * 100}%)`,
+          transform: `translateY(-${(i * ALTURA_DA_LINHA_EM).toFixed(3)}em)`,
           ...(semTransicao ? { transition: "none" } : {}),
         }}
       >
         {/* A cópia do primeiro no fim é o que faz o laço fechar sem tranco. */}
         {[...palavras, primeira].map((palavra, n) => (
-          <span key={`${n}-${palavra}`} className="block whitespace-nowrap">
+          <span
+            key={`${n}-${palavra}`}
+            // Altura e `line-height` explícitos: sem eles cada palavra ocupa o
+            // que a fonte decidir, a soma não bate com o passo em `em` e a
+            // fita desalinha um pouco a cada volta — um erro que só aparece
+            // depois de várias trocas, que é o pior jeito de aparecer.
+            className="block overflow-hidden whitespace-nowrap"
+            style={{ height: `${ALTURA_DA_LINHA_EM}em`, lineHeight: `${ALTURA_DA_LINHA_EM}em` }}
+          >
             {palavra}
           </span>
         ))}

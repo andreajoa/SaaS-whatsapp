@@ -27,6 +27,9 @@ ao `SUPABASE_DB_URL`, `NEXT_PUBLIC_SUPABASE_URL` e
 cartão ou perdeu acesso; o trial `trialing` continua atendendo. O worker
 também liga o gate automaticamente se receber `STRIPE_SECRET_KEY`, mas não é
 preciso compartilhar essa chave de pagamento com ele.
+O arquivo `infra/atenza/worker.compose.yml` sobe apenas o worker, sem duplicar
+o app ou o WAHA, e força o gate de assinatura. Fixe `WORKER_IMAGE` na imagem
+publicada da mesma revisão do app antes de subir.
 
 Se a hospedagem escolhida for Oracle Always Free, limite a soma das instâncias
 Ampere A1 a **2 OCPU e 12 GB de RAM**. O script local

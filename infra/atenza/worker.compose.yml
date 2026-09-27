@@ -1,0 +1,23 @@
+# Worker contínuo da Atenza. Rodar numa VM separada do Vercel e do WAHA.
+# Coloque o .env privado no mesmo diretório deste arquivo e fixe WORKER_IMAGE
+# no digest da imagem publicada a partir da mesma revisão do app.
+services:
+  worker:
+    image: ${WORKER_IMAGE:?defina a imagem do worker da mesma revisao do app}
+    pull_policy: always
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SAAS_BILLING_REQUIRED: "1"
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8787/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

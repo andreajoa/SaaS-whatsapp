@@ -75,6 +75,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 import type pg from "pg";
 
 import { createInboundTurnHandler } from "@/lib/agent-engine/agent/inbound-turn";
+import { temAssinaturaComAcesso } from "@/lib/billing/acesso-pg";
 import {
   createFollowupTurnHandler,
   type FollowupTurnDeps,
@@ -238,6 +239,10 @@ export async function startWorker(
     log.error("pool: conexão caiu — recria no próximo uso", { error: errMsg(err) }),
   );
   const workerId = `agent-engine-${hostname()}-${process.pid}`;
+  const billingRequired =
+    env.SAAS_BILLING_REQUIRED === "1" ||
+    (process.env.STRIPE_SECRET_KEY ?? "").trim().length > 0;
+  log.info("gate de assinatura do worker", { ativo: billingRequired });
 
   await assertHarnessSchema(pool);
 
@@ -305,6 +310,7 @@ export async function startWorker(
       debounceMs: env.INBOUND_DEBOUNCE_MS,
       reapTimeoutMs: env.CRM_EVENT_REAP_TIMEOUT_MS,
       allowlistTtlMs: env.AI_ALLOWLIST_TTL_DAYS * 24 * 60 * 60 * 1000,
+      billingRequired,
     },
     log,
     loopsAbort.signal,
@@ -400,6 +406,18 @@ export async function startWorker(
 
   const runJob = async (job: JobRow): Promise<void> => {
     try {
+      // Um job já enfileirado também perde acesso quando a assinatura é
+      // cancelada. Sem esta checagem, o gate do drain só protegeria jobs novos.
+      if (
+        billingRequired &&
+        job.kind !== "approved_reply" &&
+        job.kind !== "transactional_delivery" &&
+        !(await temAssinaturaComAcesso(pool, job.organization_id))
+      ) {
+        await cancelJob(pool, job.id, workerId, "assinatura sem acesso", claimOfJob(job)?.acquired_at);
+        log.info("job cancelado: assinatura sem acesso", { job_id: job.id, kind: job.kind });
+        return;
+      }
       const handler = handlers.get(job.kind);
       if (!handler) {
         throw new Error(`nenhum handler registrado para kind=${job.kind}`);

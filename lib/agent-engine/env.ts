@@ -89,6 +89,9 @@ const envSchema = z.object({
   // 'engine' (default) = o drain deste worker consome; 'native' = o dispatcher
   // EPIC-13 consome e o drain daqui NÃO liga. Nunca os dois.
   AGENT_DISPATCH_CONSUMER: z.enum(['engine', 'native']).default('engine'),
+  // SaaS hospedado: impede atendimento automático antes do cartão ou após
+  // cancelamento. Self-host mantém o comportamento sem cobrança por padrão.
+  SAAS_BILLING_REQUIRED: z.enum(['0', '1']).default('0'),
   // Kill switch do teto de gasto de IA. `on` (ausente = on) não liga nada:
   // respeita o que cada organização escolheu. A chave só AFROUXA — 'avisar'
   // rebaixa bloqueio a aviso, 'off' (e as grafias falsas comuns) cala tudo.

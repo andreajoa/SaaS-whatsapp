@@ -19,6 +19,7 @@ import type { Logger } from '../../obs/logger';
 import { enqueueJob } from '../../queue/queue';
 import { TIPOS_DERIVAVEIS, DERIVACAO_TERMINADA } from '@/lib/messaging/media/derivable';
 import { decidirElegibilidadeDaConversa } from '@/lib/ai/elegibilidade/consulta-pg';
+import { temAssinaturaComAcesso } from '@/lib/billing/acesso-pg';
 
 const DRAIN_CONSUMER = 'agent-engine';
 
@@ -53,6 +54,8 @@ export interface DrainKnobs {
    * testes que não exercitam o gate — o default de 21 dias em ms é aplicado.
    */
   allowlistTtlMs?: number;
+  /** No SaaS, só cria turnos para organizações com assinatura com acesso. */
+  billingRequired?: boolean;
 }
 
 /** Default de `allowlistTtlMs` (21 dias) para testes que omitem o knob. */
@@ -169,6 +172,13 @@ async function processEvent(
   if (modeRows[0]?.mode === 'external') {
     log.info('drain: org em modo external (spec 14) — evento pulado', { event_id: event.id });
     return 'processado';
+  }
+
+  if (knobs.billingRequired) {
+    if (!(await temAssinaturaComAcesso(pool, event.organization_id))) {
+      log.info('drain: assinatura sem acesso — turno pulado', { event_id: event.id });
+      return 'processado';
+    }
   }
 
   // Grupos: skip, sem exceção (regra dura nº 12).

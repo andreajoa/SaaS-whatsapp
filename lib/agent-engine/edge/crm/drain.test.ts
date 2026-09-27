@@ -49,11 +49,13 @@ function poolFalso(
   msgRow: { type: string; media_derived_status: string | null },
   calls: string[],
   capacidade: { tem_agente: boolean; tem_roteador: boolean } = { tem_agente: true, tem_roteador: false },
+  assinatura: string | null = null,
 ) {
   const query = vi.fn().mockImplementation((sql: string) => {
     calls.push(sql);
     if (sql.includes('returning e.id')) return { rows: [eventoDeAudio(Number(process.env.__ESPERA__ ?? 0))] };
     if (sql.includes('ai_dispatch_mode')) return { rows: [{ mode: null }] };
+    if (sql.includes('org_subscriptions')) return { rows: assinatura ? [{ status: assinatura }] : [] };
     if (sql.includes('is_group')) return { rows: [{ is_group: false }] };
     if (sql.includes('tem_agente')) return { rows: [capacidade] };
     if (sql.includes('media_derived_status')) return { rows: [msgRow] };
@@ -61,6 +63,33 @@ function poolFalso(
   });
   return { query } as unknown as pg.Pool;
 }
+
+it('SaaS sem cartão: mensagem entra, mas não gera resposta paga pela plataforma', async () => {
+  const calls: string[] = [];
+  await drainTick(poolFalso({ type: 'text', media_derived_status: null }, calls),
+    { ...knobs, billingRequired: true }, log);
+  expect(calls.some((s) => s.includes('org_subscriptions'))).toBe(true);
+  expect(calls.some((s) => s.includes('job_queue'))).toBe(false);
+  expect(calls.some((s) => s.includes("status = 'done'"))).toBe(true);
+});
+
+it.each(['trialing', 'active', 'past_due'])(
+  'SaaS com assinatura %s continua atendendo', async (status) => {
+    const calls: string[] = [];
+    await drainTick(poolFalso({ type: 'text', media_derived_status: null }, calls,
+      { tem_agente: true, tem_roteador: false }, status),
+      { ...knobs, billingRequired: true }, log);
+    expect(calls.some((s) => s.includes('job_queue'))).toBe(true);
+  },
+);
+
+it('SaaS com assinatura cancelada não gera novo turno', async () => {
+  const calls: string[] = [];
+  await drainTick(poolFalso({ type: 'text', media_derived_status: null }, calls,
+    { tem_agente: true, tem_roteador: false }, 'canceled'),
+    { ...knobs, billingRequired: true }, log);
+  expect(calls.some((s) => s.includes('job_queue'))).toBe(false);
+});
 
 it('áudio ainda sem transcrição: turno é ADIADO, sem enfileirar job', async () => {
   const calls: string[] = [];

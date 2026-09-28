@@ -228,6 +228,7 @@ export function ConnectWhatsappClient({
   const [info, setInfo] = useState<SessionInfo>({ status: "INIT", session: sessionName });
   const [qrTick, setQrTick] = useState(0);
   const [qrFailed, setQrFailed] = useState(false);
+  const qrSettledAt = useRef<number | null>(null);
   const [busy, setBusy] = useState(false);
 
   const status = info.status;
@@ -289,7 +290,11 @@ export function ConnectWhatsappClient({
         const json = (await res.json()) as { data?: SessionInfo };
         if (json.data) {
           setInfo(json.data);
-          if (json.data.status === "SCAN_QR_CODE") {
+          if (json.data.status === "SCAN_QR_CODE" && qrSettledAt.current !== null &&
+              (qrFailed || Date.now() - qrSettledAt.current >= 20_000)) {
+            // Não remonte uma imagem em andamento: respostas lentas seriam
+            // canceladas a cada consulta, sem nunca chegar ao navegador.
+            qrSettledAt.current = null;
             setQrFailed(false);
             setQrTick((t) => t + 1);
           }
@@ -313,7 +318,7 @@ export function ConnectWhatsappClient({
       }
     }, 3000);
     return () => clearInterval(id);
-  }, [forma, wahaConfigured, status, sessionName, t]);
+  }, [forma, wahaConfigured, status, sessionName, t, qrFailed]);
 
   // 3) When status → WORKING, auto-advance.
   useEffect(() => {
@@ -337,6 +342,7 @@ export function ConnectWhatsappClient({
       const res = await fetch("/api/v1/onboarding/whatsapp/session?restart=1", { method: "POST", headers: { "Idempotency-Key": restartKey.current ??= randomId() } });
       const json = (await res.json()) as { data?: SessionInfo };
       if (json.data) {
+        qrSettledAt.current = null;
         setQrFailed(false);
         setQrTick((tick) => tick + 1);
         setInfo(json.data);
@@ -480,8 +486,8 @@ export function ConnectWhatsappClient({
                   src={`/api/v1/onboarding/whatsapp/qr?t=${qrTick}`}
                   alt={t("Código QR para conectar o WhatsApp")}
                   className="h-48 w-48 rounded-md border bg-white object-contain sm:h-56 sm:w-56"
-                  onError={() => setQrFailed(true)}
-                  onLoad={() => setQrFailed(false)}
+                  onError={() => { qrSettledAt.current = Date.now(); setQrFailed(true); }}
+                  onLoad={() => { qrSettledAt.current = Date.now(); setQrFailed(false); }}
                 />
               )}
             </div>

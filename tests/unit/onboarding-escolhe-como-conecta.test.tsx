@@ -231,3 +231,15 @@ it("gerar novo QR recupera a imagem mesmo após falha da imagem e da sessão", a
   await act(async () => { fireEvent.click(screen.getByRole("button", { name: /gerar novo qr/i })); });
   expect(screen.getByAltText(/código qr/i)).toBeTruthy();
 });
+
+it("preserva a imagem em andamento quando a resposta demora mais que o polling", async () => {
+  vi.useFakeTimers();
+  montar();
+  await act(async () => { fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!); });
+  const imagem = screen.getByAltText(/código qr/i);
+  await act(async () => { await vi.advanceTimersByTimeAsync(9000); });
+  expect(screen.getByAltText(/código qr/i)).toBe(imagem);
+  fireEvent.load(imagem);
+  await act(async () => { await vi.advanceTimersByTimeAsync(21000); });
+  expect(screen.getByAltText(/código qr/i)).not.toBe(imagem);
+});

@@ -119,3 +119,11 @@ real e fronteiras simuladas recebeu HTTP 422 na primeira imagem e carregou a
 segunda. Separadamente, o WAHA de produção retornou HTTP 200 e PNG válido após
 reinício da sessão não pareada. Isso não substitui o cliente escanear e confirmar
 WORKING, nem comprova o atendimento ou a cobrança ponta a ponta.
+
+A validação seguinte reproduziu um segundo defeito: o polling remontava a imagem
+a cada três segundos, cancelando requisições mais lentas. O componente agora
+aguarda load/error antes de renovar (20 segundos após load; nova tentativa após
+erro). O teste Chromium com atraso de 4,5 segundos falhou antes e passou depois;
+17 testes do onboarding e typecheck passaram. Uma conta temporária isolada
+confirmou QR visível pelo painel autenticado em produção, sem enviar e-mail,
+parear telefone ou gerar cobrança.

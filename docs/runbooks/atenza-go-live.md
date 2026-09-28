@@ -105,3 +105,17 @@ com garantia de capacidade ou disponibilidade futura.
 Todos os checks do PR #8 passaram na revisão `71d09a6`: verify, invariants,
 build, imagens, preview Vercel e as três partes de E2E. Esses checks não
 substituem a prova de pagamento e atendimento real descrita acima.
+
+### Recuperação da imagem QR no onboarding (28/09/2026)
+
+Uma resposta de erro ao buscar a imagem removia o elemento da tela; o polling
+continuava, mas não limpava o erro para tentar novamente. O polling e o botão
+Gerar novo QR agora limpam esse estado. FAILED significa conexão interrompida,
+não prova que um código foi exibido e expirou.
+
+Verificação: 16 testes relevantes do onboarding passaram, incluindo erro de
+imagem seguido de nova consulta e reinício manual. Chromium com o componente
+real e fronteiras simuladas recebeu HTTP 422 na primeira imagem e carregou a
+segunda. Separadamente, o WAHA de produção retornou HTTP 200 e PNG válido após
+reinício da sessão não pareada. Isso não substitui o cliente escanear e confirmar
+WORKING, nem comprova o atendimento ou a cobrança ponta a ponta.

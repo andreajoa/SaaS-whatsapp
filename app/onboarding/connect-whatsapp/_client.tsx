@@ -80,7 +80,7 @@ function rotuloDoEstado(s: Status, t: (texto: string) => string): string {
     case "WORKING":
       return t("Conectado!");
     case "FAILED":
-      return t("O código expirou");
+      return t("Não foi possível concluir a conexão");
     default:
       return t("Não consegui falar com o WhatsApp");
   }
@@ -96,7 +96,7 @@ function explicacaoDoEstado(s: Status, t: (texto: string) => string): string {
     case "WORKING":
       return t("O número está no ar. Seguindo para o próximo passo.");
     case "FAILED":
-      return t("É normal — ele vale poucos minutos. Dá para gerar outro.");
+      return t("Gere um novo código para tentar novamente.");
     default:
       return t("O serviço roda no seu servidor e não respondeu agora.");
   }
@@ -289,7 +289,10 @@ export function ConnectWhatsappClient({
         const json = (await res.json()) as { data?: SessionInfo };
         if (json.data) {
           setInfo(json.data);
-          if (json.data.status === "SCAN_QR_CODE") setQrTick((t) => t + 1);
+          if (json.data.status === "SCAN_QR_CODE") {
+            setQrFailed(false);
+            setQrTick((t) => t + 1);
+          }
         }
         // Falha de leitura durante a espera NÃO é transitória quando se
         // repete: sem isto, a tela seguia em "preparando" enquanto toda
@@ -333,7 +336,12 @@ export function ConnectWhatsappClient({
     try {
       const res = await fetch("/api/v1/onboarding/whatsapp/session?restart=1", { method: "POST", headers: { "Idempotency-Key": restartKey.current ??= randomId() } });
       const json = (await res.json()) as { data?: SessionInfo };
-      if (json.data) { setInfo(json.data); restartKey.current = null; }
+      if (json.data) {
+        setQrFailed(false);
+        setQrTick((tick) => tick + 1);
+        setInfo(json.data);
+        restartKey.current = null;
+      }
       else toast.error(t("Não consegui gerar outro código. Tente de novo em alguns segundos."));
     } catch {
       toast.error(t("Não consegui falar com o servidor. Confira sua conexão e tente de novo."));
@@ -488,7 +496,7 @@ export function ConnectWhatsappClient({
           {status === "FAILED" && (
             <div className="mt-3 space-y-2">
               <p className="text-sm text-destructive">
-                {t("O código expirou antes de alguém escanear. É normal — ele vale só alguns minutos.")}
+                {t("A conexão foi interrompida ou o código deixou de valer. Gere outro para conectar seu WhatsApp.")}
               </p>
               <p className="text-xs text-muted-foreground">
                 {t("Deixe o WhatsApp já aberto em")} <strong>{t("Aparelhos conectados")}</strong>{" "}

@@ -30,7 +30,7 @@
  * se a escolha virasse estado gravado, ela não teria como voltar a ser nula.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 vi.mock("sonner", () => ({
   toast: { error: vi.fn(), success: vi.fn(), warning: vi.fn() },
@@ -77,6 +77,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -192,4 +193,41 @@ describe("o passo do telefone pergunta como a pessoa já usa o número", () => {
     await waitFor(() => expect(screen.getByTestId("dublê-oficial")).toBeTruthy());
     expect(screen.queryByText(/ainda não está pronto para RECEBER/i)).toBeNull();
   });
+});
+
+
+describe("recuperação do QR no onboarding", () => {
+  it("tenta carregar a imagem novamente após uma falha transitória", async () => {
+    vi.useFakeTimers();
+    montar();
+    await act(async () => { fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!); });
+    const imagem = screen.getByAltText(/código qr/i);
+    fireEvent.error(imagem);
+    await act(async () => { await vi.advanceTimersByTimeAsync(3100); });
+    expect(screen.getByAltText(/código qr/i)).toBeTruthy();
+  });
+
+  it("não afirma que um código nunca exibido expirou", async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true, json: async () => ({ data: { status: "FAILED", session: "org_teste" } }),
+    } as Response);
+    montar();
+    fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!);
+    await screen.findByRole("button", { name: /gerar novo qr/i });
+    expect(screen.queryByText("O código expirou")).toBeNull();
+  });
+});
+
+
+it("gerar novo QR recupera a imagem mesmo após falha da imagem e da sessão", async () => {
+  vi.useFakeTimers();
+  montar();
+  await act(async () => { fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!); });
+  fireEvent.error(screen.getByAltText(/código qr/i));
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true, json: async () => ({ data: { status: "FAILED", session: "org_teste" } }),
+  } as Response);
+  await act(async () => { await vi.advanceTimersByTimeAsync(3100); });
+  await act(async () => { fireEvent.click(screen.getByRole("button", { name: /gerar novo qr/i })); });
+  expect(screen.getByAltText(/código qr/i)).toBeTruthy();
 });

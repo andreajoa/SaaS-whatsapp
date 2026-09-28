@@ -32,9 +32,10 @@ o app ou o WAHA, e força o gate de assinatura. Fixe `WORKER_IMAGE` na imagem
 publicada da mesma revisão do app antes de subir.
 
 Decisão do proprietário em 27/09/2026: usar primeiro a VM Google existente
-`deskcomm-waha` e sua cota, sem criar VM ou aumentar plano. O worker compartilha
-as redes Docker já existentes `waha_default` e `redis_rede`, sem expor porta
-nova à internet. Começar com concorrência 1, pool de banco 3, limite de 384 MB
+`deskcomm-waha` e sua cota, sem criar VM ou aumentar plano. O worker usa rede
+Docker própria e os endpoints de produção recuperados da Vercel. Não reutilizar
+credenciais ou serviços de outra instalação só por estarem na mesma VM.
+Nenhuma porta nova fica exposta à internet. Começar com concorrência 1, pool de banco 3, limite de 384 MB
 de RAM, 768 MB somando RAM e swap e 0,5 CPU. A análise periódica opcional
 (`FLYWHEEL_INTERVAL_MS`) fica desligada. São limites iniciais de operação;
 medir memória, reinícios, saúde do WAHA e tempo da fila antes de ajustar.
@@ -55,18 +56,23 @@ Qualquer expansão paga depende de nova decisão do proprietário após clientes
 5. Cancelar a assinatura de teste, enviar outra pergunta e confirmar que nenhum
    turno de IA é executado depois da perda de acesso.
 
-Em 27/09/2026, a auditoria leu zero instâncias na conta Oracle configurada,
-e a VM Google `deskcomm-waha` tinha WAHA, dois Redis e Cloudflare, sem worker.
-O Supabase tinha uma organização, zero `org_subscriptions` e zero `job_queue`.
-Os tokens Vercel recebidos acessavam a equipe
-`andre-almeidas-projects-7fa48c22`, enquanto os deploys do repositório no
-GitHub apontavam para `andres-projects-bbfd1881`; por isso as variáveis do
-projeto publicado ainda não foram verificadas. Refaça estas medições antes de
-usar esta nota como estado atual.
+## Ambiente confirmado e correção da auditoria inicial
+
+O projeto Vercel é `saa-s-whatsapp`, equipe `andres-projects-bbfd1881`.
+O token com as permissões corretas permitiu confirmar em 27/09/2026 que o
+Supabase de produção é `cclrwowgjtutvtlwuday`, região `us-east-2`.
+**A cópia `.env.vercel` do checkout original aponta para outra instalação**
+(`fnvghggamjyibpiqdgha`). As primeiras contagens e a sessão WORKING vistas
+nessa cópia não descreviam o Atenza. Não reutilizar essa cópia para deploy.
+O projeto correto tinha três organizações, nenhuma assinatura e nenhum agente
+publicado; uma sessão cadastrada sem pareamento concluído. Refazer as leituras
+antes de usar essas contagens como estado atual.
 
 ### Preparação na VM existente, 27/09/2026
 
-CONFIRMADO: o worker foi preparado em `/opt/atenza-worker`, **ainda parado**.
+CONFIRMADO: o worker está em `/opt/atenza-worker`, container
+`atenza-worker-worker-1`, **running/healthy**, sem reinícios na medição inicial,
+com o gate de assinatura ativo. Medição ociosa: 151,4 MiB, 0,74% CPU.
 A imagem local `atenza-worker:71d09a6` usa como base a revisão de produção
 `75e192f503a3dbb2290592075fbec4db1de11ed8`, digest
 `sha256:ca926390813421bb74d522d0f6692c0e6c0edb21bba68623a3272903c765d975`,
@@ -74,20 +80,26 @@ com os cinco arquivos de runtime da correção de billing em `71d09a6` por cima.
 Não houve alteração de dependências. O build foi feito sem rede, reutilizando
 a imagem baixada; o contexto do build não continha o `.env`.
 
-Uma execução isolada dentro da VM confirmou conexão PostgreSQL e Redis HTTP
-(200 com POST `['PING']`). A fila de jobs e as mensagens `queued` estavam vazias.
-A chave WAHA da cópia local retornou 401; o servidor conserva somente seu hash.
-Não trocar a chave do servidor nem reiniciar o WAHA para contornar isso:
-recuperar a configuração de produção na equipe Vercel correta antes de ligar
-o worker. O acesso disponível recebeu 403 ao consultar essa equipe.
+Uma execução isolada dentro da VM confirmou conexão PostgreSQL, WAHA 200 e
+Redis HTTP 200. A fila de jobs e as mensagens `queued` estavam vazias.
+A conexão postgres que estava na Vercel retornava `28P01`. Foi criado o login
+`atenza_runtime`, com senha aleatória privada, limite de seis conexões,
+BYPASSRLS para a operação entre tenants e permissões DML no schema public.
+Não possui superuser, CREATEDB ou CREATEROLE; não se alterou a senha postgres.
+O worker usa esse login e a variável `SUPABASE_DB_URL` da Vercel foi atualizada
+e relida para confirmar o valor. A senha não fica neste repositório.
+
+A Stripe confirmou cobrança e repasse habilitados, preços recorrentes ativos
+em BRL de 9700/29700/69700 centavos e webhook enabled no endpoint de produção.
+Isso verifica configuração, não uma assinatura ou pagamento completo.
 
 O OpenRouter aceitou uma geração com
 `nvidia/nemotron-3-ultra-550b-a55b:free` (HTTP 200, resposta `PRONTO`, custo
 retornado 0); o catálogo confirmou suporte a ferramentas, ainda não exercitado
-neste teste. A chave e o modelo foram configurados somente no `.env` privado
-do worker. A organização existente ainda usa Anthropic e não tem agente
-publicado: configurar o provedor no app e validar o fluxo de publicação antes
-de declarar atendimento funcional. Não confundir modelo gratuito disponível
+neste teste. App e worker usam a configuração de plataforma OpenRouter;
+duas organizações anteriores conservam Anthropic nas próprias configurações.
+Validar o cadastro novo e o fluxo de publicação antes de declarar atendimento
+funcional. Não confundir modelo gratuito disponível
 com garantia de capacidade ou disponibilidade futura.
 
 Todos os checks do PR #8 passaram na revisão `71d09a6`: verify, invariants,

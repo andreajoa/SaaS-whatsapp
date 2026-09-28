@@ -109,24 +109,17 @@ export interface Mercado {
 }
 
 /**
- * A régua de preço, em três degraus e uma razão fixa (1 : 2,5 : 5).
- *
- * A razão é a mesma em todo mercado de propósito: um cliente que compara duas
- * páginas em idiomas diferentes — e eles comparam — vê a MESMA oferta, não uma
- * negociação. O que muda entre linhas é o nível, não a forma.
+ * Preços por mercado. No Brasil, os valores foram confirmados pelo proprietário
+ * e correspondem aos três preços mensais ativos na Stripe do Atenza.
  */
 export const MERCADOS: readonly Mercado[] = [
   {
-    // O mais caro do mundo em tarifa da Meta (marketing US$ 0,0625 por
-    // conversa), e era o mais barato da nossa tabela. R$ 97 estava ancorado no
-    // NOSSO custo, não no mercado: o concorrente direto cobra R$ 849,90 com
-    // R$ 1.197 de instalação.
     pais: "BR",
     nome: "Brasil",
     moeda: "BRL",
     idioma: "pt-BR",
     locale: "pt-BR",
-    precos: { essencial: 19700, pro: 49700, ilimitado: 99700 },
+    precos: { essencial: 9700, pro: 29700, ilimitado: 69700 },
   },
   {
     pais: "PT",

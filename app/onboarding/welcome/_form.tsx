@@ -36,12 +36,12 @@ const FUSOS: { id: string; cidade: string }[] = [
   { id: "UTC", cidade: "Outro (horário universal)" },
 ];
 
-export function WelcomeForm({ defaultOrgName }: { defaultOrgName: string }) {
+export function WelcomeForm({ defaultOrgName, initialWelcome }: { defaultOrgName: string; initialWelcome?: { o_que_faz?: string; timezone: string; accepted_at: string } }) {
   const t = useT();
   const [displayName, setDisplayName] = useState(defaultOrgName);
-  const [oQueFaz, setOQueFaz] = useState("");
-  const [timezone, setTimezone] = useState("America/Sao_Paulo");
-  const [accepted, setAccepted] = useState(false);
+  const [oQueFaz, setOQueFaz] = useState(initialWelcome?.o_que_faz ?? "");
+  const [timezone, setTimezone] = useState(initialWelcome?.timezone ?? "America/Sao_Paulo");
+  const [accepted, setAccepted] = useState(Boolean(initialWelcome?.accepted_at));
   const [pending, startTransition] = useTransition();
 
   return (

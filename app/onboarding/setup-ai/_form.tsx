@@ -46,17 +46,18 @@ const JEITOS: { id: PromptTemplate; titulo: string; desc: string }[] = [
 ];
 
 interface Props {
+  inicial?: { name: string; jeito: string; regras: string };
   /** O que ele já sabe fazer, em linguagem de dono de negócio. */
   capacidades: string[];
   /** O que ele nunca faz — as conferências antes de cada mensagem sair. */
   conferencias: string[];
 }
 
-export function SetupAiForm({ capacidades, conferencias }: Props) {
+export function SetupAiForm({ capacidades, conferencias, inicial }: Props) {
   const t = useT();
-  const [name, setName] = useState("Atendente IA");
-  const [jeito, setJeito] = useState<PromptTemplate>("ecommerce_friendly");
-  const [regras, setRegras] = useState("");
+  const [name, setName] = useState(inicial?.name ?? "Atendente IA");
+  const [jeito, setJeito] = useState<PromptTemplate>(JEITOS.find((j) => j.id === inicial?.jeito)?.id ?? "ecommerce_friendly");
+  const [regras, setRegras] = useState(inicial?.regras ?? "");
   const [naoPublicado, setNaoPublicado] = useState<string | null>(null);
   const [causa, setCausa] = useState<"canal" | "modelo" | "chave" | null>(null);
   const [provedor, setProvedor] = useState<string | null>(null);

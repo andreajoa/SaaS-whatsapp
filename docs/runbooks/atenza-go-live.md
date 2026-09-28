@@ -127,3 +127,13 @@ erro). O teste Chromium com atraso de 4,5 segundos falhou antes e passou depois;
 17 testes do onboarding e typecheck passaram. Uma conta temporária isolada
 confirmou QR visível pelo painel autenticado em produção, sem enviar e-mail,
 parear telefone ou gerar cobrança.
+
+### Revisão das etapas durante o onboarding
+
+Os números e rótulos levam à etapa com `revisar=1`. Revisar não apaga o progresso.
+Na etapa WhatsApp, a revisão suspende o avanço automático de WORKING e oferece
+continuação manual ou troca de número. A troca exige confirmação na tela e usa
+a rota existente de reconexão forçada, com as mesmas guardas de tenant/admin/MFA.
+Abrir a revisão ou cancelar não desloga o número. Negócio e treinamento carregam
+os valores já gravados antes de permitir edição. A configuração concluída segue
+sendo administrada pelo painel; o bloqueio de onboarding concluído não mudou.

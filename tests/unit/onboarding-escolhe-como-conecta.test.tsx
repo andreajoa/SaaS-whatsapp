@@ -62,6 +62,7 @@ let chamadas: string[] = [];
 
 beforeEach(() => {
   chamadas = [];
+  vi.clearAllMocks();
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: unknown, init?: { method?: string }) => {
@@ -81,10 +82,11 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function montar(props?: { oficialPodeReceber?: boolean }) {
+function montar(props?: { oficialPodeReceber?: boolean; revisando?: boolean }) {
   return render(
     <ConnectWhatsappClient
       wahaConfigured
+      revisando={props?.revisando}
       sessionName="org_teste"
       oficialPodeReceber={props?.oficialPodeReceber ?? true}
     />,
@@ -242,4 +244,25 @@ it("preserva a imagem em andamento quando a resposta demora mais que o polling",
   fireEvent.load(imagem);
   await act(async () => { await vi.advanceTimersByTimeAsync(21000); });
   expect(screen.getByAltText(/código qr/i)).not.toBe(imagem);
+});
+
+
+it("revisar WhatsApp conectado não avança nem desconecta sem confirmar", async () => {
+  const { markWhatsappConfigured } = await import("@/app/actions/onboarding/skipWhatsapp");
+  vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => ({ data: {
+    status: "WORKING", session: "org_teste", channel_session_id: "canal-teste",
+  } }) } as Response);
+  montar({ revisando: true });
+  fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!);
+  await screen.findByRole("button", { name: "Continuar com este número" });
+  expect(markWhatsappConfigured).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Trocar número" }));
+  expect(fetch).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
+  expect(fetch).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Trocar número" }));
+  vi.mocked(fetch).mockResolvedValueOnce({ ok: true, json: async () => ({ data: { status: "SCAN_QR_CODE" } }) } as Response);
+  fireEvent.click(screen.getByRole("button", { name: "Desconectar e gerar novo QR" }));
+  await screen.findByAltText(/código qr/i);
+  expect(fetch).toHaveBeenLastCalledWith("/api/v1/channel-sessions/canal-teste/reconnect", expect.objectContaining({ method: "POST", body: JSON.stringify({ force: true }) }));
 });

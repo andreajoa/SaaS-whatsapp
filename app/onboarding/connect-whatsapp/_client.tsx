@@ -11,6 +11,7 @@ import { CanalOficialClient } from "@/components/connections/CanalOficialClient"
 import { CanalParceiroClient } from "@/components/connections/CanalParceiroClient";
 
 interface Props {
+  revisando?: boolean;
   wahaConfigured: boolean;
   sessionName: string;
   /**
@@ -216,12 +217,14 @@ function Saidas({ status, sessionName }: { status: Status; sessionName: string }
 }
 
 export function ConnectWhatsappClient({
+  revisando = false,
   wahaConfigured,
   sessionName,
   oficialPodeReceber,
 }: Props) {
   const t = useT();
   const [pending, startTransition] = useTransition();
+  const [confirmarTroca, setConfirmarTroca] = useState(false);
   const [forma, setForma] = useState<Forma | null>(null);
   const createKey = useRef<string | null>(null);
   const restartKey = useRef<string | null>(null);
@@ -322,7 +325,7 @@ export function ConnectWhatsappClient({
 
   // 3) When status → WORKING, auto-advance.
   useEffect(() => {
-    if (status !== "WORKING" || !info.session) return;
+    if (revisando || status !== "WORKING" || !info.session) return;
     const confirmedSession = info.session;
     startTransition(async () => {
       try {
@@ -332,7 +335,7 @@ export function ConnectWhatsappClient({
         toast.error("Falha ao avançar: " + String(err));
       }
     });
-  }, [status, info.session, t]);
+  }, [status, info.session, t, revisando]);
 
   // Derruba a sessão morta e sobe outra. O polling volta sozinho porque `status`
   // sai de FAILED e o efeito que o observa roda de novo.
@@ -354,6 +357,26 @@ export function ConnectWhatsappClient({
     } finally {
       setBusy(false);
     }
+  }
+
+  async function trocarNumero() {
+    if (!info.channel_session_id || busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/v1/channel-sessions/${info.channel_session_id}/reconnect`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ force: true }),
+      });
+      const json = await res.json() as { data?: { status: Status }; error?: { message?: string } };
+      if (!res.ok || !json.data) throw new Error(json.error?.message ?? t("Não consegui trocar o número. Tente novamente."));
+      qrSettledAt.current = null;
+      setQrFailed(false);
+      setQrTick((tick) => tick + 1);
+      setInfo((anterior) => ({ ...anterior, status: json.data!.status }));
+      setConfirmarTroca(false);
+    } catch (err) {
+      setInfo((anterior) => ({ ...anterior, status: "ERROR", error: String(err) }));
+      toast.error(String(err));
+    } finally { setBusy(false); }
   }
 
   const showQr = wahaConfigured && status === "SCAN_QR_CODE";
@@ -495,8 +518,27 @@ export function ConnectWhatsappClient({
 
           {status === "WORKING" && (
             <p className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-              ✓ {t("Conectado! Avançando…")}
+              ✓ {t(revisando ? "WhatsApp conectado." : "Conectado! Avançando…")}
             </p>
+          )}
+
+          {revisando && status === "WORKING" && (
+            <div className="mt-3 space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Button disabled={pending || busy} onClick={() => startTransition(async () => {
+                  try { await markWhatsappConfigured(info.session!, "WORKING"); }
+                  catch (err) { if (isRedirectError(err)) throw err; toast.error(String(err)); }
+                })}>{t("Continuar com este número")}</Button>
+                <Button variant="outline" disabled={busy || !info.channel_session_id} onClick={() => setConfirmarTroca(true)}>{t("Trocar número")}</Button>
+              </div>
+              {confirmarTroca && (
+                <div className="space-y-2 rounded-md border p-3" role="group" aria-label={t("Confirmar troca de número")}>
+                  <p className="text-sm">{t("O número atual será desconectado. Escaneie o novo QR com o WhatsApp que deseja usar no lugar dele.")}</p>
+                  <Button disabled={busy} onClick={trocarNumero}>{t(busy ? "Preparando…" : "Desconectar e gerar novo QR")}</Button>
+                  <Button variant="ghost" disabled={busy} onClick={() => setConfirmarTroca(false)}>{t("Cancelar")}</Button>
+                </div>
+              )}
+            </div>
           )}
 
           {status === "FAILED" && (

@@ -221,7 +221,11 @@ test.describe("a ocupação do Google na grade da agenda", () => {
     await entrar(page, creds);
 
     const dias = await irParaASemanaSeguinte(page);
-    const alvo = dias[3]!;
+    // Ao mudar de Semana para Mês, a agenda usa o mês da âncora (hoje + 7 dias).
+    // Um índice fixo como quarta-feira pode cair no mês anterior na virada:
+    // em 24/09/2026 o teste criava o evento em 30/09 e procurava-o em outubro.
+    const diaDaAncora = await page.evaluate(() => new Date().getDay());
+    const alvo = dias[diaDaAncora]!;
     const comeca = await instanteNoDia(page, alvo, 15);
     const termina = await instanteNoDia(page, alvo, 16);
     const conexaoId = await conexaoDoGoogle(creds.org_id, dono.id);

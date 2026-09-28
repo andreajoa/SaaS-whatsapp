@@ -7,7 +7,8 @@ import { traduzir } from "@/lib/i18n/dicionario";
 
 export const dynamic = "force-dynamic";
 
-export default async function ConnectWhatsappPage() {
+export default async function ConnectWhatsappPage({ searchParams }: { searchParams: Promise<{ revisar?: string }> }) {
+  const revisando = (await searchParams).revisar === "1";
   const user = await requireAuth();
   const activeOrg = await resolveActiveOrg(user);
   if (!activeOrg) redirect("/login");
@@ -36,6 +37,7 @@ export default async function ConnectWhatsappPage() {
         {traduzir("Novos canais começam em modo de teste. Após concluir a configuração, abra Conexões para autorizar seus números de teste ou liberar o público.", idioma)}
       </p>
       <ConnectWhatsappClient
+        revisando={revisando}
         wahaConfigured={wahaConfigured}
         sessionName={`org_${activeOrg.orgId.slice(0, 8)}`}
         oficialPodeReceber={oficialPodeReceber}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 import { lerRetratoDaInstalacao } from "@/lib/instalacao/retrato";
+import { loadOnboardingState } from "@/app/actions/onboarding/_shared";
 import { SetupAiForm } from "./_form";
 import { InteligenciaDele } from "./_inteligencia";
 import { capacidadesPadraoDoOnboarding } from "@/lib/ai/agents/capacidades-padrao";
@@ -35,6 +36,20 @@ export default async function SetupAiPage() {
   const supabase = await createClient();
   const retrato = await lerRetratoDaInstalacao({ supabase, orgId: activeOrg.orgId });
 
+  const { state } = await loadOnboardingState(activeOrg.orgId);
+  const [agente, ponteiro] = await Promise.all([
+    supabase.from("ai_agents").select("name").eq("organization_id", activeOrg.orgId).eq("is_default", true).maybeSingle(),
+    supabase.from("org_memory_pointers").select("version_id").eq("organization_id", activeOrg.orgId).maybeSingle(),
+  ]);
+  if (agente.error || ponteiro.error) throw new Error("Não foi possível carregar a configuração salva.");
+  let regras = "";
+  if (ponteiro.data?.version_id) {
+    const memoria = await supabase.from("org_memory_versions").select("content").eq("organization_id", activeOrg.orgId).eq("id", ponteiro.data.version_id).single();
+    if (memoria.error) throw new Error("Não foi possível carregar as regras salvas.");
+    regras = memoria.data.content;
+  }
+  const inicial = { name: agente.data?.name ?? "Atendente IA", jeito: state.ai?.prompt_template ?? "ecommerce_friendly", regras };
+
   const porNome = new Map(TOOL_CATALOG.map((c) => [c.name, c]));
   const capacidades = capacidadesPadraoDoOnboarding()
     .map((id) => porNome.get(id)?.rotulo)
@@ -65,7 +80,7 @@ export default async function SetupAiPage() {
         }}
       />
 
-      <SetupAiForm capacidades={capacidades} conferencias={conferencias} />
+      <SetupAiForm inicial={inicial} capacidades={capacidades} conferencias={conferencias} />
     </div>
   );
 }

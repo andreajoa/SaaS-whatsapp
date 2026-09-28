@@ -136,3 +136,10 @@ describe("setup de IA: o que a tela diz quando o agente fica rascunho", () => {
     await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });
+
+it("revisar o treinamento preserva nome, jeito e regras salvos", () => {
+  render(<SetupAiForm capacidades={[]} conferencias={[]} inicial={{ name: "Clara", jeito: "support_minimal", regras: "Atendemos de segunda a sexta." }} />);
+  expect(screen.getByDisplayValue("Clara")).toBeTruthy();
+  expect(screen.getByDisplayValue("Atendemos de segunda a sexta.")).toBeTruthy();
+  expect((document.querySelector('[name="prompt_template"]:checked') as HTMLInputElement).value).toBe("support_minimal");
+});

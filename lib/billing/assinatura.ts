@@ -70,6 +70,10 @@ const STATUS_COM_ACESSO: ReadonlySet<string> = new Set([
   "past_due",
 ]);
 
+export function statusDaAssinaturaPermiteAcesso(status: string | null | undefined): boolean {
+  return STATUS_COM_ACESSO.has(status ?? "");
+}
+
 interface LinhaDeAssinatura {
   plan: string;
   status: string;
@@ -165,7 +169,7 @@ export async function estadoDaCobranca(
   // começa" em vez de tratar quem ainda não pagou como assinante em dia.
   // Esconder essa diferença é o que transforma um trial honesto em surpresa na
   // fatura — exatamente o que a promessa "7 dias sem cobrança" promete não ser.
-  const acesso: AcessoDeCobranca = !STATUS_COM_ACESSO.has(linha.status)
+  const acesso: AcessoDeCobranca = !statusDaAssinaturaPermiteAcesso(linha.status)
     ? "vencido"
     : linha.status === "trialing"
       ? "trial"

@@ -11,6 +11,7 @@ import { CanalOficialClient } from "@/components/connections/CanalOficialClient"
 import { CanalParceiroClient } from "@/components/connections/CanalParceiroClient";
 
 interface Props {
+  revisando?: boolean;
   wahaConfigured: boolean;
   sessionName: string;
   /**
@@ -80,7 +81,7 @@ function rotuloDoEstado(s: Status, t: (texto: string) => string): string {
     case "WORKING":
       return t("Conectado!");
     case "FAILED":
-      return t("O código expirou");
+      return t("Não foi possível concluir a conexão");
     default:
       return t("Não consegui falar com o WhatsApp");
   }
@@ -96,7 +97,7 @@ function explicacaoDoEstado(s: Status, t: (texto: string) => string): string {
     case "WORKING":
       return t("O número está no ar. Seguindo para o próximo passo.");
     case "FAILED":
-      return t("É normal — ele vale poucos minutos. Dá para gerar outro.");
+      return t("Gere um novo código para tentar novamente.");
     default:
       return t("O serviço roda no seu servidor e não respondeu agora.");
   }
@@ -216,18 +217,21 @@ function Saidas({ status, sessionName }: { status: Status; sessionName: string }
 }
 
 export function ConnectWhatsappClient({
+  revisando = false,
   wahaConfigured,
   sessionName,
   oficialPodeReceber,
 }: Props) {
   const t = useT();
   const [pending, startTransition] = useTransition();
+  const [confirmarTroca, setConfirmarTroca] = useState(false);
   const [forma, setForma] = useState<Forma | null>(null);
   const createKey = useRef<string | null>(null);
   const restartKey = useRef<string | null>(null);
   const [info, setInfo] = useState<SessionInfo>({ status: "INIT", session: sessionName });
   const [qrTick, setQrTick] = useState(0);
   const [qrFailed, setQrFailed] = useState(false);
+  const qrSettledAt = useRef<number | null>(null);
   const [busy, setBusy] = useState(false);
 
   const status = info.status;
@@ -289,7 +293,14 @@ export function ConnectWhatsappClient({
         const json = (await res.json()) as { data?: SessionInfo };
         if (json.data) {
           setInfo(json.data);
-          if (json.data.status === "SCAN_QR_CODE") setQrTick((t) => t + 1);
+          if (json.data.status === "SCAN_QR_CODE" && qrSettledAt.current !== null &&
+              (qrFailed || Date.now() - qrSettledAt.current >= 20_000)) {
+            // Não remonte uma imagem em andamento: respostas lentas seriam
+            // canceladas a cada consulta, sem nunca chegar ao navegador.
+            qrSettledAt.current = null;
+            setQrFailed(false);
+            setQrTick((t) => t + 1);
+          }
         }
         // Falha de leitura durante a espera NÃO é transitória quando se
         // repete: sem isto, a tela seguia em "preparando" enquanto toda
@@ -310,11 +321,11 @@ export function ConnectWhatsappClient({
       }
     }, 3000);
     return () => clearInterval(id);
-  }, [forma, wahaConfigured, status, sessionName, t]);
+  }, [forma, wahaConfigured, status, sessionName, t, qrFailed]);
 
   // 3) When status → WORKING, auto-advance.
   useEffect(() => {
-    if (status !== "WORKING" || !info.session) return;
+    if (revisando || status !== "WORKING" || !info.session) return;
     const confirmedSession = info.session;
     startTransition(async () => {
       try {
@@ -324,7 +335,7 @@ export function ConnectWhatsappClient({
         toast.error("Falha ao avançar: " + String(err));
       }
     });
-  }, [status, info.session, t]);
+  }, [status, info.session, t, revisando]);
 
   // Derruba a sessão morta e sobe outra. O polling volta sozinho porque `status`
   // sai de FAILED e o efeito que o observa roda de novo.
@@ -333,13 +344,39 @@ export function ConnectWhatsappClient({
     try {
       const res = await fetch("/api/v1/onboarding/whatsapp/session?restart=1", { method: "POST", headers: { "Idempotency-Key": restartKey.current ??= randomId() } });
       const json = (await res.json()) as { data?: SessionInfo };
-      if (json.data) { setInfo(json.data); restartKey.current = null; }
+      if (json.data) {
+        qrSettledAt.current = null;
+        setQrFailed(false);
+        setQrTick((tick) => tick + 1);
+        setInfo(json.data);
+        restartKey.current = null;
+      }
       else toast.error(t("Não consegui gerar outro código. Tente de novo em alguns segundos."));
     } catch {
       toast.error(t("Não consegui falar com o servidor. Confira sua conexão e tente de novo."));
     } finally {
       setBusy(false);
     }
+  }
+
+  async function trocarNumero() {
+    if (!info.channel_session_id || busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/v1/channel-sessions/${info.channel_session_id}/reconnect`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ force: true }),
+      });
+      const json = await res.json() as { data?: { status: Status }; error?: { message?: string } };
+      if (!res.ok || !json.data) throw new Error(json.error?.message ?? t("Não consegui trocar o número. Tente novamente."));
+      qrSettledAt.current = null;
+      setQrFailed(false);
+      setQrTick((tick) => tick + 1);
+      setInfo((anterior) => ({ ...anterior, status: json.data!.status }));
+      setConfirmarTroca(false);
+    } catch (err) {
+      setInfo((anterior) => ({ ...anterior, status: "ERROR", error: String(err) }));
+      toast.error(String(err));
+    } finally { setBusy(false); }
   }
 
   const showQr = wahaConfigured && status === "SCAN_QR_CODE";
@@ -472,8 +509,8 @@ export function ConnectWhatsappClient({
                   src={`/api/v1/onboarding/whatsapp/qr?t=${qrTick}`}
                   alt={t("Código QR para conectar o WhatsApp")}
                   className="h-48 w-48 rounded-md border bg-white object-contain sm:h-56 sm:w-56"
-                  onError={() => setQrFailed(true)}
-                  onLoad={() => setQrFailed(false)}
+                  onError={() => { qrSettledAt.current = Date.now(); setQrFailed(true); }}
+                  onLoad={() => { qrSettledAt.current = Date.now(); setQrFailed(false); }}
                 />
               )}
             </div>
@@ -481,14 +518,33 @@ export function ConnectWhatsappClient({
 
           {status === "WORKING" && (
             <p className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-              ✓ {t("Conectado! Avançando…")}
+              ✓ {t(revisando ? "WhatsApp conectado." : "Conectado! Avançando…")}
             </p>
+          )}
+
+          {revisando && status === "WORKING" && (
+            <div className="mt-3 space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Button disabled={pending || busy} onClick={() => startTransition(async () => {
+                  try { await markWhatsappConfigured(info.session!, "WORKING"); }
+                  catch (err) { if (isRedirectError(err)) throw err; toast.error(String(err)); }
+                })}>{t("Continuar com este número")}</Button>
+                <Button variant="outline" disabled={busy || !info.channel_session_id} onClick={() => setConfirmarTroca(true)}>{t("Trocar número")}</Button>
+              </div>
+              {confirmarTroca && (
+                <div className="space-y-2 rounded-md border p-3" role="group" aria-label={t("Confirmar troca de número")}>
+                  <p className="text-sm">{t("O número atual será desconectado. Escaneie o novo QR com o WhatsApp que deseja usar no lugar dele.")}</p>
+                  <Button disabled={busy} onClick={trocarNumero}>{t(busy ? "Preparando…" : "Desconectar e gerar novo QR")}</Button>
+                  <Button variant="ghost" disabled={busy} onClick={() => setConfirmarTroca(false)}>{t("Cancelar")}</Button>
+                </div>
+              )}
+            </div>
           )}
 
           {status === "FAILED" && (
             <div className="mt-3 space-y-2">
               <p className="text-sm text-destructive">
-                {t("O código expirou antes de alguém escanear. É normal — ele vale só alguns minutos.")}
+                {t("A conexão foi interrompida ou o código deixou de valer. Gere outro para conectar seu WhatsApp.")}
               </p>
               <p className="text-xs text-muted-foreground">
                 {t("Deixe o WhatsApp já aberto em")} <strong>{t("Aparelhos conectados")}</strong>{" "}

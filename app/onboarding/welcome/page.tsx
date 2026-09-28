@@ -1,5 +1,6 @@
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
+import { loadOnboardingState } from "@/app/actions/onboarding/_shared";
 import { WelcomeForm } from "./_form";
 import { branding } from "@/lib/branding";
 import { createClient } from "@/lib/supabase/server";
@@ -15,6 +16,7 @@ export default async function WelcomePage() {
   if (!activeOrg) redirect("/login");
   const idioma = user.idioma;
 
+  const { state } = await loadOnboardingState(activeOrg.orgId);
   const supabase = await createClient();
   const retrato = await lerRetratoDaInstalacao({ supabase, orgId: activeOrg.orgId });
 
@@ -37,7 +39,7 @@ export default async function WelcomePage() {
         pessoa ter de apagá-lo antes de escrever o nome dela — e quem não
         percebia seguia com o placeholder no cabeçalho do sistema para sempre.
       */}
-      <WelcomeForm defaultOrgName={retrato.empresa.aindaSemNomeProprio ? "" : activeOrg.name} />
+      <WelcomeForm initialWelcome={state.welcome} defaultOrgName={retrato.empresa.aindaSemNomeProprio ? "" : activeOrg.name} />
     </div>
   );
 }

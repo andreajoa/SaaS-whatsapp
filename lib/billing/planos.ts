@@ -45,9 +45,8 @@ export type StatusAssinatura =
  * O PREÇO não está aqui, e a ausência é deliberada. Ele depende do mercado de
  * quem lê — `lib/mercado/paises.ts` tem uma linha por país, com moeda, `locale`
  * e a régua de três degraus — e um `precoMensalCents: 9700` fixo neste arquivo
- * seria uma SEGUNDA fonte da verdade sobre o preço brasileiro. Ele já foi isso:
- * a tabela de mercados dizia R$ 197 enquanto esta linha dizia R$ 97, e as duas
- * telas que mostram preço mostrariam números diferentes conforme o import.
+ * seria uma SEGUNDA fonte da verdade sobre o preço brasileiro. Site e painel
+ * consultam a mesma tabela para não anunciar valores diferentes.
  *
  * Quem quer preço chama `precoLegivelNoMercado(id, mercado)`.
  */
@@ -180,4 +179,3 @@ export function planoDoPreco(priceId: string): PlanoId | null {
   }
   return null;
 }
-

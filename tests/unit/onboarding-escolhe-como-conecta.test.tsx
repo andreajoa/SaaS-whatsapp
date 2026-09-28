@@ -30,7 +30,7 @@
  * se a escolha virasse estado gravado, ela não teria como voltar a ser nula.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 vi.mock("sonner", () => ({
   toast: { error: vi.fn(), success: vi.fn(), warning: vi.fn() },
@@ -62,6 +62,7 @@ let chamadas: string[] = [];
 
 beforeEach(() => {
   chamadas = [];
+  vi.clearAllMocks();
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: unknown, init?: { method?: string }) => {
@@ -77,13 +78,15 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
-function montar(props?: { oficialPodeReceber?: boolean }) {
+function montar(props?: { oficialPodeReceber?: boolean; revisando?: boolean }) {
   return render(
     <ConnectWhatsappClient
       wahaConfigured
+      revisando={props?.revisando}
       sessionName="org_teste"
       oficialPodeReceber={props?.oficialPodeReceber ?? true}
     />,
@@ -192,4 +195,74 @@ describe("o passo do telefone pergunta como a pessoa já usa o número", () => {
     await waitFor(() => expect(screen.getByTestId("dublê-oficial")).toBeTruthy());
     expect(screen.queryByText(/ainda não está pronto para RECEBER/i)).toBeNull();
   });
+});
+
+
+describe("recuperação do QR no onboarding", () => {
+  it("tenta carregar a imagem novamente após uma falha transitória", async () => {
+    vi.useFakeTimers();
+    montar();
+    await act(async () => { fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!); });
+    const imagem = screen.getByAltText(/código qr/i);
+    fireEvent.error(imagem);
+    await act(async () => { await vi.advanceTimersByTimeAsync(3100); });
+    expect(screen.getByAltText(/código qr/i)).toBeTruthy();
+  });
+
+  it("não afirma que um código nunca exibido expirou", async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true, json: async () => ({ data: { status: "FAILED", session: "org_teste" } }),
+    } as Response);
+    montar();
+    fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!);
+    await screen.findByRole("button", { name: /gerar novo qr/i });
+    expect(screen.queryByText("O código expirou")).toBeNull();
+  });
+});
+
+
+it("gerar novo QR recupera a imagem mesmo após falha da imagem e da sessão", async () => {
+  vi.useFakeTimers();
+  montar();
+  await act(async () => { fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!); });
+  fireEvent.error(screen.getByAltText(/código qr/i));
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true, json: async () => ({ data: { status: "FAILED", session: "org_teste" } }),
+  } as Response);
+  await act(async () => { await vi.advanceTimersByTimeAsync(3100); });
+  await act(async () => { fireEvent.click(screen.getByRole("button", { name: /gerar novo qr/i })); });
+  expect(screen.getByAltText(/código qr/i)).toBeTruthy();
+});
+
+it("preserva a imagem em andamento quando a resposta demora mais que o polling", async () => {
+  vi.useFakeTimers();
+  montar();
+  await act(async () => { fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!); });
+  const imagem = screen.getByAltText(/código qr/i);
+  await act(async () => { await vi.advanceTimersByTimeAsync(9000); });
+  expect(screen.getByAltText(/código qr/i)).toBe(imagem);
+  fireEvent.load(imagem);
+  await act(async () => { await vi.advanceTimersByTimeAsync(21000); });
+  expect(screen.getByAltText(/código qr/i)).not.toBe(imagem);
+});
+
+
+it("revisar WhatsApp conectado não avança nem desconecta sem confirmar", async () => {
+  const { markWhatsappConfigured } = await import("@/app/actions/onboarding/skipWhatsapp");
+  vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => ({ data: {
+    status: "WORKING", session: "org_teste", channel_session_id: "canal-teste",
+  } }) } as Response);
+  montar({ revisando: true });
+  fireEvent.click(screen.getByTestId("forma-qr").querySelector("input")!);
+  await screen.findByRole("button", { name: "Continuar com este número" });
+  expect(markWhatsappConfigured).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Trocar número" }));
+  expect(fetch).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
+  expect(fetch).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Trocar número" }));
+  vi.mocked(fetch).mockResolvedValueOnce({ ok: true, json: async () => ({ data: { status: "SCAN_QR_CODE" } }) } as Response);
+  fireEvent.click(screen.getByRole("button", { name: "Desconectar e gerar novo QR" }));
+  await screen.findByAltText(/código qr/i);
+  expect(fetch).toHaveBeenLastCalledWith("/api/v1/channel-sessions/canal-teste/reconnect", expect.objectContaining({ method: "POST", body: JSON.stringify({ force: true }) }));
 });

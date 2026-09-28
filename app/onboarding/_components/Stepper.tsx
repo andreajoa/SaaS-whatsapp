@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useT } from "@/hooks/i18n/useT";
 
@@ -38,7 +39,7 @@ export function Stepper({ passos }: { passos: PassoVisivel[] }) {
   return (
     <ol
       aria-label="onboarding steps"
-      className="flex w-full items-center justify-between gap-2 px-2 py-3"
+      className="flex w-full items-center justify-between gap-1 py-3 sm:gap-2 sm:px-2"
     >
       {passos.map((p, i) => {
         const isActive = i === idx;
@@ -46,33 +47,41 @@ export function Stepper({ passos }: { passos: PassoVisivel[] }) {
           <li
             key={p.segmento}
             aria-current={isActive ? "step" : undefined}
-            className="flex flex-1 flex-col items-center text-xs"
+            className="flex min-w-0 flex-1 flex-col items-center text-xs"
           >
-            <div
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-medium",
-                isActive && "border-primary bg-primary text-primary-foreground",
-                !isActive && p.cumprido && "border-primary/40 bg-primary/10 text-primary",
-                !isActive && !p.cumprido && "border-muted-foreground/20 text-muted-foreground",
-              )}
+            <Link
+              href={`/onboarding/${p.segmento}?revisar=1`}
+              aria-label={`${i + 1}. ${t(p.rotulo)}`}
+              aria-current={isActive ? "step" : undefined}
+              className="flex min-h-11 w-full min-w-0 flex-col items-center rounded-md p-1 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              {i + 1}
-            </div>
-            {/* Some visualmente abaixo de `sm`: os rótulos são frases (`Quem
-                trabalha com ele`, `Onde ele organiza`), não palavras — com 7
-                passos espremidos num celular de 375px, cada um ganha ~45px e
-                o `truncate` cortava quase tudo, sem nenhum jeito de ler o
-                resto. A tela de cada passo já mostra o título por extenso
-                (`<h2>`), então o rótulo aqui é reforço, não a única fonte —
-                `sr-only` mantém ele lido por leitor de tela mesmo escondido. */}
-            <span
-              className={cn(
-                "sr-only mt-1 truncate sm:not-sr-only",
-                isActive ? "font-medium text-foreground" : "text-muted-foreground",
-              )}
-            >
-              {t(p.rotulo)}
-            </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-medium",
+                  isActive && "border-primary bg-primary text-primary-foreground",
+                  !isActive && p.cumprido && "border-primary/40 bg-primary/10 text-primary",
+                  !isActive && !p.cumprido && "border-muted-foreground/20 text-muted-foreground",
+                )}
+              >
+                {i + 1}
+              </span>
+              {/* Some visualmente abaixo de `sm`: os rótulos são frases (`Quem
+                  trabalha com ele`, `Onde ele organiza`), não palavras — com 7
+                  passos espremidos num celular de 375px, cada um ganha ~45px e
+                  o `truncate` cortava quase tudo, sem nenhum jeito de ler o
+                  resto. A tela de cada passo já mostra o título por extenso
+                  (`<h2>`), então o rótulo aqui é reforço, não a única fonte —
+                  `sr-only` mantém ele lido por leitor de tela mesmo escondido. */}
+              <span
+                className={cn(
+                  "sr-only mt-1 truncate sm:not-sr-only",
+                  isActive ? "font-medium text-foreground" : "text-muted-foreground",
+                )}
+              >
+                {t(p.rotulo)}
+              </span>
+            </Link>
           </li>
         );
       })}

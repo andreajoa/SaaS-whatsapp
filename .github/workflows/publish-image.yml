@@ -111,12 +111,15 @@ jobs:
           - name: deskcommcrm
             dockerfile: Dockerfile
             title: DeskcommCRM
+            platforms: linux/amd64
           - name: deskcomm-worker
             dockerfile: Dockerfile.worker
             title: DeskcommCRM worker
+            platforms: linux/amd64,linux/arm64
           - name: deskcomm-scheduler
             dockerfile: Dockerfile.scheduler
             title: DeskcommCRM scheduler
+            platforms: linux/amd64,linux/arm64
 
     steps:
       - uses: actions/checkout@v7
@@ -189,8 +192,9 @@ jobs:
         with:
           context: .
           file: ${{ matrix.dockerfile }}
-          # linux/amd64: o VPS HostGator e a imagem do WAHA são amd64.
-          platforms: linux/amd64
+          # App self-host segue amd64; worker/scheduler também saem arm64 para
+          # o runtime Oracle Ampere A1, onde o front continua na Vercel.
+          platforms: ${{ matrix.platforms }}
           # PR de fork não tem permissão de escrita no GHCR, e publicar imagem
           # de código não revisado seria pior que não gatear. Em PR: constrói
           # (que é o gate) e descarta.

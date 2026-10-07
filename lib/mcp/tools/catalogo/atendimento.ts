@@ -114,4 +114,19 @@ export const TOOLS_ATENDIMENTO = declararTools([
     risco: "critico",
     pacotes: ["atender"],
   },
+  {
+    name: "crm_list_awaiting_reply",
+    category: "read",
+    rotulo: "Ver quem está esperando resposta",
+    explicacao:
+      "Mostra os clientes que mandaram mensagem e ainda não foram respondidos, com o que eles escreveram. É o que o Claude Code ou o Codex usa para atender no lugar da IA interna.",
+    oQueToca: "Atendimento",
+    risco: "seguro",
+    // FORA de "atender", e a razão é o TETO: esta tool existe para o atendente
+    // EXTERNO (Claude Code/Codex via token), que recebe o catálogo inteiro. O
+    // agente interno é acordado pela própria mensagem que chega — ele nunca
+    // precisa perguntar quem está esperando — e cada vaga de "atender" custa
+    // uma capacidade que ele usa de verdade.
+    pacotes: ["escalar"],
+  },
 ]);

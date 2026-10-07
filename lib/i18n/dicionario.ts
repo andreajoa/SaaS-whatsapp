@@ -4248,6 +4248,22 @@ export const DICIONARIO: Traducoes = {
     es: "Cópialo y guárdalo ahora — no podremos mostrarlo de nuevo.",
   },
   "Token copiado.": { es: "Token copiado." },
+  "Não foi possível copiar — selecione o texto.": {
+    es: "No se pudo copiar — selecciona el texto.",
+  },
+  "Conectar Claude Code ou Codex": { es: "Conectar Claude Code o Codex" },
+  "Liga o seu Claude Code ou Codex ao Atenza. Ele passa a ler e preencher o CRM e pode atender os seus clientes no WhatsApp enquanto estiver aberto no seu computador.": {
+    es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
+  },
+  "Gerar conexão": { es: "Generar conexión" },
+  "1. Claude Code — cole no terminal": { es: "1. Claude Code — pégalo en la terminal" },
+  "1. Codex — cole em ~/.codex/config.toml": { es: "1. Codex — pégalo en ~/.codex/config.toml" },
+  "2. Para ele atender os clientes — cole dentro do Claude Code": {
+    es: "2. Para que atienda a los clientes — pégalo dentro de Claude Code",
+  },
+  "Antes de deixar ele atender, pause o agente interno em Agentes de IA — senão o cliente recebe duas respostas. Ele só responde enquanto o Claude Code ou o Codex estiver aberto.": {
+    es: "Antes de dejarlo atender, pausa el agente interno en Agentes de IA — si no, el cliente recibe dos respuestas. Solo responde mientras Claude Code o Codex esté abierto.",
+  },
   "Não foi possível copiar — selecione o token acima.": {
     es: "No se pudo copiar — selecciona el token de arriba.",
   },

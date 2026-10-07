@@ -58,6 +58,41 @@ const SCOPES: { id: string; label: string }[] = [
   { id: "audit:read", label: "Ler o log de auditoria" },
 ];
 
+/**
+ * O token do "Conectar Claude Code / Codex". `role:manager` vai junto porque o
+ * atendente externo responde, cria lead e move etapa — sem ele metade das
+ * ferramentas volta "Role 'agent' insufficient" e o dono acha que quebrou.
+ */
+const ESCOPOS_AGENTE_DE_CODIGO = ["mcp:read", "mcp:write", "role:manager"];
+
+const PEDIDO_DE_ATENDIMENTO =
+  "Atenda os clientes do Atenza: chame crm_list_awaiting_reply e responda cada conversa com crm_send_whatsapp_message, no tom da empresa. Se ia_interna_no_ar vier true, não responda e me avise.";
+
+function BlocoCopiavel({ titulo, texto }: { titulo: string; texto: string }) {
+  const t = useT();
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium">{titulo}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            void copyToClipboard(texto).then((ok) => {
+              if (ok) toast.success(t("Copiado."));
+              else toast.error(t("Não foi possível copiar — selecione o texto."));
+            });
+          }}
+        >
+          {t("Copiar")}
+        </Button>
+      </div>
+      <pre className="whitespace-pre-wrap break-all rounded-md border bg-muted p-2 text-xs">{texto}</pre>
+    </div>
+  );
+}
+
 export function ApiTokensClient() {
   const tagDoIdioma = useTagDeIdioma();
   const t = useT();
@@ -70,6 +105,7 @@ export function ApiTokensClient() {
   const [scopes, setScopes] = useState<string[]>([]);
   const [expiresInDays, setExpiresInDays] = useState<string>("");
   const [created, setCreated] = useState<CreatedApiToken | null>(null);
+  const [paraAgenteDeCodigo, setParaAgenteDeCodigo] = useState(false);
 
   const tokens = data?.data ?? [];
 
@@ -85,11 +121,25 @@ export function ApiTokensClient() {
         scopes,
         expires_in_days: expiresInDays ? Number(expiresInDays) : undefined,
       });
+      setParaAgenteDeCodigo(false);
       setCreated(res.data);
       setName("");
       setScopes([]);
       setExpiresInDays("");
       setCreateOpen(false);
+    } catch {
+      /* noop */
+    }
+  };
+
+  const conectarAgenteDeCodigo = async () => {
+    try {
+      const res = await create.mutateAsync({
+        name: "Claude Code / Codex",
+        scopes: ESCOPOS_AGENTE_DE_CODIGO,
+      });
+      setParaAgenteDeCodigo(true);
+      setCreated(res.data);
     } catch {
       /* noop */
     }
@@ -101,8 +151,18 @@ export function ApiTokensClient() {
 
   return (
     <>
+      <div className="rounded-md border p-4 space-y-2">
+        <p className="text-sm font-medium">{t("Conectar Claude Code ou Codex")}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("Liga o seu Claude Code ou Codex ao Atenza. Ele passa a ler e preencher o CRM e pode atender os seus clientes no WhatsApp enquanto estiver aberto no seu computador.")}
+        </p>
+        <Button onClick={conectarAgenteDeCodigo} disabled={create.isPending} className="w-full sm:w-auto">
+          {t("Gerar conexão")}
+        </Button>
+      </div>
+
       <div className="flex sm:justify-end">
-        <Button onClick={() => setCreateOpen(true)} className="w-full sm:w-auto">
+        <Button variant="secondary" onClick={() => setCreateOpen(true)} className="w-full sm:w-auto">
           {t("Criar token")}
         </Button>
       </div>
@@ -238,7 +298,7 @@ export function ApiTokensClient() {
       </Dialog>
 
       <Dialog open={!!created} onOpenChange={(o) => !o && setCreated(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t("Token criado")}</DialogTitle>
             <DialogDescription>
@@ -263,6 +323,9 @@ export function ApiTokensClient() {
                 {t("Copiar para clipboard")}
               </Button>
               <p className="text-xs text-muted-foreground">{created._warning}</p>
+              {paraAgenteDeCodigo ? (
+                <InstrucoesDeConexao token={created.plaintext} />
+              ) : null}
             </div>
           ) : null}
           <DialogFooter>
@@ -271,5 +334,25 @@ export function ApiTokensClient() {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function InstrucoesDeConexao({ token }: { token: string }) {
+  const t = useT();
+  const url = `${typeof window === "undefined" ? "" : window.location.origin}/api/mcp`;
+  const claude = `claude mcp add --transport http atenza ${url} --header "Authorization: Bearer ${token}"`;
+  const codex = `[mcp_servers.atenza]\nurl = "${url}"\nhttp_headers = { Authorization = "Bearer ${token}" }`;
+  return (
+    <div className="space-y-3 border-t pt-3">
+      <BlocoCopiavel titulo={t("1. Claude Code — cole no terminal")} texto={claude} />
+      <BlocoCopiavel titulo={t("1. Codex — cole em ~/.codex/config.toml")} texto={codex} />
+      <BlocoCopiavel
+        titulo={t("2. Para ele atender os clientes — cole dentro do Claude Code")}
+        texto={`/loop 1m ${PEDIDO_DE_ATENDIMENTO}`}
+      />
+      <p className="text-xs text-muted-foreground">
+        {t("Antes de deixar ele atender, pause o agente interno em Agentes de IA — senão o cliente recebe duas respostas. Ele só responde enquanto o Claude Code ou o Codex estiver aberto.")}
+      </p>
+    </div>
   );
 }

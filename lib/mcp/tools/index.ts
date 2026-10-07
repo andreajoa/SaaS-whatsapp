@@ -45,6 +45,7 @@ import {
   crmSaveOrgMemory,
 } from "./evolucao";
 import { crmListContactOrders, crmSearchProducts } from "./comercio";
+import { crmListAwaitingReply } from "./atendimento-externo";
 import { crmListPrivacyRequests } from "./privacidade";
 import {
   crmArchiveStage,
@@ -98,6 +99,7 @@ export const allTools: ReadonlyArray<McpToolDefinition> = [
   crmListConversations,
   crmGetConversation,
   crmGetConversationHistory,
+  crmListAwaitingReply,
   crmGetQueueStatus,
   crmListLeads,
   crmGetLead,

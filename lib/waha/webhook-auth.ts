@@ -51,20 +51,26 @@ export function authenticateWahaWebhook(input: WahaWebhookAuthInput): WahaWebhoo
   const { rawBody, signatureHeader, sessionSecret } = input;
 
   const envSecret = (env.WAHA_HMAC_SECRET ?? "").trim();
-  const secret =
-    sessionSecret && sessionSecret.length >= MIN_SECRET_LEN
-      ? sessionSecret
-      : envSecret.length >= MIN_SECRET_LEN
-        ? envSecret
-        : null;
+  // AS DUAS chaves valem, e não "a da sessão, senão a global". O WAHA assina
+  // com UMA chave só — `WHATSAPP_HOOK_HMAC`, global do contêiner — sempre que o
+  // webhook é o global (`WHATSAPP_HOOK_URL`), que é como o kit o sobe. A sessão
+  // nova ganha `webhook_secret_encrypted` próprio no connect, e com a
+  // precedência antiga esse segredo, que o WAHA nunca conheceu, virava o único
+  // aceito: toda mensagem chegava assinada com a global e voltava 401. Medido
+  // em 07/10/2026 no Atenza online — sessão WORKING, zero evento ingerido.
+  // Aceitar as duas não afrouxa nada: ambas são segredos nossos, e a regra 1
+  // continua — assinatura que não confere com NENHUMA é rejeitada.
+  const segredos = [sessionSecret ?? "", envSecret].filter(
+    (s) => s.length >= MIN_SECRET_LEN,
+  );
 
   const required = env.WAHA_WEBHOOK_REQUIRE_SIGNATURE === "true";
 
   if (signatureHeader) {
     // Assinou: tem que conferir. Sem segredo para conferir, não há como
     // confiar — e confiar no que não dá para verificar é o defeito original.
-    if (!secret) return { ok: false, reason: "bad_signature" };
-    return verifyHmacSha512(rawBody, signatureHeader, secret)
+    if (segredos.length === 0) return { ok: false, reason: "bad_signature" };
+    return segredos.some((s) => verifyHmacSha512(rawBody, signatureHeader, s))
       ? { ok: true, signatureVerified: true }
       : { ok: false, reason: "bad_signature" };
   }

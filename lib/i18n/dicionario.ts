@@ -6141,17 +6141,11 @@ export const DICIONARIO: Traducoes = {
   },
   "503 — Em manutenção": { es: "503 — En mantenimiento" },
   "Voltamos em alguns minutos.": { es: "Volvemos en unos minutos." },
-  // A recusa por modelo padrão passou a nomear as DUAS topologias: na nuvem o
-  // conserto é o script; num Supabase próprio ele não tem Management API para
-  // usar, e o caminho são as rotas do app.
-  "Este link veio do modelo de e-mail padrão do Supabase, que não fecha o acesso nesta instalação — pedir outro link não resolve. Quem administra o sistema precisa configurar os modelos de e-mail: na nuvem do Supabase, com ":
-    {
-      es: "Este enlace vino de la plantilla de correo predeterminada de Supabase, que no cierra el acceso en esta instalación — pedir otro enlace no lo resuelve. Quien administra el sistema necesita configurar las plantillas de correo: en la nube de Supabase, con ",
-    },
-  "; num Supabase próprio, apontando GOTRUE_MAILER_TEMPLATES_* para as rotas /email-templates/ do app.":
-    {
-      es: "; en un Supabase propio, apuntando GOTRUE_MAILER_TEMPLATES_* a las rutas /email-templates/ de la app.",
-    },
+  // A recusa por modelo padrão fala com o CLIENTE: o diagnóstico de
+  // administrador (script/rotas de template) mora no audit, não na tela.
+  "Não conseguimos confirmar seu e-mail por este link. Clique em «Esqueci minha senha», use o mesmo e-mail e siga o link que vamos enviar — ele confirma sua conta. Se não chegar em alguns minutos, fale com o nosso suporte.": {
+    es: "No pudimos confirmar tu correo con este enlace. Haz clic en «Olvidé mi contraseña», usa el mismo correo y sigue el enlace que te enviaremos — confirma tu cuenta. Si no llega en unos minutos, habla con nuestro soporte.",
+  },
   "Conta suspensa": { es: "Cuenta suspendida" },
   // Tela irmã de `/account-suspended`: quem TINHA acesso e não tem mais.
   "Acesso revogado": { es: "Acceso revocado" },

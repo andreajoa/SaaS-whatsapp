@@ -69,12 +69,15 @@ export default async function LoginPage({
           className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
           role="alert"
         >
+          {/*
+            Quem lê esta tela é o CLIENTE, não quem administra. Até 07/10/2026
+            ela explicava `marca-emails.sh` e `GOTRUE_MAILER_TEMPLATES_*` a quem
+            acabou de criar a conta. O diagnóstico de administrador mora no
+            audit (`auth.email_link_rejected`, `formato: "code"`), que é onde
+            ele procura; aqui fica só o que a pessoa consegue fazer.
+          */}
           {t(
-            "Este link veio do modelo de e-mail padrão do Supabase, que não fecha o acesso nesta instalação — pedir outro link não resolve. Quem administra o sistema precisa configurar os modelos de e-mail: na nuvem do Supabase, com ",
-          )}
-          <code>marca-emails.sh</code>
-          {t(
-            "; num Supabase próprio, apontando GOTRUE_MAILER_TEMPLATES_* para as rotas /email-templates/ do app.",
+            "Não conseguimos confirmar seu e-mail por este link. Clique em «Esqueci minha senha», use o mesmo e-mail e siga o link que vamos enviar — ele confirma sua conta. Se não chegar em alguns minutos, fale com o nosso suporte.",
           )}
         </div>
       )}

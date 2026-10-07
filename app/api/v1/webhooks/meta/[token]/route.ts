@@ -153,9 +153,28 @@ export async function POST(req: NextRequest, ctx: RouteCtx): Promise<NextRespons
         .eq("name", e.templateName)
         .eq("language", e.templateLanguage);
     } else {
+      // O status da Meta inteiro, e o MOTIVO da falha. Antes tudo que não era
+      // `failed` virava `sent` (entregue e lida sumiam) e o erro que a Meta manda
+      // — já lido por `parseMetaWebhook` — era jogado fora: a mensagem ficava
+      // "falhou" sem dizer por quê (Atenza online, 07/10/2026, era o 130497
+      // "restricted from messaging users in this country").
+      const patch: Record<string, unknown> = { updated_at: now };
+      if (e.status === "failed") {
+        patch.status = "failed";
+        patch.error_code = e.errorCode != null ? `meta_${e.errorCode}` : "meta_error";
+        patch.error_message = e.errorTitle ?? "A Meta recusou a entrega desta mensagem.";
+      } else if (e.status === "delivered") {
+        patch.status = "delivered";
+        patch.delivered_at = now;
+      } else if (e.status === "read") {
+        patch.status = "read";
+        patch.read_at = now;
+      } else {
+        patch.status = "sent";
+      }
       await admin
         .from("messages")
-        .update({ status: e.status === "failed" ? "failed" : "sent", updated_at: now })
+        .update(patch)
         .eq("organization_id", session.organizationId)
         .eq("external_id", e.externalId);
     }

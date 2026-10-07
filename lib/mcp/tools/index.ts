@@ -46,6 +46,8 @@ import {
 } from "./evolucao";
 import { crmListContactOrders, crmSearchProducts } from "./comercio";
 import { crmListAwaitingReply } from "./atendimento-externo";
+import { crmUpsertAgent, crmUpsertRouter } from "./configuracao";
+import { crmGetSetupStatus } from "./configuracao-status";
 import { crmListPrivacyRequests } from "./privacidade";
 import {
   crmArchiveStage,
@@ -100,6 +102,7 @@ export const allTools: ReadonlyArray<McpToolDefinition> = [
   crmGetConversation,
   crmGetConversationHistory,
   crmListAwaitingReply,
+  crmGetSetupStatus,
   crmGetQueueStatus,
   crmListLeads,
   crmGetLead,
@@ -128,6 +131,8 @@ export const allTools: ReadonlyArray<McpToolDefinition> = [
   crmListHumanCases,
   crmGetHumanCase,
   // write
+  crmUpsertAgent,
+  crmUpsertRouter,
   crmBookAppointment,
   crmRescheduleAppointment,
   crmCancelAppointment,

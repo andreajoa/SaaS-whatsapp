@@ -117,16 +117,18 @@ export interface Mercado {
  */
 export const MERCADOS: readonly Mercado[] = [
   {
-    // O mais caro do mundo em tarifa da Meta (marketing US$ 0,0625 por
-    // conversa), e era o mais barato da nossa tabela. R$ 97 estava ancorado no
-    // NOSSO custo, não no mercado: o concorrente direto cobra R$ 849,90 com
-    // R$ 1.197 de instalação.
+    // 07/10/2026: R$ 97 / 197 / 397. A IA, a Meta e a Zernio passaram a ser
+    // pagas pelo CLIENTE (chave própria), então o Atenza não embute custo
+    // variável e pode ficar abaixo de quem embute (BotConversa R$ 189 sem IA de
+    // verdade; Wati/Respond.io US$ 79+). Estes valores TÊM de bater com os
+    // `price_` do Stripe em STRIPE_PRICE_* — até esta data a tela dizia
+    // 197/497/997 e o Stripe cobrava 97/297/697.
     pais: "BR",
     nome: "Brasil",
     moeda: "BRL",
     idioma: "pt-BR",
     locale: "pt-BR",
-    precos: { essencial: 19700, pro: 49700, ilimitado: 99700 },
+    precos: { essencial: 9700, pro: 19700, ilimitado: 39700 },
   },
   {
     pais: "PT",

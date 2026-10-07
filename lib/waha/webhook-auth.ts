@@ -15,12 +15,11 @@
  *  1. Assinatura presente que NÃO confere ⇒ rejeita. Sempre. Não existe motivo
  *     legítimo para alguém assinar errado, e era o buraco mais óbvio.
  *  2. `WAHA_WEBHOOK_REQUIRE_SIGNATURE=true` ⇒ exige assinatura válida em tudo.
- *     Fica desligado por padrão porque o WAHA **Core** não assina: medido nesta
- *     VPS (2026.7.2 CORE), os eventos reais chegam sem header algum mesmo com
- *     `WHATSAPP_HOOK_HMAC` configurado no contêiner. Ligar isso por default
- *     derrubaria a ingestão de mensagens de todo mundo — remédio pior que a
- *     doença. Quem roda WAHA Plus (ou um proxy que assina) liga e ganha a
- *     verificação forte.
+ *     Fica desligado por padrão. A medição antiga dizia que o WAHA **Core** não
+ *     assina — falso: ele lê `WHATSAPP_HOOK_HMAC_KEY`, e os composes passavam
+ *     `WHATSAPP_HOOK_HMAC`, que o WAHA ignora (conferido no `dist` do contêiner
+ *     em 07/10/2026). Com o nome certo o Core assina, e a exigência pode ser
+ *     ligada; com o nome velho, ligá-la recusa toda mensagem com 401.
  *  3. Sem assinatura e sem exigência ⇒ aceita, mas devolve `signatureVerified:
  *     false` — e quem chama grava ESSA verdade no log. Antes o log registrava
  *     `valid_signature = true` para evento não verificado.
@@ -52,12 +51,12 @@ export function authenticateWahaWebhook(input: WahaWebhookAuthInput): WahaWebhoo
 
   const envSecret = (env.WAHA_HMAC_SECRET ?? "").trim();
   // AS DUAS chaves valem, e não "a da sessão, senão a global". O WAHA assina
-  // com UMA chave só — `WHATSAPP_HOOK_HMAC`, global do contêiner — sempre que o
+  // com UMA chave só — `WHATSAPP_HOOK_HMAC_KEY`, global do contêiner — sempre que o
   // webhook é o global (`WHATSAPP_HOOK_URL`), que é como o kit o sobe. A sessão
   // nova ganha `webhook_secret_encrypted` próprio no connect, e com a
   // precedência antiga esse segredo, que o WAHA nunca conheceu, virava o único
-  // aceito: toda mensagem chegava assinada com a global e voltava 401. Medido
-  // em 07/10/2026 no Atenza online — sessão WORKING, zero evento ingerido.
+  // aceito: corrigido o nome da variável no contêiner, toda mensagem chegaria
+  // assinada com a global e voltaria 401 do mesmo jeito.
   // Aceitar as duas não afrouxa nada: ambas são segredos nossos, e a regra 1
   // continua — assinatura que não confere com NENHUMA é rejeitada.
   const segredos = [sessionSecret ?? "", envSecret].filter(

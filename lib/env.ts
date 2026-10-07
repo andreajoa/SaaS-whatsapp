@@ -142,11 +142,12 @@ const schema = z.object({
   // contêiner do WAHA; o app precisa dele para CONFERIR a assinatura — e não o
   // declarava aqui, então nunca teve como verificar nada.
   WAHA_HMAC_SECRET: z.string().optional().default(""),
-  // "true" exige assinatura válida em todo webhook do WAHA. Fica desligado por
-  // padrão porque o WAHA Core não assina (medido: 2026.7.2 CORE manda os
-  // eventos sem header mesmo com WHATSAPP_HOOK_HMAC configurado), e exigir
-  // derrubaria a ingestão de mensagens. Ligue se usa WAHA Plus ou um proxy que
-  // assine — aí a verificação passa a ser obrigatória.
+  // "true" exige assinatura válida em todo webhook do WAHA. O WAHA Core ASSINA
+  // — a variável é `WHATSAPP_HOOK_HMAC_KEY`. Os composes diziam
+  // `WHATSAPP_HOOK_HMAC`, nome que o WAHA ignora, e daí veio a medição antiga
+  // de que "o Core não assina". Com a flag ligada e o nome errado, toda mensagem
+  // voltava 401 (Atenza online, 07/10/2026). Fica "false" por padrão para não
+  // derrubar instalação que ainda tenha o nome velho no contêiner.
   WAHA_WEBHOOK_REQUIRE_SIGNATURE: z.string().optional().default("false"),
 
   // ─── Chamada de voz WhatsApp (WaCalls, spec 18) ───

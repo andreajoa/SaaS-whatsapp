@@ -23,6 +23,11 @@ import type { createAdminClient } from "@/lib/supabase/admin";
 import { ackToStatus } from "@/lib/types/messaging";
 import type { WahaEnvelope, WahaPayload } from "@/lib/waha/envelope";
 import { bareWaMessageId, chatIdFromWaMessageId } from "@/lib/waha/message-id";
+import {
+  ehChatConsigoMesmo,
+  testeConsigoMesmoLigado,
+  type EuNoEnvelope,
+} from "@/lib/waha/conversa-consigo-mesmo";
 import { logger } from "@/lib/logger";
 
 export type Admin = ReturnType<typeof createAdminClient>;
@@ -1059,6 +1064,67 @@ async function handleMessageRevoked(
 }
 
 /**
+ * Janela em que uma linha nossa com o mesmo corpo explica o eco. Folgada como a
+ * de `JANELA_DO_ECO_MS`, e pelo mesmo motivo assimétrico: aqui o erro caro é o
+ * oposto — tratar a PRÓPRIA resposta como cliente abre o laço do atendente
+ * respondendo a si mesmo.
+ */
+const JANELA_ECO_CONSIGO_MESMO_MS = 120_000;
+
+/**
+ * Mensagem `fromMe` que deve entrar como CLIENTE: modo teste ligado, chat
+ * consigo mesmo, e NÃO é eco de um envio nosso. Ver
+ * `lib/waha/conversa-consigo-mesmo.ts`. As consultas só rodam no chat consigo
+ * mesmo — toda outra mensagem `fromMe` sai na primeira guarda, sem ir ao banco.
+ */
+async function viraClienteNoTesteConsigoMesmo(
+  admin: Admin,
+  session: Session,
+  envelope: WahaEnvelope,
+  p: WahaPayload,
+): Promise<boolean> {
+  const eu = (envelope as { me?: EuNoEnvelope | null }).me ?? null;
+  const chave = p._data?.key as { remoteJid?: string; remoteJidAlt?: string } | undefined;
+  const chats = [p.from, p.to, chave?.remoteJid, chave?.remoteJidAlt, chatIdFromWaMessageId(p.id ?? "")];
+  if (!p.id || !ehChatConsigoMesmo(chats, eu)) return false;
+
+  const { data: org } = await admin
+    .from("organizations")
+    .select("settings")
+    .eq("id", session.organization_id)
+    .maybeSingle();
+  if (!testeConsigoMesmoLigado(org?.settings)) return false;
+
+  // Eco 1: o envio já gravou o id do canal (forma bare ou composta).
+  const bare = bareWaMessageId(p.id);
+  const ids = bare === p.id ? [p.id] : [p.id, bare];
+  const { data: jaGravada, error: e1 } = await admin
+    .from("messages")
+    .select("id")
+    .eq("organization_id", session.organization_id)
+    .in("external_id", ids)
+    .limit(1)
+    .maybeSingle();
+  if (e1 || jaGravada) return false;
+
+  // Eco 2: envio nosso recente com o mesmo corpo, confirmado ou ainda em voo.
+  // Na dúvida (erro de leitura, mídia sem corpo), NÃO promove: o pior desfecho
+  // aqui é o laço, não uma mensagem de teste que deixou de ser respondida.
+  const corpo = (p.body ?? "").trim();
+  if (!corpo) return false;
+  const { data: recentes, error: e2 } = await admin
+    .from("messages")
+    .select("body")
+    .eq("organization_id", session.organization_id)
+    .eq("direction", "outbound")
+    .neq("sent_via", "external_device")
+    .gte("created_at", new Date(Date.now() - JANELA_ECO_CONSIGO_MESMO_MS).toISOString())
+    .limit(50);
+  if (e2) return false;
+  return !(recentes ?? []).some((m) => ((m as { body: string | null }).body ?? "").trim() === corpo);
+}
+
+/**
  * Roteador único de eventos WAHA. Os dois route handlers convergem aqui após
  * resolver a sessão e validar HMAC.
  */
@@ -1072,7 +1138,12 @@ export async function dispatchWahaEvent(
   const payload: WahaPayload = envelope.payload ?? {};
 
   if (eventType === "message" || eventType === "message.any") {
-    if (payload.fromMe) {
+    if (payload.fromMe && (await viraClienteNoTesteConsigoMesmo(admin, session, envelope, payload))) {
+      // `from` já é o próprio chat (medido: NOWEB manda o @lid do número em
+      // `from` no chat consigo mesmo), que é exatamente o que `handleInbound`
+      // usa como cliente.
+      await handleInbound(admin, session, { ...payload, fromMe: false }, requestId);
+    } else if (payload.fromMe) {
       await handleOutboundFromUserPhone(admin, session, payload, requestId);
     } else {
       await handleInbound(admin, session, payload, requestId);

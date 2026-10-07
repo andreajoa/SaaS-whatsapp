@@ -1,7 +1,7 @@
 "use client";
 
 import { useTagDeIdioma } from "@/hooks/i18n/useLocaleDeData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -93,6 +93,67 @@ function BlocoCopiavel({ titulo, texto }: { titulo: string; texto: string }) {
   );
 }
 
+/**
+ * Liga/desliga o modo teste "conversar comigo mesmo" — ver
+ * `lib/waha/conversa-consigo-mesmo.ts`. Mora junto da conexão porque é o passo
+ * seguinte de quem acabou de ligar o Claude Code e só tem um celular.
+ */
+function TesteConsigoMesmo() {
+  const t = useT();
+  const [ligado, setLigado] = useState<boolean | null>(null);
+  const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/v1/settings/teste-consigo-mesmo")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => vivo && setLigado(Boolean(j?.data?.ligado)))
+      .catch(() => vivo && setLigado(false));
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  const alternar = async () => {
+    if (ligado === null) return;
+    setSalvando(true);
+    try {
+      const r = await fetch("/api/v1/settings/teste-consigo-mesmo", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ligado: !ligado }),
+      });
+      if (!r.ok) throw new Error(String(r.status));
+      setLigado(!ligado);
+      toast.success(!ligado ? t("Modo teste ligado.") : t("Modo teste desligado."));
+    } catch {
+      toast.error(t("Não foi possível salvar. Tente de novo."));
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="text-sm font-medium">{t("Testar pelo meu próprio número")}</p>
+        <p className="text-xs text-muted-foreground">
+          {t("Com isto ligado, o que você escreve no chat com você mesmo no WhatsApp conta como mensagem de cliente, e a resposta aparece ali. Desligue depois do teste.")}
+        </p>
+      </div>
+      <Button
+        type="button"
+        variant={ligado ? "default" : "secondary"}
+        disabled={ligado === null || salvando}
+        onClick={alternar}
+        className="w-full sm:w-auto"
+      >
+        {ligado ? t("Ligado") : t("Desligado")}
+      </Button>
+    </div>
+  );
+}
+
 export function ApiTokensClient() {
   const tagDoIdioma = useTagDeIdioma();
   const t = useT();
@@ -159,6 +220,7 @@ export function ApiTokensClient() {
         <Button onClick={conectarAgenteDeCodigo} disabled={create.isPending} className="w-full sm:w-auto">
           {t("Gerar conexão")}
         </Button>
+        <TesteConsigoMesmo />
       </div>
 
       <div className="flex sm:justify-end">

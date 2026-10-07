@@ -4256,6 +4256,14 @@ export const DICIONARIO: Traducoes = {
     es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
   },
   "Gerar conexão": { es: "Generar conexión" },
+  "Modo teste ligado.": { es: "Modo de prueba activado." },
+  "Modo teste desligado.": { es: "Modo de prueba desactivado." },
+  "Testar pelo meu próprio número": { es: "Probar con mi propio número" },
+  "Com isto ligado, o que você escreve no chat com você mesmo no WhatsApp conta como mensagem de cliente, e a resposta aparece ali. Desligue depois do teste.": {
+    es: "Con esto activado, lo que escribes en el chat contigo mismo en WhatsApp cuenta como mensaje de cliente, y la respuesta aparece allí. Desactívalo después de la prueba.",
+  },
+  Ligado: { es: "Activado" },
+  Desligado: { es: "Desactivado" },
   "1. Claude Code — cole no terminal": { es: "1. Claude Code — pégalo en la terminal" },
   "1. Codex — cole em ~/.codex/config.toml": { es: "1. Codex — pégalo en ~/.codex/config.toml" },
   "2. Para ele atender os clientes — cole dentro do Claude Code": {

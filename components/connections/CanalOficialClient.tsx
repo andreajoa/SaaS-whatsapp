@@ -56,17 +56,20 @@ export function CanalOficialClient() {
   const t = useT();
   const { data, isPending } = useOfficialChannel();
   const conectar = useConnectOfficialChannel();
-  const [form, setForm] = useState({ phone_number_id: "", waba_id: "", token: "" });
+  const [form, setForm] = useState({ phone_number_id: "", waba_id: "", token: "", app_secret: "" });
 
   const estado = data?.data;
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
-    const r = await conectar.mutateAsync(form);
+    // Campo vazio não vai: a rota recusa chave curta, e quem usa o App da
+    // instalação não tem chave própria para mandar.
+    const { app_secret, ...resto } = form;
+    const r = await conectar.mutateAsync(app_secret.trim() ? { ...resto, app_secret: app_secret.trim() } : resto);
     toast.success(`${t("Conectado:")} ${r.data.displayName} ${r.data.phoneNumber ?? ""}`.trim());
     // O token some do formulário assim que grava — deixá-lo na tela seria mantê-lo
     // em memória do navegador sem motivo, e ele não volta em nenhum GET.
-    setForm((f) => ({ ...f, token: "" }));
+    setForm((f) => ({ ...f, token: "", app_secret: "" }));
   }
 
   if (isPending) return <p className="text-sm text-muted-foreground">{t("Carregando…")}</p>;
@@ -170,6 +173,20 @@ export function CanalOficialClient() {
             />
             <span className="text-xs text-muted-foreground">
               {t("Guardado cifrado. Não é exibido de volta em nenhum momento.")}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="appsecret">{t("Chave secreta do App (App Secret)")}</Label>
+            <Input
+              id="appsecret"
+              type="password"
+              value={form.app_secret}
+              onChange={(e) => setForm((f) => ({ ...f, app_secret: e.target.value }))}
+              placeholder={t("No painel da Meta: Configurações do app › Básico › Chave secreta do app")}
+              minLength={16}
+            />
+            <span className="text-xs text-muted-foreground">
+              {t("É com ela que conferimos que as mensagens vieram mesmo da Meta. Guardada cifrada.")}
             </span>
           </div>
           <Button type="submit" disabled={conectar.isPending} data-testid="btn-conectar">

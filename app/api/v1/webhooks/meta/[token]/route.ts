@@ -26,6 +26,7 @@ import { ingestMetaInbound } from "@/lib/channels/meta/ingest";
 import { metaSessionByWebhookToken } from "@/lib/channels/meta/session";
 import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { decryptWebhookSecret } from "@/lib/webhooks/secrets";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -39,10 +40,12 @@ export async function GET(req: NextRequest, ctx: RouteCtx): Promise<NextResponse
   const session = await metaSessionByWebhookToken(token);
   if (!session) return new NextResponse("not found", { status: 404 });
 
-  const challenge = verificationChallenge(
-    req.nextUrl.searchParams,
-    process.env.META_WEBHOOK_VERIFY_TOKEN ?? "",
-  );
+  // Vale o verify token da instalação OU o próprio token deste endereço — o
+  // que a tela de conexão mostra ao cliente quando a instalação não tem um.
+  // Assim um cliente com App próprio conecta sem ninguém editar o ambiente.
+  const challenge =
+    verificationChallenge(req.nextUrl.searchParams, process.env.META_WEBHOOK_VERIFY_TOKEN ?? "") ??
+    verificationChallenge(req.nextUrl.searchParams, token);
   if (challenge === null) return new NextResponse("forbidden", { status: 403 });
 
   // Texto puro, sem wrapper — ver o cabeçalho.
@@ -60,8 +63,16 @@ export async function POST(req: NextRequest, ctx: RouteCtx): Promise<NextRespons
   if (!session) return fail("not_found", "unknown webhook token", 404, { requestId });
 
   const rawBody = await req.text();
-  const appSecret = process.env.META_APP_SECRET ?? "";
-  if (!verifyMetaSignature(rawBody, req.headers.get("x-hub-signature-256"), appSecret)) {
+  // Duas chaves possíveis: a do App da INSTALAÇÃO (env) e a do App do próprio
+  // CLIENTE, gravada cifrada no canal. Qualquer uma que confira vale; nenhuma
+  // conferindo, 401. A do canal só é decifrada se a global não bastou.
+  const assinatura = req.headers.get("x-hub-signature-256");
+  let assinaturaValida = verifyMetaSignature(rawBody, assinatura, process.env.META_APP_SECRET ?? "");
+  if (!assinaturaValida && session.segredoCifrado) {
+    const segredoDoCanal = await decryptWebhookSecret(createAdminClient(), session.segredoCifrado);
+    assinaturaValida = !!segredoDoCanal && verifyMetaSignature(rawBody, assinatura, segredoDoCanal);
+  }
+  if (!assinaturaValida) {
     return fail("unauthorized", "invalid_signature", 401, { requestId });
   }
 

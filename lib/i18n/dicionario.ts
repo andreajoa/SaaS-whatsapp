@@ -4256,6 +4256,13 @@ export const DICIONARIO: Traducoes = {
     es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
   },
   "Gerar conexão": { es: "Generar conexión" },
+  "Chave secreta do App (App Secret)": { es: "Clave secreta de la App (App Secret)" },
+  "No painel da Meta: Configurações do app › Básico › Chave secreta do app": {
+    es: "En el panel de Meta: Configuración de la app › Básica › Clave secreta de la app",
+  },
+  "É com ela que conferimos que as mensagens vieram mesmo da Meta. Guardada cifrada.": {
+    es: "Con ella comprobamos que los mensajes vienen realmente de Meta. Se guarda cifrada.",
+  },
   "Modo teste ligado.": { es: "Modo de prueba activado." },
   "Modo teste desligado.": { es: "Modo de prueba desactivado." },
   "Testar pelo meu próprio número": { es: "Probar con mi propio número" },

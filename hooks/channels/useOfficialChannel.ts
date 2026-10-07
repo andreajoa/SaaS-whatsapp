@@ -25,6 +25,8 @@ export interface ConnectInput {
   phone_number_id: string;
   waba_id: string;
   token: string;
+  /** Chave do App da Meta do próprio cliente; ausente = vale o App da instalação. */
+  app_secret?: string;
 }
 
 export function useOfficialChannel() {

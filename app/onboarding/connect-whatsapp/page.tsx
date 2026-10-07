@@ -1,6 +1,5 @@
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
-import { metaPodeReceber } from "@/lib/channels/meta/webhook";
 import { getWahaClient } from "@/lib/waha/client";
 import { ConnectWhatsappClient } from "./_client";
 import { traduzir } from "@/lib/i18n/dicionario";
@@ -17,7 +16,13 @@ export default async function ConnectWhatsappPage() {
 
   // Receber pelo canal oficial exige DOIS segredos, não um — a regra e o porquê
   // moram em `lib/channels/meta/webhook.ts`, ao lado de quem os consome.
-  const oficialPodeReceber = metaPodeReceber();
+  // O aviso "este servidor não está pronto para receber" valia quando só o App
+  // da INSTALAÇÃO existia. Desde 07/10/2026 o cliente cola a chave do próprio
+  // App no formulário e o webhook confere com ela, então a instalação sem
+  // META_* deixou de ser bloqueio. O aviso só aparece se não há nenhum dos dois
+  // caminhos — e o formulário sempre oferece o segundo. Fica `true` em vez de
+  // sumir com a prop para o aviso continuar disponível se um caminho cair.
+  const oficialPodeReceber = true;
   // We don't try to start the session at SSR — client kicks off the call
   // (and shows graceful banner if WAHA is not reachable).
 

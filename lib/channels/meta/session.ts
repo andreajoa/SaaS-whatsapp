@@ -19,6 +19,12 @@ export interface MetaWebhookSession {
   id: string;
   organizationId: string;
   wabaId: string | null;
+  /**
+   * A chave do App da Meta do cliente, CIFRADA (`webhook_secret_encrypted`).
+   * Só o webhook a decifra, e só para conferir a assinatura. Em canais antigos
+   * a coluna guarda outra coisa; conferir com ela falha e vale a chave global.
+   */
+  segredoCifrado?: string | null;
 }
 
 /**
@@ -46,7 +52,7 @@ export async function metaSessionByWebhookToken(
   const base = () =>
     admin
       .from("channel_sessions")
-      .select("id, organization_id, meta_waba_id")
+      .select("id, organization_id, meta_waba_id, webhook_secret_encrypted")
       .eq("webhook_path_token", token)
       .eq("provider", CHANNEL_PROVIDER_META);
   const { data } = await queryTolerantToMissingArchived(
@@ -59,6 +65,7 @@ export async function metaSessionByWebhookToken(
     id: data.id,
     organizationId: data.organization_id,
     wabaId: data.meta_waba_id ?? null,
+    segredoCifrado: (data as { webhook_secret_encrypted?: string | null }).webhook_secret_encrypted ?? null,
   };
 }
 

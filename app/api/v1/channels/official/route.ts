@@ -45,6 +45,14 @@ const conectarSchema = z.object({
   phone_number_id: z.string().min(5),
   waba_id: z.string().min(5),
   token: z.string().min(20),
+  /**
+   * A chave secreta do App da Meta do PRÓPRIO cliente. Sem ela, só valeria a
+   * `META_APP_SECRET` da instalação — e a tela diz ao cliente "cadastre o SEU
+   * número na Meta": com App próprio, toda mensagem chegava assinada com uma
+   * chave que o servidor não conhecia e morria em 401. Opcional porque a
+   * instalação que tem App único (env) continua funcionando sem ela.
+   */
+  app_secret: z.string().trim().min(16).max(128).optional(),
 });
 
 /**
@@ -104,7 +112,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     webhook: data
       ? {
           callbackUrl: `${base}/api/v1/webhooks/meta/${data.webhook_path_token}`,
-          verifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN ?? null,
+          // O token do endereço vale como verify token: é por canal, já é
+          // segredo de rota, e dispensa configurar a instalação (a rota aceita
+          // ele OU o META_WEBHOOK_VERIFY_TOKEN do ambiente).
+          verifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN || data.webhook_path_token,
           fields: ["messages", "message_template_status_update"],
         }
       : null,
@@ -128,7 +139,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       requestId,
     });
   }
-  const { phone_number_id, waba_id, token } = parsed.data;
+  const { phone_number_id, waba_id, token, app_secret } = parsed.data;
 
   // VALIDA ANTES DE GRAVAR — a rota não sabe com quem fala; ela pergunta se a
   // credencial presta e o canal responde.
@@ -180,7 +191,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
   }
 
+  // A chave do App vai para `webhook_secret_encrypted`: é exatamente o segredo
+  // que confere o webhook deste canal (`app/api/v1/webhooks/meta/[token]`).
+  let segredoDoApp: string | undefined;
+  if (app_secret) {
+    const c = await encryptWebhookSecret(admin, app_secret);
+    if (!c) {
+      return fail("invalid_request", t("cifra indisponível nesta instalação — a chave do App não foi gravada"), 422, {
+        requestId,
+      });
+    }
+    segredoDoApp = c;
+  }
+
   const linha = {
+    ...(segredoDoApp ? { webhook_secret_encrypted: segredoDoApp } : {}),
     organization_id: orgId,
     provider: CHANNEL_PROVIDER_META,
     meta_phone_number_id: phone_number_id,
@@ -223,7 +248,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       )
     : await admin.from("channel_sessions").insert({
         ...linha,
-        webhook_secret_encrypted: cifrado,
+        webhook_secret_encrypted: segredoDoApp ?? cifrado,
         metadata: metadataInicialDoCanal(),
       });
 

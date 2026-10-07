@@ -116,9 +116,13 @@ export const metaCloudAdapter: ChannelAdapter = {
    * propósito e não de passagem. Fica registrado aqui para quem for fazê-la.
    */
   isConfigured(): boolean {
-    // Síncrono por contrato. Com credencial na sessão, quem confirma é o `send`
-    // (async) — ver o comentário acima.
-    return metaCredsFromEnv() !== null;
+    // Sempre `true` — a dívida descrita acima foi paga em 07/10/2026, com o
+    // mesmo conserto do canal intermediado (`adapters/zernio.ts`). Medido no
+    // Atenza online: canal conectado pela tela, mensagem parada em `queued`
+    // com `meta_not_configured`, `send` nunca chamado. Quem desiste agora é o
+    // `send`, que LANÇA quando não acha credencial nem na sessão nem no env —
+    // o handler grava `failed` com motivo, nunca `sent` sem id.
+    return true;
   },
 
   /**
@@ -270,9 +274,10 @@ export const metaCloudAdapter: ChannelAdapter = {
       organizationId: envelope.organizationId,
       phoneNumberId: envelope.sessionRef,
     });
-    // Mesmo contrato do outro canal: sem credencial é NOOP, não exceção. A UI mostra
-    // o banner de "canal não conectado"; transformar em erro mudaria comportamento.
-    if (!creds) return { externalId: null };
+    // Sem credencial LANÇA, e não devolve `{externalId: null}`: com
+    // `isConfigured()` sempre `true`, um NOOP aqui faria o handler gravar
+    // `sent` para algo que nunca saiu.
+    if (!creds) throw new Error("meta_not_configured: sem credencial na sessão nem no ambiente.");
 
     const corpo =
       contactPayload(envelope) ??

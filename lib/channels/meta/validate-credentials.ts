@@ -54,3 +54,30 @@ export async function validateMetaCredentials(input: {
     return { ok: false, motivo: `rede indisponível: ${err instanceof Error ? err.message : "erro"}` };
   }
 }
+
+/**
+ * Inscreve o App do token na conta do WhatsApp Business (`POST
+ * /{waba}/subscribed_apps`). Sem isto a Meta não entrega mensagem nenhuma ao
+ * webhook, mesmo com o webhook verificado e o campo `messages` assinado: medido
+ * no Atenza online em 07/10/2026, a WABA do número de teste vinha inscrita só no
+ * App interno da Meta ("WA DevX Webhook Events"), e o canal ficava "conectado"
+ * sem receber nada. Nunca lança — devolve se deu certo, para quem chama avisar.
+ */
+export async function inscreverAppNaWaba(input: {
+  wabaId: string;
+  token: string;
+  graphVersion?: string;
+}): Promise<{ ok: true } | { ok: false; motivo: string }> {
+  const version = input.graphVersion ?? process.env.META_GRAPH_VERSION ?? "v22.0";
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${version}/${encodeURIComponent(input.wabaId)}/subscribed_apps`,
+      { method: "POST", headers: { Authorization: `Bearer ${input.token}` }, cache: "no-store" },
+    );
+    const body = (await res.json().catch(() => ({}))) as { success?: boolean; error?: { message?: string } };
+    if (res.ok && body.success) return { ok: true };
+    return { ok: false, motivo: body.error?.message ?? `HTTP ${res.status}` };
+  } catch (err) {
+    return { ok: false, motivo: err instanceof Error ? err.message : String(err) };
+  }
+}

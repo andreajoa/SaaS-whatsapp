@@ -29,7 +29,7 @@ import { fail, ok } from "@/lib/api/wrappers";
 import { requireRole } from "@/lib/auth/require-role";
 import { ARCHIVED_AT, queryTolerantToMissingArchived } from "@/lib/channels/archived";
 import { CHANNEL_PROVIDER_META } from "@/lib/channels/capabilities";
-import { validateMetaCredentials } from "@/lib/channels/meta/validate-credentials";
+import { inscreverAppNaWaba, validateMetaCredentials } from "@/lib/channels/meta/validate-credentials";
 import { reactivateChannelSession } from "@/lib/channels/reactivate";
 import { cabeMaisUm, frasePrimeiraPessoa } from "@/lib/billing/tetos";
 import { env } from "@/lib/env";
@@ -258,9 +258,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
   }
 
+  // Depois de gravar: a credencial já foi validada e o canal existe. Falhar
+  // aqui não desfaz a conexão — devolve o motivo para a tela avisar, porque sem
+  // a inscrição o número envia e NUNCA recebe.
+  const inscricao = await inscreverAppNaWaba({ wabaId: waba_id, token });
+
   return ok({
     connected: true,
     displayName: linha.display_name,
     phoneNumber: linha.phone_number,
+    recebimento: inscricao.ok ? "ativo" : `pendente: ${inscricao.motivo}`,
   });
 }

@@ -56,7 +56,16 @@ function scopesRole(scopes: string[]): Role {
   return "agent";
 }
 
-function deriveActor(scopes: string[], tokenId: string): Actor {
+/**
+ * O ator `user` de um token comum é QUEM CRIOU o token (`api_tokens.created_by`),
+ * e não o token. Até 07/10/2026 o `id` era o do próprio token, e ele viajava
+ * para colunas com FK para usuário: `messages.sent_by_user_id` recusava o envio
+ * (`messages_sent_by_user_id_fkey`) — o Claude Code ligado pelo "Gerar conexão"
+ * lia a fila e não conseguia responder ninguém —, e `governance.ts`/
+ * `escalacao.ts` passavam o mesmo id como `actorUserId` da auditoria. O token
+ * age em nome de quem o emitiu; o id do token continua em `apiTokenId`.
+ */
+function deriveActor(scopes: string[], tokenId: string, criadoPor: string): Actor {
   const isAiAgent = scopes.includes("actor:ai_agent");
   const role = scopesRole(scopes);
   if (isAiAgent) {
@@ -64,7 +73,7 @@ function deriveActor(scopes: string[], tokenId: string): Actor {
     const runId = runScope ? runScope.slice("agent_run:".length) : tokenId;
     return { type: "ai_agent", id: runId, role, api_token_id: tokenId };
   }
-  return { type: "user", id: tokenId, role };
+  return { type: "user", id: criadoPor, role };
 }
 
 export function extractBearer(authHeader: string | null): string | null {
@@ -91,7 +100,7 @@ export async function validateBearerToken(
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("api_tokens")
-    .select("id, organization_id, scopes, revoked_at, expires_at")
+    .select("id, organization_id, scopes, revoked_at, expires_at, created_by")
     .eq("token_hash", hashLiteral)
     .maybeSingle();
 
@@ -110,7 +119,7 @@ export async function validateBearerToken(
 
   const scopes = parseScopes(data.scopes);
   const role = scopesRole(scopes);
-  const actor = deriveActor(scopes, data.id);
+  const actor = deriveActor(scopes, data.id, data.created_by);
 
   supabase
     .from("api_tokens")

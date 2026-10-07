@@ -62,10 +62,10 @@ export async function auditMcpToolCall(input: AuditMcpToolCallInput): Promise<vo
 
   await audit({
     action: "mcp.tool_called",
-    // Quem age via MCP é um TOKEN, nunca uma linha de auth.users: para um token
-    // comum, ctx.actor.id é o id do próprio token (lib/mcp/auth.ts), e mandá-lo
-    // como actorUserId estourava a FK api_audit_log_actor_user_id_fkey. O ator
-    // já fica registrado em actorApiTokenId e em metadata.actor_id.
+    // A chamada é atribuída ao TOKEN (actorApiTokenId). Para um token comum,
+    // ctx.actor.id é quem o criou (lib/mcp/auth.ts) e já viaja em
+    // metadata.actor_id; para um ai_agent é um id de run, que não é usuário —
+    // por isso actorUserId fica nulo nos dois casos.
     actorUserId: null,
     actorApiTokenId: ctx.apiTokenId,
     organizationId: ctx.organizationId,

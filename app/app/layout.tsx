@@ -46,6 +46,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!activeOrg && !user.support && (await acessoFoiRevogado(user.id))) {
     redirect("/acesso-revogado");
   }
+  // "Nunca teve" precisa do redirect, e não só do parágrafo acima. A empresa
+  // nasce no link de CONFIRMAÇÃO (`app/auth/confirm`); quem confirma o e-mail
+  // por outro caminho — o "Esqueci minha senha", que também confirma — entra
+  // sem empresa e caía na casca vazia: medido em 07/10/2026, um cadastro de
+  // teste terminou no Perfil, clicando "Salvar" sem ir a lugar nenhum.
+  if (!activeOrg && !user.support) redirect("/get-started");
 
   /**
    * A cor desta organização, serializada, ou `null` quando ela não tem uma.

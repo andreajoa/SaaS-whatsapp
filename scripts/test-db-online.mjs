@@ -15,8 +15,10 @@ if (!["postgres:", "postgresql:"].includes(endpoint.protocol) || !endpoint.hostn
   throw new Error("Use conexão Postgres direta ou pooler em modo sessão, nunca pooler de transação.");
 }
 const db = new pg.Client({ connectionString, statement_timeout: 120000, connectionTimeoutMillis: 20000 });
+let phase = "connection";
 try {
   await db.connect();
+  phase = "empty_database_guard";
   // Recusa qualquer banco do produto já instalado. Nunca apaga ou reseta dados.
   const { rows: tables } = await db.query("select tablename from pg_tables where schemaname='public'");
   if (tables.length) throw new Error("O banco contém tabelas em public. Use um projeto/branch Supabase de teste vazio.");
@@ -25,21 +27,26 @@ try {
   const { rows: roles } = await db.query("select rolname from pg_roles where rolname in ('anon','authenticated','service_role')");
   if (roles.length !== 3) throw new Error("O banco deve ter o bootstrap nativo do Supabase.");
 
+  phase = "extensions";
   await db.query(`create extension if not exists "uuid-ossp" with schema extensions;
     create extension if not exists pgcrypto with schema extensions;
     create extension if not exists vector with schema public;
     create extension if not exists citext with schema public;
     create extension if not exists pg_trgm with schema public;`);
   const baseline = await readFile(new URL("../supabase/baseline.sql", import.meta.url), "utf8");
-  console.log("Instalando baseline no banco online vazio.");
+  console.info("Instalando baseline no banco online vazio.");
+  phase = "baseline_install";
   await db.query(baseline);
-  console.log("Reaplicando baseline para conferir idempotência.");
+  console.info("Reaplicando baseline para conferir idempotência.");
+  phase = "baseline_update";
   await db.query(baseline);
+  phase = "validation_marker";
   const runId = randomUUID();
   await db.query(`create schema if not exists atenza_validation;
     create table if not exists atenza_validation.run(run_id uuid primary key, expires_at timestamptz not null);`);
   await db.query("insert into atenza_validation.run values($1,now()+interval '1 hour')", [runId]);
   await db.end();
+  phase = "invariant_tests";
   const child = spawn(process.execPath, ["node_modules/vitest/vitest.mjs", "run", "--config", "vitest.online-db.config.ts"], {
     cwd: root, stdio: "inherit", env: { ...process.env, ATENZA_TEST_RUN_ID: runId },
   });
@@ -50,7 +57,10 @@ try {
   process.exitCode = code;
 } catch (error) {
   // Não imprimir URL, credencial nem stack com argumentos de conexão.
-  console.error(error instanceof Error && !('code' in error) ? error.message : "Falha de banco online; confira permissões, TLS e schema do ambiente de teste.");
+  console.error(error instanceof Error && !('code' in error) ? error.message : JSON.stringify({
+    message: "Falha de banco online; confira permissões, TLS e schema do ambiente de teste.",
+    phase, code: error?.code ?? "unknown", position: error?.position,
+  }));
   process.exitCode = 1;
 } finally {
   await db.end().catch(() => {});

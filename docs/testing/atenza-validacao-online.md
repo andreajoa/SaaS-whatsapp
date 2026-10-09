@@ -4,7 +4,7 @@ Orientação explícita do proprietário em 09/10/2026: o Atenza é um serviço 
 Nesta frente, não usar Docker. O destino é a instalação Vercel/Supabase do
 Atenza; não mudar o modelo de hospedagem para self-host.
 
-## Ambiente verificado nesta retomada
+## Histórico inicial da validação
 
 Em 09/10/2026, leituras públicas de `https://www.atenza.online` e `/login`
 retornaram HTTP 200. `/api/v1/health` retornou `healthy`, com Supabase, Redis e
@@ -23,7 +23,7 @@ publicou o preview do commit `594ec14`:
 O deploy ficou Ready; o navegador autenticado abriu a Inbox e a nova central
 de integrações, sem overflow horizontal no desktop.
 
-O preview Ready mais recente corresponde exatamente ao commit
+O preview daquela rodada correspondia exatamente ao commit
 `9eac8d6f0364f506cf8e92519b40edb6269be18a`:
 `https://saa-s-whatsapp-ljc1zjyx5-andres-projects-bbfd1881.vercel.app`.
 O alias da branch foi atualizado para essa revisão. Os GETs autenticados
@@ -31,8 +31,8 @@ foram repetidos nessa revisão e mantiveram os resultados descritos abaixo.
 
 GET autenticado no preview: ações, comércio e campanhas retornaram 503;
 qualidade retornou 500. O health continuou 200/healthy. Uma consulta Postgres
-somente leitura confirmou ausência das novas tabelas no banco online. Preview
-e produção ainda apontam ao mesmo Supabase, então os testes de escrita precisam
+somente leitura confirmou ausência das novas tabelas no banco online. Naquela rodada, preview
+e produção apontavam ao mesmo Supabase, então os testes de escrita precisam
 de um ambiente separado antes da aplicação das migrations.
 Não houve promoção, alteração persistente de schema remoto ou envio de mensagem.
 
@@ -146,3 +146,96 @@ As suítes unitárias usam fixtures. O probe GitHub certifica apenas o transport
 descrito; o preflight certifica apenas o DDL revertido. Loja autorizada, jornada
 multitenant e persistência dos novos módulos no ambiente online permanecem
 pendentes.
+
+## Retomada concluída: código e preview isolado
+
+Commit `cf7dc95f2c3c9e2031a352166f4241b098a6e54a`, preview
+`https://saa-s-whatsapp-kcsbs1glw-andres-projects-bbfd1881.vercel.app`.
+A equipe e o projeto foram conferidos no CLI oficial. As 35 variáveis de
+validação têm destino preview e branch exata; o banco é exclusivamente
+`zaagoawswxlwzwhmtzyi`. WhatsApp, Redis e credenciais de serviços pagos estão
+desativados nessa configuração. A cifra do banco de teste foi provisionada e
+o papel Postgres da aplicação continua sem ownership, SUPERUSER, CREATEDB
+ou CREATEROLE. Nenhuma fixture foi inserida em produção.
+
+[CI 37994667128](https://github.com/andreajoa/SaaS-whatsapp/actions/runs/37994667128)
+aprovou tipos, lint, build serverless e a suíte completa: 833 arquivos,
+8.989 testes passaram e uma falha esperada. A suíte específica de qualidade
+passou com 63 testes; ela sobrepõe os anteriores. O typecheck local também
+passou usando Node 22 e limite de heap de 4 GB.
+
+Duas jornadas autenticadas, desktop 1440×1000 e celular 390×844, passaram em
+2,7 minutos no Playwright. Nenhuma resposta do aplicativo foi simulada:
+
+- Login e identificação da organização sintética pela API de sessão.
+- Central de lojas com resposta HTTP 200 e botões Shopify/WooCommerce.
+- Criação de ação e chamada HTTPS real ao GitHub, retorno mapeado e histórico
+  de execução preservado após recarga. Cabeçalho cifrado não reapresentado.
+- Ação disponível e selecionável no formulário do agente. Esse passo não
+  publica uma versão nem executa um atendimento de IA.
+- Cadastro de fonte por URL e persistência após recarga. A resposta confirmou
+  `indexacao_habilitada: false`, pois a chave de IA foi desativada no teste.
+- Salvamento de metas HTTP 200, recarga e confirmação visível.
+- Campanhas e opções de campanha HTTP 200, sem erro e sem overflow horizontal.
+
+As screenshots estão em `.superpowers/evidence/atenza-online-preview`.
+Traces e arquivos de sessão foram desativados para não registrar credenciais.
+O OIDC oficial só foi enviado ao domínio exato do preview. O runner recusa
+domínio de produção e exige a identidade do banco de testes.
+
+A verificação real encontrou e corrigiu a confirmação perdida ao remontar a
+política de metas. O teste de regressão falhou antes da correção e passou
+depois. Também foi corrigida a configuração que incluía Playwright no Vitest
+e o encerramento do timer de foco Radix no teste do composer.
+
+A CA pública oficial do Supabase passou a ser configurável. O pool exige
+`rejectUnauthorized: true` quando ela existe e remove parâmetros de SSL da
+URL que fariam o pg substituir a CA. A conexão remota com o papel restrito
+foi confirmada; quatro regressões exercitam a interpretação real do pg.
+
+Loja autorizada, OAuth e sincronização de catálogo/pedidos reais ainda exigem
+uma loja de teste do proprietário. A indexação/atendimento de IA e a entrega
+de WhatsApp também não foram certificados nesta rodada. Não confundir os
+resultados de preview e os 66 testes SQL anteriores com essas integrações.
+
+## Aplicação do schema em produção
+
+As quatro migrations foram aplicadas no projeto `cclrwowgjtutvtlwuday` pelo SQL
+Editor administrativo, numa única transação. O texto foi comparado byte a byte
+com o arquivo preparado antes da execução: SHA-256
+`a315de94a11ea605de83ab44710ec3ca7ff02625691bce5203dce18f8d446ffa`.
+O script conferiu as dez novas tabelas com RLS ativo e sem SELECT para `anon`
+antes do COMMIT; uma consulta posterior confirmou as mesmas invariantes.
+As contagens existentes permaneceram iguais: 4 organizações, 0 pedidos e
+0 produtos. Não houve fixtures, mensagens ou mutações de loja em produção.
+A cifra existente também foi verificada, sem trocar a chave.
+
+## Publicação e conferência final
+
+O build de produção `dpl_8GNJqx1gE6o9WWofqheqfXs6pbvx` foi preparado a partir
+do `git archive` do commit `cf7dc95`, usando variáveis de produção, e conferido
+antes da promoção. Somente arquivos rastreados foram enviados; os únicos
+arquivos `.env*` eram os dois exemplos do repositório. O login e o health foram
+abertos pelo Chrome com autenticação Vercel normal: HTTP 200 e `healthy`,
+Supabase/Redis/WhatsApp `ok`. Não foi necessário ampliar Trusted Sources.
+
+A promoção oficial foi concluída. O projeto Vercel confirmou o deployment e
+SHA exatos como destino de produção. Em `https://www.atenza.online`, login e
+health continuaram HTTP 200. A sessão existente abriu a central de integrações
+e seis GETs autenticados retornaram HTTP 200: comércio, ações, histórico de
+ações, qualidade, campanhas e opções de campanha. São verificações somente
+leitura; não houve envios ou fixtures na organização de produção.
+
+A pedido do proprietário, a Vercel Toolbar foi desativada explicitamente no
+projeto Atenza para preview e produção (`enablePreviewFeedback=false` e
+`enableProductionFeedback=false`). Não há dependência da Toolbar no código.
+O painel confirmou ambos os valores como `Off`. Uma resposta nova do servidor
+não injeta o script da Toolbar, e a conferência visual da aba autenticada,
+inclusive após recarregar `/app/integrations`, confirmou a ausência da Toolbar.
+A preferência do projeto deve permanecer em futuras publicações.
+
+Destino anterior preservado para rollback de aplicação:
+`dpl_6W1b8s1ieYc3A7osiiwBtbP1YLkV`, SHA
+`228605d8a28423448cd760dcb1af46bbcf1879de`. Não remover as novas tabelas numa
+reversão de aplicativo; as migrations são aditivas e seguem versionadas.
+A main não foi alterada; o release usa o commit verificado da branch.

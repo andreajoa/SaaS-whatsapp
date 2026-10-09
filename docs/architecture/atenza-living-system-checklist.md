@@ -36,3 +36,23 @@ CREATEROLE. O novo preview e suas jornadas permanecem em validação.
 Shopify/WooCommerce dependem da autorização de uma loja real; não afirmar
 conexão externa concluída com fixtures. Campanhas não foram enviadas a clientes.
 Detalhes e evidências em `../testing/atenza-validacao-online.md`.
+
+## Evidência da retomada online
+
+CI do commit `cf7dc95` verde, suíte completa 8.989 testes aprovados (mais uma
+falha esperada) e 63 testes específicos de qualidade aprovados. Playwright
+passou em desktop/celular no preview isolado: entrada pela UI, APIs, Supabase,
+chamada pública GitHub, histórico, fonte URL e metas após recarga. Isso comprova
+os caminhos de persistência dessa jornada; não comprova loja autorizada,
+indexação por IA, publicação do agente ou entrega externa de campanha.
+
+O salvamento de metas perdia a confirmação porque o componente de edição
+remontava ao receber a política atualizada. A confirmação agora pertence ao
+painel e sobrevive à atualização; erro de edição continua no formulário.
+Teste de regressão comprovou falha antes/correção depois.
+
+Schema de produção aplicado em transação e dez tabelas verificadas com RLS e
+sem leitura anônima; contagens existentes preservadas. A CA pública foi
+configurada para o pool remoto com verificação de TLS. Consulta de credenciais
+e fixtures ficou restrita ao projeto de teste, conforme o documento de
+validação online.

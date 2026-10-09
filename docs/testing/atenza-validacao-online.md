@@ -23,12 +23,18 @@ publicou o preview do commit `594ec14`:
 O deploy ficou Ready; o navegador autenticado abriu a Inbox e a nova central
 de integrações, sem overflow horizontal no desktop.
 
+O preview Ready mais recente corresponde exatamente ao commit
+`9eac8d6f0364f506cf8e92519b40edb6269be18a`:
+`https://saa-s-whatsapp-ljc1zjyx5-andres-projects-bbfd1881.vercel.app`.
+O alias da branch foi atualizado para essa revisão. Os GETs autenticados
+foram repetidos nessa revisão e mantiveram os resultados descritos abaixo.
+
 GET autenticado no preview: ações, comércio e campanhas retornaram 503;
 qualidade retornou 500. O health continuou 200/healthy. Uma consulta Postgres
 somente leitura confirmou ausência das novas tabelas no banco online. Preview
 e produção ainda apontam ao mesmo Supabase, então os testes de escrita precisam
 de um ambiente separado antes da aplicação das migrations.
-Não houve promoção, escrita de schema remoto ou envio de mensagem.
+Não houve promoção, alteração persistente de schema remoto ou envio de mensagem.
 
 ## Validação das alterações de schema
 
@@ -42,6 +48,17 @@ As novas migrations desta frente são 0246 (comércio), 0244 (ações), 0245
 (qualidade) e 0247 (campanhas), com timestamps que determinam a aplicação.
 A migration 0243 já existente do funil do site foi preservada.
 
+As quatro migrations foram instaladas e reaplicadas pelo SQL Editor
+administrativo do Supabase existente, dentro de uma única transação com
+`ROLLBACK` explícito. O texto executado foi conferido byte a byte com o
+arquivo preparado antes de confirmar a execução. O resultado final retornou
+NULL para as quatro novas tabelas, e uma leitura Postgres posterior confirmou
+que todas as novas tabelas continuam ausentes. Esse preflight comprova
+compatibilidade de DDL e reaplicação sobre o schema atual, sem persistir
+alterações nem inserir fixtures. Não substitui os testes de RLS e baseline
+em um banco separado. A conexão do aplicativo não é dona das tabelas e foi
+mantida com suas permissões limitadas.
+
 O harness legado depende de Docker e não foi executado. O novo
 `scripts/test-db-online.mjs` usa `TEST_DATABASE_URL`, recusa conexão inválida e
 pooler de transação, exige banco com zero tabelas públicas e zero usuários,
@@ -49,11 +66,18 @@ confere os papéis Supabase e instala/reaplica o baseline. Um marcador com
 expiração limita a execução dos testes ao ambiente preparado pelo runner.
 O config `vitest.online-db.config.ts` cobre isolamento de comércio, ações e
 campanhas e os nove casos SQL de qualidade, incluindo disputa do token.
-A execução real depende de um banco de teste. O acesso foi recuperado, mas a
-cota Free já contém Atenza e `deskcomm` ativos. Os quatro projetos de Lovable
-estão pausados e não consomem essa cota. Nenhum upgrade foi contratado, projeto
-apagado ou pausado. O proprietário determinou não pagar nada; a decisão de
-pausar `deskcomm` está pendente porque interrompe outro projeto ativo.
+O proprietário confirmou que `deskcomm` era o mesmo projeto local e autorizou
+sua pausa. Foi criado o projeto `atenza-validacao-free`
+(`zaagoawswxlwzwhmtzyi`) na organização `whatsapp`, no plano Free. Nenhum
+upgrade foi contratado e nenhum projeto Lovable foi excluído.
+
+O baseline foi instalado e reaplicado nesse banco remoto. A execução do runner
+online terminou com exit 0: quatro arquivos e 66 testes aprovados, incluindo
+isolamento entre organizações, RLS/RBAC, idempotência e concorrência do token de
+avaliação. Esses testes usaram somente dados sintéticos no projeto de teste.
+O registro da sessão anterior conserva o resultado; o log estava em `/tmp` e
+foi removido após o encerramento do ambiente. Na retomada, as novas tabelas
+foram confirmadas pela Data API do projeto de teste.
 
 ## Critérios antes de publicar
 
@@ -80,7 +104,7 @@ pausar `deskcomm` está pendente porque interrompe outro projeto ativo.
   link antes de abrir o modal, que oculta o fundo para leitores de tela; os 3
   testes da campanha passaram na reexecução.
 - Total sem duplicação nas rodadas finais: 22 arquivos / 352 testes focados.
-  Isso não representa execução/aprovação da suíte completa.
+  Essa rodada inicial foi focada; a aprovação completa posterior está abaixo.
 - Qualidade: suíte específica passou com 62 testes, 19 de UI; sobrepõe core/UI.
 - ESLint focado dos novos módulos, telas e runner online: zero erros/avisos.
   Lint global anterior: zero erros, 376 avisos. O lint de canais agora passa;
@@ -103,12 +127,22 @@ pausar `deskcomm` está pendente porque interrompe outro projeto ativo.
   revogação anon foi movido depois das novas funções no baseline.
   As reexecuções focadas passaram com 185 testes únicos, incluindo 4 novos
   testes de autorização do wrapper de campanha. Tipos e lint continuaram
-  aprovados. A nova rodada completa será executada na revisão seguinte.
-  SQL/RLS remoto permanece pendente.
+  aprovados.
+- A rodada completa sem Docker do commit `9eac8d6` foi aprovada:
+  [run 37957667832](https://github.com/andreajoa/SaaS-whatsapp/actions/runs/37957667832).
+  Os quatro shards somam 832 arquivos, 8.982 testes aprovados e uma falha
+  esperada, sem falhas inesperadas. Build serverless e tipos/lint passaram.
+  Os 62 testes específicos de qualidade também passaram em cada shard;
+  sobrepõem a suíte completa e não entram novamente na contagem única.
+  A rodada anterior do commit `464bbf5`, run 37956913280, também terminou
+  aprovada. A validação SQL/RLS no banco Free passou com 66 testes, conforme
+  descrito acima.
 - O transporte de `executeRestAction` foi executado sem mocks contra a API
   pública GitHub: HTTP 200 em 717 ms, retornando o repositório esperado. Isso
   exercita DNS/TLS/HTTP reais; não prova persistência no Atenza nem uma loja
   autenticada.
 
-Esses resultados usam fixtures e não certificam transporte, loja, jornada
-multitenant ou persistência real no ambiente online.
+As suítes unitárias usam fixtures. O probe GitHub certifica apenas o transporte
+descrito; o preflight certifica apenas o DDL revertido. Loja autorizada, jornada
+multitenant e persistência dos novos módulos no ambiente online permanecem
+pendentes.

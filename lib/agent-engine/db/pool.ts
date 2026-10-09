@@ -30,7 +30,22 @@ export function createPool(
   const raw = process.env.DB_POOL_MAX;
   const parsed = raw === undefined ? Number.NaN : Number.parseInt(raw, 10);
   const max = Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
-  const pool = new pg.Pool({ connectionString: databaseUrl, max });
+  const ca = process.env.SUPABASE_DB_CA_CERT?.trim();
+  let connectionString = databaseUrl;
+  if (ca) {
+    // pg interpreta a URL DEPOIS das opções e sobrescreve ssl. Com uma CA
+    // explícita, remova esses parâmetros para preservar TLS com verificação.
+    const url = new URL(databaseUrl);
+    for (const key of ['ssl', 'sslmode', 'sslrootcert', 'sslcert', 'sslkey', 'uselibpqcompat']) {
+      url.searchParams.delete(key);
+    }
+    connectionString = url.toString();
+  }
+  const pool = new pg.Pool({
+    connectionString,
+    max,
+    ...(ca ? { ssl: { ca, rejectUnauthorized: true } } : {}),
+  });
   const handler =
     onError ??
     ((err: Error): void => {

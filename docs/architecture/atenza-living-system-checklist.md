@@ -15,6 +15,24 @@ Registro de implementação; validação de release ainda pendente. Mapas adjace
 | 9. Retorno de erro | Erro explica reparar conexão e repetir sync | Histórico informa falha/resultado incerto e permite ajustar configuração | Corrigir URL e reindexar, sem apagar acervo anterior | Rever prazo e atendimento pelo feedback; sem automação inventada | Conferir recibo antes de repetir; relatório independente orienta correções |
 | 10. Mapa | commerce.architecture.json | integration-actions.architecture.json | url-knowledge.architecture.json | service-quality.architecture.json | customer-campaigns.architecture.json |
 
+## Conexão Postgres do ambiente online
+
+O pool existente (`lib/agent-engine/db/pool.ts`) recebe `SUPABASE_DB_URL` e,
+opcionalmente, `SUPABASE_DB_CA_CERT` do operador. Alimenta as rotas de campanha
+e o runtime do agente; exige TLS validado quando a CA está configurada. A
+superfície de configuração é `.env.example` e o ambiente Vercel da instalação.
+Falhas de conexão continuam nos logs do pool e nos estados de erro das telas;
+não há nova mutação nem decisão automática. O retorno é corrigir a conexão e
+repetir a operação pela mesma tela. Nenhuma peça nova foi criada no mapa.
+
 ## Limites da verificação
 
-Shopify/WooCommerce dependem da autorização de uma loja real; não afirmar conexão externa concluída com fixtures. Campanhas não foram enviadas a clientes. Testes sintéticos verificam permissões, contrato e estados. Um baseline anterior foi instalado em PostgreSQL 15, mas isso não aprova as correções SQL/RLS desta retomada. O proprietário definiu operação online sem Docker. Core final: 250 testes; navegação/i18n: 26. Tipos gerados sincronizados; typecheck completo, build e jornada autenticada não certificados. SQL/RLS aguardam Supabase de teste identificado; acesso ao preview Vercel retornou 403. Detalhes em `../testing/atenza-validacao-online.md`.
+O build, tipos/lint e a suíte completa foram aprovados na revisão `9eac8d6`.
+O baseline foi instalado/reaplicado no projeto Supabase Free de validação, onde
+passaram 66 testes de SQL/RLS. A retomada corrigiu e validou a conexão TLS do
+pool real, mantendo um usuário de aplicação sem ownership, CREATEDB ou
+CREATEROLE. O novo preview e suas jornadas permanecem em validação.
+
+Shopify/WooCommerce dependem da autorização de uma loja real; não afirmar
+conexão externa concluída com fixtures. Campanhas não foram enviadas a clientes.
+Detalhes e evidências em `../testing/atenza-validacao-online.md`.

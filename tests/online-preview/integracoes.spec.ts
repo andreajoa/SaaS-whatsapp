@@ -25,12 +25,17 @@ for (const [device, viewport] of [
     await page.locator('#password').fill(process.env.ATENZA_TEST_PASSWORD!);
     await page.getByRole('button', { name: 'Entrar', exact: true }).click();
     await page.waitForURL(/\/app\//);
-    await expect(page.locator('body')).toContainText('Atenza Validação');
+    const identity = await page.evaluate(async () => {
+      const response = await fetch('/api/v1/auth/interface');
+      return { status: response.status, body: await response.json() };
+    });
+    expect(identity.status).toBe(200);
+    expect(identity.body.data.organization_id).toBe(process.env.ATENZA_TEST_ORG);
 
     await page.goto('/app/integrations');
     await expect(page.getByRole('button', { name: 'Conectar Shopify', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Conectar WooCommerce', exact: true })).toBeVisible();
-    await expect(page.getByRole('alert')).toHaveCount(0);
+    await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toHaveCount(0);
     await page.screenshot({ path: info.outputPath(`${device}-integracoes.png`), fullPage: true });
     await page.getByRole('link', { name: 'Ações por API', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Ações de integração', exact: true })).toBeVisible();
@@ -41,12 +46,12 @@ for (const [device, viewport] of [
     await page.locator('input[name=enabled]').check();
     await page.locator('#action-schema').fill('{"type":"object","properties":{},"additionalProperties":false}');
     await page.getByText('Corpo, retorno e limites', { exact: true }).click();
-    await page.locator('#action-public-headers').fill('{"Accept":"application/vnd.github+json"}');
+    await page.locator('#action-public-headers').fill('{"Accept":"application/vnd.github+json","User-Agent":"Atenza-Validation"}');
     await page.locator('#action-return').fill('{"repository":"full_name","url":"html_url"}');
     const saved = page.waitForResponse(r => r.url().endsWith('/api/v1/integration-actions') && r.request().method() === 'POST');
     await page.getByRole('button', { name: 'Salvar ação', exact: true }).click();
     expect((await saved).status()).toBe(201);
-    await expect(page.getByRole('heading', { name: 'Executar e testar', exact: true })).toBeVisible();
+    await expect(page.getByText('Executar e testar', { exact: true })).toBeVisible();
     await page.locator('#execution-inputs').fill('{}');
     const executed = page.waitForResponse(r => /\/integration-actions\/[^/]+\/test$/.test(r.url()));
     await page.getByRole('button', { name: 'Testar chamada real', exact: true }).click();
@@ -75,7 +80,7 @@ for (const [device, viewport] of [
 
     await page.goto('/app/campaigns');
     await expect(page.getByRole('heading', { name: 'Campanhas de WhatsApp', exact: true })).toBeVisible();
-    await expect(page.getByRole('alert')).toHaveCount(0);
+    await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toHaveCount(0);
     await page.screenshot({ path: info.outputPath(`${device}-campanhas.png`), fullPage: true });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);

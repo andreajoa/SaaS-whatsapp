@@ -7,7 +7,7 @@ if (!baseURL || !/^https:\/\/saa-s-whatsapp-[a-z0-9-]+-andres-projects-bbfd1881\
 if (process.env.ATENZA_TEST_SUPABASE_URL !== 'https://zaagoawswxlwzwhmtzyi.supabase.co') {
   throw new Error('Estas jornadas exigem o projeto Free dedicado à validação.');
 }
-for (const key of ['ATENZA_TEST_EMAIL', 'ATENZA_TEST_PASSWORD', 'VERCEL_OIDC_TOKEN']) {
+for (const key of ['ATENZA_TEST_EMAIL', 'ATENZA_TEST_PASSWORD', 'ATENZA_TEST_ORG', 'VERCEL_OIDC_TOKEN']) {
   if (!process.env[key]) throw new Error(`Falta a configuração privada ${key}.`);
 }
 

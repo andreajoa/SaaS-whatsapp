@@ -30,6 +30,7 @@ export default defineConfig({
       "tests/e2e/**",
       "tests/invariants/**",
       "tests/journeys/**",
+      "tests/online-preview/**",
       "tests/service-quality/*.spec.ts",
     ],
   },

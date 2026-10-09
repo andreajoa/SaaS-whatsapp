@@ -75,6 +75,7 @@ function dublarBanco(opts: { agenteExiste?: boolean; erroDoInsert?: ErroDoBanco 
   } as unknown as Awaited<ReturnType<typeof createClient>>);
 
   const escritas: Array<{ tabela: string; linhas: unknown }> = [];
+  const emitir = vi.fn(async () => ({ error: null }));
   const admin = {
     from: (tabela: string) => ({
       insert: (linhas: unknown) => {
@@ -88,11 +89,13 @@ function dublarBanco(opts: { agenteExiste?: boolean; erroDoInsert?: ErroDoBanco 
         };
       },
     }),
-    rpc: async () => ({ error: null }),
+    rpc: emitir,
   };
-  vi.mocked(createAdminClient).mockReturnValue(admin as unknown as ReturnType<typeof createAdminClient>);
+  vi.mocked(createAdminClient).mockReturnValue(
+    admin as unknown as ReturnType<typeof createAdminClient>,
+  );
 
-  return { escritas };
+  return { escritas, emitir };
 }
 
 function req(body: Record<string, unknown>): NextRequest {
@@ -108,6 +111,69 @@ beforeEach(() => {
 });
 
 describe("POST /api/v1/ai/knowledge/sources — colisão do índice único", () => {
+  it("URL entra no acervo e emite o evento existente, sem criar itens FAQ", async () => {
+    sessaoOk();
+    const { escritas, emitir } = dublarBanco();
+    const { POST } = await import("@/app/api/v1/ai/knowledge/sources/route");
+    const res = await POST(
+      req({
+        source_type: "url",
+        name: "Política pública",
+        url: "https://public.site/policy#trocas",
+      }),
+    );
+    expect(res.status).toBe(201);
+    expect(emitir).toHaveBeenCalledWith(
+      "emit_event",
+      expect.objectContaining({
+        p_event_type: "knowledge_source.updated",
+        p_organization_id: ORG_ID,
+        p_payload: expect.objectContaining({ knowledge_source_id: KS_ID, source_type: "url" }),
+      }),
+    );
+    expect(escritas).toHaveLength(1);
+    expect(escritas[0]).toMatchObject({
+      tabela: "ai_knowledge_sources",
+      linhas: {
+        organization_id: ORG_ID,
+        source_type: "url",
+        source_metadata: { url: "https://public.site/policy" },
+      },
+    });
+  });
+
+  it.each([
+    undefined,
+    "http://public.site",
+    "https://127.0.0.1",
+    "https://user:password@public.site",
+  ])("URL inválida %s → 422 sem persistir fonte", async (url) => {
+    sessaoOk();
+    const { escritas } = dublarBanco();
+    const { POST } = await import("@/app/api/v1/ai/knowledge/sources/route");
+    expect((await POST(req({ source_type: "url", name: "Política", url }))).status).toBe(422);
+    expect(escritas).toHaveLength(0);
+  });
+
+  it("URL com FAQ colada é recusada sem descartar conteúdo silenciosamente", async () => {
+    sessaoOk();
+    const { escritas } = dublarBanco();
+    const { POST } = await import("@/app/api/v1/ai/knowledge/sources/route");
+    expect(
+      (
+        await POST(
+          req({
+            source_type: "url",
+            name: "Política",
+            url: "https://public.site",
+            markdown_blob: MARKDOWN,
+          }),
+        )
+      ).status,
+    ).toBe(422);
+    expect(escritas).toHaveLength(0);
+  });
+
   it("23505 vira 409 knowledge_source_type_in_use, em português e sem texto do Postgres", async () => {
     sessaoOk();
     dublarBanco({
@@ -197,7 +263,12 @@ describe("POST /api/v1/ai/knowledge/sources — tipo pedido é o tipo gravado", 
     const { escritas } = dublarBanco();
     const { POST } = await import("@/app/api/v1/ai/knowledge/sources/route");
     const res = await POST(
-      req({ agent_id: AGENT_ID, source_type: "catalog", name: "Catálogo", markdown_blob: MARKDOWN }),
+      req({
+        agent_id: AGENT_ID,
+        source_type: "catalog",
+        name: "Catálogo",
+        markdown_blob: MARKDOWN,
+      }),
     );
 
     expect(res.status).toBe(422);

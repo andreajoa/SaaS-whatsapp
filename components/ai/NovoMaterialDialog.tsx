@@ -77,6 +77,7 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
   const [nome, setNome] = useState("");
   const [conteudo, setConteudo] = useState("");
   const [arquivo, setArquivo] = useState<File | null>(null);
+  const [url, setUrl] = useState("");
   const [enviando, setEnviando] = useState(false);
   const inputArquivo = useRef<HTMLInputElement>(null);
 
@@ -87,6 +88,7 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
     setNome("");
     setConteudo("");
     setArquivo(null);
+    setUrl("");
     if (inputArquivo.current) inputArquivo.current.value = "";
   }
 
@@ -96,14 +98,18 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
       toast.error(t("Dê um nome ao material — é assim que você o encontra depois."));
       return;
     }
-    if (!arquivo && conteudo.trim().length === 0) {
+    if (tipo === "url" && !url.trim()) {
+      toast.error(t("Informe o endereço HTTPS de uma página pública."));
+      return;
+    }
+    if (tipo !== "url" && !arquivo && conteudo.trim().length === 0) {
       toast.error(t("Envie um arquivo ou cole o conteúdo."));
       return;
     }
 
     setEnviando(true);
     try {
-      if (arquivo) {
+      if (arquivo && aceitaArquivo(tipo)) {
         const form = new FormData();
         form.append("file", arquivo);
         form.append("name", nomeLimpo);
@@ -113,14 +119,16 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
         });
         const json = (await res.json()) as { error?: { message?: string } };
         if (!res.ok) {
-          toast.error(json.error?.message ? t(json.error.message) : t("Não consegui guardar o arquivo."));
+          toast.error(
+            json.error?.message ? t(json.error.message) : t("Não consegui guardar o arquivo."),
+          );
           return;
         }
       } else {
         await apiClient.post("/api/v1/ai/knowledge/sources", {
           source_type: tipo,
           name: nomeLimpo,
-          markdown_blob: conteudo,
+          ...(tipo === "url" ? { url: url.trim() } : { markdown_blob: conteudo }),
         });
       }
 
@@ -168,7 +176,10 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
                     key={tf.id}
                     type="button"
                     disabled={rotina || enviando}
-                    onClick={() => setTipo(tf.id)}
+                    onClick={() => {
+                      setTipo(tf.id);
+                      setArquivo(null);
+                    }}
                     data-testid={`material-tipo-${tf.id}`}
                     className={[
                       "rounded-lg border p-3 text-left text-sm transition",
@@ -192,7 +203,9 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
             <Input
               id="material-nome"
               data-testid="material-nome"
-              placeholder={tipo === "faq" ? t("Perguntas frequentes da loja") : t("Política de troca")}
+              placeholder={
+                tipo === "faq" ? t("Perguntas frequentes da loja") : t("Política de troca")
+              }
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               disabled={enviando || porRotina}
@@ -219,7 +232,27 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
             </div>
           ) : null}
 
-          {!porRotina && !arquivo ? (
+          {tipo === "url" ? (
+            <div className="space-y-2">
+              <Label htmlFor="material-url">{t("Endereço da página")}</Label>
+              <Input
+                id="material-url"
+                data-testid="material-url"
+                type="url"
+                placeholder="https://"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                disabled={enviando}
+              />
+              <p className="text-xs text-text-muted">
+                {t(
+                  "Use uma página pública HTTPS, sem login. Se ela redirecionar, informe o endereço final. O agente lê o texto; páginas que dependem de scripts devem ser enviadas como documento.",
+                )}
+              </p>
+            </div>
+          ) : null}
+
+          {!porRotina && tipo !== "url" && !arquivo ? (
             <div className="space-y-2">
               <Label htmlFor="material-conteudo">
                 {aceitaArquivo(tipo) ? t("…ou cole o texto aqui") : t("Conteúdo")}
@@ -235,8 +268,8 @@ export function NovoMaterialDialog({ aberto, onFechar, onCriado, podeIndexar }: 
               />
               {ePerguntaEResposta(tipo) ? (
                 <p className="text-xs text-text-muted">
-                  {t("Uma linha")} <code>## Pergunta:</code> {t("e uma")}{" "}
-                  <code>## Resposta:</code> {t("por item, separados por uma linha em branco.")}
+                  {t("Uma linha")} <code>## Pergunta:</code> {t("e uma")} <code>## Resposta:</code>{" "}
+                  {t("por item, separados por uma linha em branco.")}
                 </p>
               ) : null}
             </div>

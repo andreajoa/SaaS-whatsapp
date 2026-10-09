@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Prazos e avaliação do atendimento",
+    "subtitle": "Entrada real, controle por organização e retorno visível",
+    "output": "service-quality.html",
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    {
+      "id": "humano",
+      "label": "Pessoa"
+    },
+    {
+      "id": "app",
+      "label": "Aplicativo"
+    },
+    {
+      "id": "db",
+      "label": "Banco"
+    }
+  ],
+  "mainPath": [
+    "n0",
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+  ],
+  "nodes": [
+    {
+      "id": "n0",
+      "lane": "humano",
+      "col": 0,
+      "type": "ui",
+      "label": "Qualidade: política de prazo configurável"
+    },
+    {
+      "id": "n1",
+      "lane": "db",
+      "col": 1,
+      "type": "database",
+      "label": "Fatos reais: primeira resposta e resolução"
+    },
+    {
+      "id": "n2",
+      "lane": "humano",
+      "col": 2,
+      "type": "ui",
+      "label": "Inbox: gerar e copiar link de avaliação"
+    },
+    {
+      "id": "n3",
+      "lane": "app",
+      "col": 3,
+      "type": "service",
+      "label": "Visitante: token com expiração e uso único"
+    },
+    {
+      "id": "n4",
+      "lane": "humano",
+      "col": 4,
+      "type": "ui",
+      "label": "Dashboard e conversa: avaliação e revisão dos prazos"
+    }
+  ],
+  "edges": [
+    {
+      "from": "n0",
+      "to": "n1",
+      "label": "Configuração e contexto autorizados"
+    },
+    {
+      "from": "n1",
+      "to": "n2",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n4",
+      "to": "n0",
+      "label": "Revisão explícita e recuperação"
+    }
+  ]
+}

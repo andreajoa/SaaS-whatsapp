@@ -8,6 +8,7 @@
 import { chaveDePlataforma } from "@/lib/ai/runtime/agent";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { PUBLISH_ERROR_CODES, type PublishErrorCode } from "./validation";
+import { validarEscopoDaVersao, mensagemDoEscopo } from "./escopo";
 
 export interface PublishOk {
   ok: true;
@@ -38,13 +39,15 @@ export async function publishAgentVersion(
 ): Promise<PublishResult> {
   const { data: version, error: readError } = await admin
     .from("ai_agent_versions")
-    .select("provider,credential_id")
+    .select("provider,credential_id,integration_action_ids")
     .eq("organization_id", params.orgId)
     .eq("agent_id", params.agentId)
     .eq("id", params.versionId)
     .maybeSingle();
   if (readError || !version)
     return { ok: false, code: "version_not_found", message: "version_not_found" };
+  const scope = await validarEscopoDaVersao(admin, params.orgId, { integration_action_ids: version.integration_action_ids ?? [] });
+  if (!scope.ok) return { ok: false, code: "integration_action_invalid", message: mensagemDoEscopo(scope) };
   const platform = version.credential_id === null;
   if (platform && !chaveDePlataforma(version.provider))
     return { ok: false, code: "credential_missing", message: "credential_missing" };

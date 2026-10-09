@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Lojas conectadas ao atendimento",
+    "subtitle": "Entrada real, controle por organização e retorno visível",
+    "output": "commerce.html",
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    {
+      "id": "humano",
+      "label": "Pessoa"
+    },
+    {
+      "id": "app",
+      "label": "Aplicativo"
+    },
+    {
+      "id": "db",
+      "label": "Banco"
+    }
+  ],
+  "mainPath": [
+    "n0",
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+  ],
+  "nodes": [
+    {
+      "id": "n0",
+      "lane": "humano",
+      "col": 0,
+      "type": "ui",
+      "label": "Central de integrações: OAuth e sincronização"
+    },
+    {
+      "id": "n1",
+      "lane": "db",
+      "col": 1,
+      "type": "database",
+      "label": "Conexão org-owned e commerce_sync_runs"
+    },
+    {
+      "id": "n2",
+      "lane": "app",
+      "col": 2,
+      "type": "service",
+      "label": "Dispatcher → Shopify/WooCommerce: leitura segura"
+    },
+    {
+      "id": "n3",
+      "lane": "db",
+      "col": 3,
+      "type": "database",
+      "label": "Catálogo e pedidos com chave por organização"
+    },
+    {
+      "id": "n4",
+      "lane": "humano",
+      "col": 4,
+      "type": "ui",
+      "label": "Inbox e busca de produtos da IA; falha com nova tentativa"
+    }
+  ],
+  "edges": [
+    {
+      "from": "n0",
+      "to": "n1",
+      "label": "Configuração e contexto autorizados"
+    },
+    {
+      "from": "n1",
+      "to": "n2",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n4",
+      "to": "n0",
+      "label": "Revisão explícita e recuperação"
+    }
+  ]
+}

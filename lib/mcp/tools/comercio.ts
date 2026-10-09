@@ -183,7 +183,7 @@ export const crmSearchProducts: McpToolDefinition<typeof produtosInputShape> = {
       const { data: lote, error, count } = await ctx.supabase
         .from("catalog_products")
         .select(
-          "id, codigo, nome, descricao, marca, categoria, preco_cents, moeda, controla_estoque, quantidade, ativo",
+          "id, codigo, nome, descricao, marca, categoria, preco_cents, moeda, controla_estoque, quantidade, ativo,external_sku,product_url,external_provider",
           { count: "exact" },
         )
         .eq("organization_id", ctx.organizationId)
@@ -226,9 +226,13 @@ export const crmSearchProducts: McpToolDefinition<typeof produtosInputShape> = {
       moeda: string;
       controla_estoque: boolean;
       quantidade: number;
+      external_sku?: string | null;
+      product_url?: string | null;
+      external_provider?: string | null;
     };
 
-    const { achados, ignorados } = buscarComRelaxamento((data ?? []) as Linha[], input.termo);
+    const rows = ((data ?? []) as Linha[]).map((row) => ({ ...row, sku: row.external_sku ?? undefined }));
+    const { achados, ignorados } = buscarComRelaxamento(rows, input.termo);
 
     // `controla_estoque` é o conserto de uma armadilha da versão anterior, que
     // filtrava por quantidade sempre: numa loja que não conta estoque (decant de
@@ -269,6 +273,9 @@ export const crmSearchProducts: McpToolDefinition<typeof produtosInputShape> = {
     return {
       produtos: topo.map(({ produto }) => ({
         codigo: produto.codigo,
+        ...(produto.external_sku ? { sku: produto.external_sku } : {}),
+        ...(produto.product_url ? { url: produto.product_url } : {}),
+        ...(produto.external_provider ? { loja: produto.external_provider } : {}),
         nome: produto.nome,
         preco: formatCents(produto.preco_cents, produto.moeda),
         preco_cents: produto.preco_cents,

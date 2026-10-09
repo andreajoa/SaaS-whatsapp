@@ -16,6 +16,8 @@ import { useAutomaticoAtivo } from "@/hooks/ai/useAutomaticoAtivo";
 import { OwnerBadge } from "@/components/kanban/OwnerBadge";
 import { comandoDaConversa, ROTULO_DO_MOTIVO } from "@/lib/inbox/comando-da-conversa";
 import { ReassignDialog } from "@/components/inbox/ReassignDialog";
+import { ServiceQualityAction } from "./ServiceQualityAction";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SnoozeButton } from "@/components/inbox/SnoozeButton";
 import type { ConversationWithContact } from "@/hooks/inbox/useConversationsRealtime";
 import { rotuloDoContato } from "@/lib/contacts/rotulo-do-contato";
@@ -64,6 +66,7 @@ export function ConversationHeader({ conversation }: Props) {
   // atendendo em instalação que nunca configurou agente nenhum.
   const automaticoDaOrg = useAutomaticoAtivo();
   const [reassignOpen, setReassignOpen] = useState(false);
+  const [qualityOpen, setQualityOpen] = useState(false);
 
   const c = conversation.contacts ?? null;
   const displayName = rotuloDoContato(c, t);
@@ -304,6 +307,7 @@ export function ConversationHeader({ conversation }: Props) {
             {t("Fechar")}
           </Button>
         )}
+        <Button size="sm" variant="outline" onClick={() => setQualityOpen(true)}>{t("Avaliação")}</Button>
         {encerrada && <Button size="sm" variant="outline" disabled={reopen.isPending}
           onClick={() => reopen.mutate({ conversation_id: conversation.id, expected_revision: conversation.service_revision })}>
           {t("Reabrir")}
@@ -328,6 +332,12 @@ export function ConversationHeader({ conversation }: Props) {
           </Button>
         )}
       </div>
+      <Dialog open={qualityOpen} onOpenChange={setQualityOpen}>
+        <DialogContent className="max-h-[85dvh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{t("Avaliação do atendimento")}</DialogTitle></DialogHeader>
+          <ServiceQualityAction key={conversation.id} conversationId={conversation.id} />
+        </DialogContent>
+      </Dialog>
       <ReassignDialog
         conversationId={conversation.id}
         open={reassignOpen}

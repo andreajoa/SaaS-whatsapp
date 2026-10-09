@@ -16,10 +16,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { sendTemplate } from "./send-template";
+import { metaCredsForPhoneNumberId } from "./credentials";
+import { CHANNEL_PROVIDER_META } from "../capabilities";
 
 export interface SendTemplateForSessionInput {
   beforeSend?: () => Promise<void>;
   organizationId: string;
+  channelSessionId: string;
   /** Destinatário em dígitos E.164, já resolvido pelo adapter. */
   to: string;
   name: string;
@@ -43,10 +46,24 @@ export async function sendTemplateForSession(
     throw new Error("template_incompleto: nome e idioma são obrigatórios em type=template");
   }
 
+  const session = await db.from("channel_sessions")
+    .select("id,provider,meta_phone_number_id")
+    .eq("organization_id", input.organizationId).eq("id", input.channelSessionId)
+    .is("archived_at", null).maybeSingle();
+  if (session.error || !session.data || session.data.provider !== CHANNEL_PROVIDER_META || !session.data.meta_phone_number_id)
+    throw new Error("template_channel_unavailable: conecte o canal oficial desta organização antes de enviar.");
+  // O helper sem fallback é deliberado: uma credencial ausente/ilegível nunca
+  // autoriza usar o número de outra organização configurado na instalação.
+  const creds = await metaCredsForPhoneNumberId(db, {
+    organizationId: input.organizationId, phoneNumberId: session.data.meta_phone_number_id,
+  });
+  if (!creds) throw new Error("meta_not_configured: reconecte este canal para recuperar sua credencial.");
+
   const { data: linha, error } = await db
     .from("meta_templates")
     .select("name, language, status, contract_hash, components")
     .eq("organization_id", input.organizationId)
+    .eq("channel_session_id", input.channelSessionId)
     .eq("name", input.name)
     .eq("language", input.language)
     .maybeSingle();
@@ -55,9 +72,9 @@ export async function sendTemplateForSession(
 
   await input.beforeSend?.();
   const resultado = await sendTemplate({
-    phoneNumberId: process.env.META_PHONE_NUMBER_ID ?? "",
-    token: process.env.META_SYSTEM_USER_TOKEN ?? "",
-    graphVersion: process.env.META_GRAPH_VERSION ?? "v22.0",
+    phoneNumberId: creds.phoneNumberId,
+    token: creds.token,
+    graphVersion: creds.graphVersion,
     to: input.to,
     binding: {
       name: input.name,

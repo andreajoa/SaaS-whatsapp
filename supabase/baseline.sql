@@ -24611,3 +24611,562 @@ create index if not exists site_clicks_alvo_idx
 alter table public.site_clicks enable row level security;
 revoke all on public.site_clicks from anon, authenticated;
 grant all on public.site_clicks to service_role;
+
+
+-- ---- Atenza: 20261008100000_0246_commerce_integrations ----
+-- Shopify/WooCommerce usam o catálogo e os pedidos existentes; produtos manuais preservados.
+alter table public.tenant_integrations drop constraint if exists tenant_integrations_provider_check;
+alter table public.tenant_integrations add constraint tenant_integrations_provider_check
+  check (provider in ('nuvemshop','vtex','shopify','woocommerce'));
+alter table public.orders drop constraint if exists orders_external_provider_check;
+alter table public.orders add constraint orders_external_provider_check
+  check (external_provider in ('nuvemshop','vtex','shopify','woocommerce'));
+alter table public.catalog_products add column if not exists external_provider text;
+alter table public.catalog_products add column if not exists external_id text;
+alter table public.catalog_products add column if not exists external_sku text;
+alter table public.catalog_products add column if not exists product_url text;
+alter table public.catalog_products add column if not exists commerce_synced_at timestamptz;
+create unique index if not exists catalog_products_external_key
+  on public.catalog_products(organization_id,external_provider,external_id) where external_id is not null;
+alter table public.tenant_integrations add column if not exists token_refresh_locked_until timestamptz;
+alter table public.tenant_integrations add column if not exists commerce_resync_requested boolean not null default false;
+
+create table if not exists public.commerce_sync_runs (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  integration_id uuid not null references public.tenant_integrations(id) on delete cascade,
+  status text not null default 'queued' check(status in ('queued','running','completed','failed','cancelled')),
+  phase text not null default 'products' check(phase in ('products','orders','complete')),
+  cursor text, product_count integer not null default 0, order_count integer not null default 0,
+  started_at timestamptz not null default now(), completed_at timestamptz, error_code text,
+  locked_until timestamptz, created_by uuid references auth.users(id) on delete set null
+);
+create unique index if not exists commerce_sync_one_active on public.commerce_sync_runs(integration_id)
+  where status in ('queued','running');
+alter table public.commerce_sync_runs enable row level security;
+drop policy if exists tenant_isolation_commerce_sync_runs_all on public.commerce_sync_runs;
+create policy tenant_isolation_commerce_sync_runs_all on public.commerce_sync_runs for select to authenticated
+  using (organization_id in(select public.fn_user_org_ids()));
+revoke all on public.commerce_sync_runs from anon, authenticated;
+grant select on public.commerce_sync_runs to authenticated;
+grant all on public.commerce_sync_runs to service_role;
+
+create table if not exists public.commerce_oauth_states (
+  nonce_hash text primary key, organization_id uuid not null references public.organizations(id) on delete cascade,
+  actor_id uuid not null references auth.users(id) on delete cascade,
+  auth_session_id uuid not null, shop text not null, expires_at timestamptz not null
+);
+alter table public.commerce_oauth_states enable row level security;
+revoke all on public.commerce_oauth_states from public, anon, authenticated;
+grant all on public.commerce_oauth_states to service_role;
+
+create or replace function public.fn_commerce_oauth_allowed(p_org uuid,p_actor uuid,p_session uuid)
+returns boolean language sql stable security definer set search_path=public as $$
+ select exists(
+   select 1 from auth.sessions a join public.organizations o on o.id=p_org
+    where a.id=p_session and a.user_id=p_actor and (a.not_after is null or a.not_after>now()) and o.status='active'
+      and (not exists(select 1 from auth.mfa_factors f where f.user_id=p_actor and f.status='verified') or a.aal::text='aal2')
+      and (
+        exists(select 1 from public.user_organizations u where u.user_id=p_actor and u.organization_id=p_org and u.role='admin' and u.accepted_at is not null)
+        or exists(select 1 from public.platform_support_sessions s join public.platform_admins p on p.user_id=s.actor_user_id
+          where s.organization_id=p_org and s.actor_user_id=p_actor and s.auth_session_id=p_session and s.ended_at is null and s.expires_at>now() and s.access_mode='full' and p.scope='full' and p.revoked_at is null)
+      )
+ ) and public.fn_support_callback_write_allowed(p_org,p_actor,p_session);
+$$;
+revoke execute on function public.fn_commerce_oauth_allowed(uuid,uuid,uuid) from public,anon,authenticated;
+grant execute on function public.fn_commerce_oauth_allowed(uuid,uuid,uuid) to service_role;
+
+-- Uma página e o próximo evento são confirmados juntos: sem fila fantasma.
+create or replace function public.fn_commerce_checkpoint(p_org uuid,p_run uuid,p_phase text,p_cursor text,p_products integer,p_orders integer)
+returns void language plpgsql security definer set search_path=public as $$
+declare run public.commerce_sync_runs;
+begin
+  update public.commerce_sync_runs set phase=p_phase,cursor=p_cursor,
+    product_count=product_count+p_products,order_count=order_count+p_orders,locked_until=null,
+    status=case when p_phase='complete' then 'completed' else 'queued' end,
+    completed_at=case when p_phase='complete' then now() else null end
+    where id=p_run and organization_id=p_org and status='running' returning * into run;
+  if run.id is null then raise exception 'commerce_run_not_claimed'; end if;
+  if p_phase='complete' then
+    update public.tenant_integrations set last_sync_at=now(),status='healthy',status_reason=null
+      where id=run.integration_id and organization_id=p_org and status <> 'disconnected';
+    if exists(select 1 from public.tenant_integrations where id=run.integration_id and organization_id=p_org and commerce_resync_requested and status <> 'disconnected') then
+      update public.tenant_integrations set commerce_resync_requested=false where id=run.integration_id and organization_id=p_org;
+      perform public.fn_commerce_begin_sync(p_org,run.integration_id);
+    end if;
+  else
+    perform public.emit_event('commerce.sync_requested','commerce_sync',p_run,jsonb_build_object('run_id',p_run),'{}'::jsonb,p_org);
+  end if;
+end $$;
+revoke execute on function public.fn_commerce_checkpoint(uuid,uuid,text,text,integer,integer) from public,anon,authenticated;
+grant execute on function public.fn_commerce_checkpoint(uuid,uuid,text,text,integer,integer) to service_role;
+
+create or replace function public.fn_commerce_begin_sync(p_org uuid,p_integration uuid,p_actor uuid default null)
+returns uuid language plpgsql security definer set search_path=public as $$
+declare run_id uuid;
+begin
+  perform 1 from public.tenant_integrations where id=p_integration and organization_id=p_org and provider in('shopify','woocommerce') and status <> 'disconnected' for update;
+  if not found then
+    raise exception 'commerce_integration_unavailable';
+  end if;
+  select id into run_id from public.commerce_sync_runs where integration_id=p_integration and organization_id=p_org and status in('queued','running');
+  if run_id is not null then return run_id; end if;
+  insert into public.commerce_sync_runs(organization_id,integration_id,created_by)
+    values(p_org,p_integration,p_actor) returning id into run_id;
+  perform public.emit_event('commerce.sync_requested','commerce_sync',run_id,jsonb_build_object('run_id',run_id),'{}'::jsonb,p_org);
+  return run_id;
+exception when unique_violation then
+  select id into run_id from public.commerce_sync_runs where integration_id=p_integration and organization_id=p_org and status in('queued','running');
+  return run_id;
+end $$;
+revoke execute on function public.fn_commerce_begin_sync(uuid,uuid,uuid) from public,anon,authenticated;
+grant execute on function public.fn_commerce_begin_sync(uuid,uuid,uuid) to service_role;
+
+create or replace function public.fn_commerce_store_page(p_org uuid,p_run uuid,p_lock timestamptz,p_products jsonb,p_orders jsonb,p_phase text,p_cursor text)
+returns void language plpgsql security definer set search_path=public as $$
+declare run public.commerce_sync_runs; connection public.tenant_integrations;
+begin
+  select * into run from public.commerce_sync_runs where id=p_run and organization_id=p_org;
+  if run.id is null then raise exception 'commerce_stale_claim'; end if;
+  select * into connection from public.tenant_integrations where id=run.integration_id and organization_id=p_org for update;
+  if connection.id is null or connection.status='disconnected' then raise exception 'commerce_disconnected'; end if;
+  select * into run from public.commerce_sync_runs where id=p_run and organization_id=p_org for update;
+  if run.status <> 'running' or run.locked_until is distinct from p_lock then raise exception 'commerce_stale_claim'; end if;
+  insert into public.catalog_products(organization_id,codigo,nome,descricao,marca,categoria,preco_cents,moeda,controla_estoque,quantidade,ativo,origem,imagem_url,external_provider,external_id,external_sku,product_url,commerce_synced_at)
+    select p_org,connection.provider||':'||p.external_id,p.name,p.description,p.brand,p.category,p.price_cents,p.currency,p.tracks_inventory,p.quantity,p.active,connection.provider,p.image_url,connection.provider,p.external_id,p.sku,p.url,now()
+      from jsonb_to_recordset(p_products) as p(external_id text,sku text,name text,description text,brand text,category text,price_cents bigint,currency text,tracks_inventory boolean,quantity integer,active boolean,image_url text,url text)
+    on conflict(organization_id,codigo) do update set nome=excluded.nome,descricao=excluded.descricao,marca=excluded.marca,categoria=excluded.categoria,preco_cents=excluded.preco_cents,moeda=excluded.moeda,controla_estoque=excluded.controla_estoque,quantidade=excluded.quantidade,ativo=excluded.ativo,imagem_url=excluded.imagem_url,external_sku=excluded.external_sku,product_url=excluded.product_url,commerce_synced_at=excluded.commerce_synced_at
+      where catalog_products.external_provider=connection.provider and catalog_products.external_id=excluded.external_id;
+  insert into public.orders(organization_id,external_id,external_provider,customer_external_id,contact_id,status,total_cents,currency,tracking_code,ordered_at,updated_at_remote)
+    select p_org,o.external_id,connection.provider,o.customer_external_id,
+      case when exists(select 1 from public.contacts c where c.id=o.contact_id and c.organization_id=p_org and not c.is_anonymized) then o.contact_id else null end,
+      o.status,o.total_cents,o.currency,o.tracking_code,o.ordered_at,o.updated_at_remote
+    from jsonb_to_recordset(p_orders) as o(external_id text,customer_external_id text,contact_id uuid,status text,total_cents bigint,currency text,tracking_code text,ordered_at timestamptz,updated_at_remote timestamptz)
+    on conflict(organization_id,external_provider,external_id) do update set
+      status=excluded.status,total_cents=excluded.total_cents,currency=excluded.currency,tracking_code=excluded.tracking_code,
+      updated_at_remote=excluded.updated_at_remote,contact_id=coalesce(orders.contact_id,excluded.contact_id)
+    where not orders.is_anonymized and (orders.updated_at_remote is null or excluded.updated_at_remote >= orders.updated_at_remote);
+  if run.phase='products' and p_phase='orders' then
+    update public.catalog_products set ativo=false where organization_id=p_org and external_provider=connection.provider and commerce_synced_at < run.started_at;
+  end if;
+  perform public.fn_commerce_checkpoint(p_org,p_run,p_phase,p_cursor,jsonb_array_length(p_products),jsonb_array_length(p_orders));
+end $$;
+revoke execute on function public.fn_commerce_store_page(uuid,uuid,timestamptz,jsonb,jsonb,text,text) from public,anon,authenticated;
+grant execute on function public.fn_commerce_store_page(uuid,uuid,timestamptz,jsonb,jsonb,text,text) to service_role;
+
+-- Recebimento e fila na mesma transação. Nenhum payload com PII é arquivado.
+create table if not exists public.commerce_webhook_receipts (
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  integration_id uuid not null references public.tenant_integrations(id) on delete cascade,
+  external_id text not null, topic text not null, received_at timestamptz not null default now(),
+  primary key(organization_id,integration_id,external_id)
+);
+alter table public.commerce_webhook_receipts enable row level security;
+revoke all on public.commerce_webhook_receipts from public,anon,authenticated;
+grant all on public.commerce_webhook_receipts to service_role;
+create or replace function public.fn_commerce_webhook(p_org uuid,p_integration uuid,p_external text,p_topic text)
+returns boolean language plpgsql security definer set search_path=public as $$
+begin
+  perform 1 from public.tenant_integrations where id=p_integration and organization_id=p_org for update;
+  if not found then raise exception 'commerce_integration_unavailable'; end if;
+  insert into public.commerce_webhook_receipts(organization_id,integration_id,external_id,topic) values(p_org,p_integration,p_external,p_topic) on conflict do nothing;
+  if not found then return false; end if;
+  if p_topic='app/uninstalled' then
+    update public.tenant_integrations set status='disconnected',status_reason='Aplicativo removido da loja.',oauth_access_token_encrypted='\x'::bytea,oauth_refresh_token_encrypted=null where id=p_integration and organization_id=p_org;
+    update public.commerce_sync_runs set status='cancelled',locked_until=null,completed_at=now() where integration_id=p_integration and organization_id=p_org and status in('queued','running');
+    update public.catalog_products set ativo=false where organization_id=p_org and external_provider='shopify';
+  else
+    if exists(select 1 from public.commerce_sync_runs where integration_id=p_integration and organization_id=p_org and status in('queued','running')) then
+      update public.tenant_integrations set commerce_resync_requested=true where id=p_integration and organization_id=p_org;
+    else
+      perform public.fn_commerce_begin_sync(p_org,p_integration);
+    end if;
+  end if;
+  return true;
+end $$;
+revoke execute on function public.fn_commerce_webhook(uuid,uuid,text,text) from public,anon,authenticated;
+grant execute on function public.fn_commerce_webhook(uuid,uuid,text,text) to service_role;
+
+create or replace function public.fn_commerce_disconnect(p_org uuid,p_provider text)
+returns void language plpgsql security definer set search_path=public as $$
+declare v_integration_id uuid;
+begin
+  update public.tenant_integrations set status='disconnected',status_reason=null,oauth_access_token_encrypted='\x'::bytea,oauth_refresh_token_encrypted=null,token_refresh_locked_until=null,commerce_resync_requested=false
+    where organization_id=p_org and provider=p_provider and provider in('shopify','woocommerce') returning id into v_integration_id;
+  if v_integration_id is not null then
+    update public.commerce_sync_runs set status='cancelled',locked_until=null,completed_at=now() where organization_id=p_org and integration_id=v_integration_id and status in('queued','running');
+    update public.catalog_products set ativo=false where organization_id=p_org and external_provider=p_provider;
+  end if;
+end $$;
+revoke execute on function public.fn_commerce_disconnect(uuid,text) from public,anon,authenticated;
+grant execute on function public.fn_commerce_disconnect(uuid,text) to service_role;
+
+-- Uma única loja por provedor/organização. IDs numéricos WooCommerce podem
+-- colidir entre lojas; reaproveitar a conexão sobrescreveria pedidos históricos.
+create or replace function public.fn_commerce_keep_store_identity() returns trigger
+language plpgsql set search_path = public, pg_temp as $$
+begin
+  if old.provider in ('shopify','woocommerce') and old.store_metadata->>'store_url' is not null
+    and new.store_metadata->>'store_url' is distinct from old.store_metadata->>'store_url' then
+    raise exception 'commerce_store_change_requires_new_organization';
+  end if;
+  return new;
+end $$;
+revoke all on function public.fn_commerce_keep_store_identity() from public, anon, authenticated;
+drop trigger if exists tr_commerce_keep_store_identity on public.tenant_integrations;
+create trigger tr_commerce_keep_store_identity before update on public.tenant_integrations
+  for each row execute function public.fn_commerce_keep_store_identity();
+
+
+-- ---- Atenza: 20261008110000_0244_integration_actions ----
+-- Ações REST configuráveis por organização. Credenciais em tabela separada,
+-- inacessível ao browser; resultado higienizado pelo executor, sem input bruto.
+-- CONFIRMADO: o coordenador acrescenta este bloco ao baseline e ao MANIFEST.
+alter table public.ai_agent_versions add column if not exists integration_action_ids uuid[] not null default '{}';
+comment on column public.ai_agent_versions.integration_action_ids is 'Allowlist explícita de ações REST desta versão publicada. Vazio habilita nenhuma ação; enabled na ação não publica a capacidade em todos os agentes.';
+
+create table if not exists public.integration_actions (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  configuration jsonb not null check (jsonb_typeof(configuration) = 'object'),
+  credential_header_names text[] not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (organization_id, id)
+);
+create index if not exists integration_actions_org_created_idx on public.integration_actions (organization_id, created_at desc);
+alter table public.integration_actions enable row level security;
+drop policy if exists integration_actions_manager_read on public.integration_actions;
+create policy integration_actions_manager_read on public.integration_actions for select to authenticated
+  using (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'manager'));
+drop policy if exists integration_actions_manager_write on public.integration_actions;
+create policy integration_actions_manager_write on public.integration_actions for all to authenticated
+  using (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'manager') and public.fn_support_write_allowed(organization_id))
+  with check (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'manager') and public.fn_support_write_allowed(organization_id));
+revoke all on public.integration_actions from public, anon, authenticated;
+grant select, insert, update, delete on public.integration_actions to authenticated, service_role;
+drop trigger if exists integration_actions_updated_at on public.integration_actions;
+create trigger integration_actions_updated_at before update on public.integration_actions for each row execute function public.fn_set_updated_at();
+
+create table if not exists public.integration_action_credentials (
+  action_id uuid primary key,
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  headers_encrypted bytea not null,
+  foreign key (organization_id, action_id) references public.integration_actions(organization_id, id) on delete cascade
+);
+alter table public.integration_action_credentials enable row level security;
+revoke all on public.integration_action_credentials from public, anon, authenticated;
+grant select, insert, update, delete on public.integration_action_credentials to service_role;
+comment on column public.integration_action_credentials.headers_encrypted is 'JSON de cabeçalhos cifrado por fn_encrypt_oauth. Nunca devolver ao cliente, nem em hex.';
+
+create table if not exists public.integration_action_executions (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  action_id uuid,
+  action_name text not null,
+  actor_user_id uuid references auth.users(id) on delete set null,
+  request_id uuid not null,
+  source text not null check (source in ('manual', 'test', 'agent')),
+  state text not null check (state in ('running', 'succeeded', 'failed')),
+  result jsonb,
+  started_at timestamptz not null default now(),
+  completed_at timestamptz,
+  foreign key (organization_id, action_id) references public.integration_actions(organization_id, id) on delete set null (action_id)
+);
+create index if not exists integration_action_executions_org_started_idx on public.integration_action_executions (organization_id, started_at desc);
+create index if not exists integration_action_executions_action_started_idx on public.integration_action_executions (organization_id, action_id, started_at desc);
+alter table public.integration_action_executions enable row level security;
+drop policy if exists integration_action_executions_agent_read on public.integration_action_executions;
+create policy integration_action_executions_agent_read on public.integration_action_executions for select to authenticated
+  using (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'));
+-- Somente o executor grava: um atendente não pode inventar prova de execução.
+revoke all on public.integration_action_executions from public, anon, authenticated;
+grant select on public.integration_action_executions to authenticated;
+grant select, insert, update on public.integration_action_executions to service_role;
+
+-- Configuração e troca de credenciais são atômicas. Serviço revalida requireRole
+-- e requireSupportWrite antes de chegar aqui; nenhum cliente executa esta RPC.
+create or replace function public.fn_save_integration_action(
+  p_org uuid, p_id uuid, p_configuration jsonb, p_header_names text[], p_encrypted bytea, p_create boolean
+) returns uuid language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if p_create then
+    insert into public.integration_actions (id, organization_id, configuration, credential_header_names)
+      values (p_id, p_org, p_configuration, coalesce(p_header_names, '{}'));
+  else
+    update public.integration_actions set configuration = p_configuration,
+      credential_header_names = coalesce(p_header_names, credential_header_names)
+      where id = p_id and organization_id = p_org;
+    if not found then raise exception 'integration_action_not_found' using errcode = 'P0002'; end if;
+  end if;
+  if p_header_names is not null then
+    if cardinality(p_header_names) = 0 then
+      delete from public.integration_action_credentials where action_id = p_id and organization_id = p_org;
+    else
+      if p_encrypted is null then raise exception 'encrypted_credentials_required' using errcode = '23514'; end if;
+      insert into public.integration_action_credentials (action_id, organization_id, headers_encrypted)
+        values (p_id, p_org, p_encrypted)
+        on conflict (action_id) do update set headers_encrypted = excluded.headers_encrypted
+        where integration_action_credentials.organization_id = p_org;
+    end if;
+  end if;
+  return p_id;
+end;
+$$;
+revoke execute on function public.fn_save_integration_action(uuid, uuid, jsonb, text[], bytea, boolean) from public, anon, authenticated;
+grant execute on function public.fn_save_integration_action(uuid, uuid, jsonb, text[], bytea, boolean) to service_role;
+
+-- A seleção é conteúdo da versão: não pode mudar depois de publicada.
+-- A existência e o tenant também são conferidos na porta SQL, inclusive para
+-- quem não passou pelas rotas HTTP ou pelas server actions.
+create or replace function public.fn_validate_agent_integration_actions() returns trigger
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if TG_OP = 'UPDATE' then
+    if old.status in ('published','superseded','archived') and (
+      new.integration_action_ids is distinct from old.integration_action_ids
+      or new.organization_id is distinct from old.organization_id
+      or new.status = 'draft'
+    ) then
+      raise exception 'version_immutable';
+    end if;
+    if new.integration_action_ids is not distinct from old.integration_action_ids
+      and new.organization_id is not distinct from old.organization_id
+      and not (new.status = 'published' and old.status <> 'published') then return new; end if;
+  end if;
+  if cardinality(new.integration_action_ids) > 25
+    or cardinality(new.integration_action_ids) <> (select count(distinct id) from unnest(new.integration_action_ids) id)
+    or exists (select 1 from unnest(new.integration_action_ids) selected(id)
+      where not exists (select 1 from public.integration_actions a
+        where a.id = selected.id and a.organization_id = new.organization_id
+          and a.configuration->>'enabled' = 'true')) then
+    raise exception 'integration_action_invalid';
+  end if;
+  return new;
+end $$;
+revoke all on function public.fn_validate_agent_integration_actions() from public, anon, authenticated;
+drop trigger if exists tr_agent_integration_actions on public.ai_agent_versions;
+create trigger tr_agent_integration_actions before insert or update on public.ai_agent_versions
+  for each row execute function public.fn_validate_agent_integration_actions();
+
+
+-- ---- Atenza: 20261008120000_0245_service_quality ----
+-- Qualidade sobre o atendimento existente. Sem tickets paralelos, metas opt-in,
+-- tempo corrido (inclusive pausas/noites). Não agenda nem envia mensagens.
+create table if not exists public.service_quality_policies (
+ organization_id uuid primary key references public.organizations(id) on delete cascade,
+ enabled boolean not null default false,
+ first_response_target_seconds integer check (first_response_target_seconds > 0),
+ resolution_target_seconds integer check (resolution_target_seconds > 0),
+ clock_mode text not null default 'elapsed' check (clock_mode = 'elapsed'),
+ updated_at timestamptz not null default now(),
+ constraint service_quality_enabled_targets check (not enabled or first_response_target_seconds is not null or resolution_target_seconds is not null)
+);
+create table if not exists public.service_quality_surveys (
+ id uuid primary key default gen_random_uuid(),
+ organization_id uuid not null references public.organizations(id) on delete cascade,
+ conversation_id uuid not null references public.conversations(id) on delete cascade,
+ service_started_at timestamptz,
+ token_hash text not null unique check (token_hash ~ '^[a-f0-9]{64}$'),
+ requested_by_user_id uuid references auth.users(id) on delete set null,
+ created_at timestamptz not null default now(),
+ expires_at timestamptz not null,
+ responded_at timestamptz,
+ score smallint check (score between 1 and 5),
+ comment text check (char_length(comment) <= 2000),
+ constraint service_quality_survey_expiry check (expires_at > created_at),
+ constraint service_quality_survey_response check ((responded_at is null and score is null and comment is null) or (responded_at is not null and score is not null))
+);
+create index if not exists service_quality_surveys_conversation_idx on public.service_quality_surveys(organization_id, conversation_id, created_at desc);
+create index if not exists service_quality_messages_clock_idx on public.messages(organization_id, conversation_id, sent_at) where revoked_at is null;
+alter table public.service_quality_policies enable row level security;
+alter table public.service_quality_surveys enable row level security;
+-- ALL restritiva aplica isolamento mesmo às policies de escrita.
+drop policy if exists tenant_isolation_service_quality_policies_all on public.service_quality_policies;
+create policy tenant_isolation_service_quality_policies_all on public.service_quality_policies as restrictive for all to authenticated
+ using (organization_id in (select public.fn_user_org_ids())) with check (organization_id in (select public.fn_user_org_ids()));
+drop policy if exists service_quality_policies_read on public.service_quality_policies;
+create policy service_quality_policies_read on public.service_quality_policies for select to authenticated using (true);
+drop policy if exists service_quality_policies_write on public.service_quality_policies;
+create policy service_quality_policies_write on public.service_quality_policies for all to authenticated
+ using (public.fn_role_at_least(organization_id,'manager') and public.fn_support_write_allowed(organization_id))
+ with check (public.fn_role_at_least(organization_id,'manager') and public.fn_support_write_allowed(organization_id));
+drop policy if exists tenant_isolation_service_quality_surveys_all on public.service_quality_surveys;
+create policy tenant_isolation_service_quality_surveys_all on public.service_quality_surveys as restrictive for all to authenticated
+ using (organization_id in (select public.fn_user_org_ids())) with check (organization_id in (select public.fn_user_org_ids()));
+drop policy if exists service_quality_surveys_read on public.service_quality_surveys;
+create policy service_quality_surveys_read on public.service_quality_surveys for select to authenticated using (exists (
+ select 1 from public.conversations c where c.id=conversation_id and c.organization_id=service_quality_surveys.organization_id
+ and public.fn_can_view_conversation(c.organization_id,c.assigned_to_user_id)));
+revoke all on public.service_quality_policies, public.service_quality_surveys from public, anon, authenticated;
+grant select, insert, update on public.service_quality_policies to authenticated;
+-- Hash nunca sai pela API autenticada/cliente.
+grant select (id,organization_id,conversation_id,service_started_at,requested_by_user_id,created_at,expires_at,responded_at,score,comment) on public.service_quality_surveys to authenticated;
+grant select,insert,update,delete on public.service_quality_policies,public.service_quality_surveys to service_role;
+
+-- Fatos calculados no banco: não há limite oculto de 1000 mensagens do PostgREST.
+-- RLS de conversations/messages permanece ativa: atendente não ganha escopo extra.
+create or replace function public.fn_service_quality_facts(p_org uuid,p_after uuid default null,p_limit integer default 50,p_conversation uuid default null)
+returns jsonb language sql stable security invoker set search_path=public,pg_temp as $fn$
+ with selected as (
+ select c.* from public.conversations c where c.organization_id=p_org and not c.is_group
+ and (p_after is null or c.id>p_after) and (p_conversation is null or c.id=p_conversation)
+ order by c.id limit least(greatest(p_limit,1),101)
+ ), facts as (
+ select c.id as conversation_id,c.status,c.service_started_at,
+ case when c.status in ('closed','resolved','archived') then c.service_closed_at end as closed_at,
+ inbound.first_inbound_at,response.first_response_at
+ from selected c
+ left join lateral (select min(m.sent_at) as first_inbound_at from public.messages m
+  where m.organization_id=p_org and m.conversation_id=c.id and m.direction='inbound' and m.revoked_at is null
+  and m.sent_at>=coalesce(c.service_started_at,c.created_at)
+  and (c.status not in ('closed','resolved','archived') or m.sent_at<=c.service_closed_at)) inbound on true
+ left join lateral (select min(m.sent_at) as first_response_at from public.messages m
+  where m.organization_id=p_org and m.conversation_id=c.id and m.direction='outbound' and m.revoked_at is null
+  and m.status in ('sent','delivered','read') and m.sent_at>=inbound.first_inbound_at
+  and (c.status not in ('closed','resolved','archived') or m.sent_at<=c.service_closed_at)) response on true
+ ) select coalesce(jsonb_agg(to_jsonb(facts) order by conversation_id),'[]'::jsonb) from facts;
+$fn$;
+revoke execute on function public.fn_service_quality_facts(uuid,uuid,integer,uuid) from public,anon;
+grant execute on function public.fn_service_quality_facts(uuid,uuid,integer,uuid) to authenticated,service_role;
+
+-- Criação é explícita e exclusivamente por gerente autenticado; verifica vínculo
+-- antes de inserir para impedir survey org A -> conversa org B até via RPC.
+create or replace function public.fn_service_quality_request(p_org uuid,p_conversation uuid,p_hash text,p_expires timestamptz)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $fn$
+declare c public.conversations; s public.service_quality_surveys;
+begin
+ if auth.uid() is null or not public.fn_role_at_least(p_org,'manager') or not public.fn_support_write_allowed(p_org) then
+  raise exception 'forbidden' using errcode='42501'; end if;
+ select * into c from public.conversations where organization_id=p_org and id=p_conversation and not is_group for share;
+ if not found then raise exception 'conversation_not_found' using errcode='P0002'; end if;
+ if p_expires<=clock_timestamp() or p_expires>clock_timestamp()+interval '30 days' then
+  raise exception 'invalid_expiration' using errcode='22023'; end if;
+ insert into public.service_quality_surveys(organization_id,conversation_id,service_started_at,token_hash,requested_by_user_id,expires_at)
+ values(p_org,c.id,c.service_started_at,p_hash,auth.uid(),p_expires) returning * into s;
+ return jsonb_build_object('id',s.id,'conversation_id',s.conversation_id,'expires_at',s.expires_at);
+end;
+$fn$;
+revoke execute on function public.fn_service_quality_request(uuid,uuid,text,timestamptz) from public,anon,service_role;
+grant execute on function public.fn_service_quality_request(uuid,uuid,text,timestamptz) to authenticated;
+
+-- Única porta de resgate: hash forte identifica tenant, não aceita org do visitante.
+-- Compare-and-set garante uso único inclusive para duas submissões simultâneas.
+create or replace function public.fn_service_quality_respond(p_hash text,p_score integer,p_comment text default null)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $fn$
+declare s public.service_quality_surveys;
+begin
+ if p_score is null or p_score not between 1 and 5 or char_length(p_comment)>2000 then
+  raise exception 'invalid_feedback' using errcode='22023'; end if;
+ update public.service_quality_surveys set score=p_score,comment=nullif(btrim(p_comment),''),responded_at=clock_timestamp()
+ where token_hash=p_hash and responded_at is null and expires_at>clock_timestamp() returning * into s;
+ if not found then return null; end if;
+ -- Somente identificadores/nota no audit; comentário é dado privado da conversa.
+ insert into public.api_audit_log(organization_id,action,resource_type,resource_id,bypassed_rls,metadata)
+ values(s.organization_id,'conversation.note_added','service_quality_surveys',s.id,true,
+ jsonb_build_object('service_quality_action','csat.responded','conversation_id',s.conversation_id,'score',s.score));
+ return jsonb_build_object('id',s.id,'organization_id',s.organization_id,'conversation_id',s.conversation_id,'score',s.score,'responded_at',s.responded_at);
+end;
+$fn$;
+revoke execute on function public.fn_service_quality_respond(text,integer,text) from public,anon,authenticated;
+grant execute on function public.fn_service_quality_respond(text,integer,text) to service_role;
+
+-- Resumo considera TODAS as avaliações das conversas selecionadas; histórico
+-- visual limitado é declarado, não vira média silenciosamente truncada.
+create or replace function public.fn_service_quality_surveys(p_org uuid,p_conversations uuid[],p_limit integer default 100)
+returns jsonb language sql stable security invoker set search_path=public,pg_temp as $fn$
+ with visible as (
+ select id,conversation_id,created_at,expires_at,responded_at,score,comment
+ from public.service_quality_surveys where organization_id=p_org and conversation_id=any(p_conversations)
+ ), history as (select * from visible order by created_at desc,id desc limit least(greatest(p_limit,1),100)), summary as (
+ select count(*) as total,count(score) as csat_responses,avg(score) as csat_average,
+ count(*) filter(where score<=2) as csat_low_scores,
+ count(*) filter(where responded_at is null and expires_at>now()) as pending_surveys,
+ count(*) filter(where responded_at is null and expires_at<=now()) as expired_surveys from visible
+ ) select jsonb_build_object('surveys',coalesce((select jsonb_agg(to_jsonb(h) order by created_at desc,id desc) from history h),'[]'::jsonb),'summary',(select to_jsonb(summary) from summary));
+$fn$;
+revoke execute on function public.fn_service_quality_surveys(uuid,uuid[],integer) from public,anon;
+grant execute on function public.fn_service_quality_surveys(uuid,uuid[],integer) to authenticated,service_role;
+
+-- FK composta: o vínculo de tenant é propriedade do banco, inclusive para ingestão service_role.
+create unique index if not exists service_quality_conversation_tenant_key on public.conversations(organization_id,id);
+do $guard$
+begin
+ if not exists(select 1 from pg_constraint where conname='service_quality_surveys_tenant_conversation_fk' and conrelid='public.service_quality_surveys'::regclass) then
+  alter table public.service_quality_surveys add constraint service_quality_surveys_tenant_conversation_fk foreign key(organization_id,conversation_id) references public.conversations(organization_id,id) on delete cascade;
+ end if;
+end;
+$guard$;
+
+
+-- ---- Atenza: 20261008140000_0247_customer_campaigns ----
+-- Campanhas dos tenants. Não são campanhas do site da instalação.
+-- Leituras via RLS; mutações exclusivamente nas rotas manager + suporte full.
+create unique index if not exists customer_campaign_contacts_org_id on public.contacts(organization_id,id);
+create unique index if not exists customer_campaign_sessions_org_id on public.channel_sessions(organization_id,id);
+create unique index if not exists customer_campaign_conversations_org_id on public.conversations(organization_id,id);
+create unique index if not exists customer_campaign_messages_org_id on public.messages(organization_id,id);
+
+create table if not exists public.customer_campaigns (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  name text not null check (length(name) between 1 and 120),
+  channel_session_id uuid not null,
+  status text not null default 'draft' check(status in ('draft','scheduled','running','paused','completed','cancelled')),
+  template_snapshot jsonb not null,
+  snapshot_hash text not null,
+  template_values jsonb not null default '{}',
+  delay_seconds integer not null default 5 check(delay_seconds between 5 and 3600),
+  scheduled_at timestamptz,
+  next_dispatch_at timestamptz,
+  created_by uuid not null references auth.users(id),
+  launched_by uuid references auth.users(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(organization_id,id),
+  foreign key(organization_id,channel_session_id) references public.channel_sessions(organization_id,id)
+);
+create table if not exists public.customer_campaign_recipients (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  campaign_id uuid not null,
+  contact_id uuid not null,
+  conversation_id uuid not null,
+  status text not null default 'pending' check(status in ('pending','sending','sent','failed','needs_review','cancelled')),
+  last_error text,
+  safe_to_retry boolean not null default false,
+  unique(organization_id,id),
+  unique(organization_id,campaign_id,contact_id),
+  foreign key(organization_id,campaign_id) references public.customer_campaigns(organization_id,id) on delete cascade,
+  foreign key(organization_id,contact_id) references public.contacts(organization_id,id),
+  foreign key(organization_id,conversation_id) references public.conversations(organization_id,id)
+);
+create table if not exists public.customer_campaign_attempts (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  recipient_id uuid not null,
+  intended_message_id uuid not null unique,
+  message_id uuid,
+  state text not null default 'sending' check(state in ('sending','sent','failed','needs_review')),
+  safe_to_retry boolean not null default false,
+  error_code text,
+  started_at timestamptz not null default now(),
+  finished_at timestamptz,
+  foreign key(organization_id,recipient_id) references public.customer_campaign_recipients(organization_id,id) on delete cascade,
+  foreign key(organization_id,message_id) references public.messages(organization_id,id)
+);
+create unique index if not exists customer_campaign_single_sending on public.customer_campaign_attempts(organization_id,recipient_id) where state='sending';
+create index if not exists customer_campaign_pending on public.customer_campaign_recipients(organization_id,campaign_id,status);
+create index if not exists customer_campaign_attempt_history on public.customer_campaign_attempts(organization_id,recipient_id,started_at desc);
+alter table public.customer_campaigns enable row level security;
+alter table public.customer_campaign_recipients enable row level security;
+alter table public.customer_campaign_attempts enable row level security;
+drop policy if exists tenant_isolation_customer_campaigns_all on public.customer_campaigns;
+create policy tenant_isolation_customer_campaigns_all on public.customer_campaigns for select to authenticated using(organization_id in (select public.fn_user_org_ids()));
+drop policy if exists tenant_isolation_customer_campaign_recipients_all on public.customer_campaign_recipients;
+create policy tenant_isolation_customer_campaign_recipients_all on public.customer_campaign_recipients for select to authenticated using(organization_id in (select public.fn_user_org_ids()));
+drop policy if exists tenant_isolation_customer_campaign_attempts_all on public.customer_campaign_attempts;
+create policy tenant_isolation_customer_campaign_attempts_all on public.customer_campaign_attempts for select to authenticated using(organization_id in (select public.fn_user_org_ids()));
+revoke all on public.customer_campaigns,public.customer_campaign_recipients,public.customer_campaign_attempts from anon,authenticated;
+grant select on public.customer_campaigns,public.customer_campaign_recipients,public.customer_campaign_attempts to authenticated;
+grant all on public.customer_campaigns,public.customer_campaign_recipients,public.customer_campaign_attempts to service_role;

@@ -37,6 +37,11 @@ export const PUBLIC_PATHS: RegExp[] = [
   // qualquer sub-path futuro nascer público de carona.
   /^\/api\/v1\/agenda\/google\/callback$/,
   /^\/api\/v1\/integrations\/nuvemshop\/callback$/,
+  // Estado assinado, vínculo Lax, HMAC Shopify, nonce único e autorização atual na própria rota.
+  /^\/api\/v1\/integrations\/shopify\/callback$/,
+  // Token aleatório, expiração e uso único conferidos pela própria rota de avaliação.
+  /^\/feedback\/[A-Za-z0-9_-]{43}$/,
+  /^\/api\/v1\/service-quality\/public\/[A-Za-z0-9_-]{43}$/,
   /^\/api\/internal\//,
   /^\/api\/mcp(\/.*)?$/,
   // GET /api/v1/contacts aceita SESSÃO ou Bearer `dsk_...` (api_tokens) — a

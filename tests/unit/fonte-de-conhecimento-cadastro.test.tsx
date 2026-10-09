@@ -37,10 +37,7 @@ vi.mock("sonner", () => ({
 
 import { NovoMaterialDialog } from "@/components/ai/NovoMaterialDialog";
 import { KnowledgeSourceCard } from "@/components/ai/KnowledgeSourceCard";
-import {
-  ChaveDeConhecimento,
-  type EstadoDaChave,
-} from "@/components/ai/ChaveDeConhecimento";
+import { ChaveDeConhecimento, type EstadoDaChave } from "@/components/ai/ChaveDeConhecimento";
 import type { SourceRow } from "@/hooks/ai/useKnowledgeSources";
 
 const CONTEUDO = [
@@ -106,11 +103,31 @@ afterEach(() => {
 });
 
 describe("NovoMaterialDialog — o tipo escolhido é o tipo enviado", () => {
+  it("Página da internet envia URL para o mesmo cadastro, sem FAQ nem upload", async () => {
+    const spy = dublarFetch();
+    render(<NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />);
+    fireEvent.click(screen.getByTestId("material-tipo-url"));
+    fireEvent.change(screen.getByTestId("material-nome"), {
+      target: { value: "Política pública" },
+    });
+    fireEvent.change(screen.getByTestId("material-url"), {
+      target: { value: "https://public.site/policy" },
+    });
+    expect(screen.queryByTestId("material-conteudo")).toBeNull();
+    expect(screen.queryByTestId("material-arquivo")).toBeNull();
+    fireEvent.click(screen.getByTestId("material-criar"));
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+    expect(spy.mock.calls[0]?.[0]).toBe("/api/v1/ai/knowledge/sources");
+    expect(corpoEnviado(spy)).toEqual({
+      source_type: "url",
+      name: "Política pública",
+      url: "https://public.site/policy",
+    });
+  });
+
   it('tipo "faq" chega na API como "faq"', async () => {
     const spy = dublarFetch();
-    render(
-      <NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />,
-    );
+    render(<NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />);
 
     fireEvent.change(screen.getByTestId("material-nome"), { target: { value: "FAQ da loja" } });
     fireEvent.change(screen.getByTestId("material-conteudo"), { target: { value: CONTEUDO } });
@@ -123,9 +140,7 @@ describe("NovoMaterialDialog — o tipo escolhido é o tipo enviado", () => {
 
   it('tipo "documento" chega na API como "documento" — nunca reescrito para faq', async () => {
     const spy = dublarFetch();
-    render(
-      <NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />,
-    );
+    render(<NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />);
 
     fireEvent.click(screen.getByTestId("material-tipo-documento"));
     fireEvent.change(screen.getByTestId("material-nome"), { target: { value: "Política" } });
@@ -140,9 +155,7 @@ describe("NovoMaterialDialog — o tipo escolhido é o tipo enviado", () => {
 
   for (const tipo of ["conversas", "catalogo"] as const) {
     it(`"${tipo}" não pode ser cadastrado à mão — ele é preenchido por rotina`, () => {
-      render(
-        <NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />,
-      );
+      render(<NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />);
       // Desabilitado, e não ausente: sumir com a opção esconderia que o material
       // EXISTE e chega sozinho — que é a informação que a pessoa precisa.
       expect(screen.getByTestId(`material-tipo-${tipo}`)).toBeDisabled();
@@ -151,20 +164,13 @@ describe("NovoMaterialDialog — o tipo escolhido é o tipo enviado", () => {
 
   it("sem chave, o diálogo DIZ que o material vai ficar esperando", () => {
     render(
-      <NovoMaterialDialog
-        aberto
-        onFechar={() => {}}
-        onCriado={() => {}}
-        podeIndexar={false}
-      />,
+      <NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar={false} />,
     );
     expect(screen.getByTestId("material-aviso-sem-chave")).toBeInTheDocument();
   });
 
   it("COM chave, o aviso de espera não aparece (controle)", () => {
-    render(
-      <NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />,
-    );
+    render(<NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />);
     // Sem este controle, o caso acima passaria com o aviso renderizado SEMPRE —
     // que é ruído, não informação.
     expect(screen.queryByTestId("material-aviso-sem-chave")).toBeNull();
@@ -185,9 +191,7 @@ describe("NovoMaterialDialog — o tipo escolhido é o tipo enviado", () => {
     );
     vi.stubGlobal("fetch", spy);
 
-    render(
-      <NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />,
-    );
+    render(<NovoMaterialDialog aberto onFechar={() => {}} onCriado={() => {}} podeIndexar />);
     fireEvent.change(screen.getByTestId("material-nome"), { target: { value: "FAQ da loja" } });
     fireEvent.change(screen.getByTestId("material-conteudo"), { target: { value: CONTEUDO } });
     fireEvent.click(screen.getByTestId("material-criar"));
@@ -199,6 +203,31 @@ describe("NovoMaterialDialog — o tipo escolhido é o tipo enviado", () => {
 });
 
 describe("KnowledgeSourceCard — só oferece controle onde existe ação", () => {
+  it("URL com falha mantém última indexação visível e oferece tentar de novo", () => {
+    const retry = vi.fn();
+    render(
+      <KnowledgeSourceCard
+        source={material({
+          source_type: "url",
+          source_metadata: { url: "https://public.site/policy" },
+          last_index_status: "failed",
+          last_index_error: "A página redireciona.",
+        })}
+        usadoPor={["Suporte"]}
+        onReindex={retry}
+        onArquivar={() => {}}
+        onMudou={() => {}}
+      />,
+    );
+    expect(screen.getByTestId("material-url-ks-1")).toHaveTextContent("https://public.site/policy");
+    expect(screen.getByText("A página redireciona.")).toBeInTheDocument();
+    expect(screen.getByText("Preparado")).toBeInTheDocument();
+    expect(screen.getByTestId("material-trechos-ks-1")).toHaveTextContent("4");
+    expect(screen.queryByTestId("material-editar-ks-1")).toBeNull();
+    fireEvent.click(screen.getByTestId("material-reindexar-ks-1"));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
   it("FAQ pronta oferece editar conteúdo e ver o que o agente aprendeu", () => {
     render(
       <KnowledgeSourceCard

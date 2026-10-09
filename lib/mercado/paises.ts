@@ -117,7 +117,7 @@ export interface Mercado {
  */
 export const MERCADOS: readonly Mercado[] = [
   {
-    // 07/10/2026: R$ 97 / 197 / 397. A IA, a Meta e a Zernio passaram a ser
+    // 07/10/2026: R$ 97 / 197 / 397. A IA e os fornecedores de canal passaram a ser
     // pagas pelo CLIENTE (chave própria), então o Atenza não embute custo
     // variável e pode ficar abaixo de quem embute (BotConversa R$ 189 sem IA de
     // verdade; Wati/Respond.io US$ 79+). Estes valores TÊM de bater com os

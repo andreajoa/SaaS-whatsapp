@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Campanhas com público e execução durável",
+    "subtitle": "Entrada real, controle por organização e retorno visível",
+    "output": "customer-campaigns.html",
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    {
+      "id": "humano",
+      "label": "Pessoa"
+    },
+    {
+      "id": "app",
+      "label": "Aplicativo"
+    },
+    {
+      "id": "db",
+      "label": "Banco"
+    }
+  ],
+  "mainPath": [
+    "n0",
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+  ],
+  "nodes": [
+    {
+      "id": "n0",
+      "lane": "humano",
+      "col": 0,
+      "type": "ui",
+      "label": "Campanhas: modelo aprovado e prévia do público"
+    },
+    {
+      "id": "n1",
+      "lane": "db",
+      "col": 1,
+      "type": "database",
+      "label": "Aprovação, destinatários e revisão de conteúdo"
+    },
+    {
+      "id": "n2",
+      "lane": "app",
+      "col": 2,
+      "type": "service",
+      "label": "Dispatcher → guards → envio normal do canal"
+    },
+    {
+      "id": "n3",
+      "lane": "db",
+      "col": 3,
+      "type": "database",
+      "label": "Recibos e estados por destinatário; pausa/cancelamento"
+    },
+    {
+      "id": "n4",
+      "lane": "humano",
+      "col": 4,
+      "type": "ui",
+      "label": "Campanhas: progresso, falhas e conferência de resultado incerto"
+    }
+  ],
+  "edges": [
+    {
+      "from": "n0",
+      "to": "n1",
+      "label": "Configuração e contexto autorizados"
+    },
+    {
+      "from": "n1",
+      "to": "n2",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "label": "Resultado com estado persistido"
+    },
+    {
+      "from": "n4",
+      "to": "n0",
+      "label": "Revisão explícita e recuperação"
+    }
+  ]
+}

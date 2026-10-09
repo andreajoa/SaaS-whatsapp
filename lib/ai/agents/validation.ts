@@ -88,6 +88,7 @@ const versionShapeSchema = z
      * mora na rota de versões, que é quem conhece o `process.env` do servidor.
      */
     credential_id: UUID.nullable(),
+    integration_action_ids: z.array(UUID).max(25).default([]),
     tool_ids: z
       .array(z.string().min(1).max(80))
       // O mesmo teto que a tela mostra ("13 de 20") é o que o servidor recusa —
@@ -228,7 +229,8 @@ export type PublishErrorCode =
   | "channel_session_not_found"
   | "channel_session_offline"
   | "model_not_found"
-  | "tool_id_invalid";
+  | "tool_id_invalid"
+  | "integration_action_invalid";
 
 export const PUBLISH_ERROR_CODES: ReadonlySet<string> = new Set<PublishErrorCode>([
   "agent_not_found",
@@ -245,4 +247,5 @@ export const PUBLISH_ERROR_CODES: ReadonlySet<string> = new Set<PublishErrorCode
   "channel_session_offline",
   "model_not_found",
   "tool_id_invalid",
+  "integration_action_invalid",
 ]);

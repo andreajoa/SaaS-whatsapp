@@ -1,4 +1,4 @@
-import { currentExecutionBoundary, currentExecutionJob } from '@/lib/atendimento/fronteira-server';
+import { currentExecutionBoundary, currentExecutionJob, guardServiceEffect } from '@/lib/atendimento/fronteira-server';
 import { claimOfJob } from '@/lib/agent-engine/queue/claim';
 /**
  * Tools MCP habilitadas NA TELA entrando no turno do engine (Fase 2B-tools).
@@ -23,6 +23,7 @@ import { pickToolsFromMcp, type RuntimeHandoffSignal } from '@/lib/ai/runtime/to
 import { mintEphemeralToken, revokeEphemeralToken } from '@/lib/ai/runtime/mcp_token';
 import type { McpAuthResult } from '@/lib/mcp/auth';
 import type { McpContext } from '@/lib/mcp/types';
+import { createIntegrationActionTools } from '@/lib/integration-actions/tools';
 
 import type { Logger } from '../../obs/logger';
 import type { CrmEdgeConfig } from './mcp-client';
@@ -60,7 +61,7 @@ export async function buildMcpTurnTools(
       blocked_tool_ids: blocked,
     });
   }
-  if (allowed.length === 0) {
+  if (allowed.length === 0 && !agentConfig.integrationActionIds?.length) {
     return null;
   }
 
@@ -106,6 +107,7 @@ export async function buildMcpTurnTools(
   // O engine não usa o sinal de handoff da ponte (a tool está bloqueada) — dummy.
   const handoffSignal: RuntimeHandoffSignal = { triggered: false };
 
+  try {
   const tools = pickToolsFromMcp({
     supabase: cfg.supabase,
     ctx,
@@ -120,6 +122,16 @@ export async function buildMcpTurnTools(
     // tela e o card parado. Quem passava era só o dispatcher antigo.
     pipelineIds: agentConfig.pipelineIds,
   });
+  const actions = await createIntegrationActionTools({ ctx, auth,
+    actionIds: agentConfig.integrationActionIds ?? [], readOnly: options?.readOnly,
+    agentAuthorization: { agentId: agentConfig.agentId, versionId: agentConfig.versionId },
+    authorizeBeforeDispatch: options?.readOnly ? undefined : guardServiceEffect,
+    contextVariables: { agent_id: agentConfig.agentId,
+      ...(originJob?.id === ids.jobId && typeof originJob.payload.conversation_id === 'string' ? { conversation_id: originJob.payload.conversation_id } : {}),
+      ...(originJob?.id === ids.jobId && originJob.contact_id ? { contact_id: originJob.contact_id } : {}),
+    },
+  });
+  Object.assign(tools, actions);
 
   return {
     tools,
@@ -134,4 +146,8 @@ export async function buildMcpTurnTools(
       }
     },
   };
+  } catch (error) {
+    await revokeEphemeralToken(ephemeral.id).catch(() => undefined);
+    throw error;
+  }
 }

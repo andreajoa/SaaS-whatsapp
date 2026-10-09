@@ -32,11 +32,303 @@
  * do que estava.
  */
 import type { Idioma } from "./idiomas";
+import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translations";
 
 /** `pt-BR` não aparece: é a chave. Só o que DIFERE precisa de linha. */
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  // O mapa das ações usa o mesmo consumidor das telas: useT() → traduzir().
+  ...INTEGRATION_ACTION_TRANSLATIONS,
+
+  // ── Integrações de lojas ─────────────────────────────────────────────────
+  "Sua operação conectada": { es: "Tu operación conectada" },
+  "Traga o catálogo e os pedidos da sua loja para a conversa. A IA e a equipe usam os mesmos dados para responder com mais precisão e ajudar o cliente a comprar.": {
+    es: "Lleva el catálogo y los pedidos de tu tienda a la conversación. La IA y el equipo usan los mismos datos para responder con más precisión y ayudar al cliente a comprar.",
+  },
+  "Atualizar status": { es: "Actualizar estado" },
+  "Lojas disponíveis": { es: "Tiendas disponibles" },
+  "Precisa de atenção": { es: "Necesita atención" },
+  Conectada: { es: "Conectada" },
+  Desconectada: { es: "Desconectada" },
+  Sincronizando: { es: "Sincronizando" },
+  Gerenciar: { es: "Gestionar" },
+  "Aguarde…": { es: "Espera…" },
+  "Reconecte a loja": { es: "Vuelve a conectar la tienda" },
+  "Na fila": { es: "En cola" },
+  "Verificar conexão": { es: "Comprobar conexión" },
+  "Pedidos, produtos e clientes conectados ao seu atendimento.": {
+    es: "Pedidos, productos y clientes conectados a tu atención.",
+  },
+  "Produtos, variantes, preços, estoque e pedidos no atendimento.": {
+    es: "Productos, variantes, precios, inventario y pedidos durante la atención.",
+  },
+  "Última sincronização:": { es: "Última sincronización:" },
+  "Aguardando a primeira": { es: "Esperando la primera" },
+  "Atualização automática por eventos da loja": { es: "Actualización automática mediante eventos de la tienda" },
+  "Sincronização manual disponível": { es: "Sincronización manual disponible" },
+  produtos: { es: "productos" },
+  pedidos: { es: "pedidos" },
+  "Conecte uma loja para consultar informações reais sem sair da conversa.": {
+    es: "Conecta una tienda para consultar información real sin salir de la conversación.",
+  },
+  "Conecte outras ferramentas": { es: "Conecta otras herramientas" },
+  "Consulte um ERP, registre dados no CRM ou execute uma ação na ferramenta que sua equipe já usa.": {
+    es: "Consulta un ERP, registra datos en el CRM o ejecuta una acción en la herramienta que tu equipo ya usa.",
+  },
+  "Ações por API": { es: "Acciones por API" },
+  "Webhooks e automações": { es: "Webhooks y automatizaciones" },
+  "Dados que ajudam a vender": { es: "Datos que ayudan a vender" },
+  "Os produtos sincronizados entram no catálogo que o assistente consulta. Os pedidos associados ao contato aparecem no histórico de compras.": {
+    es: "Los productos sincronizados se incorporan al catálogo que consulta el asistente. Los pedidos asociados al contacto aparecen en el historial de compras.",
+  },
+  "Shopify: os últimos 60 dias de pedidos dependem das permissões do aplicativo. Informações de clientes podem exigir autorização adicional da Shopify. Nenhuma compra ou alteração na loja é feita por estas conexões.": {
+    es: "Shopify: los pedidos de los últimos 60 días dependen de los permisos de la aplicación. La información de los clientes puede requerir autorización adicional de Shopify. Estas conexiones no realizan compras ni cambios en la tienda.",
+  },
+  "Histórico de sincronização": { es: "Historial de sincronización" },
+  "Acompanhe o que foi importado e resolva falhas antes de afetarem o atendimento.": {
+    es: "Revisa lo que se importó y resuelve los errores antes de que afecten la atención.",
+  },
+  "Verifique as permissões e use Sincronizar para tentar novamente.": {
+    es: "Revisa los permisos y usa Sincronizar para volver a intentarlo.",
+  },
+  "Sua loja continua funcionando normalmente. Vamos ler o catálogo e os pedidos para ajudar no atendimento.": {
+    es: "Tu tienda sigue funcionando normalmente. Leeremos el catálogo y los pedidos para ayudar durante la atención.",
+  },
+  "Endereço da loja": { es: "Dirección de la tienda" },
+  "Você será levado à Shopify para autorizar o acesso. Depois voltará para acompanhar a sincronização.": {
+    es: "Se te redirigirá a Shopify para autorizar el acceso. Después volverás para seguir la sincronización.",
+  },
+  "Na sua loja: WooCommerce → Configurações → Avançado → REST API. Crie uma chave com permissão de leitura e informe o par abaixo.": {
+    es: "En tu tienda: WooCommerce → Ajustes → Avanzado → API REST. Crea una clave con permiso de lectura e introduce el par de credenciales a continuación.",
+  },
+  "Use a credencial de um aplicativo próprio com leitura de produtos, estoque e pedidos. Para conexão com renovação automática, solicite a ativação da autorização Shopify ao administrador.": {
+    es: "Usa la credencial de una aplicación propia con acceso de lectura a productos, inventario y pedidos. Para una conexión con renovación automática, solicita al administrador que active la autorización de Shopify.",
+  },
+  "Consumer key": { es: "Clave de consumidor" },
+  "Consumer secret": { es: "Secreto de consumidor" },
+  "As credenciais são protegidas e não serão exibidas novamente.": {
+    es: "Las credenciales están protegidas y no volverán a mostrarse.",
+  },
+  "Validando conexão…": { es: "Validando conexión…" },
+  "Autorizar na Shopify": { es: "Autorizar en Shopify" },
+  "Usar autorização Shopify": { es: "Usar autorización de Shopify" },
+  "Usar credencial de aplicativo próprio": { es: "Usar credencial de una aplicación propia" },
+  "Desconectar a loja?": { es: "¿Desconectar la tienda?" },
+  "Os pedidos já importados serão preservados. Os produtos desta conexão deixarão de ser oferecidos pela IA até você reconectar e sincronizar.": {
+    es: "Los pedidos ya importados se conservarán. La IA dejará de ofrecer los productos de esta conexión hasta que vuelvas a conectarla y sincronizarla.",
+  },
+  "Manter conexão": { es: "Mantener conexión" },
+  "Não foi possível carregar suas integrações. Tente novamente.": {
+    es: "No se pudieron cargar tus integraciones. Inténtalo de nuevo.",
+  },
+  "Não foi possível carregar suas integrações.": { es: "No se pudieron cargar tus integraciones." },
+  "Shopify conectada. Os produtos e pedidos estão sendo sincronizados.": {
+    es: "Shopify conectada. Se están sincronizando los productos y pedidos.",
+  },
+  "Shopify conectada. Alguns avisos automáticos precisam de configuração; você pode sincronizar manualmente.": {
+    es: "Shopify conectada. Algunos avisos automáticos necesitan configuración; puedes sincronizar manualmente.",
+  },
+  "Não foi possível concluir a autorização Shopify. Abra a conexão e tente novamente.": {
+    es: "No se pudo completar la autorización de Shopify. Abre la conexión e inténtalo de nuevo.",
+  },
+  "Não foi possível concluir. Tente novamente.": { es: "No se pudo completar. Inténtalo de nuevo." },
+  "Informe sua-loja.myshopify.com.": { es: "Introduce tu-tienda.myshopify.com." },
+  "Loja conectada. A sincronização foi colocada na fila.": {
+    es: "Tienda conectada. La sincronización se añadió a la cola.",
+  },
+  "Loja desconectada. O histórico foi preservado e seus produtos deixaram de ser oferecidos.": {
+    es: "Tienda desconectada. El historial se conservó y sus productos dejaron de ofrecerse.",
+  },
+  "Sincronização solicitada. Você pode acompanhar o progresso abaixo.": {
+    es: "Sincronización solicitada. Puedes seguir el progreso a continuación.",
+  },
+  "Não foi possível concluir.": { es: "No se pudo completar." },
+
+  // ── Campanhas: manter os espaços dos fragmentos usados na tela ────────────
+  "Campanhas de WhatsApp": { es: "Campañas de WhatsApp" },
+  "Selecione contatos com opt-in, confira o modelo aprovado e acompanhe cada envio.": {
+    es: "Selecciona contactos que hayan dado su consentimiento, revisa la plantilla aprobada y sigue cada envío.",
+  },
+  "Você pode acompanhar as campanhas. Criar e disparar requer permissão de gerente e acompanhamento com acesso completo.": {
+    es: "Puedes consultar las campañas. Para crearlas y enviarlas necesitas permisos de gerente y acceso completo al seguimiento.",
+  },
+  "Nova campanha": { es: "Nueva campaña" },
+  "Preparar campanha": { es: "Preparar campaña" },
+  "Nome da campanha": { es: "Nombre de la campaña" },
+  "Canal WhatsApp": { es: "Canal de WhatsApp" },
+  "Este canal não tem modelos aprovados sincronizados. Atualize os modelos na Central de Conexões.": {
+    es: "Este canal no tiene plantillas aprobadas sincronizadas. Actualiza las plantillas en la Central de conexiones.",
+  },
+  "Buscar contatos existentes": { es: "Buscar contactos existentes" },
+  " selecionados · ": { es: " seleccionados · " },
+  " elegíveis na lista": { es: " aptos en la lista" },
+  "A lista mostra até 500 contatos. Marque explicitamente quem deve receber. Consentimento e bloqueio serão conferidos novamente antes do envio.": {
+    es: "La lista muestra hasta 500 contactos. Selecciona expresamente quién debe recibir el mensaje. El consentimiento y los bloqueos se comprobarán de nuevo antes del envío.",
+  },
+  "Nenhum contato nesta lista.": { es: "No hay contactos en esta lista." },
+  "Intervalo entre destinatários (segundos)": { es: "Intervalo entre destinatarios (segundos)" },
+  "Pré-visualizar seleção": { es: "Vista previa de la selección" },
+  " elegíveis · ": { es: " aptos · " },
+  " excluídos": { es: " excluidos" },
+  "Rascunho salvo. Confira os destinatários e confirme o disparo.": {
+    es: "Borrador guardado. Revisa los destinatarios y confirma el envío.",
+  },
+  Campanhas: { es: "Campañas" },
+  "Suas campanhas": { es: "Tus campañas" },
+  "Nenhuma campanha criada.": { es: "No hay campañas creadas." },
+  "Detalhes da campanha": { es: "Detalles de la campaña" },
+  "Fechar detalhes": { es: "Cerrar detalles" },
+  "Agendar (opcional)": { es: "Programar (opcional)" },
+  "Revisar disparo": { es: "Revisar envío" },
+  "Retomar pendentes": { es: "Reanudar pendientes" },
+  "Cancelar campanha": { es: "Cancelar campaña" },
+  "Confirme o envio para ": { es: "Confirma el envío a " },
+  " contatos explicitamente selecionados": { es: " contactos seleccionados expresamente" },
+  " em ": { es: " el " },
+  " a partir de agora": { es: " a partir de ahora" },
+  ". O intervalo e as regras do canal serão respeitados.": {
+    es: ". Se respetarán el intervalo y las reglas del canal.",
+  },
+  "Confirmar e ": { es: "Confirmar y " },
+  agendar: { es: "programar" },
+  disparar: { es: "enviar" },
+  "Há envios sem confirmação segura. Confira a conversa e a entrega antes de continuar. Esses destinatários não podem ser reenviados pela campanha.": {
+    es: "Hay envíos sin confirmación fiable. Revisa la conversación y la entrega antes de continuar. La campaña no puede volver a enviar mensajes a estos destinatarios.",
+  },
+  "Destinatários, tentativas e entrega": { es: "Destinatarios, intentos y entrega" },
+  "Envio / entrega": { es: "Envío / entrega" },
+  "Próximo passo": { es: "Siguiente paso" },
+  " e entrega": { es: " y entrega" },
+  "Entrega: ": { es: "Entrega: " },
+  "Preparar nova tentativa segura": { es: "Preparar un nuevo intento seguro" },
+  "Encerrar revisão sem reenviar": { es: "Cerrar revisión sin reenviar" },
+  "Encerrar revisão deste destinatário?": { es: "¿Cerrar la revisión de este destinatario?" },
+  "Confira a conversa e o recibo de entrega antes de confirmar. O destinatário será retirado dos pendentes e este envio não será repetido. Uma confirmação tardia ainda poderá atualizar o histórico.": {
+    es: "Revisa la conversación y el recibo de entrega antes de confirmar. El destinatario se retirará de los pendientes y este envío no se repetirá. Una confirmación tardía aún podrá actualizar el historial.",
+  },
+  "Confirmar encerramento da revisão": { es: "Confirmar cierre de la revisión" },
+  "Tentativa preparada. Retome a campanha para enviar.": {
+    es: "Intento preparado. Reanuda la campaña para enviar.",
+  },
+  "Revisão encerrada. Retome os destinatários pendentes quando estiver pronto.": {
+    es: "Revisión cerrada. Reanuda los envíos a los destinatarios pendientes cuando estés listo.",
+  },
+  "Campanha atualizada.": { es: "Campaña actualizada." },
+  "Não foi possível concluir a operação.": { es: "No se pudo completar la operación." },
+  "Falha na campanha.": { es: "Error en la campaña." },
+  "Acesso às campanhas indisponível.": { es: "Acceso a las campañas no disponible." },
+  "Precisa de revisão": { es: "Necesita revisión" },
+  "Em fila": { es: "En cola" },
+  Enviando: { es: "Enviando" },
+
+  // ── Porta da avaliação do atendimento no Inbox ───────────────────────────
+  Avaliação: { es: "Evaluación" },
+  "Avaliação do atendimento": { es: "Evaluación de la atención" },
+  "O atendimento": { es: "La atención" },
+  "Ensinar o agente": { es: "Enseñar al agente" },
+  "Qualidade do atendimento": { es: "Calidad de la atención" },
+  "Acompanhe prazos de resposta e resolução e as avaliações dos clientes.": {
+    es: "Consulta los plazos de respuesta y resolución y las evaluaciones de los clientes.",
+  },
+  "Conecte APIs ao atendimento, configure credenciais e acompanhe cada execução.": {
+    es: "Conecta APIs a la atención, configura credenciales y sigue cada ejecución.",
+  },
+  "Envie modelos aprovados para contatos autorizados, com prévia e acompanhamento.": {
+    es: "Envía plantillas aprobadas a contactos autorizados, con vista previa y seguimiento.",
+  },
+  "Conecte Shopify, WooCommerce, Nuvemshop e outras ferramentas ao atendimento.": {
+    es: "Conecta Shopify, WooCommerce, Nuvemshop y otras herramientas a la atención.",
+  },
+
+  "Não consegui ler a codificação da página. Envie o texto como documento.": { es: "No pude leer la codificación de la página. Envía el texto como documento." },
+  "Não consegui resolver o endereço público da página. Tente novamente.": { es: "No pude resolver la dirección pública de la página. Inténtalo de nuevo." },
+  "O endereço resolve para uma rede interna ou reservada. A página não foi acessada.": { es: "La dirección resuelve a una red interna o reservada. No se accedió a la página." },
+  "A página redireciona. Informe o endereço HTTPS final para preparar o material.": { es: "La página redirige. Indica la dirección HTTPS final para preparar el material." },
+  "A página não está disponível para leitura pública. Tente novamente.": { es: "La página no está disponible para lectura pública. Inténtalo de nuevo." },
+  "A página precisa responder com HTML ou texto simples.": { es: "La página debe responder con HTML o texto sin formato." },
+  "A página respondeu com conteúdo comprimido. Use uma página que permita leitura em texto.": { es: "La página respondió con contenido comprimido. Usa una página que permita leer el texto." },
+  "A página excede o limite de 1 MB.": { es: "La página supera el límite de 1 MB." },
+  "A leitura da página foi interrompida. Tente novamente.": { es: "Se interrumpió la lectura de la página. Inténtalo de nuevo." },
+  "A página demorou demais para responder. Tente novamente.": { es: "La página tardó demasiado en responder. Inténtalo de nuevo." },
+  "Não consegui acessar a página com segurança. Tente novamente.": { es: "No pude acceder a la página de forma segura. Inténtalo de nuevo." },
+  "A página não contém texto para preparar. Páginas que dependem de scripts precisam ser enviadas como documento.": { es: "La página no contiene texto para preparar. Las páginas que dependen de scripts deben enviarse como documento." },
+  "A estrutura da página é complexa demais. Envie o texto como documento.": { es: "La estructura de la página es demasiado compleja. Envía el texto como documento." },
+  "Página da internet": { es: "Página de internet" },
+  "O texto de uma página pública HTTPS do seu negócio. Prepare de novo quando a página mudar.": { es: "El texto de una página pública HTTPS de tu negocio. Prepáralo de nuevo cuando cambie la página." },
+  "Endereço da página": { es: "Dirección de la página" },
+  "Informe o endereço HTTPS de uma página pública.": { es: "Indica la dirección HTTPS de una página pública." },
+  "Escolha Página da internet para cadastrar um endereço.": { es: "Elige Página de internet para registrar una dirección." },
+  "Use uma página pública HTTPS, sem login. Se ela redirecionar, informe o endereço final. O agente lê o texto; páginas que dependem de scripts devem ser enviadas como documento.": { es: "Usa una página pública HTTPS, sin inicio de sesión. Si redirige, indica la dirección final. El agente lee el texto; las páginas que dependen de scripts deben enviarse como documento." },
+  "Use HTTPS, sem senha no endereço, na porta padrão.": { es: "Usa HTTPS, sin contraseña en la dirección, en el puerto predeterminado." },
+  "O endereço deve apontar para uma página pública, fora da rede interna.": { es: "La dirección debe apuntar a una página pública, fuera de la red interna." },
+  // Mensagens das lojas e campanhas exibidas pela interface.
+  "Integração não encontrada.": { es: "Integración no encontrada." },
+  "Não foi possível carregar a conexão.": { es: "No se pudo cargar la conexión." },
+  "Conecte sua loja antes de sincronizar.": { es: "Conecta tu tienda antes de sincronizar." },
+  "Não foi possível iniciar a sincronização.": { es: "No se pudo iniciar la sincronización." },
+  "Não foi possível desconectar a loja.": { es: "No se pudo desconectar la tienda." },
+  "Não foi possível carregar as integrações.": { es: "No se pudieron cargar las integraciones." },
+  "Confira o endereço e as credenciais da loja.": { es: "Revisa la dirección y las credenciales de la tienda." },
+  "Não foi possível validar a loja. Confira as credenciais e permissões.": { es: "No se pudo validar la tienda. Revisa las credenciales y los permisos." },
+  "A loja recusou a consulta. Verifique as permissões do aplicativo.": { es: "La tienda rechazó la consulta. Revisa los permisos de la aplicación." },
+  "Autorize leitura de produtos, estoque e pedidos para conectar.": { es: "Autoriza la lectura de productos, inventario y pedidos para conectar." },
+  "A proteção das credenciais ainda não foi configurada pelo administrador da plataforma.": { es: "El administrador de la plataforma aún no ha configurado la protección de las credenciales." },
+  "Não foi possível acessar a credencial. Reconecte a loja.": { es: "No se pudo acceder a la credencial. Vuelve a conectar la tienda." },
+  "A autorização Shopify expirou. Reconecte a loja.": { es: "La autorización de Shopify venció. Vuelve a conectar la tienda." },
+  "Reconecte a loja para renovar a autorização.": { es: "Vuelve a conectar la tienda para renovar la autorización." },
+  "Falha ao renovar a autorização.": { es: "Error al renovar la autorización." },
+  "A autorização está sendo renovada. Aguarde alguns segundos.": { es: "Se está renovando la autorización. Espera unos segundos." },
+  "Resposta de renovação inválida.": { es: "Respuesta de renovación no válida." },
+  "A renovação não foi salva. Reconecte a loja.": { es: "No se guardó la renovación. Vuelve a conectar la tienda." },
+  "Falha ao associar o cliente do pedido.": { es: "Error al asociar al cliente del pedido." },
+  "Loja desconectada.": { es: "Tienda desconectada." },
+  "Falha ao salvar a sincronização.": { es: "Error al guardar la sincronización." },
+  "Não foi possível sincronizar a loja. Confira a conexão e tente novamente.": { es: "No se pudo sincronizar la tienda. Revisa la conexión e inténtalo de nuevo." },
+  "Informe a URL HTTPS pública da loja, sem credenciais ou parâmetros.": { es: "Introduce la URL HTTPS pública de la tienda, sin credenciales ni parámetros." },
+  "Use o domínio original da loja: sua-loja.myshopify.com.": { es: "Usa el dominio original de la tienda: tu-tienda.myshopify.com." },
+  "Credencial inválida ou expirada.": { es: "Credencial no válida o vencida." },
+  "A loja não autorizou as permissões necessárias.": { es: "La tienda no autorizó los permisos necesarios." },
+  "A loja atingiu o limite de consultas. Tente novamente em alguns minutos.": { es: "La tienda alcanzó el límite de consultas. Inténtalo de nuevo en unos minutos." },
+  "A loja não respondeu à consulta. Tente novamente.": { es: "La tienda no respondió a la consulta. Inténtalo de nuevo." },
+  "Resposta inválida da loja.": { es: "Respuesta de la tienda no válida." },
+  "Esta página da loja excedeu o tempo de sincronização. Revise produtos com muitas variantes e tente novamente.": { es: "Esta página de la tienda superó el tiempo de sincronización. Revisa los productos con muchas variantes e inténtalo de nuevo." },
+  "Página de sincronização inválida.": { es: "Página de sincronización no válida." },
+  "Produto com mais de mil variantes: sincronização interrompida para evitar truncagem.": { es: "Producto con más de mil variantes: sincronización interrumpida para evitar resultados incompletos." },
+  "Contato bloqueado": { es: "Contacto bloqueado" },
+  "Consentimento revogado": { es: "Consentimiento revocado" },
+  "Sem opt-in de marketing": { es: "Sin consentimiento para marketing" },
+  "Contato sem telefone": { es: "Contacto sin teléfono" },
+  "Sem conversa neste canal": { es: "Sin conversación en este canal" },
+  "Conversa encerrada": { es: "Conversación cerrada" },
+  "Canal indisponível nesta organização.": { es: "Canal no disponible en esta organización." },
+  "Este canal não envia modelos aprovados. Selecione um canal oficial conectado.": { es: "Este canal no envía plantillas aprobadas. Selecciona un canal oficial conectado." },
+  "O envio de componentes deste canal ainda não está disponível.": { es: "El envío de componentes de este canal aún no está disponible." },
+  "Modelo não encontrado neste canal.": { es: "No se encontró la plantilla en este canal." },
+  "A seleção contém contato fora desta organização.": { es: "La selección contiene un contacto ajeno a esta organización." },
+  "Remova os contatos inelegíveis da seleção antes de salvar.": { es: "Quita los contactos no aptos de la selección antes de guardar." },
+  "Campanha não encontrada.": { es: "Campaña no encontrada." },
+  "Pause a campanha antes de conferir o envio incerto.": { es: "Pausa la campaña antes de comprobar el envío sin confirmar." },
+  "Este destinatário não está aguardando revisão. Atualize a campanha para conferir o recibo atual.": { es: "Este destinatario no está pendiente de revisión. Actualiza la campaña para comprobar el recibo actual." },
+  "Pause a campanha antes de preparar uma nova tentativa.": { es: "Pausa la campaña antes de preparar un nuevo intento." },
+  "Este envio não tem uma falha comprovadamente segura para repetir.": { es: "No se ha comprobado que el fallo de este envío permita repetirlo de forma segura." },
+  "Escolha um horário futuro.": { es: "Elige una hora futura." },
+  "Confira e encerre os envios incertos antes de retomar os pendentes.": { es: "Revisa y cierra los envíos sin confirmar antes de reanudar los pendientes." },
+  "A campanha não possui destinatários pendentes.": { es: "La campaña no tiene destinatarios pendientes." },
+  "O modelo mudou ou deixou de estar aprovado. Cancele e crie uma campanha com o modelo atual.": { es: "La plantilla cambió o dejó de estar aprobada. Cancela y crea una campaña con la plantilla actual." },
+  "O modelo precisa estar aprovado.": { es: "La plantilla debe estar aprobada." },
+  "Campanhas ainda não aceitam modelos de carrossel.": { es: "Las campañas aún no admiten plantillas de carrusel." },
+  "Este canal aceita somente parâmetros posicionais no corpo. Escolha um modelo com {{1}}, {{2}} ou use um canal que envie componentes completos.": { es: "Este canal solo admite parámetros posicionales en el cuerpo. Elige una plantilla con {{1}}, {{2}} o usa un canal que envíe componentes completos." },
+  "Este canal aceita somente parâmetros de texto no corpo. Escolha um modelo sem parâmetros no cabeçalho ou nos botões.": { es: "Este canal solo admite parámetros de texto en el cuerpo. Elige una plantilla sin parámetros en el encabezado ni en los botones." },
+  "Parâmetro fora do contrato aprovado.": { es: "Parámetro fuera del contrato aprobado." },
+  "Preencha todos os parâmetros do modelo.": { es: "Completa todos los parámetros de la plantilla." },
+  "Este modelo usa a mesma variável com valores diferentes; escolha outro modelo.": { es: "Esta plantilla usa la misma variable con valores distintos; elige otra plantilla." },
+  "O texto do modelo não pode ser usado nesta campanha.": { es: "El texto de la plantilla no puede usarse en esta campaña." },
+  "Transição de campanha não permitida.": { es: "Transición de campaña no permitida." },
+  "Confira os campos da campanha.": { es: "Revisa los campos de la campaña." },
+  "Não foi possível acessar as campanhas.": { es: "No se pudo acceder a las campañas." },
+  "Campanhas indisponíveis.": { es: "Campañas no disponibles." },
+
   // ── Foto do perfil (upload) ───────────────────────────────────────────────
   // As duas abaixo continuam vivas porque `app/app/settings/profile/_form.tsx`
   // AINDA as usa na versão commitada. Elas saem no mesmo commit que trocar a
@@ -4050,6 +4342,7 @@ export const DICIONARIO: Traducoes = {
   // ─── lib/channels/meta/template-contract.ts (preview de template do WhatsApp) ───
   cabeçalho: { es: "encabezado" },
   corpo: { es: "cuerpo" },
+  botão: { es: "botón" },
 
   // ─── lib/channels/zernio/avisos.ts (avisos de número/conta na Central) ───
   "Número ativado.": { es: "Número activado." },

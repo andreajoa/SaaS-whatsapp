@@ -416,7 +416,7 @@ export function createOperatorTurnHandler(deps: InboundTurnDeps) {
     // registra a promessa em aberto. Chamar o modelo para descobrir que ele não
     // tem mão nenhuma seria gastar a chave do self-hoster para nada.
     let mcp: Awaited<ReturnType<typeof buildMcpTurnTools>> = null;
-    if (agentConfig.operatorToolIds.length > 0) {
+    if (agentConfig.operatorToolIds.length > 0 || agentConfig.integrationActionIds?.length) {
       try {
         mcp = await buildMcpTurnTools(
           deps.crmCfg,

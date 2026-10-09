@@ -92,6 +92,7 @@ function temONumero(alvoNormalizado: string, numero: string): boolean {
 export interface ProdutoBuscavel {
   nome: string;
   codigo: string;
+  sku?: string;
   marca?: string | null;
   categoria?: string | null;
 }
@@ -105,7 +106,7 @@ export interface ProdutoBuscavel {
  */
 export function pontuar(produto: ProdutoBuscavel, tokens: TokensDaBusca): number | null {
   const alvo = normalizar(
-    [produto.nome, produto.marca ?? "", produto.categoria ?? "", produto.codigo].join(" "),
+    [produto.nome, produto.marca ?? "", produto.categoria ?? "", produto.codigo, produto.sku ?? ""].join(" "),
   );
 
   // ── O FILTRO DURO ──────────────────────────────────────────────────────────
@@ -240,7 +241,7 @@ function numerosQueOCatalogoConhece<T extends ProdutoBuscavel>(
 
   for (const produto of produtos) {
     const alvo = normalizar(
-      [produto.nome, produto.marca ?? "", produto.categoria ?? "", produto.codigo].join(" "),
+      [produto.nome, produto.marca ?? "", produto.categoria ?? "", produto.codigo, produto.sku ?? ""].join(" "),
     );
     for (const n of numeros) {
       if (!conhecidos.has(n) && temONumero(alvo, n)) conhecidos.add(n);

@@ -38,7 +38,7 @@ import { VALID_TOOL_IDS } from "@/lib/mcp/tools";
 const UUID_RX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const VERSION_COLUMNS =
-  "id, organization_id, agent_id, version_number, system_prompt, provider, model, credential_id, tool_ids, trigger_config, channel_session_id, max_steps, token_budget, cost_budget_cents, history_message_window, history_token_window, handoff_keywords, handoff_tool_enabled, cases_enabled, split_messages, split_max_chars, followup, operator_enabled, operator_model, operator_tool_ids, status, published_at, superseded_at, created_at, created_by,pipeline_ids,knowledge_source_ids,provisioning_origin";
+  "id, organization_id, agent_id, version_number, system_prompt, provider, model, credential_id, tool_ids, integration_action_ids, trigger_config, channel_session_id, max_steps, token_budget, cost_budget_cents, history_message_window, history_token_window, handoff_keywords, handoff_tool_enabled, cases_enabled, split_messages, split_max_chars, followup, operator_enabled, operator_model, operator_tool_ids, status, published_at, superseded_at, created_at, created_by,pipeline_ids,knowledge_source_ids,provisioning_origin";
 
 type ActionResult<T = void> =
   | { ok: true; data?: T }
@@ -165,6 +165,7 @@ export async function saveAgentDraftAction(
   const escopo = await validarEscopoDaVersao(admin, activeOrg.orgId, {
     pipeline_ids: v.pipeline_ids,
     knowledge_source_ids: v.knowledge_source_ids,
+    integration_action_ids: v.integration_action_ids,
   });
   if (!escopo.ok) {
     return { ok: false, error: "validation_failed", message: mensagemDoEscopo(escopo) };
@@ -298,6 +299,7 @@ export async function saveAgentDraftAction(
         model: v.model,
         credential_id: v.credential_id,
         tool_ids: v.tool_ids,
+        integration_action_ids: v.integration_action_ids ?? [],
         trigger_config: v.trigger_config ?? undefined,
         channel_session_id: v.channel_session_id,
         max_steps: v.max_steps,
@@ -505,6 +507,7 @@ export async function revertToVersionAction(
     model: string;
     credential_id: string;
     tool_ids: string[];
+    integration_action_ids?: string[];
     trigger_config: Record<string, unknown> | null;
     channel_session_id: string;
     max_steps: number;
@@ -549,6 +552,7 @@ export async function revertToVersionAction(
         model: src.model,
         credential_id: src.credential_id,
         tool_ids: src.tool_ids,
+        integration_action_ids: src.integration_action_ids ?? [],
         trigger_config: src.trigger_config ?? undefined,
         channel_session_id: src.channel_session_id,
         max_steps: src.max_steps,
@@ -703,6 +707,7 @@ export async function createMcpAgentAction(
     model: v.model,
     credential_id: v.credential_id,
     tool_ids: v.tool_ids,
+    integration_action_ids: v.integration_action_ids ?? [],
     trigger_config: v.trigger_config ?? undefined,
     channel_session_id: v.channel_session_id,
     max_steps: v.max_steps,

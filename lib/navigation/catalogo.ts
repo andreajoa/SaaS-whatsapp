@@ -451,6 +451,31 @@ export const NAV_CATALOG = [
     // navegável. Para voltar a mostrá-la, basta devolver `sidebar: true`.
   },
   {
+    href: "/app/integration-actions",
+    label: "Ações de integração",
+    description: "Conecte APIs ao atendimento, configure credenciais e acompanhe cada execução.",
+    icon: "PlugsConnected", group: "ia", section: "Ensinar o agente", minRole: "manager",
+  },
+  {
+    href: "/app/campaigns", label: "Campanhas",
+    description: "Envie modelos aprovados para contatos autorizados, com prévia e acompanhamento.",
+    icon: "Megaphone", group: "crm", section: "O dia a dia da venda",
+  },
+  {
+    href: "/app/service-quality", label: "Qualidade do atendimento",
+    description: "Acompanhe prazos de resposta e resolução e as avaliações dos clientes.",
+    icon: "Gauge", group: "analise", section: "O atendimento",
+  },
+  {
+    href: "/app/integrations",
+    label: "Integrações",
+    description: "Conecte Shopify, WooCommerce, Nuvemshop e outras ferramentas ao atendimento.",
+    icon: "Plugs",
+    group: "canais",
+    minRole: "admin",
+    sidebar: true,
+  },
+  {
     href: "/app/webhooks",
     label: "Webhooks",
     description: "Avise outros sistemas quando algo acontecer aqui dentro.",

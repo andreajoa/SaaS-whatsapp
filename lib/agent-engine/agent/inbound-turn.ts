@@ -3256,7 +3256,7 @@ async function executarTurnoDoAgente(
   // ver edge/crm/mcp-tools.ts). As 8 tools do engine têm precedência de nome.
   let mcpCleanup: (() => Promise<void>) | null = null;
   try {
-    if (agentConfig !== null && agentConfig.toolIds.length > 0) {
+    if (agentConfig !== null && (agentConfig.toolIds.length > 0 || agentConfig.integrationActionIds?.length)) {
       try {
         // As de OPERAÇÃO saem antes de serem montadas, quando o Operador as tem.
         // Medido: são elas que carregavam 2 dos 3 vazamentos (o DADO que devolvem),
@@ -3281,7 +3281,7 @@ async function executarTurnoDoAgente(
         const mcp = await buildMcpTurnTools(
           deps.crmCfg,
           { organizationId: tenantId, jobId: preview?.runId ?? liveJob().id },
-          configDoTurno,
+          { ...configDoTurno, integrationActionIds: agentConfig.operatorEnabled && !preview ? [] : agentConfig.integrationActionIds },
           runLog,
           preview ? { readOnly: true } : undefined,
         );

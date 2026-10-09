@@ -21,6 +21,8 @@ import { mediaDeriveHandler } from "@/workers/media-derive-worker.handler";
 import { webPushInboundHandler } from "@/lib/notifications/push.handler";
 import { conversaoDeVendaHandler } from "@/lib/conversoes/envio.handler";
 import { registerHandler } from "@/lib/event-log/dispatcher";
+import { commerceSyncHandler } from "@/lib/commerce/sync.handler";
+import { campaignDispatchHandler } from "@/lib/campaigns/dispatch.handler";
 
 let _registered = false;
 
@@ -46,5 +48,7 @@ export function ensureHandlersRegistered(): void {
   // fechamento — depende de rede de terceiro e não pode atrasar quem escreve
   // no banco. Falha dele nunca segura os handlers acima.
   registerHandler(conversaoDeVendaHandler);
+  registerHandler(commerceSyncHandler);
+  registerHandler(campaignDispatchHandler);
   _registered = true;
 }

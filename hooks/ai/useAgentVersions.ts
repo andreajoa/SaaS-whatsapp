@@ -14,6 +14,7 @@ export interface AgentVersionRow {
   model: string;
   credential_id: string;
   tool_ids: string[];
+  integration_action_ids?: string[];
   trigger_config: Record<string, unknown> | null;
   channel_session_id: string;
   max_steps: number;

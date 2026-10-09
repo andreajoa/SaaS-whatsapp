@@ -228,7 +228,7 @@ export const AUDIT_ACTIONS = [
   "leads.bulk_assigned",
   "attendant.availability_changed",
   "routing.config_changed",
-  /** Liga/desliga o modo teste "conversar comigo mesmo" (lib/waha/conversa-consigo-mesmo.ts). */
+  /** Liga/desliga o modo teste "conversar comigo mesmo" (lib/channels/teste-consigo-mesmo.ts). */
   "settings.teste_consigo_mesmo_changed",
   // Mudar a régua do abandono (spec 16 §5.2) muda como TODO período passa a ser
   // lido — é mutação relevante, não preferência de exibição.
@@ -519,6 +519,15 @@ export const AUDIT_ACTIONS = [
   // consultas voltam vazias de hora em hora, e auditar isso encheria a tabela
   // com a prova de que nada aconteceu.
   "marketing.abandono_run",
+
+  // Ciclo de conexão e sincronização das lojas no atendimento.
+  "commerce.connected",
+  "commerce.disconnected",
+  "commerce.oauth_failed",
+  "commerce.sync_requested",
+  "commerce.sync_completed",
+  "commerce.sync_failed",
+  "commerce.webhook_received",
 ] as const;
 
 /** Um código de auditoria. Derivado de `AUDIT_ACTIONS` — não redigite a lista. */

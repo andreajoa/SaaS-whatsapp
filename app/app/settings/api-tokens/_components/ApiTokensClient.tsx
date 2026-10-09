@@ -95,7 +95,7 @@ function BlocoCopiavel({ titulo, texto }: { titulo: string; texto: string }) {
 
 /**
  * Liga/desliga o modo teste "conversar comigo mesmo" — ver
- * `lib/waha/conversa-consigo-mesmo.ts`. Mora junto da conexão porque é o passo
+ * `lib/channels/teste-consigo-mesmo.ts`. Mora junto da conexão porque é o passo
  * seguinte de quem acabou de ligar o Claude Code e só tem um celular.
  */
 function TesteConsigoMesmo() {

@@ -371,6 +371,8 @@ const schema = z.object({
   NUVEMSHOP_APP_ID: z.string().optional().default(""),
   NUVEMSHOP_CLIENT_ID: z.string().optional().default(""),
   NUVEMSHOP_CLIENT_SECRET: z.string().optional().default(""),
+  SHOPIFY_CLIENT_ID: z.string().optional().default(""),
+  SHOPIFY_CLIENT_SECRET: z.string().optional().default(""),
   NUVEMSHOP_ENABLED: z
     .enum(["true", "false"])
     .optional()

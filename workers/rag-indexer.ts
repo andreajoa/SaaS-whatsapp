@@ -43,6 +43,7 @@ import { acquireDebounce } from "@/lib/ai/rag/debounce";
 import { chunkText, computeContentHash } from "@/lib/ai/rag/chunker";
 import { canonizarTipoDeFonte } from "@/lib/ai/rag/tipos-de-fonte";
 import { extrairTextoDoArquivo, ErroDeExtracao } from "@/lib/ai/rag/ingest/documento";
+import { extrairTextoDaUrl } from "@/lib/ai/rag/url-source";
 import { estimateTokens } from "@/lib/ai/runtime/history";
 import { formatProductForRag, type NuvemshopProduct } from "@/lib/ai/rag/format-product";
 import {
@@ -333,6 +334,14 @@ async function indexarFonte(
       case "documento":
         pedacos = await pedacosDeDocumento(fonte);
         break;
+      case "url": {
+        const { texto, url } = await extrairTextoDaUrl(fonte.source_metadata?.url);
+        pedacos = chunkText(texto, { maxChars: 1600, overlapChars: 200 }).map((content) => ({
+          content,
+          metadata: { source_type: "url", url },
+        }));
+        break;
+      }
       case "catalogo":
         pedacos = await pedacosDeCatalogo(fonte, extra.productId);
         break;

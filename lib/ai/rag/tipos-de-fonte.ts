@@ -35,6 +35,8 @@ export type ComoSePreenche =
    * pessoa que cola a política de troca não quer saber a diferença.
    */
   | "arquivo_ou_texto"
+  /** A pessoa informa uma página pública HTTPS. */
+  | "url"
   /** Uma rotina do sistema alimenta sozinha; não há o que colar. */
   | "automatico";
 
@@ -67,6 +69,13 @@ export const TIPOS_DE_FONTE = [
     oQueE:
       "Um texto do seu negócio — política de troca, tabela de preços, manual, contrato. Envie o arquivo (PDF, Markdown ou texto) ou cole o conteúdo.",
     comoSePreenche: "arquivo_ou_texto",
+  },
+  {
+    id: "url",
+    rotulo: "Página da internet",
+    oQueE:
+      "O texto de uma página pública HTTPS do seu negócio. Prepare de novo quando a página mudar.",
+    comoSePreenche: "url",
   },
   {
     id: "conversas",
@@ -115,6 +124,8 @@ export function canonizarTipoDeFonte(bruto: string): TipoDeFonteId | null {
   switch (t) {
     case "faq":
       return "faq";
+    case "url":
+      return "url";
     case "documento":
     case "policy":
       return "documento";

@@ -20,11 +20,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export interface EscopoDaVersao {
   pipeline_ids?: string[];
   knowledge_source_ids?: string[];
+  integration_action_ids?: string[];
 }
 
 export type ResultadoDoEscopo =
   | { ok: true }
-  | { ok: false; campo: "pipeline_ids" | "knowledge_source_ids"; ausentes: string[] };
+  | { ok: false; campo: "pipeline_ids" | "knowledge_source_ids" | "integration_action_ids"; ausentes: string[] };
 
 /**
  * Confere que todo id do escopo existe NESTA organização.
@@ -66,11 +67,20 @@ export async function validarEscopoDaVersao(
     if (ausentes.length > 0) return { ok: false, campo: "knowledge_source_ids", ausentes };
   }
 
+  const actions = escopo.integration_action_ids ?? [];
+  if (actions.length) {
+    const { data } = await supabase.from("integration_actions").select("id")
+      .eq("organization_id", organizationId).eq("configuration->>enabled", "true").in("id", actions);
+    const found = new Set((data ?? []).map((row: { id: string }) => row.id));
+    const missing = actions.filter(id => !found.has(id));
+    if (missing.length) return { ok: false, campo: "integration_action_ids", ausentes: missing };
+  }
   return { ok: true };
 }
 
 /** Frase para quem lê na tela — nunca o id cru sem contexto. */
 export function mensagemDoEscopo(r: Extract<ResultadoDoEscopo, { ok: false }>): string {
+  if (r.campo === "integration_action_ids") return `Uma das ações selecionadas foi pausada, excluída ou pertence a outra organização (${r.ausentes.length}). Revise a seleção antes de publicar.`;
   return r.campo === "pipeline_ids"
     ? `Um dos funis marcados não existe mais nesta organização (${r.ausentes.length}). Recarregue a página e marque de novo.`
     : `Um dos materiais marcados não existe mais, ou foi arquivado (${r.ausentes.length}). Recarregue a página e marque de novo.`;

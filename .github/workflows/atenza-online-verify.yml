@@ -1,0 +1,65 @@
+name: Atenza online verification
+
+on:
+  push:
+    branches: [feat/atenza-experiencia-integracoes]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atenza-online-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_PUBLIC_SUPABASE_URL: https://test-placeholder.invalid
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: test-placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: test-placeholder-service-role-key
+  NEXT_TELEMETRY_DISABLED: "1"
+  SENTRY_DSN: "off"
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  verify:
+    name: Types and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+        timeout-minutes: 5
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm lint:channels
+      - run: pnpm lint:role-rank
+      - run: pnpm release:conferir
+
+  unit:
+    name: Complete unit suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+        timeout-minutes: 5
+      - run: pnpm exec vitest run --config vitest.offline.config.ts
+      - run: pnpm exec vitest run --config tests/service-quality/vitest.unit.config.ts
+
+  build:
+    name: Serverless production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      VERCEL: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+        timeout-minutes: 5
+      - run: pnpm build

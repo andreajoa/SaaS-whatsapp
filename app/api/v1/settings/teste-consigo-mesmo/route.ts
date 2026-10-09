@@ -3,7 +3,7 @@ import { requireSupportWrite } from "@/lib/impersonate/support";
  * GET   /api/v1/settings/teste-consigo-mesmo — a opção está ligada? (admin)
  * PATCH /api/v1/settings/teste-consigo-mesmo — liga/desliga (admin)
  *
- * O que a opção faz está em `lib/waha/conversa-consigo-mesmo.ts`. Admin, e não
+ * A configuração está em `lib/channels/teste-consigo-mesmo.ts`. Admin, e não
  * manager, porque muda o que conta como CLIENTE na ingestão — é decisão do dono
  * da conta, como o perfil da organização.
  *
@@ -20,7 +20,7 @@ import { ok, fail } from "@/lib/api/wrappers";
 import { audit } from "@/lib/audit";
 import { requireRole } from "@/lib/auth/require-role";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { testeConsigoMesmoLigado } from "@/lib/waha/conversa-consigo-mesmo";
+import { testeConsigoMesmoLigado } from "@/lib/channels/teste-consigo-mesmo";
 
 export const dynamic = "force-dynamic";
 

@@ -20,6 +20,7 @@ import { useState } from "react";
 import {
   BookOpen,
   FileText,
+  Globe,
   HelpCircle,
   MessageSquare,
   Package,
@@ -42,6 +43,7 @@ import type { SourceRow } from "@/hooks/ai/useKnowledgeSources";
 const ICONE_POR_TIPO: Record<string, typeof HelpCircle> = {
   faq: HelpCircle,
   documento: FileText,
+  url: Globe,
   conversas: MessageSquare,
   catalogo: Package,
 };
@@ -113,6 +115,14 @@ export function KnowledgeSourceCard({
       </CardHeader>
 
       <CardContent className="flex-1 space-y-2 text-sm">
+        {tipo === "url" && typeof source.source_metadata?.url === "string" ? (
+          <p
+            className="text-xs break-all text-text-muted"
+            data-testid={`material-url-${source.id}`}
+          >
+            {source.source_metadata.url}
+          </p>
+        ) : null}
         <div className="flex items-baseline justify-between">
           <span className="text-text-muted">{t("Preparado")}</span>
           <span>{formatRelative(source.last_indexed_at, tagDoIdioma, t)}</span>
@@ -140,7 +150,9 @@ export function KnowledgeSourceCard({
         {mostraErro ? (
           <details className="rounded-md border border-error-bg bg-error-bg/30 p-2 text-xs text-error-fg">
             <summary className="cursor-pointer font-medium">{t("Por que não entrou")}</summary>
-            <p className="mt-1 whitespace-pre-wrap break-words">{source.last_index_error}</p>
+            <p className="mt-1 break-words whitespace-pre-wrap">
+              {tipo === "url" ? t(source.last_index_error!) : source.last_index_error}
+            </p>
           </details>
         ) : null}
       </CardContent>

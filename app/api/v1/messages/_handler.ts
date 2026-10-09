@@ -716,9 +716,10 @@ export async function sendMessageHandler(
                 values: input.template_values ?? {},
               })
             ).externalId
-          : await sendTemplateForSession(supabase, {
+          : await sendTemplateForSession(createAdminClient(), {
               beforeSend: checkBoundary,
               organizationId: ctx.organization_id,
+              channelSessionId: c.channel_session_id,
               to: chatId,
               name: input.template_name ?? "",
               language: input.template_language ?? "",

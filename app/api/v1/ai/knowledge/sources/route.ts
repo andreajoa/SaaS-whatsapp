@@ -30,6 +30,7 @@ import {
 } from "@/lib/ai/rag/tipos-de-fonte";
 import { BUCKET_DE_CONHECIMENTO } from "@/lib/ai/rag/ingest/documento";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { validarUrlDeFonte } from "@/lib/ai/rag/url-source";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,7 @@ const createSourceSchema = z.object({
   name: z.string().trim().min(2).max(120),
   items: z.array(faqItemSchema).optional(),
   markdown_blob: z.string().optional(),
+  url: z.string().max(2048).optional(),
   source_metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
@@ -135,7 +137,23 @@ export async function POST(req: NextRequest): Promise<Response> {
   if (tipo === null) {
     return fail(
       "validation_failed",
-      `Tipo de material desconhecido: "${input.source_type}". Use faq, documento, conversas ou catalogo.`,
+      `Tipo de material desconhecido: "${input.source_type}". Use faq, documento, url, conversas ou catalogo.`,
+      422,
+      { requestId },
+    );
+  }
+
+  let url: string | undefined;
+  if (tipo === "url") {
+    try {
+      url = validarUrlDeFonte(input.url ?? input.source_metadata.url);
+    } catch (err) {
+      return fail("validation_failed", t((err as Error).message), 422, { requestId });
+    }
+  } else if (input.url !== undefined) {
+    return fail(
+      "validation_failed",
+      t("Escolha Página da internet para cadastrar um endereço."),
       422,
       { requestId },
     );
@@ -173,7 +191,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       return fail("internal_error", "Erro ao validar agent_id.", 500, { requestId });
     }
     if (!agent) {
-      return fail("not_found", t("Assistente não encontrado nesta organização."), 404, { requestId });
+      return fail("not_found", t("Assistente não encontrado nesta organização."), 404, {
+        requestId,
+      });
     }
   }
 
@@ -192,7 +212,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       if (faqItems.length === 0) {
         return fail(
           "invalid_request",
-          t("Não achei nenhum par pergunta/resposta no texto. Use uma linha ## Pergunta: e uma ## Resposta: por item."),
+          t(
+            "Não achei nenhum par pergunta/resposta no texto. Use uma linha ## Pergunta: e uma ## Resposta: por item.",
+          ),
           400,
           { requestId },
         );
@@ -223,6 +245,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   // como `.md` no mesmo bucket dos arquivos e segue exatamente a mesma rota de
   // extração. Um destino, um caminho, um lugar para consertar.
   let metadata: Record<string, unknown> = { ...(input.source_metadata ?? {}) };
+  if (tipo === "url") metadata = { url };
   if (tipo === "documento" && input.markdown_blob) {
     const blobPath = `${activeOrg.orgId}/${randomUUID()}.md`;
     const { error: upErr } = await admin.storage
@@ -233,7 +256,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       });
     if (upErr) {
       console.error("[ai-knowledge-sources] guardar o texto falhou:", upErr.message);
-      return fail("internal_error", t("Erro ao guardar o conteúdo do material."), 500, { requestId });
+      return fail("internal_error", t("Erro ao guardar o conteúdo do material."), 500, {
+        requestId,
+      });
     }
     metadata = { ...metadata, blob_path: blobPath, ext: "md", origem: "texto_colado" };
   }
@@ -290,22 +315,27 @@ export async function POST(req: NextRequest): Promise<Response> {
       // linha que promete conteúdo e nunca vai indexar nada.
       await admin.from("ai_knowledge_sources").delete().eq("id", ksId);
       console.error("[ai-knowledge-sources] insert dos itens falhou:", itemsErr.message);
-      return fail("internal_error", t("Erro ao gravar o conteúdo do material."), 500, { requestId });
+      return fail("internal_error", t("Erro ao gravar o conteúdo do material."), 500, {
+        requestId,
+      });
     }
     itemsCount = rows.length;
   }
 
-  const { error: emitErr } = await admin.rpc("emit_event" as never, {
-    p_event_type: "knowledge_source.updated",
-    p_entity_kind: "ai_knowledge_source",
-    p_entity_id: ksId,
-    p_payload: {
-      knowledge_source_id: ksId,
-      agent_id: input.agent_id ?? null,
-      source_type: tipo,
-    },
-    p_organization_id: activeOrg.orgId,
-  } as never);
+  const { error: emitErr } = await admin.rpc(
+    "emit_event" as never,
+    {
+      p_event_type: "knowledge_source.updated",
+      p_entity_kind: "ai_knowledge_source",
+      p_entity_id: ksId,
+      p_payload: {
+        knowledge_source_id: ksId,
+        agent_id: input.agent_id ?? null,
+        source_type: tipo,
+      },
+      p_organization_id: activeOrg.orgId,
+    } as never,
+  );
 
   if (emitErr) {
     console.warn("[ai-knowledge-sources] emit_event falhou (não bloqueia):", emitErr.message);

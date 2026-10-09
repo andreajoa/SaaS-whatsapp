@@ -42,6 +42,7 @@ import { ModelPicker, useModelMeta } from "./ModelPicker";
 import { CHAVE_DA_INSTALACAO, CredentialPicker, STATUS_LABEL, findCredential } from "./CredentialPicker";
 import { rotuloDoEstadoDoCanal } from "@/lib/channels/estado";
 import { ToolPicker } from "./ToolPicker";
+import { IntegrationActionPicker } from "./IntegrationActionPicker";
 import { TriggerEditor, type TriggerValue } from "./TriggerEditor";
 import { HandoffKeywordsInput } from "./HandoffKeywordsInput";
 import { FollowupFlowPicker } from "./FollowupFlowPicker";
@@ -141,6 +142,7 @@ interface FormState {
   channel_session_id: string;
   system_prompt: string;
   tool_ids: string[];
+  integration_action_ids: string[];
   trigger_config: TriggerValue;
   max_steps: number;
   token_budget: number;
@@ -199,6 +201,7 @@ function buildState(args: {
       version?.system_prompt ??
       "Você é um atendente. Responda de forma educada e clara, em pt-BR.",
     tool_ids: version?.tool_ids ?? [],
+    integration_action_ids: version?.integration_action_ids ?? [],
     trigger_config: (version?.trigger_config as unknown as TriggerValue) ?? DEFAULT_TRIGGER,
     max_steps: version?.max_steps ?? 10,
     token_budget: version?.token_budget ?? 50_000,
@@ -255,6 +258,7 @@ function toVersionPayload(s: FormState) {
     // O token é da TELA; o contrato da versão é `null` = chave da instalação.
     credential_id: s.credential_id === CHAVE_DA_INSTALACAO ? null : s.credential_id,
     tool_ids: s.tool_ids,
+    integration_action_ids: s.integration_action_ids,
     trigger_config: s.trigger_config,
     channel_session_id: s.channel_session_id,
     max_steps: s.max_steps,
@@ -993,6 +997,8 @@ export function AgentForm(props: Props) {
               <p className="text-xs text-destructive">{validation.tool_ids}</p>
             ) : null}
           </Card>
+
+          <IntegrationActionPicker value={form.integration_action_ids} onChange={ids => patch({ integration_action_ids: ids })} disabled={disabled} operatorEnabled={form.operator_enabled} />
 
           {/* O acervo que este assistente consulta (0181) */}
           <BasesDoAgente

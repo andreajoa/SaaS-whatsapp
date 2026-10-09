@@ -327,7 +327,9 @@ function pesDePagina(base: string, legal: string): string {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr><td height="1" bgcolor="${TINTA.borda}" style="background-color:${TINTA.borda};height:1px;line-height:1px;font-size:0">&nbsp;</td></tr>
         </table>
-        <div style="padding-top:12px">${legal}</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr><td style="padding-top:12px">${legal}</td></tr>
+        </table>
       </td></tr>`;
 }
 

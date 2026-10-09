@@ -7,6 +7,7 @@ import { qualityFetch } from "@/lib/service-quality/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requestSurveySchema } from "@/lib/service-quality/contracts";
+import { copyToClipboard } from "@/lib/clipboard";
 /** Seam de inbox: criar/copiar não envia. O integrador pode oferecer sua ação
  * normal de messenger através de onExplicitSend. Callback só roda num clique.
  */
@@ -62,8 +63,7 @@ export function QualitySurveyRequest({
   }
   async function copy() {
     try {
-      await navigator.clipboard.writeText(message);
-      setNotice(text.copied);
+      setNotice(await copyToClipboard(message) ? text.copied : text.copyError);
     } catch {
       setNotice(text.copyError);
     }
@@ -130,7 +130,7 @@ export function QualitySurveyRequest({
               {text.copy}
             </Button>
             <Button asChild variant="outline">
-              <Link href={`/app/inbox/${link.conversation_id}`}>{text.inbox}</Link>
+              <Link href={`/app/inbox?id=${link.conversation_id}`}>{text.inbox}</Link>
             </Button>
             {onExplicitSend && (
               <Button type="button" disabled={busy} onClick={send}>

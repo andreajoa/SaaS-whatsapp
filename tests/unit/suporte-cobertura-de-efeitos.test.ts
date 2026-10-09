@@ -45,6 +45,20 @@ it("todo handler mutante do app declara guarda de suporte ou é infraestrutura i
     // rotas é outra coisa, e está medido em outro lugar — Zod com teto de
     // tamanho, limite por IP, campo-armadilha, e `PUBLIC_PATHS` ancorado.
     if (/app\/api\/v1\/(site|painel)\//.test(path)) continue;
+    // POST transporta os filtros da prévia; só consulta público/template e
+    // valida o corpo. Não cria campanha, não enfileira nem dispara mensagens.
+    if (path === "app/api/v1/campaigns/preview/route.ts") {
+      expect(readFileSync(path, "utf8")).toContain("campaignApi(false,");
+      continue;
+    }
+    // Avaliação pública é identificada por token secreto, expiração e uso único
+    // na RPC service-only. Não há sessão de operador/support neste endpoint.
+    if (path === "app/api/v1/service-quality/public/[token]/route.ts") {
+      const text = readFileSync(path, "utf8");
+      expect(text).toContain("await guardPublicFeedback(");
+      expect(text).toContain('db.rpc("fn_service_quality_respond"');
+      continue;
+    }
     const source = ts.createSourceFile(
       path,
       readFileSync(path, "utf8"),
@@ -78,10 +92,20 @@ it("todo handler mutante do app declara guarda de suporte ou é infraestrutura i
             trechos.push([decl.name.text, decl.getText(source)]);
     }
     for (const [nome, texto] of trechos)
-      if (!texto.includes("requireSupportWrite(") && !texto.includes("methodNotAllowed("))
+      if (!texto.includes("requireSupportWrite(") && !texto.includes("methodNotAllowed(") &&
+          !/campaignApi\(true\s*,/.test(texto) &&
+          !/withActionAuth\("(?:manager|agent)",\s*true\s*,/.test(texto))
         uncovered.push(`${path}:${nome}`);
   }
   expect(uncovered).toEqual([]);
+});
+it("wrappers de campanha e ação mantêm a guarda de suporte antes do efeito", () => {
+  const campaign = readFileSync("lib/campaigns/api.ts", "utf8");
+  const action = readFileSync("app/api/v1/integration-actions/_http.ts", "utf8");
+  expect(campaign).toMatch(/if\(write\).*await requireSupportWrite\(/);
+  expect(campaign.indexOf("await requireSupportWrite(")).toBeLessThan(campaign.indexOf("await fn("));
+  expect(action).toMatch(/if \(effect\)/);
+  expect(action.indexOf("await requireSupportWrite(")).toBeLessThan(action.indexOf("await handler("));
 });
 it("Server Actions que resolvem tenant declaram efeito ou uma exceção pessoal/transição", () => {
   const exceptions = new Set(["updateProfile.ts", "trocarIdioma.ts", "recoverOrganization.ts"]); // preferências próprias e recuperação sem org

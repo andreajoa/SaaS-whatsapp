@@ -17,7 +17,8 @@ export async function POST(_req: Request, ctx: Context) {
   if (!connection.data || connection.data.status === "disconnected") return fail("not_found", "Conecte sua loja antes de sincronizar.", 404);
   const queued = await db.rpc("fn_commerce_begin_sync", { p_org: auth.org.orgId, p_integration: connection.data.id, p_actor: auth.user.id });
   if (queued.error) return fail("upstream_unavailable", "Não foi possível iniciar a sincronização.", 503);
-  await audit({ actorUserId: auth.user.id, organizationId: auth.org.orgId, action: "commerce.sync_requested", resourceType: "tenant_integration", resourceId: connection.data.id });
+  await audit({ actorUserId: auth.user.id, organizationId: auth.org.orgId, action: "commerce.sync_requested", resourceType: "tenant_integration", resourceId: connection.data.id,
+  });
   return ok({ sync_run_id: queued.data });
 }
 export async function DELETE(_req: Request, ctx: Context) {

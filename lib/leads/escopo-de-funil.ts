@@ -127,6 +127,10 @@ export const ALVO_DE_FUNIL: Record<string, AlvoDeFunil> = {
   crm_create_webhook_source: "sem_funil",
   crm_set_webhook_source_active: "sem_funil",
   crm_set_automation_rule_active: "sem_funil",
+  // Configuram atendentes/roteadores, sem tocar cards. Manager + apenasHumano
+  // impedem que o atendente reconfigure a própria operação.
+  crm_upsert_agent: "sem_funil",
+  crm_upsert_router: "sem_funil",
 };
 
 /**

@@ -39,7 +39,7 @@ export default function robots(): MetadataRoute.Robots {
         // O produto em si nunca entra: `/app` é a área logada, `/api` não tem
         // nada legível, e `/login`/`/signup` indexados competem com a raiz pela
         // mesma busca — e perdem, porque não explicam nada.
-        disallow: ["/app", "/api", "/login", "/signup", "/reset-password"],
+        disallow: ["/app", "/api", "/login", "/signup", "/reset-password", "/feedback"],
       },
     ],
     sitemap: new URL("/sitemap.xml", env.NEXT_PUBLIC_APP_URL).toString(),

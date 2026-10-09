@@ -70,7 +70,7 @@ export function IntegrationActionsClient() {
           <Badge variant={result.success ? "success" : "error"}>{result.success ? t("Concluída") : t("Falhou")}</Badge>
           {result.message && <p>{t(result.message)}</p>}
           {result.outcome_uncertain && <p className="text-sm text-warning">{t("O fornecedor pode ter aplicado a alteração. Confira antes de repetir; não há repetição automática.")}</p>}
-          <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-3 text-xs">{pretty(result)}</pre>
+          <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">{pretty(result)}</pre>
         </div>}
         <details className="rounded-lg border p-3"><summary className="cursor-pointer text-sm font-medium">{t("Excluir ação")}</summary>
           <p className="my-3 text-sm text-muted-foreground">{t("As credenciais serão removidas e o histórico será preservado.")}</p>
@@ -89,7 +89,7 @@ export function IntegrationActionsClient() {
           <summary className="flex cursor-pointer flex-wrap items-center gap-3 text-sm"><span className="font-medium">{run.action_name}</span><Badge variant={run.state === "succeeded" ? "success" : run.state === "failed" ? "error" : "neutral"}>{run.state === "succeeded" ? t("Concluída") : run.state === "failed" ? t("Falhou") : t("Em execução")}</Badge><span className="text-muted-foreground">{run.source === "agent" ? t("Agente") : run.source === "test" ? t("Teste") : t("Manual")}</span><time dateTime={run.started_at}>{new Date(run.started_at).toLocaleString(locale === "es" ? "es" : "pt-BR")}</time></summary>
           {run.result?.outcome_uncertain && <p className="mt-3 text-sm">{t("O fornecedor pode ter aplicado a alteração. Confira antes de repetir; não há repetição automática.")}</p>}
           {run.state === "running" && <p className="mt-3 text-sm text-muted-foreground">{t("Se esta execução permanecer aberta, confira a operação no fornecedor antes de tentar novamente.")}</p>}
-          <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-3 text-xs">{pretty(run.result ?? { execution_id: run.id })}</pre>
+          <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">{pretty(run.result ?? { execution_id: run.id })}</pre>
         </details>)}
       </CardContent>
     </Card>

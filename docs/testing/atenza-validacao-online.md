@@ -15,12 +15,19 @@ Essa verificação descreve a revisão que já estava publicada. Não comprova a
 integrações, campanhas ou avaliações novas desta branch, nem prova o worker de
 IA ou a jornada autenticada.
 
-O conector Vercel recusou a consulta do projeto `saa-s-whatsapp`, equipe
-`andres-projects-bbfd1881`, com HTTP 403 por falta de acesso ao escopo. O CLI
-63.1.0 foi instalado separadamente e confirmou que a sessão salva acessa outra
-equipe, sem o projeto Atenza. A integração GitHub/Vercel existente foi
-confirmada pelos status do commit de produção. A branch de implementação será
-enviada para gerar o preview e executar verificações GitHub sem Docker.
+O conector Vercel e a sessão CLI inicial não acessavam a equipe correta. A
+sessão do Chrome permitiu autenticar o CLI 63.1.0 em uma configuração isolada,
+sem substituir a sessão anterior. A branch foi enviada e a integração Git
+publicou o preview do commit `594ec14`:
+`https://saa-s-whatsapp-7unmjbbw1-andres-projects-bbfd1881.vercel.app`.
+O deploy ficou Ready; o navegador autenticado abriu a Inbox e a nova central
+de integrações, sem overflow horizontal no desktop.
+
+GET autenticado no preview: ações, comércio e campanhas retornaram 503;
+qualidade retornou 500. O health continuou 200/healthy. Uma consulta Postgres
+somente leitura confirmou ausência das novas tabelas no banco online. Preview
+e produção ainda apontam ao mesmo Supabase, então os testes de escrita precisam
+de um ambiente separado antes da aplicação das migrations.
 Não houve promoção, escrita de schema remoto ou envio de mensagem.
 
 ## Validação das alterações de schema
@@ -40,9 +47,13 @@ O harness legado depende de Docker e não foi executado. O novo
 pooler de transação, exige banco com zero tabelas públicas e zero usuários,
 confere os papéis Supabase e instala/reaplica o baseline. Um marcador com
 expiração limita a execução dos testes ao ambiente preparado pelo runner.
-O config `vitest.online-db.config.ts` cobre isolamento de comércio e ações;
-qualidade e campanhas ainda precisam de validação SQL online adicional.
-A execução real depende de um banco de teste e acesso ainda indisponíveis.
+O config `vitest.online-db.config.ts` cobre isolamento de comércio, ações e
+campanhas e os nove casos SQL de qualidade, incluindo disputa do token.
+A execução real depende de um banco de teste. O acesso foi recuperado, mas a
+cota Free já contém Atenza e `deskcomm` ativos. Os quatro projetos de Lovable
+estão pausados e não consomem essa cota. Nenhum upgrade foi contratado, projeto
+apagado ou pausado. O proprietário determinou não pagar nada; a decisão de
+pausar `deskcomm` está pendente porque interrompe outro projeto ativo.
 
 ## Critérios antes de publicar
 
@@ -81,10 +92,23 @@ A execução real depende de um banco de teste e acesso ainda indisponíveis.
 - Typecheck completo aprovado após corrigir duplicações de campos, eventos de
   auditoria, locale das telas e tipos de testes. A rodada final terminou com
   exit 0. A UI de qualidade passou novamente com 19 testes.
-- O build local anterior foi interrompido com TERM após cerca de 18 minutos
-  (exit 143). O workflow `atenza-online-verify.yml` executa typecheck/lint,
-  suíte unitária completa e build em três runners separados. Esses gates
-  remotos e SQL/RLS ainda precisam de resultados.
+- O workflow sem Docker foi executado no GitHub para o commit `594ec14`:
+  [run 37954137761](https://github.com/andreajoa/SaaS-whatsapp/actions/runs/37954137761).
+  O build de produção e o job de tipos/lint foram aprovados. A suíte completa
+  terminou com 8.960 aprovados, 14 falhas e 1 falha esperada em 831 arquivos.
+  As 14 falhas foram corrigidas: clipboard canônico, status traduzido, tokens
+  Tailwind, inventário/contratos CI, classificação de ferramentas de
+  configuração, compatibilidade do rodapé de e-mail, cobertura das guardas de
+  suporte e fixtures do envio por credencial do tenant. O bloco final de
+  revogação anon foi movido depois das novas funções no baseline.
+  As reexecuções focadas passaram com 185 testes únicos, incluindo 4 novos
+  testes de autorização do wrapper de campanha. Tipos e lint continuaram
+  aprovados. A nova rodada completa será executada na revisão seguinte.
+  SQL/RLS remoto permanece pendente.
+- O transporte de `executeRestAction` foi executado sem mocks contra a API
+  pública GitHub: HTTP 200 em 717 ms, retornando o repositório esperado. Isso
+  exercita DNS/TLS/HTTP reais; não prova persistência no Atenza nem uma loja
+  autenticada.
 
 Esses resultados usam fixtures e não certificam transporte, loja, jornada
 multitenant ou persistência real no ambiente online.

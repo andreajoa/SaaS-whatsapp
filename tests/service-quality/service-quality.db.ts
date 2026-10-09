@@ -7,8 +7,10 @@
 import { randomBytes } from "node:crypto";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { invariantConnection } from "../db/test-connection";
+const online = Boolean(process.env.TEST_DATABASE_URL);
 const template = process.env.TEST_DB_TEMPLATE;
-if (!template || !process.env.TEST_DB_PORT || !/^[a-z0-9_]+$/.test(template))
+if (!online && (!template || !process.env.TEST_DB_PORT || !/^[a-z0-9_]+$/.test(template)))
   throw new Error(
     "SLA/CSAT DB: exporte TEST_DB_PORT e TEST_DB_TEMPLATE do harness central (banco descartável).",
   );
@@ -20,9 +22,11 @@ const base = {
   password: "postgres",
   max: 2,
 };
-const root = new pg.Pool({ ...base, database: "template1" });
+const root = online ? null : new pg.Pool({ ...base, database: "template1" });
 // Limite no próprio servidor: um timeout do runner não deixa SQL em execução.
-const db = new pg.Pool({ ...base, database, statement_timeout: 90000 });
+const db = new pg.Pool(online
+  ? { ...invariantConnection(), max: 2 }
+  : { ...base, database, statement_timeout: 90000 });
 let created = false;
 const orgA = "aaaaaaaa-0000-4000-8000-000000000001",
   orgB = "bbbbbbbb-0000-4000-8000-000000000002";
@@ -63,8 +67,10 @@ function asService(sql: string, params: unknown[] = []) {
   return asRole("service_role", null, sql, params);
 }
 beforeAll(async () => {
-  await root.query(`create database ${database} template ${template}`);
-  created = true;
+  if (root) {
+    await root.query(`create database ${database} template ${template}`);
+    created = true;
+  }
   // O template já contém o schema entregue pelo baseline. Não instalar aqui
   // uma migration avulsa: isso esconderia uma ausência no artefato integrado.
   await db.query("select organization_id from public.service_quality_policies limit 0");
@@ -139,15 +145,15 @@ afterAll(async () => {
   // Cancelar apenas consultas do nosso clone impede que um teste expirado
   // bloqueie pool.end(). Conexões ociosas são fechadas normalmente pelo pool.
   try {
-    if (created)
+    if (created && root)
       await root.query(
         "select pg_cancel_backend(pid) from pg_stat_activity where datname=$1 and state='active'",
         [database],
       );
     await db.end();
-    if (created) await root.query(`drop database ${database} with (force)`);
+    if (created && root) await root.query(`drop database ${database} with (force)`);
   } finally {
-    await root.end();
+    await root?.end();
   }
 });
 describe("SLA/CSAT no Postgres real", () => {

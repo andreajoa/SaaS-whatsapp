@@ -1,7 +1,14 @@
 # Testes dedicados de SLA/CSAT
 
+Para validar o Atenza online sem Docker, use um Supabase de teste vazio e
+execute `node scripts/test-db-online.mjs` com `TEST_DATABASE_URL` provisionada
+fora do código. O runner verifica o ambiente, instala/reaplica o baseline e
+executa esta suíte junto com comércio, ações e campanhas. Nesse modo a suíte
+usa diretamente o banco preparado, com dois clientes para a disputa do token,
+e mantém as fixtures no projeto descartável; não cria nem remove databases.
+
 O teste de banco cria um clone aleatório `service_quality_<sufixo>` do template
-descartável já instalado. Usa as colunas canônicas de `organizations`, não
+descartável já instalado apenas no harness legado. Usa as colunas canônicas de `organizations`, não
 reaplica migrations e não altera `postgres` ou o template. Na limpeza, cancela
 apenas consultas ativas do clone, fecha o pool e remove esse clone.
 

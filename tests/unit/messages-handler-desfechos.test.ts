@@ -32,8 +32,9 @@ const WAHA_BASE = 'http://localhost:3030';
 const signedUrl = vi.fn<() => Promise<{ data: { signedUrl: string } | null; error: { message: string } | null }>>(
   async () => ({ data: { signedUrl: 'https://signed.example/a.jpg' }, error: null }),
 );
+const admin = vi.hoisted(() => ({ from: vi.fn(), rpc: vi.fn() }));
 vi.mock('@/lib/supabase/admin', () => ({
-  createAdminClient: () => ({ storage: { from: () => ({ createSignedUrl: signedUrl }) } }),
+  createAdminClient: () => ({ from: admin.from, rpc: admin.rpc, storage: { from: () => ({ createSignedUrl: signedUrl }) } }),
 }));
 // Audit é fire-and-forget e escreve em outra tabela; fora do escopo dos desfechos.
 vi.mock('@/lib/audit', () => ({ audit: vi.fn(async () => {}) }));
@@ -100,7 +101,14 @@ function makeSupabase(
         const query = {
           select: () => query,
           eq: () => query,
-          maybeSingle: async () => ({ data: { metadata: opts.channelMetadata ?? {} }, error: null }),
+          is: () => query,
+          maybeSingle: async () => ({ data: {
+            id: SESSION,
+            provider: (conversation.channel_sessions as Row | null)?.provider,
+            meta_phone_number_id: "1103328999528818",
+            meta_token_encrypted: "\\x01",
+            metadata: opts.channelMetadata ?? {},
+          }, error: null }),
         };
         return query;
       }
@@ -183,6 +191,10 @@ function makeSupabase(
     rpc: async () => ({ error: null }),
   };
 
+  // O fallback usa service_role para resolver a credencial da conexão. A rede
+  // de desfechos mantém o banco sintético, incluindo a decifra dessa fixture.
+  admin.from.mockImplementation(client.from);
+  admin.rpc.mockResolvedValue({ data: "tenant-token", error: null });
   return client as unknown as SupabaseClient;
 }
 

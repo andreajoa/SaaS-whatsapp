@@ -64,6 +64,18 @@ const DIR = join(process.cwd(), ".github/workflows");
  * que desliga um job de entrega fica visível em code review.
  */
 const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string }> = {
+  "atenza-online-verify.yml::verify": {
+    condicao: null,
+    efeito: "Verifica tipos, lint e contratos da branch Atenza sem depender do harness Docker.",
+  },
+  "atenza-online-verify.yml::unit": {
+    condicao: null,
+    efeito: "Executa a suíte unitária completa e os testes de qualidade com placeholders sem credenciais reais.",
+  },
+  "atenza-online-verify.yml::build": {
+    condicao: null,
+    efeito: "Confere o build serverless que o deploy online do Atenza precisa publicar.",
+  },
   // --- a cadeia que leva o conserto até a VPS ---------------------------------
   "release.yml::abrir-pr-de-release": {
     condicao: "github.event_name == 'workflow_dispatch'",

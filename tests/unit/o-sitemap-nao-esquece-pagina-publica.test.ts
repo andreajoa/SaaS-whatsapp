@@ -50,6 +50,8 @@ const FORA_DO_SITEMAP: Readonly<Record<string, string>> = {
   design: "página interna de referência visual, sem texto que responda a uma busca",
   "descadastrar/[token]":
     "endereço pessoal com token: indexá-lo publicaria o link de descadastro de quem o recebeu",
+  "feedback/[token]":
+    "avaliação pessoal de uso único: o token secreto não deve ser publicado nem indexado",
   "get-started": "porta de entrada do fluxo de conta, não conteúdo que responda a uma busca",
   "legal/[documento]":
     "rota paramétrica — quem entra no sitemap são os slugs concretos de DOCUMENTOS_LEGAIS",

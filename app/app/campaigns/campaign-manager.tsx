@@ -1,4 +1,5 @@
 "use client";
+import { rotuloDoEstadoDoCanal } from "@/lib/channels/estado";
 import { useCallback,useEffect,useRef,useState } from "react";
 import Link from "next/link";
 import { useT } from "@/hooks/i18n/useT";
@@ -79,7 +80,7 @@ export default function CampaignManager({canManage}:{canManage:boolean}) {
       <h2 className="text-lg font-medium">{t("Preparar campanha")}</h2>
       <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-2"><Label htmlFor="campaign-name">{t("Nome da campanha")}</Label><Input id="campaign-name" value={name} maxLength={120} onChange={e=>setName(e.target.value)}/></div>
-        <div className="space-y-2"><Label htmlFor="campaign-channel">{t("Canal")}</Label><select id="campaign-channel" className={fieldClass} disabled={busy} value={session} onChange={e=>{if(e.target.value)void changeSession(e.target.value);}}><option value="">{t("Escolha um canal")}</option>{options.sessions.map(s=><option key={s.id} value={s.id}>{s.display_name??t("Canal WhatsApp")} · {s.status}</option>)}</select></div>
+        <div className="space-y-2"><Label htmlFor="campaign-channel">{t("Canal")}</Label><select id="campaign-channel" className={fieldClass} disabled={busy} value={session} onChange={e=>{if(e.target.value)void changeSession(e.target.value);}}><option value="">{t("Escolha um canal")}</option>{options.sessions.map(s=><option key={s.id} value={s.id}>{s.display_name??t("Canal WhatsApp")} · {rotuloDoEstadoDoCanal(s.status,t)}</option>)}</select></div>
         <div className="space-y-2"><Label htmlFor="campaign-template">{t("Modelo aprovado")}</Label><select id="campaign-template" className={fieldClass} disabled={!session||busy} value={templateId} onChange={e=>{setTemplateId(e.target.value);setValues({});invalidate();}}><option value="">{t("Escolha um modelo")}</option>{options.templates.map(t=><option key={t.id} value={t.id}>{t.name} · {t.language}</option>)}</select></div>
       </div>
       {session&&!options.templates.length&&!busy&&<p className="text-sm text-muted-foreground">{t("Este canal não tem modelos aprovados sincronizados. Atualize os modelos na Central de Conexões.")}</p>}

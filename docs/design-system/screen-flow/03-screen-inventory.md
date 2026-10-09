@@ -255,7 +255,6 @@ não.
 - `/app/ai/knowledge/sources/catalog` (#39)
 - `/app/ai/knowledge/sources/conversations` (#40)
 - `/app/ai/budget` (#42)
-- `/app/integrations` (#43) — virou `/app/connections`, a Central de Conexões
 - `/app/integrations/whatsapp` (#44)
 - `/app/integrations/whatsapp/[id]` (#45)
 - `/app/integrations/whatsapp/[id]/qr` (#46)

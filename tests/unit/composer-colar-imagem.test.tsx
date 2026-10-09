@@ -1,6 +1,13 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+afterEach(async () => {
+  cleanup();
+  // Radix restaura o foco num timeout após desmontar o diálogo. Termine esse
+  // trabalho neste jsdom, antes de o próximo arquivo substituir o Event global.
+  await act(async () => new Promise<void>(resolve => setTimeout(resolve, 0)));
+});
 
 /**
  * Colar imagem no composer (Ctrl/Cmd+V), padrão WhatsApp.

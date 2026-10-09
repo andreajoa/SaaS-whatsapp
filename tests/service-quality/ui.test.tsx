@@ -165,6 +165,21 @@ describe("UI de SLA e CSAT: ações explícitas", () => {
     expect(screen.getByText("2.00/5")).toBeTruthy();
     expect(screen.getByLabelText(text.enabled)).toBeTruthy();
   });
+  it("confirma o salvamento após recarregar uma política alterada", async () => {
+    const policy = { ...DISABLED_POLICY, enabled: true, first_response_target_seconds: 300 };
+    api.fetch.mockResolvedValueOnce(snapshot).mockResolvedValueOnce(policy)
+      .mockResolvedValueOnce({ ...snapshot, policy });
+    render(<QualityDashboard />);
+    await screen.findByLabelText(text.enabled);
+    fireEvent.click(screen.getByLabelText(text.enabled));
+    fireEvent.change(screen.getByLabelText(text.firstTarget), { target: { value: "5" } });
+    fireEvent.click(screen.getByRole("button", { name: text.save }));
+    await screen.findByText(text.saved);
+    expect((screen.getByLabelText(text.firstTarget) as HTMLInputElement).value).toBe("5");
+    expect(api.fetch).toHaveBeenCalledWith("/api/v1/service-quality/policy", {
+      method: "PUT", body: JSON.stringify(policy),
+    });
+  });
   it("selecionar conversa abre pedido inline já ligado ao inbox existente", async () => {
     api.fetch.mockResolvedValue(snapshot);
     render(<QualityDashboard />);

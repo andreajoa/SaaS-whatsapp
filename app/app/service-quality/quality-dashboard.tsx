@@ -42,9 +42,11 @@ function Metric({
 function PolicyEditor({
   policy,
   onSaved,
+  onSaving,
 }: {
   policy: QualityPolicy;
   onSaved: () => Promise<void>;
+  onSaving: () => void;
 }) {
   const text = qualityText(useIdioma());
   const [enabled, setEnabled] = useState(policy.enabled);
@@ -61,6 +63,7 @@ function PolicyEditor({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setNotice("");
+    onSaving();
     const input = policySchema.safeParse({
       enabled,
       first_response_target_seconds: first.trim() ? Math.round(Number(first) * 60) : null,
@@ -78,7 +81,6 @@ function PolicyEditor({
         body: JSON.stringify(input.data),
       });
       await onSaved();
-      setNotice(text.saved);
     } catch {
       setNotice(text.error);
     } finally {
@@ -132,6 +134,7 @@ export function QualityDashboard() {
   const text = qualityText(idioma);
   const [data, setData] = useState<QualitySnapshot | null>(null);
   const [error, setError] = useState(false);
+  const [policySaved, setPolicySaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [cursors, setCursors] = useState<(string | null)[]>([null]);
   const cursor = cursors.at(-1) ?? null;
@@ -206,6 +209,7 @@ export function QualityDashboard() {
         </p>
       )}
       {loading && <p role="status">{text.loading}</p>}
+      {policySaved && <p role="status" className="text-sm">{text.saved}</p>}
       {data && (
         <>
           {!data.policy.enabled && <p className="rounded-lg border p-3 text-sm">{text.disabled}</p>}
@@ -213,8 +217,10 @@ export function QualityDashboard() {
             <PolicyEditor
               key={JSON.stringify(data.policy)}
               policy={data.policy}
+              onSaving={() => setPolicySaved(false)}
               onSaved={async () => {
                 await load();
+                setPolicySaved(true);
               }}
             />
           ) : (

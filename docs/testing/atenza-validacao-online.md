@@ -332,6 +332,66 @@ de linha retornada e depois aprovou os 11 casos, sem BLOCKER ou MAJOR no escopo.
 
 Typecheck completo passou. ESLint global terminou com zero erros e 365 avisos
 existentes; lint focado, canais, hierarquia de papéis, fragmentos de release e
-diff-check passaram. Schema e políticas não foram alterados. A verificação
-online desta revisão ainda está pendente; estes resultados locais não
-certificam uma chamada de IA ou entrega de mensagem.
+diff-check passaram. Schema e políticas não foram alterados. Os resultados
+online da mesma revisão estão registrados abaixo, com seus limites.
+
+
+### CI, preview e publicação da correção
+
+O commit `8da768ae794b4397c76c1e0c75efdcd2bd4f1ee6` passou no
+[CI 38061241322](https://github.com/andreajoa/SaaS-whatsapp/actions/runs/38061241322):
+834 arquivos, 9.012 testes aprovados e uma falha esperada; tipos, lint e build
+serverless também passaram. A suíte específica de qualidade passou com 63
+casos, já incluídos na suíte completa. Não foi usado Docker.
+
+No preview desse commit, uma jornada real entrou pela UI, conferiu a identidade
+da organização sintética e executou a aba Teste com um rascunho sem credencial.
+O POST devolveu HTTP 422 (`preview_failed`), a tela mostrou a falha e o banco
+confirmou um único dry-run `failed`, com `completed_at` e o código correspondente.
+Canal parado, agente inativo e versão de rascunho existiram somente no banco
+isolado; os registros criados para esse teste foram removidos. A jornada
+comprova o caminho de falha e sua persistência, sem geração ou envio real de IA.
+
+O build de produção `dpl_DyRUKUgAvhAXzRZZneVYCJAhTcFs` foi preparado a partir de
+`git archive` do mesmo SHA, conferido como READY/healthy e promovido pelo CLI
+oficial. O alias `www.atenza.online` aponta para esse deployment. Após a promoção,
+cinco páginas em desktop e celular responderam HTTP 200, sem exceção JavaScript,
+overflow horizontal ou Toolbar; o health público respondeu `healthy`, com
+Supabase, Redis e WAHA `ok`. Proteção de deployments e Trusted Sources foram
+preservadas; credenciais e arquivos não rastreados ficaram fora do release.
+
+Rollback de aplicação preservado: `dpl_8UsZsrbcKyNvTAN2vErNV9uif9n6`, SHA
+`e71c4e91eddcb12781500c132131589295f14929`. A branch foi enviada; main não foi
+alterada.
+
+### Manutenção observada após a correção
+
+Consulta somente leitura confirmou as 24 tarefas do Relógio com último status
+`ok`, sem falhas consecutivas. A execução diária de `data-retention` ocorreu em
+2026-10-10 às 04:40:03 UTC e terminou com sucesso. Os 176 eventos de despacho
+observados estavam `done`. Isso resolve a pendência de observar a rotina diária;
+nenhum expurgo global foi forçado para testar.
+
+### Destinatários próprios e entrega
+
+O proprietário forneceu destinatários próprios e autorizou uma mensagem de
+validação para email e WhatsApp. Endereços, telefone e credenciais não são
+registrados neste documento nem nos commits.
+
+O email identificado como teste foi enviado pelo wrapper Resend existente.
+O mesmo serviço evoluiu o recibo de `queued` para `delivered`: o servidor do
+destinatário aceitou a mensagem. Leitura, colocação na caixa de entrada e os
+gatilhos automáticos de cadastro/recuperação não foram certificados por esse envio.
+
+Uma única mensagem de WhatsApp foi enviada pelo handler compartilhado, usando
+os controles de contato, organização, canal e modo de teste. Somente o número
+autorizado foi acrescentado temporariamente à lista do canal `pre_go_live`;
+a lista anterior foi restaurada após o envio e o modo de teste foi preservado.
+O provedor retornou um identificador externo e a linha persistiu como `sent`.
+Na última consulta, `delivered_at` e `read_at` ainda estavam vazios. Portanto,
+entrega ao aparelho segue pendente de recibo ou confirmação do proprietário.
+Não houve segundo envio, publicação de agente ou disparo de campanha.
+
+Loja real e geração com API real continuam fora desta rodada por dispensa
+explícita do proprietário. Envio direto de teste não certifica atendimento
+por agente publicado nem sequência de campanha.

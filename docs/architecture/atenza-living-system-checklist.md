@@ -27,7 +27,7 @@ repetir a operação pela mesma tela. Nenhuma peça nova foi criada no mapa.
 
 ## Limites da verificação
 
-O build, tipos/lint e a suíte completa foram aprovados na revisão `e71c4e9`.
+O build, tipos/lint e a suíte completa foram aprovados na revisão `8da768a`.
 O baseline foi instalado/reaplicado no projeto Supabase Free de validação, onde
 passaram 66 testes de SQL/RLS. A retomada corrigiu e validou a conexão TLS do
 pool real, mantendo um usuário de aplicação sem ownership, CREATEDB ou
@@ -37,7 +37,8 @@ e a publicação foi conferida no domínio de produção.
 O proprietário dispensou a conexão real de Shopify/WooCommerce e a chamada
 de IA com a chave da plataforma, pois cada cliente usará a própria API. Não
 afirmar conexão externa ou geração concluída com fixtures. Campanhas não foram
-enviadas a clientes; entrega de WhatsApp e email não foi certificada.
+enviadas a clientes. O teste próprio de email teve recibo de entrega; o de
+WhatsApp foi aceito pelo provedor e aguarda confirmação de entrega.
 Detalhes e evidências em `../testing/atenza-validacao-online.md`.
 
 ## Evidência da retomada online
@@ -72,8 +73,9 @@ retornou Supabase/Redis/WAHA `ok`.
 O Relógio recebe o cron por minuto, registra a execução e devolve HTTP 500 ao
 agendador se alguma tarefa falhar. Esse retorno permite detectar e investigar
 a falha; não existe um painel de Relógio inventado para essa correção. A
-retenção usa os argumentos reais da RPC de nonces. Sua próxima execução diária
-posterior à correção ainda não foi observada; a falha antiga fica no histórico.
+retenção usa os argumentos reais da RPC de nonces. A execução diária posterior à correção
+foi observada com sucesso em 10/10/2026 às 04:40:03 UTC; a falha antiga fica no
+histórico.
 
 A revisão do fluxo de chave própria confirmou cadastro cifrado, listagem
 segura, seleção por agente e precedência da credencial do cliente no runtime.
@@ -102,3 +104,17 @@ entrada no mapa de arquitetura.
 10. Mapa: o motor compartilhado está documentado em `agent-turn.workflow.json`;
     esta correção altera a persistência da rota de preview existente, sem
     adicionar peça nova de arquitetura.
+
+
+## Fechamento online da correção de preview
+
+A revisão `8da768a` passou em 834 arquivos/9.012 testes e foi publicada no domínio
+Atenza. A jornada da aba Teste no banco isolado demonstrou HTTP 422, orientação
+visível e dry-run terminal `failed` persistido, removendo os registros sintéticos
+após a conferência. Nenhuma peça nova foi criada no mapa.
+
+A entrega usa os caminhos existentes: wrapper Resend e handler compartilhado de
+mensagens. O email próprio teve recibo `delivered`; WhatsApp teve identificador
+externo e estado `sent`, com confirmação ao aparelho ainda pendente. O número
+próprio entrou temporariamente na lista permitida do canal de teste, cuja
+configuração original foi restaurada. Não houve geração de IA nem campanha.

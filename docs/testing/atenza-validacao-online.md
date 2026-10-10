@@ -239,3 +239,99 @@ Destino anterior preservado para rollback de aplicação:
 `228605d8a28423448cd760dcb1af46bbcf1879de`. Não remover as novas tabelas numa
 reversão de aplicativo; as migrations são aditivas e seguem versionadas.
 A main não foi alterada; o release usa o commit verificado da branch.
+
+## Conferência para divulgação — 9 de outubro de 2026
+
+Este registro complementa as rodadas anteriores. O proprietário dispensou a
+conexão com loja real, pois não dispõe de uma loja, e dispensou a chamada de IA
+com a chave da plataforma: cada cliente usará a própria API. Essas dispensas
+não equivalem a testes aprovados de OAuth, sincronização, geração ou entrega.
+
+O commit `e71c4e91eddcb12781500c132131589295f14929` passou no
+[CI 38016497933](https://github.com/andreajoa/SaaS-whatsapp/actions/runs/38016497933):
+tipos, lint, build serverless e 9.001 testes unitários, mais uma falha esperada.
+Foi publicado como `dpl_8UsZsrbcKyNvTAN2vErNV9uif9n6`, com o domínio
+`www.atenza.online` conferido pelo CLI oficial. A origem desse release é um
+arquivo dos arquivos rastreados; credenciais e evidências privadas ficaram de
+fora. O destino anterior de aplicação é
+`dpl_8GNJqx1gE6o9WWofqheqfXs6pbvx`, para rollback sem remover tabelas.
+
+As verificações online adicionais passaram:
+
+- Cinco páginas públicas em desktop e celular: dez respostas HTTP 200, sem
+  exceções JavaScript, overflow horizontal ou Vercel Toolbar visível.
+- Cadastro sintético, confirmação pelo callback normal com TokenHash, vínculo
+  com a organização, primeiro acesso e onboarding concluído sem conectar loja
+  nem enviar mensagens. Entrega de email não foi exercitada.
+- Recuperação de senha em celular: callback, troca de senha, saída da sessão
+  e novo login com a senha alterada, preservando a organização correta.
+- CRM: criação/edição de contato, criação/conclusão de tarefa e criação de
+  lead com persistência após recarga, em desktop e celular.
+- O botão Novo contato estava cortado no celular. A correção permite quebrar
+  as ações em linhas; o botão inteiro foi conferido visualmente e criou um
+  contato sintético sem telefone, HTTP 201, preservado após recarga e no desktop.
+- Após a promoção, o health público respondeu HTTP 200, `healthy`, com
+  Supabase, Redis e WAHA `ok`. Isso prova conectividade; não prova entrega ao
+  destinatário nem resposta de um agente publicado.
+
+Todos os testes com escrita de cadastro e CRM usaram o banco isolado
+`zaagoawswxlwzwhmtzyi`, com guardas de origem e de identidade da organização.
+OIDC foi limitado ao domínio exato do preview. Não houve fixtures, publicação
+de agente ou envio a clientes em produção. Traces, tokens e senhas não estão
+neste relatório nem no repositório.
+
+### Manutenção e acompanhamento
+
+O tick do Relógio agora retorna HTTP 500 se uma tarefa falhar, mantendo o
+registro das tarefas executadas e sem expor exceções internas. A retenção
+chama a função de nonces com os argumentos reais `p_dias` e `p_lote`; as outras
+funções continuam com seus contratos próprios. As regressões e a revisão
+independente passaram. Uma consulta somente leitura confirmou a rotina por
+minuto e as tarefas recentes com sucesso. O histórico de retenção ainda
+mostrava a execução anterior à correção: a próxima execução diária não foi
+observada, e nenhum expurgo global foi forçado em produção para testar.
+
+### API de IA do cliente e limites
+
+A revisão independente confirmou o fluxo de chave própria: administrador
+cadastra a credencial, o sistema cifra com AES-GCM, a lista usa a view segura,
+o agente seleciona a credencial e a publicação verifica sua organização,
+atividade, validação e correspondência ao provedor. O runtime prioriza a chave
+do cliente; a chave da plataforma é fallback. Há testes da precedência,
+ausência de chave e exposição segura. Isso comprova a implementação revisada,
+sem certificar uma chave ou atendimento real de cliente.
+
+Antes da dispensa, o modelo do rascunho testado devolveu texto sem propor
+`send_message` (`no_candidate`). Um modelo alternativo recebeu HTTP 402;
+consulta somente leitura confirmou saldo negativo na conta da plataforma.
+Não houve compra de créditos, troca de modelo persistido ou publicação desse
+rascunho. Os controles de horário foram exercitados isoladamente: bloquearam
+fora da janela e permitiram uma proposta no horário simulado, sem executar
+envio. Esses probes não contam como aprovação de geração de IA.
+
+Entrega real de WhatsApp, campanhas e emails não foi certificada sem
+destinatário próprio fornecido. Conexão de loja e geração com API real ficam
+fora do fechamento por decisão explícita do proprietário. Não afirmar que
+essas integrações foram comprovadas pelos testes de interface ou pelo health.
+
+## Retomada — 10 de outubro de 2026: desfecho do teste do agente
+
+O POST de teste gravava `ok`/`error` em `ai_agent_runs`, enquanto o CHECK do
+baseline aceita `completed`/`failed`. A correção preserva `ok`/`blocked` na API,
+grava um estado terminal válido e informa falha de persistência. Ambos os
+UPDATEs exigem uma linha retornada, inclusive quando o runtime lança uma
+exceção: atualização sem registro não pode anunciar sucesso.
+
+Prova local com configuração offline, sem credenciais reais: o handler
+original reprovou 9 dos 11 casos; restaurada a correção byte a byte, os 11
+passaram, junto com 7 casos do preview do motor (18 testes em dois arquivos).
+Os casos cobrem candidato, bloqueio, exceção, falha de gravação, ausência de
+registro, recorte de organização/versão e autorização. A revisão independente
+reproduziu o UPDATE sem efeito no client PostgREST instalado, exigiu a guarda
+de linha retornada e depois aprovou os 11 casos, sem BLOCKER ou MAJOR no escopo.
+
+Typecheck completo passou. ESLint global terminou com zero erros e 365 avisos
+existentes; lint focado, canais, hierarquia de papéis, fragmentos de release e
+diff-check passaram. Schema e políticas não foram alterados. A verificação
+online desta revisão ainda está pendente; estes resultados locais não
+certificam uma chamada de IA ou entrega de mensagem.

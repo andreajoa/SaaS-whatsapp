@@ -481,7 +481,7 @@ Resposta:
 {
   "data": {
     "run_id": "uuid",
-    "status": "completed",
+    "status": "ok",
     "final_text": "...",
     "tool_calls": [...trace...],
     "tokens_in": 1234, "tokens_out": 567, "cost_cents": 0.4, "latency_ms": 3200,
@@ -489,6 +489,14 @@ Resposta:
   }
 }
 ```
+
+O endpoint de teste mantém `data.status` como `ok` (há resposta candidata) ou
+`blocked` (sem candidato), usado pelo painel de teste. O registro no histórico
+`ai_agent_runs` usa o enum do banco: `completed` para `ok`, `failed` com
+`error_code=preview_blocked` para `blocked` e `failed` com
+`error_code=preview_failed` quando o runtime lança uma exceção. Se a gravação do
+desfecho falhar ou não retornar o registro atualizado, o endpoint retorna HTTP 500 com `internal_error`, sem anunciar
+sucesso nem expor o erro interno do banco.
 
 ### 4.5 Publish / lifecycle
 

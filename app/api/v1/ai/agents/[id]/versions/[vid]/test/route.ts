@@ -3,7 +3,7 @@ import { requireSupportWrite } from "@/lib/impersonate/support";
  * POST /api/v1/ai/agents/:id/versions/:vid/test (admin)
  *
  * Spec 10 §4.4. Cria ai_agent_runs com is_dry_run=true e executa o runtime
- * real (S-13.08) via `callInternalRuntime` → `runAgent`. Esse é o default.
+ * real via `testAgentVersion`, com as mesmas dependências do atendimento.
  *
  * INTERNAL_AGENT_RUN_STUB=true troca a execução por um trace fabricado —
  * serve para exercitar o render da UI sem gastar token, e NÃO é o default:
@@ -126,25 +126,36 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<Response> {
       stub: process.env.INTERNAL_AGENT_RUN_STUB === "true",
       guardrails: avaliarRespostaDeTeste(finalText),
     };
-    await admin
+    const { data: completedRun, error: completedError } = await admin
       .from("ai_agent_runs")
       .update({
-        status: "ok",
+        status: result.candidates.length ? "completed" : "failed",
+        error_code: result.candidates.length ? null : "preview_blocked",
         completed_at: new Date().toISOString(),
         tool_calls: JSON.parse(JSON.stringify(result.proposals)),
       })
       .eq("organization_id", activeOrg.orgId)
-      .eq("id", runRow.id);
+      .eq("id", runRow.id)
+      .select("id")
+      .single();
+    if (completedError || !completedRun) {
+      return fail("internal_error", t("Não foi possível registrar o resultado do teste."), 500, { requestId });
+    }
   } catch {
-    await admin
+    const { data: failedRun, error: failedError } = await admin
       .from("ai_agent_runs")
       .update({
-        status: "error",
+        status: "failed",
         completed_at: new Date().toISOString(),
         error_code: "preview_failed",
       })
       .eq("organization_id", activeOrg.orgId)
-      .eq("id", runRow.id);
+      .eq("id", runRow.id)
+      .select("id")
+      .single();
+    if (failedError || !failedRun) {
+      return fail("internal_error", t("Não foi possível registrar o resultado do teste."), 500, { requestId });
+    }
     return fail(
       "preview_failed",
       t("Não foi possível executar o teste. Confira modelo, credencial e materiais do agente."),

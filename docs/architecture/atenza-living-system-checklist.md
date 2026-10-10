@@ -1,6 +1,6 @@
 # Living System Checklist — Atenza: integrações e experiência
 
-Registro de implementação; validação de release ainda pendente. Mapas adjacentes têm entrada, saída e retorno explícitos para cada módulo.
+Registro de implementação e publicação online verificada. Mapas adjacentes têm entrada, saída e retorno explícitos para cada módulo. Os limites de integrações externas estão registrados abaixo.
 
 | Pergunta | Comércio | Ações REST | Conhecimento URL | Qualidade | Campanhas |
 |---|---|---|---|---|---|
@@ -27,14 +27,17 @@ repetir a operação pela mesma tela. Nenhuma peça nova foi criada no mapa.
 
 ## Limites da verificação
 
-O build, tipos/lint e a suíte completa foram aprovados na revisão `9eac8d6`.
+O build, tipos/lint e a suíte completa foram aprovados na revisão `e71c4e9`.
 O baseline foi instalado/reaplicado no projeto Supabase Free de validação, onde
 passaram 66 testes de SQL/RLS. A retomada corrigiu e validou a conexão TLS do
 pool real, mantendo um usuário de aplicação sem ownership, CREATEDB ou
-CREATEROLE. O novo preview e suas jornadas permanecem em validação.
+CREATEROLE. Jornadas autenticadas desktop/celular passaram no preview isolado,
+e a publicação foi conferida no domínio de produção.
 
-Shopify/WooCommerce dependem da autorização de uma loja real; não afirmar
-conexão externa concluída com fixtures. Campanhas não foram enviadas a clientes.
+O proprietário dispensou a conexão real de Shopify/WooCommerce e a chamada
+de IA com a chave da plataforma, pois cada cliente usará a própria API. Não
+afirmar conexão externa ou geração concluída com fixtures. Campanhas não foram
+enviadas a clientes; entrega de WhatsApp e email não foi certificada.
 Detalhes e evidências em `../testing/atenza-validacao-online.md`.
 
 ## Evidência da retomada online
@@ -56,3 +59,46 @@ sem leitura anônima; contagens existentes preservadas. A CA pública foi
 configurada para o pool remoto com verificação de TLS. Consulta de credenciais
 e fixtures ficou restrita ao projeto de teste, conforme o documento de
 validação online.
+
+## Conferência adicional de operação
+
+Cadastro, confirmação, onboarding, recuperação de senha e CRM passaram no
+banco isolado, com vínculo da organização conferido antes das escritas. O
+botão Novo contato ficou totalmente acessível no celular e criou um contato
+HTTP 201 que permaneceu após recarga e no desktop. O domínio publicado passou
+em dez verificações de páginas públicas, sem Toolbar ou overflow, e seu health
+retornou Supabase/Redis/WAHA `ok`.
+
+O Relógio recebe o cron por minuto, registra a execução e devolve HTTP 500 ao
+agendador se alguma tarefa falhar. Esse retorno permite detectar e investigar
+a falha; não existe um painel de Relógio inventado para essa correção. A
+retenção usa os argumentos reais da RPC de nonces. Sua próxima execução diária
+posterior à correção ainda não foi observada; a falha antiga fica no histórico.
+
+A revisão do fluxo de chave própria confirmou cadastro cifrado, listagem
+segura, seleção por agente e precedência da credencial do cliente no runtime.
+Geração e entrega com uma API real ficam fora desta certificação por decisão
+do proprietário. Esses ajustes usam módulos existentes e não criam uma nova
+entrada no mapa de arquitetura.
+
+## Desfecho do teste do agente
+
+1. Entrada: `TestPanel` envia a versão autorizada ao POST de teste, que exige
+   administrador e recorta versão, agente e organização.
+2. Saída: `testAgentVersion` retorna candidatos/propostas; `ai_agent_runs`
+   recebe o desfecho e `TestPanel` recebe resultado ou erro.
+3. Registro: dry-run com `completed_at`, estado válido e código de falha;
+   `ai_agent.tested` audita o resultado quando a gravação é confirmada.
+4. Tela: a aba Teste mostra o resultado ou a orientação do erro. O registro
+   de dry-run não deve ser confundido com a aba Execuções, que lê `llm_calls`.
+5. Porta: Hub IA → Agentes → detalhe → Teste.
+6. Anti-morte: fim declarado como `completed` ou `failed`; gravação sem linha
+   retornada ou com erro devolve HTTP 500, sem anunciar sucesso.
+7. Configuração: versão, modelo, credencial e materiais no formulário do agente.
+8. Continuidade: teste não atende clientes; não envia mensagem nem publica a
+   versão. O operador usa o resultado para revisar a configuração.
+9. Retorno: falha orienta conferir modelo, credencial e materiais; o operador
+   corrige o rascunho e repete explicitamente o teste, sem reenvio automático.
+10. Mapa: o motor compartilhado está documentado em `agent-turn.workflow.json`;
+    esta correção altera a persistência da rota de preview existente, sem
+    adicionar peça nova de arquitetura.

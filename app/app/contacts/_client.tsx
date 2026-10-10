@@ -89,11 +89,11 @@ export function ContactsListClient() {
           </p>
         </div>
         {/*
-          A estrutura é a da main (o "Importar CSV" do PR #313); o `shrink-0`
-          vem do PR #267, e vale para os DOIS botões agora: numa tela de 390px
-          uma linha de dois botões sem isso comprime os rótulos.
+          As três ações precisam caber na largura disponível. O contêiner
+          pode encolher e quebrar em linhas: numa tela de 390px, a linha única
+          deixava "Novo contato" cortado pela área de rolagem do AppShell.
         */}
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/*
             A porta do recurso de duplicados fica AQUI, na tela que já existe, e
             não num item de menu novo: quem descobre que tem contato repetido

@@ -146,7 +146,13 @@ describe("podarHistorico — o laço de lotes", () => {
     ]) {
       const assinatura = sql.match(new RegExp(`function public\\.${nome}\\(([^)]*)\\)`, "i"));
       expect(assinatura, `assinatura SQL de ${nome}`).not.toBeNull();
-      assinaturas.set(nome, assinatura![1].split(",").map((arg) => arg.trim().split(/\s+/)[0]).sort());
+      const parametros = assinatura?.[1];
+      if (parametros === undefined) throw new Error(`assinatura SQL ausente: ${nome}`);
+      assinaturas.set(nome, parametros.split(",").map((arg) => {
+        const nomeDoArgumento = arg.trim().split(/\s+/)[0];
+        if (!nomeDoArgumento) throw new Error(`argumento SQL vazio: ${nome}`);
+        return nomeDoArgumento;
+      }).sort());
     }
     const chamadas: { nome: string; args: Record<string, number> }[] = [];
     const db: PodaDb = {

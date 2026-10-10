@@ -38,7 +38,8 @@ O proprietário dispensou a conexão real de Shopify/WooCommerce e a chamada
 de IA com a chave da plataforma, pois cada cliente usará a própria API. Não
 afirmar conexão externa ou geração concluída com fixtures. Campanhas não foram
 enviadas a clientes. O teste próprio de email teve recibo de entrega; o de
-WhatsApp foi aceito pelo provedor e aguarda confirmação de entrega.
+WhatsApp teve recebimento confirmado pelo proprietário na conversa consigo
+mesmo; entrega entre números distintos não foi certificada.
 Detalhes e evidências em `../testing/atenza-validacao-online.md`.
 
 ## Evidência da retomada online
@@ -115,6 +116,8 @@ após a conferência. Nenhuma peça nova foi criada no mapa.
 
 A entrega usa os caminhos existentes: wrapper Resend e handler compartilhado de
 mensagens. O email próprio teve recibo `delivered`; WhatsApp teve identificador
-externo e estado `sent`, com confirmação ao aparelho ainda pendente. O número
-próprio entrou temporariamente na lista permitida do canal de teste, cuja
+externo e estado `sent`, com recebimento posteriormente confirmado pelo
+proprietário no chat. O remetente e o destinatário eram o mesmo número; esse
+teste não certifica entrega entre números distintos. O número próprio entrou
+temporariamente na lista permitida do canal de teste, cuja
 configuração original foi restaurada. Não houve geração de IA nem campanha.

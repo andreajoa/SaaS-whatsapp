@@ -388,8 +388,14 @@ os controles de contato, organização, canal e modo de teste. Somente o número
 autorizado foi acrescentado temporariamente à lista do canal `pre_go_live`;
 a lista anterior foi restaurada após o envio e o modo de teste foi preservado.
 O provedor retornou um identificador externo e a linha persistiu como `sent`.
-Na última consulta, `delivered_at` e `read_at` ainda estavam vazios. Portanto,
-entrega ao aparelho segue pendente de recibo ou confirmação do proprietário.
+Na última consulta, `delivered_at` e `read_at` ainda estavam vazios. Em seguida,
+o proprietário confirmou no chat que recebeu a mensagem no WhatsApp. Essa é
+uma confirmação humana de recebimento; não é um recibo de entrega do provedor
+nem uma atualização desses campos no banco.
+
+A consulta à identidade da sessão WAHA confirmou que o canal remetente usa o
+mesmo número fornecido como destinatário. Portanto, o teste aprovado foi na
+conversa consigo mesmo e não certifica entrega entre dois números distintos.
 Não houve segundo envio, publicação de agente ou disparo de campanha.
 
 Loja real e geração com API real continuam fora desta rodada por dispensa

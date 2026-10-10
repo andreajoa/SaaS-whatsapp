@@ -109,25 +109,33 @@ export interface ResultadoDaRetencao {
 }
 
 /** Só a superfície que este cron usa — o teste injeta uma implementação. */
+type ArgumentosDaPoda = {
+  fn_podar_fila_de_jobs: { p_retencao_dias: number; p_limite: number };
+  fn_expurgar_auditoria_vencida: { p_retencao_dias: number; p_limite: number };
+  fn_expurgar_espelho_da_agenda: { p_retencao_dias: number; p_limite: number };
+  fn_expurgar_nonces_de_oauth: { p_dias: number; p_lote: number };
+};
+
 export interface PodaDb {
-  rpc(
-    nome: "fn_podar_fila_de_jobs" | "fn_expurgar_auditoria_vencida" | "fn_expurgar_espelho_da_agenda" | "fn_expurgar_nonces_de_oauth",
-    args: { p_retencao_dias: number; p_limite: number },
+  rpc<Nome extends keyof ArgumentosDaPoda>(
+    nome: Nome,
+    args: ArgumentosDaPoda[Nome],
   ): Promise<{ data: number | null; error: { message: string } | null }>;
 }
 
 async function drenar(
   db: PodaDb,
-  nome: "fn_podar_fila_de_jobs" | "fn_expurgar_auditoria_vencida" | "fn_expurgar_espelho_da_agenda" | "fn_expurgar_nonces_de_oauth",
+  nome: keyof ArgumentosDaPoda,
   dias: number,
 ): Promise<{ apagadas: number; lotes: number; temResto: boolean }> {
   let apagadas = 0;
   let lotes = 0;
   for (let i = 0; i < MAX_LOTES; i += 1) {
-    const { data, error } = await db.rpc(nome, {
-      p_retencao_dias: dias,
-      p_limite: TAMANHO_DO_LOTE,
-    });
+    // A 0190 usa nomes diferentes das três irmãs. PostgREST identifica a RPC
+    // pelos nomes dos argumentos: padronizá-los aqui produz PGRST202.
+    const { data, error } = nome === "fn_expurgar_nonces_de_oauth"
+      ? await db.rpc(nome, { p_dias: dias, p_lote: TAMANHO_DO_LOTE })
+      : await db.rpc(nome, { p_retencao_dias: dias, p_limite: TAMANHO_DO_LOTE });
     if (error) throw new Error(`${nome}: ${error.message}`);
     const n = data ?? 0;
     lotes += 1;

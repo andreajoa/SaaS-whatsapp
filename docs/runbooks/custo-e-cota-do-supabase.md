@@ -110,6 +110,15 @@ significa que o teto por invocação foi atingido e sobrou trabalho para a rodad
 seguinte** — normal na primeira poda de uma instalação antiga, e nada a fazer
 além de esperar (ou disparar o `curl` acima algumas vezes).
 
+Se a auditoria registrar `PGRST202` ou erro de schema cache para
+`fn_expurgar_nonces_de_oauth`, confira a assinatura na migration 0190 e os
+argumentos enviados pelo app: essa função recebe `p_dias` e `p_lote`; as
+outras três podas recebem `p_retencao_dias` e `p_limite`. A chamada correta
+preserva o piso de um dia, os lotes e a auditoria existentes, e permite chegar
+à varredura de anonimização que roda depois das podas. O teste
+`tests/unit/retencao-poda-em-lotes.test.ts` compara os nomes enviados com as
+assinaturas do baseline SQL para impedir que o contrato volte a divergir.
+
 ### 4.2. As duas alavancas, e o que cada uma custa
 
 Ambas são opcionais e vivem no `.env`; os defaults funcionam sem editar nada.

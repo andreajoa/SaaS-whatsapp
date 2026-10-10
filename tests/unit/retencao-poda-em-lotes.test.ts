@@ -86,7 +86,11 @@ function bancoQueDevolve(sequencias: {
   const restante = { fila: [...sequencias.fila], auditoria: [...sequencias.auditoria] };
   const db: PodaDb = {
     async rpc(nome, args) {
-      chamadas.push({ nome, dias: args.p_retencao_dias, limite: args.p_limite });
+      chamadas.push({
+        nome,
+        dias: "p_dias" in args ? args.p_dias : args.p_retencao_dias,
+        limite: "p_lote" in args ? args.p_lote : args.p_limite,
+      });
       const balde = nome === "fn_podar_fila_de_jobs" ? restante.fila : restante.auditoria;
       return { data: balde.shift() ?? 0, error: null };
     },
@@ -127,6 +131,44 @@ describe("interpretarRetencao — o knob nunca derruba o produto", () => {
 });
 
 describe("podarHistorico — o laço de lotes", () => {
+  it("chama as quatro RPCs com os nomes de argumentos definidos no SQL real", async () => {
+    // PostgREST resolve a RPC pelos NOMES, não só pelo número/tipo dos args.
+    // Um mock que aceitava qualquer objeto escondia PGRST202 na quarta poda.
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const sql = readFileSync(join(__dirname, "..", "..", "supabase", "baseline.sql"), "utf8");
+    const assinaturas = new Map<string, string[]>();
+    for (const nome of [
+      "fn_podar_fila_de_jobs",
+      "fn_expurgar_auditoria_vencida",
+      "fn_expurgar_espelho_da_agenda",
+      "fn_expurgar_nonces_de_oauth",
+    ]) {
+      const assinatura = sql.match(new RegExp(`function public\\.${nome}\\(([^)]*)\\)`, "i"));
+      expect(assinatura, `assinatura SQL de ${nome}`).not.toBeNull();
+      assinaturas.set(nome, assinatura![1].split(",").map((arg) => arg.trim().split(/\s+/)[0]).sort());
+    }
+    const chamadas: { nome: string; args: Record<string, number> }[] = [];
+    const db: PodaDb = {
+      async rpc(nome, args) {
+        chamadas.push({ nome, args });
+        if (JSON.stringify(Object.keys(args).sort()) !== JSON.stringify(assinaturas.get(nome))) {
+          return { data: null, error: { message: `PGRST202: argumentos incompatíveis com ${nome}` } };
+        }
+        return { data: nome === "fn_expurgar_nonces_de_oauth" ? 3 : 0, error: null };
+      },
+    };
+
+    const resultado = await podarHistorico(db, {});
+    expect(chamadas).toHaveLength(4);
+    expect(chamadas[3]).toEqual({
+      nome: "fn_expurgar_nonces_de_oauth",
+      args: { p_dias: 1, p_lote: TAMANHO_DO_LOTE },
+    });
+    expect(resultado.nonces_apagados).toBe(3);
+    expect(houveEfeito(resultado)).toBe(true);
+  });
+
   it("para no primeiro lote incompleto (não gasta uma ida a mais)", async () => {
     const { db, chamadas } = bancoQueDevolve({
       fila: [TAMANHO_DO_LOTE, 7],

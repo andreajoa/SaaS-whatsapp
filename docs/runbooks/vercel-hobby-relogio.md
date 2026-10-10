@@ -127,10 +127,16 @@ vault.secrets where name = 'relogio_tick_secret'), '<NOVO>');`.
 
 Nos logs da Vercel (produção), a cada batida:
 
-- `POST /api/v1/system/relogio/tick` → 200
+- `POST /api/v1/system/relogio/tick` → 200 quando todas as tarefas executadas têm `ok: true`;
+- tarefa com `ok: false` → 500, com `{ error: { code: "internal_error", details: { tarefas } } }`;
+  `tarefas` contém apenas `id` e `ok`, sem detalhes internos. O Actions marca a batida como falha;
 - quando há "SIM" preso: `[relogio] follow-up avancou por resposta inbound`
 
 Na fila de follow-ups, o status sai de **Aguardando resposta**.
+O item `orcamento` com `ok: true` indica tarefas adiadas para a próxima batida
+e mantém o HTTP 200 quando nenhuma tarefa executada falhou. Os efeitos já
+concluídos e a auditoria continuam válidos quando outra tarefa falha; o 500
+não significa que a rodada inteira foi desfeita.
 
 ## O que o tick faz (ordem)
 
@@ -188,9 +194,23 @@ na conta.
 
 O despacho por HTTP precisa de `NEXT_PUBLIC_APP_URL` e de
 `INTERNAL_CRON_SECRET` (ou `INTERNAL_SECRET`). Faltando qualquer um, o tick
-responde 200 **dizendo isso** numa tarefa chamada `despacho-http` — um tick que
-devolvesse 200 calado sobre as dezoito seria indistinguível de um tick saudável.
+responde 500 com a tarefa `despacho-http` marcada como `ok: false`. O agendador
+externo consegue distinguir a falta de configuração de uma rodada saudável.
 
 Definição canônica: `lib/relogio/agenda.ts` (as 22 rotas e suas cadências,
 espelho do crontab do self-host, com paridade cobrada em
 `tests/unit/relogio-agenda-bate-com-scheduler.test.ts`) + `lib/relogio/executar.ts`.
+
+### Conexões e retorno da sinalização de falha
+
+A entrada continua sendo o cron externo ou a sessão admin autorizada na rota
+`app/api/v1/system/relogio/tick/route.ts`. A saída alimenta o status do job em
+`.github/workflows/relogio.yml` e a inspeção do cron-job.org/`net._http_response`.
+O motor preserva as marcas em `relogio_execucoes`, os logs de tarefa e a auditoria
+`relogio.tick_run` quando houve efeito; o erro HTTP permite que o operador
+identifique a tarefa, corrija a configuração e observe a próxima execução.
+As cadências e o limite de tempo não mudam, evitando repetição cara após falha.
+Os parâmetros de instalação continuam na configuração do agendador e do app,
+descrita acima. Não há nova tela ou peça no mapa: esta mudança fecha o retorno
+entre a rota existente e o agendador existente. A inspeção das marcas ainda é
+feita pela consulta SQL deste runbook; não há painel de relógio no app.

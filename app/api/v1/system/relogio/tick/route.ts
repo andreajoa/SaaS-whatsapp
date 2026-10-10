@@ -81,10 +81,18 @@ export async function POST(req: NextRequest): Promise<Response> {
         metadata: { tarefas: resultado.tarefas.map((t) => ({ id: t.id, ok: t.ok })) },
       });
     }
+    // O agendador externo mede o status HTTP. Uma tarefa falha não pode
+    // deixar o Actions verde, mesmo quando as demais já tiveram efeito.
+    // `orcamento` vem com ok=true: trabalho adiado não é falha de execução.
+    if (resultado.tarefas.some((t) => !t.ok)) {
+      return fail("internal_error", "Uma ou mais tarefas do relógio falharam.", 500, {
+        requestId,
+        details: { tarefas: resultado.tarefas.map((t) => ({ id: t.id, ok: t.ok })) },
+      });
+    }
     return ok(resultado, { requestId });
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err);
-    return fail("internal_error", detail, 500, { requestId });
+  } catch {
+    return fail("internal_error", "Não foi possível executar o relógio.", 500, { requestId });
   }
 }
 

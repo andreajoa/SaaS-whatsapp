@@ -156,28 +156,59 @@ export function instalacaoCobra(): boolean {
 }
 
 /**
+ * O ciclo de cobrança. O anual custa DEZ mensalidades — dois meses grátis — e
+ * é o mesmo plano, com os mesmos tetos: muda só de quanto em quanto tempo o
+ * Stripe cobra.
+ */
+export type Ciclo = "mensal" | "anual";
+
+/** Mensalidades cobradas por um ano no ciclo anual (12 − 2 meses grátis). */
+export const MESES_PAGOS_NO_ANUAL = 10;
+
+export function ehCiclo(valor: unknown): valor is Ciclo {
+  return valor === "mensal" || valor === "anual";
+}
+
+/**
  * O `price` do Stripe correspondente a um plano, ou `null` quando o operador
  * não configurou aquele plano nesta instalação.
  *
  * Plano sem preço configurado NÃO é erro — é um plano que esta instalação não
  * vende. A tela simplesmente não o oferece. Lançar aqui derrubaria a tela
- * inteira por causa de um plano que ninguém pediu.
+ * inteira por causa de um plano que ninguém pediu. Vale igual para o ciclo
+ * anual: sem `STRIPE_PRICE_*_ANUAL`, o anual não aparece.
  */
-export function precoDoPlano(plano: PlanoId): string | null {
-  const porPlano: Record<PlanoId, string | undefined> = {
-    essencial: process.env.STRIPE_PRICE_ESSENCIAL,
-    pro: process.env.STRIPE_PRICE_PRO,
-    ilimitado: process.env.STRIPE_PRICE_ILIMITADO,
-  };
+export function precoDoPlano(plano: PlanoId, ciclo: Ciclo = "mensal"): string | null {
+  const porPlano: Record<PlanoId, string | undefined> =
+    ciclo === "anual"
+      ? {
+          essencial: process.env.STRIPE_PRICE_ESSENCIAL_ANUAL,
+          pro: process.env.STRIPE_PRICE_PRO_ANUAL,
+          ilimitado: process.env.STRIPE_PRICE_ILIMITADO_ANUAL,
+        }
+      : {
+          essencial: process.env.STRIPE_PRICE_ESSENCIAL,
+          pro: process.env.STRIPE_PRICE_PRO,
+          ilimitado: process.env.STRIPE_PRICE_ILIMITADO,
+        };
   const valor = (porPlano[plano] ?? "").trim();
   return valor.length > 0 ? valor : null;
 }
 
-/** O caminho inverso: de `price_...` de volta ao plano, para o webhook. */
+/**
+ * O anual só é oferecido quando TODO plano vendido tem o seu preço anual.
+ * Metade dos cartões com alternância e metade sem seria uma tela que muda de
+ * forma conforme o plano — e um botão "Anual" que some no meio da escolha.
+ */
+export function instalacaoVendeAnual(): boolean {
+  const vendidos = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  return vendidos.length > 0 && vendidos.every((p) => precoDoPlano(p, "anual") !== null);
+}
+
+/** O caminho inverso: de `price_...` de volta ao plano, para o webhook. Os dois ciclos. */
 export function planoDoPreco(priceId: string): PlanoId | null {
   for (const id of ORDEM_DOS_PLANOS) {
-    if (precoDoPlano(id) === priceId) return id;
+    if (precoDoPlano(id) === priceId || precoDoPlano(id, "anual") === priceId) return id;
   }
   return null;
 }
-

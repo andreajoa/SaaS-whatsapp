@@ -12,6 +12,7 @@ import {
   DIAS_DE_TRIAL,
   ORDEM_DOS_PLANOS,
   instalacaoCobra,
+  instalacaoVendeAnual,
   precoDoPlano,
   type PlanoId,
 } from "@/lib/billing/planos";
@@ -58,10 +59,7 @@ export default async function BillingPage({
             {traduzir("Esta instalação não cobra assinatura", idioma)}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            {traduzir(
-              "Este sistema roda no seu próprio servidor e não tem mensalidade.",
-              idioma,
-            )}{" "}
+            {traduzir("Este sistema roda no seu próprio servidor e não tem mensalidade.", idioma)}{" "}
             {suporte ? (
               <>
                 {traduzir("Para questões de pagamento, contate", idioma)}{" "}
@@ -102,6 +100,9 @@ export default async function BillingPage({
   // Só oferece o que esta instalação de fato vende — plano sem `price_...`
   // configurado não é erro, é plano que não existe aqui.
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  // O preço anual existe só em real (os `price_..._ANUAL` são BRL): fora do
+  // Brasil o anual não aparece, em vez de cobrar em real quem vê em outra moeda.
+  const vendeAnual = instalacaoVendeAnual() && mercado.moeda === "BRL";
 
   const params = await searchParams;
   const bruto = params.sessao;
@@ -196,6 +197,8 @@ export default async function BillingPage({
         mercado={mercado}
         temAssinatura={Boolean(estado.stripeCustomerId)}
         sessaoDeRetorno={sessao}
+        vendeAnual={vendeAnual}
+        cicloInicial={params.ciclo === "anual" ? "anual" : "mensal"}
       />
     </div>
   );

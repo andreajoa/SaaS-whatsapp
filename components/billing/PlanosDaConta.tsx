@@ -37,12 +37,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useT } from "@/lib/i18n/IdiomaProvider";
 import { cn } from "@/lib/utils";
+import { ORDEM_DOS_PLANOS, PLANOS, type Ciclo, type PlanoId } from "@/lib/billing/planos";
 import {
-  ORDEM_DOS_PLANOS,
-  PLANOS,
-  type PlanoId,
-} from "@/lib/billing/planos";
-import { precoLegivelNoMercado, type Mercado } from "@/lib/mercado/paises";
+  precoAnualLegivelNoMercado,
+  precoLegivelNoMercado,
+  type Mercado,
+} from "@/lib/mercado/paises";
 
 import { CheckoutEmbutido, chavePublicavelAusente } from "./CheckoutEmbutido";
 
@@ -69,11 +69,15 @@ interface Props {
    * `redirect_on_completion` em lib/billing/stripe.ts.
    */
   sessaoDeRetorno: string | null;
+  /** A instalação tem preço anual para todo plano vendido (`instalacaoVendeAnual`). */
+  vendeAnual?: boolean;
+  /** `?ciclo=anual` da URL — quem escolheu o anual em /precos chega com ele marcado. */
+  cicloInicial?: Ciclo;
 }
 
 type Passo =
   | { nome: "escolher" }
-  | { nome: "pagar"; plano: PlanoId; clientSecret: string; sessionId: string }
+  | { nome: "pagar"; plano: PlanoId; ciclo: Ciclo; clientSecret: string; sessionId: string }
   | { nome: "confirmando"; sessionId: string }
   | { nome: "pronto"; plano: PlanoId | null };
 
@@ -86,8 +90,11 @@ export function PlanosDaConta({
   mercado,
   temAssinatura,
   sessaoDeRetorno,
+  vendeAnual = false,
+  cicloInicial = "mensal",
 }: Props) {
   const t = useT();
+  const [ciclo, setCiclo] = useState<Ciclo>(vendeAnual ? cicloInicial : "mensal");
   const [passo, setPasso] = useState<Passo>(
     sessaoDeRetorno ? { nome: "confirmando", sessionId: sessaoDeRetorno } : { nome: "escolher" },
   );
@@ -100,33 +107,37 @@ export function PlanosDaConta({
    * `?sessao=`) — porque nenhum dos dois é prova por si: os dois só sabem que
    * o Stripe terminou, e é o servidor que confere e grava.
    */
-  const confirmar = useCallback(async (sessionId: string) => {
-    try {
-      const res = await fetch(
-        `/api/v1/billing/checkout/status?sessao=${encodeURIComponent(sessionId)}`,
-        { cache: "no-store" },
-      );
-      const json = (await res.json().catch(() => null)) as
-        | { data?: { status?: string; plano?: PlanoId | null }; error?: { message?: string } }
-        | null;
+  const confirmar = useCallback(
+    async (sessionId: string) => {
+      try {
+        const res = await fetch(
+          `/api/v1/billing/checkout/status?sessao=${encodeURIComponent(sessionId)}`,
+          { cache: "no-store" },
+        );
+        const json = (await res.json().catch(() => null)) as {
+          data?: { status?: string; plano?: PlanoId | null };
+          error?: { message?: string };
+        } | null;
 
-      if (!res.ok) {
-        toast.error(json?.error?.message ?? t("Não foi possível confirmar o pagamento."));
+        if (!res.ok) {
+          toast.error(json?.error?.message ?? t("Não foi possível confirmar o pagamento."));
+          setPasso({ nome: "escolher" });
+          return;
+        }
+        if (json?.data?.status !== "complete") {
+          // Sessão aberta ou expirada: não houve pagamento. Volta à escolha em
+          // silêncio — dizer "falhou" para quem só fechou a aba assusta à toa.
+          setPasso({ nome: "escolher" });
+          return;
+        }
+        setPasso({ nome: "pronto", plano: json.data.plano ?? null });
+      } catch {
+        toast.error(t("Falha de rede ao confirmar o pagamento."));
         setPasso({ nome: "escolher" });
-        return;
       }
-      if (json?.data?.status !== "complete") {
-        // Sessão aberta ou expirada: não houve pagamento. Volta à escolha em
-        // silêncio — dizer "falhou" para quem só fechou a aba assusta à toa.
-        setPasso({ nome: "escolher" });
-        return;
-      }
-      setPasso({ nome: "pronto", plano: json.data.plano ?? null });
-    } catch {
-      toast.error(t("Falha de rede ao confirmar o pagamento."));
-      setPasso({ nome: "escolher" });
-    }
-  }, [t]);
+    },
+    [t],
+  );
 
   // A volta do boleto/Pix cai direto em `confirmando`.
   const jaConfirmou = useRef(false);
@@ -142,11 +153,12 @@ export function PlanosDaConta({
       const res = await fetch("/api/v1/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plano }),
+        body: JSON.stringify({ plano, ciclo }),
       });
-      const json = (await res.json().catch(() => null)) as
-        | { data?: { clientSecret?: string; sessionId?: string }; error?: { message?: string } }
-        | null;
+      const json = (await res.json().catch(() => null)) as {
+        data?: { clientSecret?: string; sessionId?: string };
+        error?: { message?: string };
+      } | null;
 
       if (!res.ok || !json?.data?.clientSecret || !json.data.sessionId) {
         // A mensagem do servidor é escrita para quem lê (ver as rotas); passá-la
@@ -157,6 +169,7 @@ export function PlanosDaConta({
       setPasso({
         nome: "pagar",
         plano,
+        ciclo,
         clientSecret: json.data.clientSecret,
         sessionId: json.data.sessionId,
       });
@@ -176,9 +189,10 @@ export function PlanosDaConta({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
-      const json = (await res.json().catch(() => null)) as
-        | { data?: { url?: string }; error?: { message?: string } }
-        | null;
+      const json = (await res.json().catch(() => null)) as {
+        data?: { url?: string };
+        error?: { message?: string };
+      } | null;
       if (!res.ok || !json?.data?.url) {
         toast.error(json?.error?.message ?? t("Não foi possível abrir o portal agora."));
         setOcupado(null);
@@ -206,14 +220,21 @@ export function PlanosDaConta({
             <h2 className="text-sm font-medium text-muted-foreground">
               {t("Você está assinando")}
             </h2>
-            <Badge variant="secondary">{t("Mensal")}</Badge>
+            <Badge variant="secondary">{passo.ciclo === "anual" ? t("Anual") : t("Mensal")}</Badge>
           </div>
           <div>
             <p className="text-lg font-semibold">{plano.nome}</p>
             <p className="mt-1 text-3xl font-semibold tracking-tight">
-              {precoLegivelNoMercado(passo.plano, mercado)}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">{t("/mês")}</span>
+              {passo.ciclo === "anual"
+                ? precoAnualLegivelNoMercado(passo.plano, mercado)
+                : precoLegivelNoMercado(passo.plano, mercado)}
+              <span className="ml-1 text-sm font-normal text-muted-foreground">
+                {passo.ciclo === "anual" ? t("/ano") : t("/mês")}
+              </span>
             </p>
+            {passo.ciclo === "anual" ? (
+              <p className="mt-1 text-xs text-muted-foreground">{t("2 meses grátis")}</p>
+            ) : null}
           </div>
           <Separator />
           <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
@@ -309,7 +330,11 @@ export function PlanosDaConta({
               {t("Trocar de plano, atualizar o cartão, baixar faturas ou cancelar.")}
             </p>
           </div>
-          <Button variant="secondary" disabled={ocupado !== null} onClick={() => void abrirPortal()}>
+          <Button
+            variant="secondary"
+            disabled={ocupado !== null}
+            onClick={() => void abrirPortal()}
+          >
             {ocupado === "portal" ? t("Abrindo…") : t("Abrir portal de cobrança")}
           </Button>
         </Card>
@@ -322,72 +347,106 @@ export function PlanosDaConta({
           )}
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-3">
-          {vendidos.map((id) => {
-            const plano = PLANOS[id];
-            const atual = planoAtual === id;
-            const destaque = id === PLANO_EM_DESTAQUE && !atual;
-            return (
-              <Card
-                key={id}
-                className={cn(
-                  "relative flex flex-col gap-4 p-5 transition-shadow",
-                  destaque && "border-accent/40 shadow-md",
-                )}
-              >
-                {destaque ? (
-                  <Badge className="absolute -top-2.5 left-5">{t("Mais escolhido")}</Badge>
-                ) : null}
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-base font-semibold">{plano.nome}</h3>
-                  {atual ? <Badge variant="success">{t("Seu plano")}</Badge> : null}
-                </div>
-                <p className="text-2xl font-semibold tracking-tight">
-                  {precoLegivelNoMercado(id, mercado)}
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">{t("/mês")}</span>
-                </p>
-                <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
-                  {plano.destaques.map((d) => (
-                    <li key={d} className="flex gap-2">
-                      <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
-                      <span>{t(d)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-auto pt-2">
-                  {atual ? (
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      disabled
-                      title={t("Este já é o plano da sua conta — não há o que trocar aqui.")}
-                    >
-                      {t("Plano atual")}
-                    </Button>
-                  ) : (
-                    <Button
-                      className="w-full"
-                      variant={destaque ? "default" : "secondary"}
-                      // Sem a chave publicável o formulário não monta. Barrar
-                      // aqui evita gastar uma sessão do Stripe para mostrar um
-                      // aviso de configuração.
-                      disabled={ocupado !== null || (!temAssinatura && semChavePublica)}
-                      onClick={() =>
-                        temAssinatura ? void abrirPortal() : void abrirCheckout(id)
-                      }
-                    >
-                      {ocupado === id
-                        ? t("Abrindo…")
-                        : temAssinatura
-                          ? t("Trocar para este plano")
-                          : t("Assinar")}
-                    </Button>
+        <>
+          {vendeAnual && !temAssinatura ? (
+            <div
+              role="radiogroup"
+              aria-label={t("Ciclo de cobrança")}
+              className="inline-flex w-fit items-center gap-1 rounded-full border bg-muted/40 p-1 text-sm"
+            >
+              {(["mensal", "anual"] as const).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  role="radio"
+                  aria-checked={ciclo === c}
+                  onClick={() => setCiclo(c)}
+                  className={cn(
+                    "rounded-full px-4 py-1.5 font-medium transition-colors",
+                    ciclo === c ? "bg-background shadow-sm" : "text-muted-foreground",
                   )}
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                >
+                  {c === "mensal" ? t("Mensal") : t("Anual")}
+                  {c === "anual" ? (
+                    <span className="ml-2 rounded-full bg-accent/15 px-2 py-0.5 text-xs text-accent">
+                      {t("2 meses grátis")}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <div className="grid gap-4 md:grid-cols-3">
+            {vendidos.map((id) => {
+              const plano = PLANOS[id];
+              const atual = planoAtual === id;
+              const destaque = id === PLANO_EM_DESTAQUE && !atual;
+              return (
+                <Card
+                  key={id}
+                  className={cn(
+                    "relative flex flex-col gap-4 p-5 transition-shadow",
+                    destaque && "border-accent/40 shadow-md",
+                  )}
+                >
+                  {destaque ? (
+                    <Badge className="absolute -top-2.5 left-5">{t("Mais escolhido")}</Badge>
+                  ) : null}
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-base font-semibold">{plano.nome}</h3>
+                    {atual ? <Badge variant="success">{t("Seu plano")}</Badge> : null}
+                  </div>
+                  <p className="text-2xl font-semibold tracking-tight">
+                    {ciclo === "anual"
+                      ? precoAnualLegivelNoMercado(id, mercado)
+                      : precoLegivelNoMercado(id, mercado)}
+                    <span className="ml-1 text-sm font-normal text-muted-foreground">
+                      {ciclo === "anual" ? t("/ano") : t("/mês")}
+                    </span>
+                  </p>
+                  <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
+                    {plano.destaques.map((d) => (
+                      <li key={d} className="flex gap-2">
+                        <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
+                        <span>{t(d)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-auto pt-2">
+                    {atual ? (
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        disabled
+                        title={t("Este já é o plano da sua conta — não há o que trocar aqui.")}
+                      >
+                        {t("Plano atual")}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full"
+                        variant={destaque ? "default" : "secondary"}
+                        // Sem a chave publicável o formulário não monta. Barrar
+                        // aqui evita gastar uma sessão do Stripe para mostrar um
+                        // aviso de configuração.
+                        disabled={ocupado !== null || (!temAssinatura && semChavePublica)}
+                        onClick={() =>
+                          temAssinatura ? void abrirPortal() : void abrirCheckout(id)
+                        }
+                      >
+                        {ocupado === id
+                          ? t("Abrindo…")
+                          : temAssinatura
+                            ? t("Trocar para este plano")
+                            : t("Assinar")}
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {semChavePublica && !temAssinatura ? (

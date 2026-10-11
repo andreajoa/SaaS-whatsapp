@@ -322,6 +322,10 @@ const schema = z.object({
   STRIPE_PRICE_ESSENCIAL: z.string().optional().default(""),
   STRIPE_PRICE_PRO: z.string().optional().default(""),
   STRIPE_PRICE_ILIMITADO: z.string().optional().default(""),
+  /** Ciclo anual (dez mensalidades). Só aparece quando os três estão preenchidos. */
+  STRIPE_PRICE_ESSENCIAL_ANUAL: z.string().optional().default(""),
+  STRIPE_PRICE_PRO_ANUAL: z.string().optional().default(""),
+  STRIPE_PRICE_ILIMITADO_ANUAL: z.string().optional().default(""),
   /**
    * A chave PUBLICÁVEL, e ela é `NEXT_PUBLIC_` de propósito — ao contrário de
    * todas as outras deste bloco. O checkout é EMBUTIDO: o `Stripe.js` monta o

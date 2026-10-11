@@ -59,7 +59,7 @@
  * Prometer o que não se entrega é o modo de falha caro aqui.
  */
 
-import type { PlanoId } from "@/lib/billing/planos";
+import { MESES_PAGOS_NO_ANUAL, type PlanoId } from "@/lib/billing/planos";
 import { IDIOMA_PADRAO, type Idioma } from "@/lib/i18n/idiomas";
 
 /**
@@ -80,8 +80,7 @@ export function ehIdiomaDoSite(valor: string): valor is IdiomaDoSite {
 
 /** ISO-4217 em maiúsculas, como a doutrina de API exige. */
 export type Moeda =
-  | "BRL" | "USD" | "MXN" | "EUR" | "COP" | "CLP"
-  | "PEN" | "ARS" | "INR" | "IDR" | "MYR" | "ZAR";
+  "BRL" | "USD" | "MXN" | "EUR" | "COP" | "CLP" | "PEN" | "ARS" | "INR" | "IDR" | "MYR" | "ZAR";
 
 /**
  * Moedas sem centavos NO STRIPE: o `unit_amount` é a unidade inteira.
@@ -261,9 +260,7 @@ export const MERCADO_INTERNACIONAL: Mercado = {
 export const MERCADO_PADRAO: Mercado =
   MERCADOS.find((m) => m.pais === "BR") ?? MERCADO_INTERNACIONAL;
 
-const POR_PAIS: ReadonlyMap<string, Mercado> = new Map(
-  MERCADOS.map((m) => [m.pais, m]),
-);
+const POR_PAIS: ReadonlyMap<string, Mercado> = new Map(MERCADOS.map((m) => [m.pais, m]));
 
 /**
  * O mercado de um país, ou o internacional.
@@ -294,6 +291,22 @@ export function precoNoMercado(plano: PlanoId, mercado: Mercado): number {
  */
 export function precoLegivelNoMercado(plano: PlanoId, mercado: Mercado): string {
   const bruto = precoNoMercado(plano, mercado);
+  const valor = MOEDAS_SEM_CENTAVOS.has(mercado.moeda) ? bruto : bruto / 100;
+  return new Intl.NumberFormat(mercado.locale, {
+    style: "currency",
+    currency: mercado.moeda,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(valor);
+}
+
+/**
+ * O preço do ANO no ciclo anual: dez mensalidades (dois meses grátis), escrito
+ * como `precoLegivelNoMercado`. Calculado da régua mensal para não existir uma
+ * segunda tabela de preço que possa discordar da primeira.
+ */
+export function precoAnualLegivelNoMercado(plano: PlanoId, mercado: Mercado): string {
+  const bruto = precoNoMercado(plano, mercado) * MESES_PAGOS_NO_ANUAL;
   const valor = MOEDAS_SEM_CENTAVOS.has(mercado.moeda) ? bruto : bruto / 100;
   return new Intl.NumberFormat(mercado.locale, {
     style: "currency",

@@ -35,6 +35,7 @@ export const runtime = "nodejs";
 
 const corpoSchema = z.object({
   plano: z.enum(["essencial", "pro", "ilimitado"]),
+  ciclo: z.enum(["mensal", "anual"]).optional().default("mensal"),
 });
 
 /**
@@ -78,13 +79,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!parsed.success) {
     return fail("invalid_request", "plano inválido.", 422, { requestId });
   }
-  const plano = parsed.data.plano;
+  const { plano, ciclo } = parsed.data;
 
-  const priceId = precoDoPlano(plano);
+  const priceId = precoDoPlano(plano, ciclo);
   if (!priceId) {
-    return fail("invalid_request", `O plano ${plano} não está configurado nesta instalação.`, 422, {
-      requestId,
-    });
+    return fail(
+      "invalid_request",
+      `O plano ${plano} (${ciclo}) não está configurado nesta instalação.`,
+      422,
+      {
+        requestId,
+      },
+    );
   }
 
   const admin = createAdminClient();
@@ -156,7 +162,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // `customer_creation`, medido em produção. Uma sessão de checkout aberta
       // e não usada não cobra nada e expira sozinha, então o custo de abrir
       // duas é zero; o de repetir um erro já consertado é a venda.
-      idempotencyKey: `checkout:${orgId}:${plano}:${new Date().toISOString().slice(0, 16)}`,
+      idempotencyKey: `checkout:${orgId}:${plano}:${ciclo}:${new Date().toISOString().slice(0, 16)}`,
     });
     clientSecret = sessao.client_secret;
     sessionId = sessao.id;
@@ -183,7 +189,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     resourceType: "org_subscriptions",
     resourceId: orgId,
     requestId,
-    metadata: { plano, sessao: sessionId },
+    metadata: { plano, ciclo, sessao: sessionId },
   });
 
   // A anotação do funil. Sem ela não existe "carrinho largado": uma sessão que

@@ -9,6 +9,7 @@ import homeStyles from "@/components/site/atenza-home.module.css";
 import {
   DIAS_DE_TRIAL,
   instalacaoCobra,
+  instalacaoVendeAnual,
   ORDEM_DOS_PLANOS,
   PLANOS,
   precoDoPlano,
@@ -19,7 +20,7 @@ import { env } from "@/lib/env";
 import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 import { jsonLdSeguro, metadadosPublicos, schemaDoFaq } from "@/lib/marketing/seo";
 import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
-import { precoLegivelNoMercado } from "@/lib/mercado/paises";
+import { precoAnualLegivelNoMercado, precoLegivelNoMercado } from "@/lib/mercado/paises";
 import { visitanteAtual } from "@/lib/mercado/visitante";
 import styles from "./precos.module.css";
 
@@ -128,10 +129,21 @@ const FAQ = [
   },
 ];
 
-export default async function PaginaDePrecos() {
+export default async function PaginaDePrecos({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (!instalacaoCobra()) notFound();
-  const [marca, visitante] = await Promise.all([marcaDaSaida(null), visitanteAtual()]);
+  const [marca, visitante, params] = await Promise.all([
+    marcaDaSaida(null),
+    visitanteAtual(),
+    searchParams,
+  ]);
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  // Os preços anuais são em real: fora do Brasil a página segue só mensal.
+  const vendeAnual = instalacaoVendeAnual() && visitante.mercado.moeda === "BRL";
+  const anual = vendeAnual && params.ciclo === "anual";
   const condicoes =
     "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.";
 
@@ -168,6 +180,26 @@ export default async function PaginaDePrecos() {
           aria-label="Planos"
         >
           <div className={homeStyles.container}>
+            {vendeAnual && (
+              <nav className={styles.ciclo} aria-label="Ciclo de cobrança">
+                <Link
+                  href="/precos#planos"
+                  scroll={false}
+                  aria-current={anual ? undefined : "page"}
+                  data-medir="ciclo-mensal"
+                >
+                  Mensal
+                </Link>
+                <Link
+                  href="/precos?ciclo=anual#planos"
+                  scroll={false}
+                  aria-current={anual ? "page" : undefined}
+                  data-medir="ciclo-anual"
+                >
+                  Anual <span>2 meses grátis</span>
+                </Link>
+              </nav>
+            )}
             <div className={homeStyles.plans}>
               {vendidos.map((id) => {
                 const plano = PLANOS[id];
@@ -182,9 +214,16 @@ export default async function PaginaDePrecos() {
                       {destaque && <span>Recomendado</span>}
                     </div>
                     <p className={homeStyles.price}>
-                      {precoLegivelNoMercado(id, visitante.mercado)}
-                      <small>/mês</small>
+                      {anual
+                        ? precoAnualLegivelNoMercado(id, visitante.mercado)
+                        : precoLegivelNoMercado(id, visitante.mercado)}
+                      <small>{anual ? "/ano" : "/mês"}</small>
                     </p>
+                    {anual && (
+                      <p className={styles.economia}>
+                        Equivale a 10 mensalidades: 2 meses grátis por ano.
+                      </p>
+                    )}
                     <ul>
                       {plano.destaques.map((d) => (
                         <li key={d}>
@@ -194,8 +233,8 @@ export default async function PaginaDePrecos() {
                       ))}
                     </ul>
                     <Link
-                      href="/signup"
-                      data-medir={`plano-${id}`}
+                      href={anual ? "/signup?ciclo=anual" : "/signup"}
+                      data-medir={`plano-${id}${anual ? "-anual" : ""}`}
                       className={destaque ? homeStyles.buttonLight : homeStyles.buttonOutline}
                     >
                       Começar agora

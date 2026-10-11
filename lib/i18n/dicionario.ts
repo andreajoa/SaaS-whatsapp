@@ -10604,6 +10604,10 @@ export const DICIONARIO: Traducoes = {
   "Seu plano": { es: "Tu plan" },
   "/mês": { es: "/mes" },
   Mensal: { es: "Mensual" },
+  Anual: { es: "Anual" },
+  "/ano": { es: "/año" },
+  "2 meses grátis": { es: "2 meses gratis" },
+  "Ciclo de cobrança": { es: "Ciclo de cobro" },
   "Plano atual": { es: "Plan actual" },
   "Este já é o plano da sua conta — não há o que trocar aqui.": {
     es: "Este ya es el plan de tu cuenta: no hay nada que cambiar aquí.",

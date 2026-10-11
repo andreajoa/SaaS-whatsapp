@@ -433,7 +433,7 @@ psql_run() { docker run --rm -i postgres:17-alpine psql "$(url_do_schema)" -v ON
 # `docker-compose.prod.yml`, `.env.hostgator.example` e a matriz de
 # `publish-image.yml` digam o mesmo. Se você é um fork, é lá que está a lista do
 # que trocar junto.
-IMG_NS="ghcr.io/melgarafael"
+IMG_NS="ghcr.io/andreajoa"
 IMG_APP="${IMG_NS}/atenza"
 IMG_WORKER="${IMG_NS}/atenza-worker"
 IMG_SCHEDULER="${IMG_NS}/atenza-scheduler"
@@ -478,7 +478,7 @@ ultima_versao_publicada() {
 # passe 5 da triagem.
 #
 # E o literal escapava da catraca por acidente: `namespace-das-imagens.test.ts`
-# procura a string contígua `ghcr.io/melgarafael`, e a URL do token a parte em
+# procura a string contígua `ghcr.io/andreajoa`, e a URL do token a parte em
 # `ghcr.io/token?scope=repository:melgarafael/`.
 ghcr_status() {
   local img="$1" tag="$2" tok registry owner

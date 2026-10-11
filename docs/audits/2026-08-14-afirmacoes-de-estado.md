@@ -1954,7 +1954,7 @@ grep -n 'SUPABASE_ACCESS_TOKEN\|Criando o projeto Supabase' hostgator-setup-kit/
 **Mede com:**
 
 ```bash
-for i in atenza atenza-worker atenza-scheduler; do for t in 1.3.0 stable; do echo -n "$i:$t "; docker buildx imagetools inspect ghcr.io/melgarafael/$i:$t --format '{{.Manifest.Digest}}'; done; done
+for i in atenza atenza-worker atenza-scheduler; do for t in 1.3.0 stable; do echo -n "$i:$t "; docker buildx imagetools inspect ghcr.io/andreajoa/$i:$t --format '{{.Manifest.Digest}}'; done; done
 ```
 
 **Deu:**
@@ -2057,7 +2057,7 @@ grep -rn 'IMAGE_NAME' .github/ ; grep -n 'images:' .github/workflows/publish-ima
 **Mede com:**
 
 ```bash
-grep -c 'melgarafael' tests/unit/packaging-artefato-do-cliente.test.ts ; grep -rln 'ghcr.io/melgarafael' --exclude-dir=node_modules . | grep -E 'tests/|hostgator-setup-kit/test'
+grep -c 'melgarafael' tests/unit/packaging-artefato-do-cliente.test.ts ; grep -rln 'ghcr.io/andreajoa' --exclude-dir=node_modules . | grep -E 'tests/|hostgator-setup-kit/test'
 ```
 
 **Deu:**
@@ -2068,9 +2068,9 @@ tests/shell/update-guard.test.sh
 hostgator-setup-kit/test-validators.sh
 ```
 
-**Sugestão:** ... os testes que casam a string (`tests/shell/update-guard.test.sh`, `hostgator-setup-kit/test-validators.sh`) e os docs — **mais** o `.env` de cada instalação viva, que é a parte que nenhum commit alcança. (`tests/unit/packaging-artefato-do-cliente.test.ts` entra no custo por outro motivo: ele guarda a forma do compose e os gatilhos do workflow, não a string do namespace.) Régua para reconferir antes de citar este parágrafo: `grep -rln "ghcr.io/melgarafael" --exclude-dir=node_modules .`
+**Sugestão:** ... os testes que casam a string (`tests/shell/update-guard.test.sh`, `hostgator-setup-kit/test-validators.sh`) e os docs — **mais** o `.env` de cada instalação viva, que é a parte que nenhum commit alcança. (`tests/unit/packaging-artefato-do-cliente.test.ts` entra no custo por outro motivo: ele guarda a forma do compose e os gatilhos do workflow, não a string do namespace.) Régua para reconferir antes de citar este parágrafo: `grep -rln "ghcr.io/andreajoa" --exclude-dir=node_modules .`
 
-**Vira teste:** tests/unit/packaging-artefato-do-cliente.test.ts: it("o ADR só lista como guarda-namespace arquivos que contêm a string") — para cada path citado na §D1 como teste que 'casa a string', exigir grep('ghcr.io/melgarafael') > 0
+**Vira teste:** tests/unit/packaging-artefato-do-cliente.test.ts: it("o ADR só lista como guarda-namespace arquivos que contêm a string") — para cada path citado na §D1 como teste que 'casa a string', exigir grep('ghcr.io/andreajoa') > 0
 
 ### L126 · FALSA · gravidade alta · pendencia
 
@@ -2611,7 +2611,7 @@ stable → sha256:c4bc70b606c8e63f3fc9557ed31b1a211b58beaac3b67509eb0c8acbc0dbae
 **Mede com:**
 
 ```bash
-for i in atenza atenza-worker atenza-scheduler; do for t in 1.3.0 stable; do echo -n "$i:$t "; docker buildx imagetools inspect ghcr.io/melgarafael/$i:$t --format '{{.Manifest.Digest}}'; done; done
+for i in atenza atenza-worker atenza-scheduler; do for t in 1.3.0 stable; do echo -n "$i:$t "; docker buildx imagetools inspect ghcr.io/andreajoa/$i:$t --format '{{.Manifest.Digest}}'; done; done
 ```
 
 **Deu:**
@@ -2893,7 +2893,7 @@ update.sh:200: "if ! dc pull; then ... se um run de publicação quebrou ... o c
 GHCR (medido agora): as três respondem HTTP 200 em :latest e :stable.
 ```
 
-**Sugestão:** publica **três** imagens — `atenza`, `atenza-worker` e `atenza-scheduler` — sob a mesma tag de versão. Sob a mesma tag, não necessariamente as três: a matriz roda com `fail-fast: false` e cada job empurra a sua, então uma versão pode existir para duas imagens e faltar na terceira (é exatamente o caso que o `dc pull` do `update.sh` trata). Antes de anunciar uma versão, confirme as três: `for i in atenza atenza-worker atenza-scheduler; do docker buildx imagetools inspect ghcr.io/melgarafael/$i:<versão> --format '{{.Manifest.Digest}}'; done`
+**Sugestão:** publica **três** imagens — `atenza`, `atenza-worker` e `atenza-scheduler` — sob a mesma tag de versão. Sob a mesma tag, não necessariamente as três: a matriz roda com `fail-fast: false` e cada job empurra a sua, então uma versão pode existir para duas imagens e faltar na terceira (é exatamente o caso que o `dc pull` do `update.sh` trata). Antes de anunciar uma versão, confirme as três: `for i in atenza atenza-worker atenza-scheduler; do docker buildx imagetools inspect ghcr.io/andreajoa/$i:<versão> --format '{{.Manifest.Digest}}'; done`
 
 ### L108 · FRAGIL · gravidade media · contagem
 

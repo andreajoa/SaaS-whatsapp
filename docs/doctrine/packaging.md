@@ -417,7 +417,7 @@ do banco. É o passo que mais trava na estreia de uma imagem nova.
         for i in atenza atenza-worker atenza-scheduler; do
           for t in X.Y.Z stable; do
             echo -n "$i:$t "; docker buildx imagetools inspect \
-              ghcr.io/melgarafael/$i:$t --format '{{.Manifest.Digest}}'; done; done
+              ghcr.io/andreajoa/$i:$t --format '{{.Manifest.Digest}}'; done; done
         → o par de cada imagem tem que bater
         Não bateu? Alguma coisa republicou depois do push da tag. NÃO siga:
         um canal apontando para build diferente da versão é o invariante 3

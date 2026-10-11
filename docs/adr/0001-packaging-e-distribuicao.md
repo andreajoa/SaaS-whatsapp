@@ -29,7 +29,7 @@ enxergou o defeito mais caro, que era o motivo real para escrever esta doutrina.
 
 ## Decisões
 
-### D1 — O namespace é `ghcr.io/melgarafael/*`. Não migramos para uma org.
+### D1 — O namespace é `ghcr.io/andreajoa/*`. Não migramos para uma org.
 
 **Escolhido porque** é o namespace que o CI já publica (`IMAGE_NAME: ${{ github.repository }}`),
 que o compose já consome, e — decisivo — que está **gravado no `.env` de cada cliente
@@ -46,7 +46,7 @@ mudança que as consertaria — o clássico problema de atualizar o atualizador.
 (`tests/shell/update-guard.test.sh`, `hostgator-setup-kit/test-validators.sh`,
 `tests/unit/packaging-artefato-do-cliente.test.ts`) e os docs — **mais** o `.env` de cada
 instalação viva, que é a parte que nenhum commit alcança. Régua para reconferir antes de
-citar este parágrafo: `grep -rln "ghcr.io/melgarafael" --exclude-dir=node_modules .`
+citar este parágrafo: `grep -rln "ghcr.io/andreajoa" --exclude-dir=node_modules .`
 
 **Reconsideraríamos se:** o projeto ganhar mantenedores com necessidade de publicar sem
 credencial pessoal, ou o repositório mudar de dono. Nesse caso a migração é **aditiva**:

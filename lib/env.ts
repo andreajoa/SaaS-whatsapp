@@ -267,6 +267,11 @@ const schema = z.object({
    */
   RESEND_API_KEY: z.string().optional().default(""),
   RESEND_FROM_EMAIL: z.string().optional().default(""),
+  /**
+   * Segredo `whsec_…` do webhook do Resend (entrega, abertura, clique, bounce,
+   * reclamação → `email_envios`). Vazio = `/api/v1/webhooks/resend` responde 404.
+   */
+  RESEND_WEBHOOK_SECRET: z.string().optional().default(""),
 
   /**
    * E-mail de suporte que a instalação mostra ao CLIENTE FINAL (tela de conta

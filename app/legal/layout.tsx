@@ -1,3 +1,4 @@
+import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import Link from "next/link";
 
 import { LinksLegais } from "@/components/site/LinksLegais";
@@ -90,11 +91,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
         </main>
       </div>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto w-full max-w-7xl px-4 py-6 text-xs text-text-subtle sm:px-6">
-          {marca.name}
-        </div>
-      </footer>
+      <RodapeDoSite nome={marca.name} />
     </div>
   );
 }

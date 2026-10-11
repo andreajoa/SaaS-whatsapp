@@ -1,3 +1,4 @@
+import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,14 +11,7 @@ import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
 import { INTERFACE_SEO as ui } from "@/lib/marketing/interface-seo";
-import {
-  instagramOficial,
-  jsonLdSeguro,
-  LINKS_SEO,
-  metadadosPublicos,
-  schemaDaPagina,
-  schemaDoFaq,
-} from "@/lib/marketing/seo";
+import { jsonLdSeguro, metadadosPublicos, schemaDaPagina, schemaDoFaq } from "@/lib/marketing/seo";
 import { visitanteAtual } from "@/lib/mercado/visitante";
 import styles from "./solucoes.module.css";
 
@@ -182,28 +176,7 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
           </div>
         </section>
       </main>
-      <footer className={styles.footer}>
-        <Link href="/">{marca.nome}</Link>
-        <nav aria-label={ui.content}>
-          {LINKS_SEO.map((p) => (
-            <Link key={p.href} href={p.href}>
-              {p.label}
-            </Link>
-          ))}
-          {instagramOficial(env.NEXT_PUBLIC_APP_URL) && (
-            <a
-              href={instagramOficial(env.NEXT_PUBLIC_APP_URL)!}
-              target="_blank"
-              rel="noopener noreferrer me"
-            >
-              Instagram
-            </a>
-          )}
-          <Link href="/legal/privacy">{ui.privacy}</Link>
-          <Link href="/legal/terms">{ui.terms}</Link>
-          <Link href="/contato">{ui.contact}</Link>
-        </nav>
-      </footer>
+      <RodapeDoSite nome={marca.nome} />
     </div>
   );
 }

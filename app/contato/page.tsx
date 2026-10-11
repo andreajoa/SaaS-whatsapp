@@ -1,3 +1,4 @@
+import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -84,13 +85,7 @@ export default async function ContatoPage() {
         </div>
       </main>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap gap-x-6 gap-y-2 px-4 py-6 text-sm sm:px-6">
-          <Link href="/legal" className="link-sublinha text-text-muted hover:text-text">
-            {t("Documentos")}
-          </Link>
-        </div>
-      </footer>
+      <RodapeDoSite nome={marca.name} />
     </div>
   );
 }

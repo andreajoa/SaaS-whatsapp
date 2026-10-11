@@ -493,6 +493,11 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
       "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
     marcas: ["atenza", "atenza", "atenza", "atenza"],
   },
+  "components/site/RodapeDoSite.tsx": {
+    categoria: "ATENZA",
+    motivo: "rótulo do perfil oficial da Atenza no Instagram (@atenzaon); o link só aparece no domínio oficial",
+    marcas: ["@atenzaon"],
+  },
   // ─── PADRAO — a marca padrão precisa existir em algum lugar. ───
   "lib/branding.ts": {
     categoria: "PADRAO",

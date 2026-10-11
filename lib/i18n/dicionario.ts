@@ -38,6 +38,37 @@ import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translat
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  "Pagamento seguro": { es: "Pago seguro" },
+  "Processado pela Stripe. Não guardamos o número do seu cartão.": {
+    es: "Procesado por Stripe. No guardamos el número de tu tarjeta.",
+  },
+  "Dados protegidos": { es: "Datos protegidos" },
+  "Tratamento conforme a LGPD, com DPA e lista de subprocessadores publicados.": {
+    es: "Tratamiento conforme a la LGPD, con DPA y lista de subencargados publicados.",
+  },
+  "WhatsApp oficial": { es: "WhatsApp oficial" },
+  "Conexão pela API oficial do WhatsApp, da Meta.": {
+    es: "Conexión por la API oficial de WhatsApp, de Meta.",
+  },
+  "Cancele quando quiser, em um clique, sem falar com ninguém.": {
+    es: "Cancela cuando quieras, en un clic, sin hablar con nadie.",
+  },
+  Produto: { es: "Producto" },
+  "Planos e preços": { es: "Planes y precios" },
+  "Demonstração em vídeo": { es: "Demostración en video" },
+  Soluções: { es: "Soluciones" },
+  Ajuda: { es: "Ayuda" },
+  "Cancelamento e reembolso": { es: "Cancelación y reembolso" },
+  "Acordo de tratamento de dados (DPA)": { es: "Acuerdo de tratamiento de datos (DPA)" },
+  Subprocessadores: { es: "Subencargados" },
+  "Segurança e garantias": { es: "Seguridad y garantías" },
+  "WhatsApp que atende e vende 24h: vários atendentes no mesmo número, agentes de IA com as informações do seu negócio e CRM com histórico de cada cliente.":
+    {
+      es: "WhatsApp que atiende y vende 24h: varios agentes en el mismo número, agentes de IA con la información de tu negocio y CRM con el historial de cada cliente.",
+    },
+  "Atendimento e vendas por WhatsApp para empresas de todo o Brasil.": {
+    es: "Atención y ventas por WhatsApp para empresas de todo Brasil.",
+  },
   "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.":
     {
       es: "Quiero recibir consejos, novedades y campañas de temporada por correo, como máximo un mensaje comercial al día. Puedo cancelar cuando quiera.",

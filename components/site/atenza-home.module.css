@@ -444,6 +444,14 @@
   padding: 16px 22px 22px;
   font-size: 13px;
 }
+/* A conversa encenada ocupa a largura toda: cada fala decide o próprio lado. */
+.conversaViva {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  min-height: 228px;
+}
 .historyLabel {
   align-self: center;
   color: #5b6d60;

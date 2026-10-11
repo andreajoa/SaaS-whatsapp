@@ -16,6 +16,7 @@ import {
   Users,
 } from "lucide-react";
 
+import { ConversaAoVivo } from "./ConversaAoVivo";
 import styles from "./atenza-home.module.css";
 
 export interface TextosDoProduto {
@@ -188,20 +189,47 @@ export function ProdutoDemonstracao({
                 </div>
                 <div className={styles.messages}>
                   <span className={styles.historyLabel}>{textos.historico}</span>
-                  <div className={styles.received}>
-                    {textos.pergunta}
-                    <small>10:21</small>
-                  </div>
-                  <div className={styles.sent}>
-                    {textos.resposta}
-                    <small>
-                      10:22 <CheckCheck size={13} aria-hidden />
-                    </small>
-                  </div>
-                  <div className={styles.received}>
-                    {textos.agradecimento}
-                    <small>10:23</small>
-                  </div>
+                  <ConversaAoVivo
+                    className={styles.conversaViva}
+                    repetirAposMs={5000}
+                    classeDaFala={(lado) =>
+                      lado === "agente" ? "flex w-full justify-end" : "flex w-full"
+                    }
+                    falas={[
+                      {
+                        lado: "cliente",
+                        digitandoMs: 0,
+                        balao: (
+                          <div className={styles.received}>
+                            {textos.pergunta}
+                            <small>10:21</small>
+                          </div>
+                        ),
+                      },
+                      {
+                        lado: "agente",
+                        digitandoMs: 1300,
+                        balao: (
+                          <div className={styles.sent}>
+                            {textos.resposta}
+                            <small>
+                              10:22 <CheckCheck size={13} aria-hidden />
+                            </small>
+                          </div>
+                        ),
+                      },
+                      {
+                        lado: "cliente",
+                        digitandoMs: 2000,
+                        balao: (
+                          <div className={styles.received}>
+                            {textos.agradecimento}
+                            <small>10:23</small>
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
                 </div>
                 <div className={styles.composer} aria-hidden>
                   <span>{textos.escrever}</span>

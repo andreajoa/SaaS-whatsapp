@@ -37,11 +37,36 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  Recursos: "Features",
+  "Pagamento seguro": "Secure payment",
+  "Processado pela Stripe. Não guardamos o número do seu cartão.":
+    "Processed by Stripe. We never store your card number.",
+  "Dados protegidos": "Protected data",
+  "Tratamento conforme a LGPD, com DPA e lista de subprocessadores publicados.":
+    "Handled under Brazil's LGPD, with a published DPA and subprocessor list.",
+  "WhatsApp oficial": "Official WhatsApp",
+  "Conexão pela API oficial do WhatsApp, da Meta.":
+    "Connected through Meta's official WhatsApp API.",
+  "Cancele quando quiser, em um clique, sem falar com ninguém.":
+    "Cancel anytime in one click, without talking to anyone.",
+  Produto: "Product",
+  "Planos e preços": "Plans and pricing",
+  "Demonstração em vídeo": "Video demo",
+  Soluções: "Solutions",
+  Ajuda: "Help",
+  "Cancelamento e reembolso": "Cancellation and refunds",
+  Segurança: "Security",
+  "Acordo de tratamento de dados (DPA)": "Data processing agreement (DPA)",
+  Subprocessadores: "Subprocessors",
+  "Segurança e garantias": "Security and guarantees",
+  "WhatsApp que atende e vende 24h: vários atendentes no mesmo número, agentes de IA com as informações do seu negócio e CRM com histórico de cada cliente.":
+    "WhatsApp that serves and sells 24/7: several agents on one number, AI agents trained on your business and a CRM with every customer's history.",
+  "Atendimento e vendas por WhatsApp para empresas de todo o Brasil.":
+    "WhatsApp customer service and sales for businesses across Brazil.",
   "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.":
     "I want tips, news and seasonal email campaigns, with at most one commercial message a day. I can unsubscribe at any time.",
   // ── Navegação e ações ──────────────────────────────────────────────────
   "Como funciona": "How it works",
-  Recursos: "Features",
   Planos: "Pricing",
   Perguntas: "FAQ",
   Entrar: "Sign in",

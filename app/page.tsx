@@ -1,3 +1,4 @@
+import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,7 +30,7 @@ import {
 } from "@/components/site/VideosDaHome";
 import styles from "@/components/site/atenza-home.module.css";
 import { marcaEhADoProduto } from "@/lib/branding";
-import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
+import { marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
   DIAS_DE_TRIAL,
   ORDEM_DOS_PLANOS,
@@ -41,7 +42,6 @@ import {
 import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 import {
   identidadePublica,
-  instagramOficial,
   jsonLdSeguro,
   metadadosDaHome,
   LINKS_SEO,
@@ -80,8 +80,6 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
   const visitante = { ...origem, idioma };
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
-  const suporte = emailDeSuporte();
-  const instagram = instagramOficial(env.NEXT_PUBLIC_APP_URL);
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
   const textosDaCaptura = {
     rotulo: t("Seu e-mail"),
@@ -657,26 +655,8 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             className={styles.capture}
           />
         </div>
-        <div className={`${styles.container} ${styles.footerBottom}`}>
-          <div>
-            <Marca marca={marca} />
-            <p>{t("Atendimento e vendas por WhatsApp")}</p>
-          </div>
-          <nav aria-label={t("Informações e contato")}>
-            <Link href="/legal/terms">{t("Termos de uso")}</Link>
-            <Link href="/legal/privacy">{t("Política de Privacidade")}</Link>
-            <Link href="/legal">{t("Documentos")}</Link>
-            <Link href="/contato">{t("Fale com a gente")}</Link>
-            {suporte && <a href={`mailto:${suporte}`}>{suporte}</a>}
-            {instagram && (
-              <a href={instagram} target="_blank" rel="noopener noreferrer me">
-                Instagram
-              </a>
-            )}
-            <Link href="/login">{t("Entrar")}</Link>
-          </nav>
-        </div>
       </footer>
+      <RodapeDoSite nome={marca.nome} idioma={idioma} />
     </div>
   );
 }

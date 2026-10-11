@@ -557,6 +557,17 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
       "atenza",
     ],
   },
+  "app/precos/page.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "a página de preços reaproveita o módulo de estilo da vitrine da Atenza (atenza-home.module.css)",
+    marcas: ["atenza-home.module.css"],
+  },
+  "lib/marketing/ilustracoes.ts": {
+    categoria: "ATENZA",
+    motivo: "mapa das ilustrações das páginas editoriais, servidas em /media/atenza/ilustracoes",
+    marcas: ["atenza"],
+  },
   // ─── PADRAO — a marca padrão precisa existir em algum lugar. ───
   "lib/branding.ts": {
     categoria: "PADRAO",

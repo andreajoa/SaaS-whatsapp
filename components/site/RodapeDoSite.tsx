@@ -72,7 +72,7 @@ export function RodapeDoSite({ nome, idioma = "pt-BR" }: { nome: string; idioma?
         { href: "/#como-funciona", rotulo: t("Como funciona") },
         { href: "/#recursos", rotulo: t("Recursos") },
         { href: "/#integracoes", rotulo: t("Integrações") },
-        { href: "/#planos", rotulo: t("Planos e preços") },
+        { href: "/precos", rotulo: t("Planos e preços") },
         { href: "/demonstracao", rotulo: t("Demonstração em vídeo") },
         { href: "/signup", rotulo: t("Criar conta") },
         { href: "/login", rotulo: t("Entrar") },

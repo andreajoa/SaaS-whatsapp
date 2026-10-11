@@ -40,7 +40,7 @@ export function schemaDoSoftware(nome: string, base: string) {
       name: `Plano ${PLANOS[id].nome}`,
       price: (precoNoMercado(id, brasil) / 100).toFixed(2),
       priceCurrency: brasil.moeda,
-      url: `${url}#planos`,
+      url: `${url}precos`,
       availability: "https://schema.org/InStock",
       eligibleRegion: { "@type": "Country", name: "Brasil" },
       priceSpecification: {

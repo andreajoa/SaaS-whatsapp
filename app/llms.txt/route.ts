@@ -66,7 +66,8 @@ ${planos}
 
 ## Páginas
 
-- [Início e planos](${url("/")}): visão geral do produto e preços
+- [Início](${url("/")}): visão geral do produto
+- [Preços e planos](${url("/precos")}): planos, comparação e como funciona a assinatura
 - [Demonstração em vídeo](${url("/demonstracao")}): 48 segundos, com legendas
 ${paginas}
 - [Contato](${url("/contato")}): falar com o suporte

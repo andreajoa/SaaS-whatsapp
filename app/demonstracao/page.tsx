@@ -62,7 +62,7 @@ export default async function Page() {
           />
         </video>
         <div className={styles.actions}>
-          <Link href="/#planos" className={styles.primary}>
+          <Link href="/precos" className={styles.primary}>
             {ui.plans}
           </Link>
           <Link href="/contato" className={styles.secondary}>

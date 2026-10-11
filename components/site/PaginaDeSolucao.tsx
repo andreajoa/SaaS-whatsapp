@@ -5,12 +5,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Play } from "lucide-react";
 
-import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
 import { Medidor } from "@/components/site/Medidor";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
+import { ilustracaoDaPagina } from "@/lib/marketing/ilustracoes";
 import { INTERFACE_SEO as ui } from "@/lib/marketing/interface-seo";
 import { jsonLdSeguro, metadadosPublicos, schemaDaPagina, schemaDoFaq } from "@/lib/marketing/seo";
 import { visitanteAtual } from "@/lib/mercado/visitante";
@@ -26,7 +26,7 @@ export async function metadadosDaSolucao(slug: string) {
     descricao: pagina.description,
     caminho: `/${slug}`,
     base: env.NEXT_PUBLIC_APP_URL,
-    imagem: pagina.image.src,
+    imagem: ilustracaoDaPagina(slug)?.src ?? pagina.image.src,
   });
 }
 
@@ -52,6 +52,8 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
       schemaDoFaq(env.NEXT_PUBLIC_APP_URL, `/${slug}`, pagina.faq),
     ],
   };
+  const ilustracao = ilustracaoDaPagina(slug);
+  const imagem = ilustracao ?? pagina.image;
   const relacionadas = PAGES_SEO.filter((p) => pagina.relatedSlugs.includes(p.slug));
   return (
     <div className={styles.page} lang="pt-BR">
@@ -76,7 +78,7 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
             <h1>{pagina.headline}</h1>
             <p className={styles.intro}>{pagina.intro}</p>
             <div className={styles.actions}>
-              <Link href="/#planos" className={styles.primary}>
+              <Link href="/precos" className={styles.primary}>
                 {ui.plans}
                 <ArrowRight size={17} aria-hidden />
               </Link>
@@ -87,10 +89,10 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
             </div>
             <p className={styles.trial}>{ui.trial}</p>
           </div>
-          <figure className={styles.figure}>
+          <figure className={styles.figure} data-ilustracao={ilustracao ? "true" : undefined}>
             <Image
-              src={pagina.image.src}
-              alt={pagina.image.alt}
+              src={imagem.src}
+              alt={imagem.alt}
               width={1000}
               height={563}
               sizes="(max-width: 800px) 100vw, 45vw"
@@ -143,7 +145,7 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
           <p className={styles.eyebrow}>{marca.nome}</p>
           <h2>{ui.cta}</h2>
           <div className={styles.actions}>
-            <Link href="/#planos" className={styles.primary}>
+            <Link href="/precos" className={styles.primary}>
               {ui.plans}
               <ArrowRight size={17} aria-hidden />
             </Link>

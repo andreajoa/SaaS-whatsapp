@@ -1,0 +1,207 @@
+.pagina {
+  background: #f8faf7;
+  color: #17212b;
+  min-height: 100vh;
+}
+.topo {
+  width: min(900px, calc(100% - 32px));
+  margin: 64px auto 8px;
+  text-align: center;
+}
+.sobretitulo {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2f5a3f;
+}
+.topo h1 {
+  margin: 0 0 16px;
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.08;
+  color: #173a2c;
+}
+.intro {
+  margin: 0 auto;
+  max-width: 64ch;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #3d4f3f;
+}
+.nomeDoPlano {
+  margin: 0;
+  font-size: 22px;
+}
+.bloco {
+  width: min(1080px, calc(100% - 32px));
+  margin: 72px auto 0;
+}
+.bloco > h2,
+.destaque h2 {
+  margin: 0 0 24px;
+  font-size: clamp(26px, 3.4vw, 36px);
+  line-height: 1.15;
+  color: #173a2c;
+}
+.tabelaRolagem {
+  overflow-x: auto;
+  border: 1px solid #d6e3d1;
+  border-radius: 16px;
+  background: #ffffff;
+}
+.tabela {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.tabela th,
+.tabela td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e7eee4;
+  text-align: center;
+}
+.tabela thead th {
+  background: #f3f6f1;
+  font-size: 14px;
+  color: #173a2c;
+}
+.tabela th[scope="row"],
+.tabela thead th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.tabela tr:last-child th,
+.tabela tr:last-child td {
+  border-bottom: 0;
+}
+.sim {
+  color: #2f5a3f;
+}
+.nao {
+  color: #a9b6a6;
+}
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.passos li {
+  padding: 22px;
+  border: 1px solid #d6e3d1;
+  border-radius: 16px;
+  background: #ffffff;
+}
+.numero {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: #173a2c;
+  color: #ffffff;
+  font-weight: 700;
+}
+.passos strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 6px;
+  color: #173a2c;
+}
+.passos p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #3d4f3f;
+}
+.destaque {
+  padding: 36px 40px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #173a2c, #2f5a3f);
+  color: #ffffff;
+}
+.destaque h2 {
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+.destaque p {
+  margin: 0;
+  max-width: 80ch;
+  font-size: 17px;
+  line-height: 1.65;
+  color: #e3ece0;
+}
+.faq {
+  border-top: 1px solid #d6e3d1;
+}
+.faq details {
+  padding: 18px 0;
+  border-bottom: 1px solid #d6e3d1;
+}
+.faq summary {
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  color: #173a2c;
+}
+.faq p {
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #3d4f3f;
+}
+.chamada {
+  width: min(1080px, calc(100% - 32px));
+  margin: 72px auto 0;
+  padding: 48px 32px;
+  text-align: center;
+  border-radius: 24px;
+  background: #e7efe3;
+}
+.chamada h2 {
+  margin: 0 0 20px;
+  font-size: clamp(24px, 3vw, 32px);
+  color: #173a2c;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.primario.primario,
+.secundario.secundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.primario.primario {
+  background: #173a2c;
+  color: #ffffff;
+}
+.secundario.secundario {
+  border: 1px solid #2f5a3f;
+  color: #173a2c;
+}
+@media (max-width: 900px) {
+  .passos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .passos {
+    grid-template-columns: 1fr;
+  }
+  .destaque {
+    padding: 28px 22px;
+  }
+}

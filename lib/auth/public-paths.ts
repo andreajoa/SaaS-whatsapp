@@ -9,6 +9,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/guias\/como-escolher-atendimento-whatsapp$/,
   // Páginas de recurso e de segmento do mega menu (lista fechada em conteudo-recursos.ts).
   /^\/(?:recursos|segmentos)\/[a-z0-9-]+$/,
+  /^\/precos$/,
   // Resumo para buscadores de IA; só texto público do produto.
   /^\/llms\.txt$/,
   /^\/login(\/.*)?$/,

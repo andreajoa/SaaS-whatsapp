@@ -39,12 +39,10 @@ import { marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
   DIAS_DE_TRIAL,
   ORDEM_DOS_PLANOS,
-  PLANOS,
   instalacaoCobra,
   precoDoPlano,
   type PlanoId,
 } from "@/lib/billing/planos";
-import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 import {
   identidadePublica,
   jsonLdSeguro,
@@ -54,7 +52,7 @@ import {
 } from "@/lib/marketing/seo";
 import { env } from "@/lib/env";
 import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
-import { precoLegivelNoMercado, type IdiomaDoSite } from "@/lib/mercado/paises";
+import { type IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
 import { visitanteAtual } from "@/lib/mercado/visitante";
 import { createClient } from "@/lib/supabase/server";
@@ -290,7 +288,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
                 {t("Ver em ação")}
               </a>
               <a
-                href={`#${vendidos.length ? ID_DA_SECAO_DE_PLANOS : "como-funciona"}`}
+                href={vendidos.length ? "/precos" : "#como-funciona"}
                 className={styles.buttonOutline}
               >
                 {vendidos.length ? t("Conhecer os planos") : t("Como funciona")}
@@ -530,61 +528,6 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             </VideoExplicativo>
           </div>
         </section>
-
-        {vendidos.length > 0 && (
-          <section
-            id={ID_DA_SECAO_DE_PLANOS}
-            className={`${styles.section} ${styles.pricingSection}`}
-          >
-            <div className={styles.container}>
-              <div className={styles.centerHeading}>
-                <h2>{t("Um plano para o seu momento.")}</h2>
-                <p>
-                  {trial}. {t("Escolha o tamanho da sua operação.")}
-                </p>
-              </div>
-              <div className={styles.plans}>
-                {vendidos.map((id) => {
-                  const plano = PLANOS[id];
-                  const destaque = id === "pro";
-                  return (
-                    <article
-                      key={id}
-                      className={`${styles.plan} ${destaque ? styles.featuredPlan : ""}`}
-                    >
-                      <div className={styles.planHeading}>
-                        <h3>{t(plano.nome)}</h3>
-                        {destaque && <span>{t("Recomendado")}</span>}
-                      </div>
-                      <p className={styles.price}>
-                        {precoLegivelNoMercado(id, mercado)}
-                        <small>{t("/mês")}</small>
-                      </p>
-                      <ul>
-                        {plano.destaques.map((d) => (
-                          <li key={d}>
-                            <Check size={17} aria-hidden />
-                            {t(d)}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link
-                        href="/signup"
-                        data-medir={`plano-${id}`}
-                        className={destaque ? styles.buttonLight : styles.buttonOutline}
-                      >
-                        {t("Começar agora")}
-                        <ArrowRight size={17} aria-hidden />
-                      </Link>
-                      <p className={styles.planTerms}>{condicoes}</p>
-                    </article>
-                  );
-                })}
-              </div>
-              <p className={styles.conditions}>{condicoes}</p>
-            </div>
-          </section>
-        )}
 
         <section id="perguntas" className={styles.section}>
           <div className={`${styles.container} ${styles.faqLayout}`}>

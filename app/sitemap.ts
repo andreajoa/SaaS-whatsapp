@@ -53,6 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Toda página editorial vem da lista fechada — página nova entra sozinha.
     ...PAGES_SEO.map((p) => ({ url: url(`/${p.slug}`), lastModified: "2026-10-11" })),
     { url: url("/demonstracao"), lastModified: "2026-10-10" },
+    { url: url("/precos"), lastModified: "2026-10-11", priority: 0.9 },
     // Quem procura "como falar com o suporte" antes de assinar procura esta.
     { url: url("/contato"), changeFrequency: "yearly", priority: 0.5 },
     { url: url("/legal"), changeFrequency: "yearly", priority: 0.4 },

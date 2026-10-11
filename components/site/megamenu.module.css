@@ -141,7 +141,9 @@
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 8px;
+  background: radial-gradient(closest-side, #e3ece0, #f3f6f1);
   border-radius: 10px;
   margin-bottom: 10px;
 }

@@ -38,7 +38,7 @@ it("no celular, escolher um destino fecha a gaveta para não cobrir a página", 
 it("todo destino do menu é uma página que existe", async () => {
   const { PAGES_SEO } = await import("@/lib/marketing/conteudo-seo");
   const paginas = new Set(PAGES_SEO.map((p) => `/${p.slug}`));
-  const fixas = new Set(["/demonstracao", "/signup", "/contato", "/#perguntas", "/#planos"]);
+  const fixas = new Set(["/demonstracao", "/signup", "/contato", "/#perguntas", "/precos"]);
   const destinos = menu.grupos.flatMap((g) => [...g.itens.map((i) => i.href), g.destaque.href]);
   const quebrados = destinos.filter((h) => !paginas.has(h) && !fixas.has(h));
   expect(quebrados).toEqual([]);

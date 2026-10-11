@@ -152,9 +152,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Criar conta": "Create account",
 
   "Começar com": "Start with",
-  "Começar agora": "Get started",
-  Recomendado: "Recommended",
-  "/mês": "/month",
 
   // ── Topo ───────────────────────────────────────────────────────────────
 
@@ -423,8 +420,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
     "Press play and see how conversations, AI and the pipeline connect in daily work.",
   "Assistir à explicação": "Watch the explanation",
   "Com áudio e legendas em português": "With Portuguese audio and captions",
-  "Um plano para o seu momento.": "A plan for your stage.",
-  "Escolha o tamanho da sua operação.": "Choose the size of your operation.",
   "Respostas antes do primeiro passo.": "Answers before your first step.",
   "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.":
     "Data is separated by company, with access controls. The platform offers export tools and features for handling privacy requests.",

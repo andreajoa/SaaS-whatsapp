@@ -79,6 +79,11 @@ const FORA_DO_PRODUTO: Record<string, string> = {
   // segundo leitor. Traduzi-la seria manutenção para ninguém.
   "app/dashboard": "painel do funil do operador: atrás de PAINEL_SENHA, noindex, fora de app/app/",
   "components/painel": "a porta do painel do funil: mesma tela, mesmo leitor único",
+  // A página de preços é conteúdo comercial para o mercado brasileiro, como as
+  // páginas de solução/recurso/segmento (lang pt-BR, texto editorial próprio).
+  // Não é tela do produto: quem escolhe espanhol no produto nunca chega aqui logado.
+  "app/precos":
+    "página comercial de preços em pt-BR, como as páginas editoriais de conteudo-seo.ts",
 };
 
 /**

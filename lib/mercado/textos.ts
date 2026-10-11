@@ -37,6 +37,10 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  "Empresa cadastrada no Reclame Aqui": "Company registered on Reclame Aqui",
+  "Veja a nossa página e a nossa reputação.": "See our page and our reputation.",
+  "Empresa cadastrada no Reclame Aqui — abrir página":
+    "Company registered on Reclame Aqui — open page",
   "Trocas e devoluções": "Exchanges and returns",
   "Qual o prazo de entrega para Campinas?": "How long does delivery to Campinas take?",
   "Vocês aceitam Pix?": "Do you accept Pix?",

@@ -39,6 +39,52 @@
   color: #506d48;
   margin-top: 1px;
 }
+.reclameAqui {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 28px;
+  padding: 12px 18px;
+  background: #ffffff;
+  border: 1px solid #c8d6c1;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #2f3c2b;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.reclameAqui:hover,
+.reclameAqui:focus-visible {
+  border-color: #7cb342;
+  box-shadow: 0 6px 18px -10px rgba(76, 140, 43, 0.6);
+}
+.raLogo {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: italic;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+.raLogo span {
+  color: #8bc34a;
+  font-weight: 700;
+}
+.raLogo b {
+  color: #2e7d32;
+  font-weight: 900;
+}
+.raTexto strong {
+  display: block;
+  font-size: 14.5px;
+}
+.raTexto span {
+  display: block;
+  font-size: 13px;
+  color: #506d48;
+}
 .grade {
   display: grid;
   grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));

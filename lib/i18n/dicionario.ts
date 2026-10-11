@@ -38,6 +38,13 @@ import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translat
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  "Empresa cadastrada no Reclame Aqui": { es: "Empresa registrada en Reclame Aqui" },
+  "Veja a nossa página e a nossa reputação.": {
+    es: "Mira nuestra página y nuestra reputación.",
+  },
+  "Empresa cadastrada no Reclame Aqui — abrir página": {
+    es: "Empresa registrada en Reclame Aqui — abrir página",
+  },
   "Trocas e devoluções": { es: "Cambios y devoluciones" },
   "Qual o prazo de entrega para Campinas?": { es: "¿Cuál es el plazo de entrega a Campinas?" },
   "Vocês aceitam Pix?": { es: "¿Aceptan Pix?" },

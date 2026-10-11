@@ -5,10 +5,13 @@ import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
 import { DIAS_DE_TRIAL, instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 import { emailDeSuporte } from "@/lib/branding/saida";
-import { instagramOficial, LINKS_SEO } from "@/lib/marketing/seo";
+import { instagramOficial, LINKS_SEO, reclameAquiOficial } from "@/lib/marketing/seo";
 import { textoDoSite } from "@/lib/mercado/textos";
 import type { IdiomaDoSite } from "@/lib/mercado/paises";
 import styles from "./rodape.module.css";
+
+/** Nome de marca de terceiro (logotipo em texto), não prosa: não se traduz. */
+const MARCA_RECLAME_AQUI = ["Reclame", "AQUI"] as const;
 
 /**
  * O rodapé de TODA página pública — o mesmo em todas, para quem chega por
@@ -36,6 +39,7 @@ export function RodapeDoSite({ nome, idioma = "pt-BR" }: { nome: string; idioma?
   }
   const suporte = emailDeSuporte();
   const instagram = instagramOficial(env.NEXT_PUBLIC_APP_URL);
+  const reclameAqui = reclameAquiOficial(env.NEXT_PUBLIC_APP_URL);
   const selos = [
     {
       icone: LockKeyhole,
@@ -113,6 +117,24 @@ export function RodapeDoSite({ nome, idioma = "pt-BR" }: { nome: string; idioma?
             </li>
           ))}
         </ul>
+        {reclameAqui && (
+          <a
+            href={reclameAqui}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.reclameAqui}
+            aria-label={t("Empresa cadastrada no Reclame Aqui — abrir página")}
+          >
+            <span className={styles.raLogo} aria-hidden>
+              <span>{MARCA_RECLAME_AQUI[0]}</span>
+              <b>{MARCA_RECLAME_AQUI[1]}</b>
+            </span>
+            <span className={styles.raTexto}>
+              <strong>{t("Empresa cadastrada no Reclame Aqui")}</strong>
+              <span>{t("Veja a nossa página e a nossa reputação.")}</span>
+            </span>
+          </a>
+        )}
         <div className={styles.grade}>
           <div className={styles.marca}>
             <Link href="/" aria-label={nome}>

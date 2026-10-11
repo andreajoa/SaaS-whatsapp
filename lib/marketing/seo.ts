@@ -137,6 +137,17 @@ function ehDominioOficial(base: string): boolean {
   return new URL(base).hostname.replace(/^www\./, "") === "atenza.online";
 }
 
+/**
+ * Página da Atenza no Reclame Aqui (empresa cadastrada pelo dono em 11/10/2026).
+ * Aponta para a busca pelo nome, que sempre leva à página da empresa — o
+ * endereço exato do perfil não pôde ser conferido (o site barra acesso automático).
+ */
+const RECLAME_AQUI_ATENZA = "https://www.reclameaqui.com.br/busca/?q=atenza";
+
+export function reclameAquiOficial(base: string): string | null {
+  return ehDominioOficial(base) ? RECLAME_AQUI_ATENZA : null;
+}
+
 export function instagramOficial(base: string): string | null {
   return ehDominioOficial(base) ? INSTAGRAM_ATENZA : null;
 }

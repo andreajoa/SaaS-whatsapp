@@ -25210,7 +25210,7 @@ as $$
       and (a.audience <> 'cadastro_sem_assinatura' or (l.user_id is not null and l.virou_usuario_em <= now() - interval '24 hours'))
       and ((e.id is null and (l.ultimo_envio_em is null or l.ultimo_envio_em <= now() - interval '24 hours')) or
         (e.status = 'falhou' and e.erro like 'rate_limited:%' and e.tentativas < 3 and e.created_at > now() - interval '23 hours'
-          and coalesce(e.ultima_tentativa_em,e.created_at) <= now() - interval '10 minutes')))
+          and coalesce(e.ultima_tentativa_em,e.created_at) <= now() - interval '10 minutes'))
   ), lote as (
     select id,email,idioma,user_id,token_descadastro,campanha from elegiveis where prioridade = 1
     order by ultimo_envio_em asc nulls first,id

@@ -1,5 +1,15 @@
 # Mapa de Jornadas & Testes E2E — Experiência do usuário em VPS fresca
 
+## Vitrine Atenza online — 10/10/2026
+
+Visitante anônimo → demonstração fictícia → vídeo por escolha → planos →
+cadastro/contato. Revisão independente em 320, 390, 768 e 1440 px: sem
+overflow, erros de JavaScript, falhas de imagens ou violações axe; abas e
+funil demonstrativo operantes. Movimento reduzido, pausa persistente,
+carregamento sob demanda e menu por teclado conferidos. Detalhes e limites:
+`atenza-pagina-publica-2026-10-10.md`. Esta prova usa o banco online de teste
+e não substitui as jornadas de VPS fresca descritas abaixo.
+
 > Fonte da verdade do QA de produto do DeskcommCRM open-source. Cada caso aqui é
 > exercitado **pelo frontend real** (Playwright), com contas de teste reais e
 > recursos reais (banco fresco do `baseline.sql`, WAHA local, receiver de webhook

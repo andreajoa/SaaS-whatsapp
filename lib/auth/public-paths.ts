@@ -104,6 +104,10 @@ export const PUBLIC_PATHS: RegExp[] = [
   // autenticação (Zod, limite por IP, campo-armadilha) está no cabeçalho da
   // rota, e a instalação que não cobra responde 404.
   /^\/api\/v1\/site\/lead$/,
+  // Arquivos estáticos da demonstração pública: vídeos e legendas precisam
+  // carregar antes do cadastro. Lista fechada: não libera mídia de clientes,
+  // rotas do produto ou qualquer arquivo futuro pela extensão.
+  /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt))$/,
   // A SAÍDA DA LISTA — a tela e a rota que dá baixa.
   //
   // Quem clica para sair de uma lista de e-mails nunca teve sessão, e nunca

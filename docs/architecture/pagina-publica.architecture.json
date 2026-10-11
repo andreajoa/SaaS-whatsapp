@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Página pública de demonstração e conversão",
+    "subtitle": "Mídia local, escolha explícita do visitante e funil existente",
+    "output": "pagina-publica.html",
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    {
+      "id": "pessoa",
+      "label": "Pessoa"
+    },
+    {
+      "id": "site",
+      "label": "Site público"
+    },
+    {
+      "id": "produto",
+      "label": "Produto e registro existentes"
+    }
+  ],
+  "mainPath": ["visitante", "pagina", "demonstracao", "signup"],
+  "nodes": [
+    {
+      "id": "visitante",
+      "lane": "pessoa",
+      "col": 0,
+      "type": "ui",
+      "label": "Visitante anônimo: entrada pela raiz pública"
+    },
+    {
+      "id": "pagina",
+      "lane": "site",
+      "col": 1,
+      "type": "ui",
+      "label": "app/page.tsx: marca, país, preços e conteúdo"
+    },
+    {
+      "id": "midia",
+      "lane": "site",
+      "col": 2,
+      "type": "service",
+      "label": "Arquivos estáticos locais, vídeo e legendas"
+    },
+    {
+      "id": "demonstracao",
+      "lane": "site",
+      "col": 2,
+      "type": "ui",
+      "label": "Demonstração identificada, vídeo e transcrição"
+    },
+    {
+      "id": "signup",
+      "lane": "produto",
+      "col": 3,
+      "type": "ui",
+      "label": "/signup → onboarding → assinatura existente"
+    },
+    {
+      "id": "captura",
+      "lane": "site",
+      "col": 3,
+      "type": "ui",
+      "label": "CapturaDeLead e ConviteDeLead: opt-in existente"
+    },
+    {
+      "id": "lead",
+      "lane": "produto",
+      "col": 4,
+      "type": "api",
+      "label": "POST /api/v1/site/lead: registrarLead existente"
+    },
+    {
+      "id": "medidor",
+      "lane": "site",
+      "col": 3,
+      "type": "ui",
+      "label": "Medidor: visitas, preço e cliques permitidos"
+    },
+    {
+      "id": "metricas",
+      "lane": "produto",
+      "col": 4,
+      "type": "database",
+      "label": "site_visits e pulso: funil público existente"
+    }
+  ],
+  "edges": [
+    {
+      "from": "visitante",
+      "to": "pagina",
+      "label": "Chegada anônima; autenticado continua para /app"
+    },
+    {
+      "from": "pagina",
+      "to": "midia",
+      "label": "Referências a arquivos versionados; sem serviço de geração em runtime"
+    },
+    {
+      "from": "midia",
+      "to": "demonstracao",
+      "label": "Imagem de contexto, vídeo mudo e vídeo narrado sob demanda"
+    },
+    {
+      "from": "pagina",
+      "to": "demonstracao",
+      "label": "Copy traduzida, controles acessíveis e dados fictícios declarados"
+    },
+    {
+      "from": "demonstracao",
+      "to": "signup",
+      "label": "Próximo passo por CTA: avaliação com condições visíveis"
+    },
+    {
+      "from": "pagina",
+      "to": "captura",
+      "label": "Formulários já existentes preservados"
+    },
+    {
+      "from": "captura",
+      "to": "lead",
+      "label": "Inscrição voluntária, validação e rate limit existentes"
+    },
+    {
+      "from": "lead",
+      "to": "captura",
+      "label": "Confirmação ou erro visível; usuário pode tentar novamente"
+    },
+    {
+      "from": "pagina",
+      "to": "medidor",
+      "label": "Idioma, moeda, dispositivo e âncora planos canônica"
+    },
+    {
+      "from": "medidor",
+      "to": "metricas",
+      "label": "Visitas e cliques de vocabulário existente"
+    },
+    {
+      "from": "metricas",
+      "to": "visitante",
+      "label": "Operador revisa fricção do funil e melhora a página"
+    }
+  ]
+}

@@ -1,35 +1,33 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
   Bot,
-  ChartColumn,
   Check,
-  Clock,
-  Inbox,
+  History,
+  LockKeyhole,
+  Play,
   QrCode,
   ShieldCheck,
   SquareKanban,
-  Sparkles,
+  Users,
 } from "lucide-react";
 
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
-import { BarraDeBeneficios } from "@/components/site/BarraDeBeneficios";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
-import { CartaoComLuz } from "@/components/site/CartaoComLuz";
-import { ComESem } from "@/components/site/ComESem";
-import {
-  Balao as BalaoDeSecao,
-  CorpoDaConversa,
-  EtiquetaDeAssunto,
-} from "@/components/site/Conversa";
-import { ConversaAoVivo } from "@/components/site/ConversaAoVivo";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
-import { EntraEmSequencia } from "@/components/site/EntraEmSequencia";
+import { IntegracoesDaHome } from "@/components/site/IntegracoesDaHome";
 import { Medidor } from "@/components/site/Medidor";
-import { PalavraQueAlterna } from "@/components/site/PalavraQueAlterna";
-import { TextoQuePreenche } from "@/components/site/TextoQuePreenche";
+import { NavegacaoDaHome } from "@/components/site/NavegacaoDaHome";
+import { ProdutoDemonstracao, type TextosDoProduto } from "@/components/site/ProdutoDemonstracao";
+import {
+  VideoDeContexto,
+  VideoExplicativo,
+  type TextosDoVideo,
+} from "@/components/site/VideosDaHome";
+import styles from "@/components/site/atenza-home.module.css";
 import { marcaEhADoProduto } from "@/lib/branding";
 import { emailDeSuporte, marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
@@ -46,63 +44,15 @@ import { textoDoSite } from "@/lib/mercado/textos";
 import { visitanteAtual } from "@/lib/mercado/visitante";
 import { createClient } from "@/lib/supabase/server";
 
-/**
- * A PÁGINA QUE EXPLICA O PRODUTO ANTES DE PEDIR DINHEIRO.
- *
- * ─── Por que a raiz deixou de ser só um redirect ───────────────────────────
- *
- * Até aqui `/` mandava direto para `/app`, e o middleware jogava quem não tem
- * sessão em `/login`. Isso basta enquanto o produto é instalado por quem já
- * sabe o que ele é — o self-host. Num SaaS que cobra assinatura é o contrário:
- * a primeira coisa que a pessoa encontra é um formulário de senha de um sistema
- * que ela nunca viu. Não há como assinar o que não foi explicado.
- *
- * ─── As duas caras, pelo mesmo interruptor da tela de cobrança ─────────────
- *
- * `instalacaoCobra() === false` (sem `STRIPE_SECRET_KEY`) → **nada muda**: a
- * raiz segue redirecionando para `/app`. Quem clonou este repositório para uma
- * VPS não tem plano para vender e não deve ganhar uma página de vendas nossa na
- * frente do próprio sistema. É o MESMO interruptor de
- * `app/app/settings/billing/page.tsx`, de propósito: uma segunda condição para
- * "esta instalação é o SaaS hospedado" divergiria da primeira no primeiro dia.
- *
- * Quem já está logado também segue para `/app`. A página é para quem chega de
- * fora; entregá-la a quem já paga seria pedir que ele passe pela portaria toda
- * vez que digita o domínio.
- *
- * ─── O idioma e o PREÇO, aqui, vêm do país ─────────────────────────────────
- *
- * Nas telas de dentro o idioma sai de `AuthUser.idioma`. Aqui não há usuário:
- * quem lê é um visitante anônimo, e o que se sabe dele é de onde ele chegou.
- * `lib/mercado/visitante.ts` lê o país do cabeçalho da borda e
- * `lib/mercado/paises.ts` converte isso em idioma, moeda e preço de uma vez —
- * as três coisas são a MESMA decisão, e separá-las produziria a combinação
- * absurda de uma página em espanhol cobrando em real.
- *
- * O país vence o `Accept-Language`, e o motivo está no cabeçalho de
- * `visitante.ts`: o cabeçalho do navegador diz que idioma a pessoa configurou
- * uma vez; o país diz onde ela vai passar o cartão.
- *
- * ─── `robots` ──────────────────────────────────────────────────────────────
- *
- * O layout raiz declara `index: false` para o produto INTEIRO, e está certo: o
- * que há lá dentro é conversa de cliente. Esta página é a única exceção, e ela
- * a declara localmente — metadata de página vence a do layout.
- */
-
+// O mesmo interruptor da cobrança preserva o clone self-host sem vitrine de assinatura.
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const marca = await marcaDaSaida(null);
   return {
-    // `absolute` porque o layout raiz aplica o sufixo `· <marca>` a toda página
-    // filha, e aqui o nome da marca já abre o título. Sem isto o resultado é
-    // "Atenza — ... · Atenza", que é como um título de página anuncia descuido.
-    title: {
-      absolute: `${marca.nome} — atendimento por WhatsApp que não perde cliente`,
-    },
+    title: { absolute: `${marca.nome} — atendimento por WhatsApp que não perde cliente` },
     description:
-      "Centralize o WhatsApp da sua empresa em uma tela só, com um atendente de IA que responde na hora e chama o time humano quando o assunto pede. Funil, histórico e follow-up no mesmo lugar.",
+      "Centralize o WhatsApp da sua empresa em uma tela só, com agentes de IA, histórico compartilhado e funil de vendas. Automatize a rotina e mantenha o cuidado com cada cliente.",
     robots: { index: true, follow: true },
     alternates: { canonical: "/" },
   };
@@ -110,34 +60,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   if (!instalacaoCobra()) redirect("/app");
-
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) redirect("/app");
 
-  const visitante = await visitanteAtual();
+  const [visitante, marca] = await Promise.all([visitanteAtual(), marcaDaSaida(null)]);
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
-
-  const marca = await marcaDaSaida(null);
   const suporte = emailDeSuporte();
-  // Só os planos que ESTA instalação de fato vende — mesma regra da tela de
-  // cobrança. Anunciar um plano sem `price_...` configurado levaria a pessoa a
-  // um checkout que não existe.
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
-
-  // Os textos do campo de e-mail são montados AQUI, e não dentro dos
-  // componentes que os mostram. Duas razões, nesta ordem:
-  //
-  //  - `CapturaDeLead` e `ConviteDeLead` são `"use client"`. `textoDoSite`
-  //    conhece três idiomas e o dicionário do cliente conhece dois — chamado
-  //    lá dentro, um visitante indiano veria a página em inglês e o campo em
-  //    português. É a mesma razão escrita em `FormularioDeContato`.
-  //  - `tests/unit/vitrine-fala-ingles.test.ts` varre ESTE arquivo, não os
-  //    componentes. Frase nova escrita aqui nasce dentro do alcance do guarda;
-  //    escrita lá dentro, nasce fora dele.
   const textosDaCaptura = {
     rotulo: t("Seu e-mail"),
     exemplo: t("seu@email.com"),
@@ -147,9 +80,105 @@ export default async function HomePage() {
     sucesso: t("Pronto. Se houver novidade que valha o seu tempo, ela chega por e-mail."),
     erro: t("Não foi possível inscrever agora. Tente de novo em instantes."),
   };
+  // As ilhas recebem os três idiomas da vitrine por prop, sem importar o dicionário do produto.
+  const produto: TextosDoProduto = {
+    demonstracao: t("Demonstração"),
+    titulo: t("Explore o produto"),
+    conversas: t("Conversas"),
+    agentes: t("Agentes de IA"),
+    funil: t("Funil de vendas"),
+    fila: t("Fila"),
+    minhas: t("Minhas"),
+    todas: t("Todas"),
+    contato: t("Dados do contato"),
+    historico: t("Histórico compartilhado"),
+    cliente: t("Cliente da loja"),
+    equipe: t("Sua equipe"),
+    ultima: t("Quero mais informações"),
+    pergunta: t("Oi! Vocês têm este modelo em estoque?"),
+    resposta: t("Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?"),
+    agradecimento: t("Pode sim! Estou procurando o tamanho 38."),
+    escrever: t("Escreva uma mensagem..."),
+    nota: t("Demonstração interativa com dados fictícios. Nenhuma mensagem é enviada."),
+    atribuida: t("Conversa atribuída à equipe"),
+    conhecimento: t("O conhecimento é da sua empresa."),
+    documentos: t("Organize os materiais que orientam o agente."),
+    documento1: t("Produtos e serviços"),
+    documento2: t("Prazos e entregas"),
+    documento3: t("Perguntas frequentes"),
+    limites: t("Limites definidos por você"),
+    limiteTexto: t("Configure instruções, base de conhecimento e quando pedir ajuda ao time."),
+    transferencia: t("Uma pessoa assume com contexto"),
+    transferenciaTexto: t("O histórico acompanha a conversa quando ela passa da IA para a equipe."),
+    oportunidade: t("A conversa tem um próximo passo."),
+    etapa1: t("Novo contato"),
+    etapa2: t("Em atendimento"),
+    etapa3: t("Proposta"),
+    etapa4: t("Concluído"),
+    proximo: t("Próximo passo"),
+    proximoTexto: t("Confirmar o tamanho e acompanhar a decisão."),
+    mover: t("Mover para"),
+    demonstracaoTexto: t("Experimente mudar a etapa deste contato no exemplo acima."),
+  };
+  const video: TextosDoVideo = {
+    titulo: t("Veja como funciona"),
+    descricao: t(
+      "Um passeio pelo atendimento, pela IA e pelo funil. Vídeo com áudio e legendas em português.",
+    ),
+    fechar: t("Fechar vídeo"),
+    legendas: t("Português"),
+    transcricao: t("Ler a explicação"),
+    indisponivel: t("O vídeo não carregou. Você pode ler a explicação abaixo."),
+    paragrafo1: t(
+      "Seu cliente mandou uma mensagem. E agora? Com o Atenza, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.",
+    ),
+    paragrafo2: t(
+      "Configure seu agente de IA com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.",
+    ),
+    paragrafo3: t(
+      "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.",
+    ),
+    paragrafo4: t(
+      "Menos improviso. Mais atenção em cada conversa. Conheça os planos do Atenza. Comece com sete dias sem cobrança. É necessário cartão.",
+    ),
+  };
+  const trial = `${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`;
+  const condicoes = t(
+    "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.",
+  );
+  const segmentos = [
+    {
+      arquivo: "segmento-comercio.webp",
+      nome: t("Comércio e e-commerce"),
+      titulo: t("A dúvida chega. A conversa continua."),
+      texto: t("Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja."),
+      alt: t("Empreendedora organizando pedidos de uma loja"),
+    },
+    {
+      arquivo: "segmento-clinica.webp",
+      nome: t("Clínicas e saúde"),
+      titulo: t("Mais atenção a quem precisa agendar."),
+      texto: t("Organize o primeiro contato e encaminhe dúvidas para a equipe responsável."),
+      alt: t("Profissional de recepção em uma clínica"),
+    },
+    {
+      arquivo: "segmento-educacao.webp",
+      nome: t("Educação"),
+      titulo: t("Do interesse à próxima conversa."),
+      texto: t("Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil."),
+      alt: t("Profissional de educação acompanhando informações no computador"),
+    },
+    {
+      arquivo: "segmento-servicos.webp",
+      nome: t("Serviços e B2B"),
+      titulo: t("O contexto acompanha cada proposta."),
+      texto: t("Qualifique os contatos e mantenha o próximo passo visível para o time."),
+      alt: t("Profissional de serviços conversando com um cliente"),
+    },
+  ];
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className={styles.home}>
       <Medidor
         idioma={visitante.idioma}
         moeda={mercado.moeda}
@@ -167,409 +196,352 @@ export default async function HomePage() {
         idioma={visitante.idioma}
         moeda={mercado.moeda}
       />
-      {/*
-        A faixa fica ACIMA do cabeçalho e FORA do `sticky`: ela é apoio, não
-        navegação. Grudada no topo junto com o menu, roubaria altura útil da
-        tela em toda rolagem — e num celular isso é caro. Assim ela cumpre o
-        papel na chegada e sai do caminho.
-
-        Os textos são montados aqui, e não dentro do componente, pelo mesmo
-        motivo dos textos da captura de e-mail algumas linhas acima:
-        `tests/unit/vitrine-fala-ingles.test.ts` varre ESTE arquivo.
-      */}
-      <BarraDeBeneficios
-        itens={[
-          t("Seu número de WhatsApp continua o mesmo"),
-          `${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`,
-          t("A IA responde em segundos, 24 horas por dia"),
-          t("Cancele em um clique, sem falar com ninguém"),
-          t("Conversas, funil e histórico em uma tela só"),
-          t("Dados isolados por empresa, LGPD desde o primeiro dia"),
-        ]}
-      />
-      <header className="sticky top-0 z-30 border-b border-border/70 bg-bg/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-6">
-          <Marca marca={marca} />
-          <nav className="hidden items-center gap-7 text-sm text-text-muted md:flex">
-            <a className="link-sublinha transition-colors hover:text-text" href="#como-funciona">
-              {t("Como funciona")}
-            </a>
-            <a className="link-sublinha transition-colors hover:text-text" href="#recursos">
-              {t("Recursos")}
-            </a>
-            {vendidos.length > 0 ? (
-              <a className="link-sublinha transition-colors hover:text-text" href={`#${ID_DA_SECAO_DE_PLANOS}`}>
-                {t("Planos")}
-              </a>
-            ) : null}
-            <a className="link-sublinha transition-colors hover:text-text" href="#perguntas">
-              {t("Perguntas")}
-            </a>
+      <a className={styles.skipLink} href="#conteudo">
+        {t("Ir para o conteúdo")}
+      </a>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <Link href="/" aria-label={marca.nome} className={styles.brandLink}>
+            <Marca marca={marca} />
+          </Link>
+          <nav className={styles.desktopNav} aria-label={t("Navegação principal")}>
+            <a href="#como-funciona">{t("Como funciona")}</a>
+            <a href="#recursos">{t("Recursos")}</a>
+            <a href="#integracoes">{t("Integrações")}</a>
+            {vendidos.length > 0 && <a href={`#${ID_DA_SECAO_DE_PLANOS}`}>{t("Planos")}</a>}
+            <a href="#perguntas">{t("Perguntas")}</a>
           </nav>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="hidden h-9 items-center rounded-sm px-3 text-sm font-medium text-text-muted transition-colors hover:text-text sm:inline-flex"
-            >
+          <div className={styles.headerActions}>
+            <Link href="/login" className={styles.login}>
               {t("Entrar")}
             </Link>
-            <Link
-              href="/signup"
-                  data-medir="cta-menu"
-              className="inline-flex h-9 items-center gap-1.5 rounded-sm bg-accent px-4 text-sm font-medium text-accent-foreground shadow-xs transition-colors hover:bg-accent-hover"
-            >
+            <Link href="/signup" data-medir="cta-menu" className={styles.buttonSmall}>
               {t("Criar conta")}
-              <ArrowRight className="size-4" />
+              <ArrowRight size={16} aria-hidden />
             </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1">
-        {/* ── Capa ─────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-[560px]"
-            style={{
-              background:
-                "radial-gradient(70% 60% at 72% 0%, var(--color-accent-100), transparent 70%)",
-            }}
-          />
-          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-14 px-6 pt-16 pb-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-24 lg:pb-28">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-soft px-3 py-1 text-xs font-medium text-accent-700">
-                <Sparkles className="size-3.5" />
-                {/*
-                  O nicho alterna aqui, e não um adjetivo: quem chega
-                  procurando "CRM para clínica" vê a própria palavra na
-                  primeira linha, e a promessa deixa de ser genérica sem que a
-                  página precise de uma versão por segmento.
-                */}
-                {t("Atendimento por WhatsApp para")}{" "}
-                <PalavraQueAlterna
-                  className="font-semibold text-accent"
-                  palavras={[
-                    t("clínicas"),
-                    t("imobiliárias"),
-                    t("e-commerce"),
-                    t("prestadores de serviço"),
-                  ]}
-                />
-              </span>
-              <h1 className="mt-6 text-4xl leading-[1.05] font-semibold tracking-tight text-text sm:text-5xl lg:text-6xl">
-                {t("Nunca mais perca um cliente por demora na resposta")}
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
-                {t(
-                  "Todo o WhatsApp da sua empresa em uma tela só. Um atendente de IA responde na hora, com o que você ensinou, e passa a conversa para uma pessoa do time quando o assunto pede.",
-                )}
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/signup"
-                  data-medir="cta-hero"
-                  className="inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-6 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
-                >
-                  {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`}
-                  <ArrowRight className="size-4" />
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex h-12 items-center rounded-sm border border-border bg-surface px-6 text-sm font-medium text-text transition-colors hover:border-accent hover:text-accent"
-                >
-                  {t("Já tenho conta")}
-                </Link>
-              </div>
-              <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-subtle">
-                <ItemDeConfianca texto={t("Nada é cobrado nos primeiros dias")} />
-                <ItemDeConfianca texto={t("Você usa o número que já tem")} />
-                <ItemDeConfianca texto={t("Cancele quando quiser")} />
-              </ul>
-            </div>
-
-            <ConversaDeExemplo t={t} />
-          </div>
-        </section>
-
-        {/* ── A conversa: o problema, o que muda, e como funciona ───────── */}
-        <CorpoDaConversa>
-          <EtiquetaDeAssunto>{t("O problema")}</EtiquetaDeAssunto>
-
-          {/*
-            Estas três são as ÚNICAS falas do lado esquerdo da página, e a razão
-            é de papel: aqui quem fala é o visitante, na boca dele. "A resposta
-            demora" é a queixa dele, não a nossa afirmação. Todo o resto da
-            página é a empresa respondendo, e por isso vai para a direita.
-          */}
-          <EntraEmSequencia ritmo="cascata" className="space-y-3">
-            <BalaoDeSecao lado="cliente">
-              <p className="text-sm font-semibold text-text">{t("A resposta demora")}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
-                {t(
-                  "Quem pergunta às 22h só é atendido no dia seguinte. Até lá, já comprou de quem respondeu primeiro.",
-                )}
-              </p>
-            </BalaoDeSecao>
-            <BalaoDeSecao lado="cliente">
-              <p className="text-sm font-semibold text-text">{t("A conversa se perde")}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
-                {t(
-                  "Cada pessoa do time guarda um pedaço da história no próprio celular. Ninguém sabe o que já foi combinado.",
-                )}
-              </p>
-            </BalaoDeSecao>
-            <BalaoDeSecao lado="cliente">
-              <p className="text-sm font-semibold text-text">{t("O retorno nunca acontece")}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
-                {t(
-                  "O cliente disse “depois eu vejo” e ninguém voltou nele. É a venda mais barata da empresa, e ela evapora.",
-                )}
-              </p>
-            </BalaoDeSecao>
-          </EntraEmSequencia>
-
-          {/* A resposta da empresa às três queixas, do lado direito. */}
-          <BalaoDeSecao lado="empresa">
-            <h2 className="text-xl leading-snug font-semibold tracking-tight text-text sm:text-2xl">
-              <TextoQuePreenche
-                texto={t("A venda raramente se perde no preço. Ela se perde no silêncio.")}
-              />
-            </h2>
-          </BalaoDeSecao>
-
-          <EtiquetaDeAssunto>{t("Como funciona")}</EtiquetaDeAssunto>
-
-          <div id="como-funciona" className="scroll-mt-20" />
-          <EntraEmSequencia ritmo="cascata" className="space-y-3">
-            <BalaoDeSecao lado="empresa">
-              <PassoNaConversa
-                numero="1"
-                Icone={QrCode}
-                titulo={t("Conecte o seu WhatsApp")}
-                texto={t(
-                  "O mesmo número que a sua empresa já usa, por leitura de QR code. Ninguém troca de número e nenhuma conversa se perde.",
-                )}
-              />
-            </BalaoDeSecao>
-            <BalaoDeSecao lado="empresa">
-              <PassoNaConversa
-                numero="2"
-                Icone={Bot}
-                titulo={t("Ensine o atendente")}
-                texto={t(
-                  "Escreva o que a empresa faz, preço, prazo e as regras. O agente responde a partir disso — e só disso.",
-                )}
-              />
-            </BalaoDeSecao>
-            <BalaoDeSecao lado="empresa">
-              <PassoNaConversa
-                numero="3"
-                Icone={SquareKanban}
-                titulo={t("Acompanhe pelo funil")}
-                texto={t(
-                  "Cada conversa vira um card. Você vê quem está esperando, quem comprou e quem esfriou, sem perguntar a ninguém.",
-                )}
-              />
-            </BalaoDeSecao>
-          </EntraEmSequencia>
-
-          <EtiquetaDeAssunto>{t("Recursos")}</EtiquetaDeAssunto>
-
-          <div id="recursos" className="scroll-mt-20" />
-          {/*
-            Os seis recursos cabem em UM balão, e não em seis: seis balões
-            seguidos do mesmo lado viram uma parede, e a conversa perde o ritmo
-            que os três passos acabaram de estabelecer. Dentro do balão eles
-            voltam a ser grade — que é a forma certa para uma lista que se
-            compara em vez de se ler em ordem.
-          */}
-          <BalaoDeSecao lado="empresa" className="w-full max-w-3xl">
-            <p className="text-sm font-semibold text-text">
-              {t("O atendimento inteiro em um lugar só")}
-            </p>
-            <EntraEmSequencia
-              ritmo="cascata"
-              className="mt-4 grid gap-x-6 gap-y-5 sm:grid-cols-2"
-            >
-              <RecursoNaConversa
-                Icone={Inbox}
-                titulo={t("Uma caixa de entrada para o time todo")}
-                texto={t(
-                  "Todas as conversas em uma tela, com quem está atendendo o quê à vista de todos.",
-                )}
-              />
-              <RecursoNaConversa
-                Icone={Bot}
-                titulo={t("Agente de IA com a sua base de conhecimento")}
-                texto={t(
-                  "Ele responde pelo que você escreveu, não por achismo, e chama uma pessoa quando não sabe.",
-                )}
-              />
-              <RecursoNaConversa
-                Icone={SquareKanban}
-                titulo={t("Funil de vendas colado na conversa")}
-                texto={t(
-                  "Arraste o card, leia o histórico inteiro e pare de perguntar em que pé está cada cliente.",
-                )}
-              />
-              <RecursoNaConversa
-                Icone={Clock}
-                titulo={t("Retorno automático no tempo certo")}
-                texto={t(
-                  "Quem parou de responder recebe uma mensagem de volta sem que ninguém precise lembrar disso.",
-                )}
-              />
-              <RecursoNaConversa
-                Icone={ChartColumn}
-                titulo={t("Relatórios de atendimento")}
-                texto={t(
-                  "Tempo de resposta, volume por pessoa do time e o que de fato virou venda.",
-                )}
-              />
-              <RecursoNaConversa
-                Icone={ShieldCheck}
-                titulo={t("LGPD desde o primeiro dia")}
-                texto={t(
-                  "Dados isolados por empresa, registro de acesso e exclusão a pedido do titular.",
-                )}
-              />
-            </EntraEmSequencia>
-          </BalaoDeSecao>
-        </CorpoDaConversa>
-
-        {/* ── Com a Atenza / Sem a Atenza ──────────────────────────────── */}
-        {/*
-          Fica imediatamente ANTES dos planos, e a posição é o argumento: a
-          comparação é o que transforma o preço em conta. Depois da tabela ela
-          seria consolo para quem já decidiu; antes, ela é a régua com que a
-          pessoa lê o número.
-
-          É CARTÃO, e não balão de conversa — mesma regra do resto da página:
-          conversa onde o conteúdo é fala, cartão onde é decisão. Comparar duas
-          colunas dentro de balões tortos seria bonito e ilegível.
-        */}
-        <section className="border-y border-border bg-bg">
-          <div className="mx-auto w-full max-w-5xl px-6 py-16 lg:py-20">
-            <h2 className="mb-8 max-w-2xl text-2xl font-semibold tracking-tight text-text sm:text-3xl">
-              {t("O que muda no dia seguinte")}
-            </h2>
-            <ComESem
-              tituloSem={t("Sem a Atenza")}
-              tituloCom={t("Com a Atenza")}
-              pares={[
-                {
-                  sem: t("A pessoa pergunta às 22h e é atendida no dia seguinte."),
-                  com: t("Responde em segundos, a qualquer hora, com o que você ensinou."),
-                },
-                {
-                  sem: t(
-                    "Cada pessoa do time guarda um pedaço da conversa no próprio celular.",
-                  ),
-                  com: t(
-                    "Todas as conversas numa tela só, com o histórico inteiro à vista do time.",
-                  ),
-                },
-                {
-                  sem: t("Quem disse “depois eu vejo” nunca mais é procurado."),
-                  com: t("O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar."),
-                },
-                {
-                  sem: t("Ninguém sabe quantas conversas viraram venda, nem onde elas param."),
-                  com: t(
-                    "Cada conversa vira um card no funil, e o relatório mostra o que converteu.",
-                  ),
-                },
-                {
-                  sem: t(
-                    "Usar um sistema novo significa trocar o número que os clientes já conhecem.",
-                  ),
-                  com: t("O mesmo número de sempre, conectado por um QR code em um minuto."),
-                },
+            <NavegacaoDaHome
+              abrir={t("Abrir navegação")}
+              rotulo={t("Navegação principal")}
+              itens={[
+                { href: "#como-funciona", texto: t("Como funciona") },
+                { href: "#recursos", texto: t("Recursos") },
+                { href: "#integracoes", texto: t("Integrações") },
+                ...(vendidos.length
+                  ? [{ href: `#${ID_DA_SECAO_DE_PLANOS}`, texto: t("Planos") }]
+                  : []),
+                { href: "#perguntas", texto: t("Perguntas") },
+                { href: "/login", texto: t("Entrar") },
               ]}
             />
           </div>
+        </div>
+      </header>
+      <main id="conteudo">
+        <section className={styles.hero}>
+          <Image
+            src="/media/atenza/hero-office.webp"
+            alt=""
+            fill
+            preload
+            sizes="100vw"
+            className={styles.heroImage}
+          />
+          <div className={styles.heroContent}>
+            <h1>
+              {t("Seu atendimento cresce.")}
+              <br />
+              {t("Seu cliente não espera.")}
+            </h1>
+            <p>{t("WhatsApp, agentes de IA e funil de vendas na mesma plataforma.")}</p>
+            <div className={styles.heroActions}>
+              <VideoExplicativo textos={video} className={styles.button}>
+                <Play size={17} aria-hidden />
+                {t("Ver em ação")}
+              </VideoExplicativo>
+              <a
+                href={`#${vendidos.length ? ID_DA_SECAO_DE_PLANOS : "como-funciona"}`}
+                className={styles.buttonOutline}
+              >
+                {vendidos.length ? t("Conhecer os planos") : t("Como funciona")}
+                <ArrowRight size={17} aria-hidden />
+              </a>
+            </div>
+          </div>
+          <div className={styles.heroProduct}>
+            <ProdutoDemonstracao textos={produto} marca={marca.nome} compacto />
+            <span className={styles.heroDemoNote}>
+              {t("Prévia ilustrativa com dados fictícios")}
+            </span>
+          </div>
+        </section>
+        <div className={styles.benefits}>
+          <span>
+            <Check size={17} aria-hidden />
+            {t("Seu número de WhatsApp continua o mesmo")}
+          </span>
+          <span>
+            <Check size={17} aria-hidden />
+            {trial}
+          </span>
+          <span>
+            <Check size={17} aria-hidden />
+            {t("O controle continua com você")}
+          </span>
+        </div>
+
+        <section id="como-funciona" className={`${styles.section} ${styles.productSection}`}>
+          <div className={styles.container}>
+            <div className={styles.centerHeading}>
+              <h2>{t("Veja o atendimento acontecer.")}</h2>
+              <p>{t("Da primeira mensagem ao próximo passo da venda.")}</p>
+            </div>
+            <ProdutoDemonstracao textos={produto} marca={marca.nome} />
+            <div className={styles.productBenefits}>
+              <div>
+                <History size={22} aria-hidden />
+                <h3>{t("Um histórico para o time inteiro")}</h3>
+                <p>{t("Todos acompanham o que já foi conversado.")}</p>
+              </div>
+              <div>
+                <Users size={22} aria-hidden />
+                <h3>{t("IA e pessoas, na mesma conversa")}</h3>
+                <p>{t("O time assume quando o atendimento pede.")}</p>
+              </div>
+              <div>
+                <SquareKanban size={22} aria-hidden />
+                <h3>{t("O próximo passo fica à vista")}</h3>
+                <p>{t("Organize os contatos e acompanhe as oportunidades.")}</p>
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* ── Planos ───────────────────────────────────────────────────── */}
-        {vendidos.length > 0 ? (
-          <section id={ID_DA_SECAO_DE_PLANOS} className="scroll-mt-20">
-            <div className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
-              <Titulo
-                olho={t("Planos")}
-                titulo={t("Escolha o plano e comece hoje. A cobrança só depois.")}
-                apoio={`${t("São")} ${DIAS_DE_TRIAL} ${t("dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.")}`}
+        <section id="recursos" className={styles.section}>
+          <div className={styles.container}>
+            <div className={styles.sectionHeading}>
+              <h2>{t("No ritmo do seu negócio.")}</h2>
+              <p>{t("Veja onde a plataforma entra na sua rotina.")}</p>
+            </div>
+            <div className={styles.segmentGrid}>
+              {segmentos.map((s, i) => (
+                <article
+                  className={`${styles.segment} ${i === 0 ? styles.segmentFeatured : ""}`}
+                  key={s.arquivo}
+                >
+                  <div className={styles.segmentImage}>
+                    <Image
+                      src={`/media/atenza/${s.arquivo}`}
+                      alt={s.alt}
+                      fill
+                      sizes="(max-width: 599px) 100vw, (max-width: 1023px) 50vw, 40vw"
+                    />
+                  </div>
+                  <div className={styles.segmentCopy}>
+                    <span>{s.nome}</span>
+                    <h3>{s.titulo}</h3>
+                    <p>{s.texto}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className={styles.useCaseNote}>
+              {t(
+                "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.",
+              )}
+            </p>
+          </div>
+        </section>
+
+        <section id="integracoes" className={`${styles.section} ${styles.integrationSection}`}>
+          <div className={styles.container}>
+            <div className={styles.centerHeading}>
+              <h2>{t("Conecte o que sua operação já usa.")}</h2>
+              <p>{t("Lojas, APIs e webhooks para trazer mais contexto ao atendimento.")}</p>
+            </div>
+          </div>
+          <IntegracoesDaHome
+            rotulo={t("Ferramentas e formas de conexão disponíveis")}
+            pausar={t("Pausar animação")}
+            continuar={t("Continuar animação")}
+          />
+          <div className={styles.integrationFoot}>
+            <p>
+              {t(
+                "As conexões dependem do plano, das credenciais e das permissões de cada ferramenta.",
+              )}
+            </p>
+            <Link href="/contato" className={styles.buttonOutline}>
+              {t("Conversar sobre integrações")}
+              <ArrowRight size={17} aria-hidden />
+            </Link>
+          </div>
+        </section>
+
+        <section className={styles.careSection}>
+          <div className={styles.careLayout}>
+            <VideoDeContexto
+              textos={{
+                alt: t("Cena de atendimento com uma profissional usando headset"),
+                semSom: t("Vídeo de contexto · sem som"),
+                pausar: t("Pausar vídeo de contexto"),
+                tocar: t("Reproduzir vídeo de contexto"),
+                indisponivel: t("A imagem continua disponível enquanto o vídeo não carrega."),
+              }}
+            />
+            <div className={styles.careCopy}>
+              <h2>
+                {t("Automatize a rotina.")}
+                <br />
+                {t("Mantenha o cuidado.")}
+              </h2>
+              <p>
+                {t(
+                  "A IA ajuda no repetitivo. Sua equipe entra com atenção, contexto e autonomia quando o cliente precisa.",
+                )}
+              </p>
+              <ul>
+                <li>
+                  <LockKeyhole size={22} aria-hidden />
+                  <span>
+                    <strong>{t("Acesso por pessoa")}</strong>
+                    {t(
+                      "Cada integrante entra com o próprio acesso e as permissões definidas pela empresa.",
+                    )}
+                  </span>
+                </li>
+                <li>
+                  <History size={22} aria-hidden />
+                  <span>
+                    <strong>{t("Histórico compartilhado")}</strong>
+                    {t("O contexto fica na conversa, mesmo quando muda quem atende.")}
+                  </span>
+                </li>
+                <li>
+                  <ShieldCheck size={22} aria-hidden />
+                  <span>
+                    <strong>{t("Limites definidos por você")}</strong>
+                    {t("Configure o conhecimento, as instruções e a passagem para o time.")}
+                  </span>
+                </li>
+              </ul>
+              <Link href="/legal/privacy" className={styles.textLink}>
+                {t("Conhecer a política de privacidade")}
+                <ArrowRight size={17} aria-hidden />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={`${styles.container} ${styles.explainerLayout}`}>
+            <div className={styles.sectionHeading}>
+              <h2>{t("Conheça antes de decidir.")}</h2>
+              <p>
+                {t(
+                  "Dê o play e entenda como as conversas, a IA e o funil se conectam no dia a dia.",
+                )}
+              </p>
+              <div className={styles.steps}>
+                {[
+                  [QrCode, t("Conecte o seu WhatsApp")],
+                  [Bot, t("Ensine o atendente")],
+                  [SquareKanban, t("Acompanhe pelo funil")],
+                ].map(([Icone, texto], i) => {
+                  const Icon = Icone as typeof QrCode;
+                  return (
+                    <div key={String(texto)}>
+                      <span>{i + 1}</span>
+                      <Icon size={21} aria-hidden />
+                      <strong>{texto as string}</strong>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <VideoExplicativo textos={video} className={styles.explainerCard}>
+              <Image
+                src="/media/atenza/explainer-poster.webp"
+                alt=""
+                fill
+                sizes="(max-width: 767px) 100vw, 52vw"
               />
-              <div className="mt-12 grid gap-6 lg:grid-cols-3">
+              <span className={styles.playCircle}>
+                <Play size={27} fill="currentColor" aria-hidden />
+              </span>
+              <span className={styles.explainerLabel}>
+                {t("Assistir à explicação")}
+                <small>{t("Com áudio e legendas em português")}</small>
+              </span>
+            </VideoExplicativo>
+          </div>
+        </section>
+
+        {vendidos.length > 0 && (
+          <section
+            id={ID_DA_SECAO_DE_PLANOS}
+            className={`${styles.section} ${styles.pricingSection}`}
+          >
+            <div className={styles.container}>
+              <div className={styles.centerHeading}>
+                <h2>{t("Um plano para o seu momento.")}</h2>
+                <p>
+                  {trial}. {t("Escolha o tamanho da sua operação.")}
+                </p>
+              </div>
+              <div className={styles.plans}>
                 {vendidos.map((id) => {
                   const plano = PLANOS[id];
                   const destaque = id === "pro";
                   return (
-                    // A luz segue o mouse AQUI, e só aqui: é o lugar da página em
-                    // que a pessoa compara, hesita e passa o ponteiro de um
-                    // cartão para o outro. O brilho confirma qual ela está
-                    // olhando. Espalhado por todo cartão viraria ruído.
-                    <CartaoComLuz
+                    <article
                       key={id}
-                      className={
-                        destaque
-                          ? "relative rounded-lg border-2 border-accent bg-surface p-6 shadow-lg"
-                          : "relative rounded-lg border border-border bg-surface p-6 shadow-xs"
-                      }
+                      className={`${styles.plan} ${destaque ? styles.featuredPlan : ""}`}
                     >
-                      {destaque ? (
-                        <span className="absolute -top-3 left-6 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
-                          {t("Recomendado")}
-                        </span>
-                      ) : null}
-                      <h3 className="text-sm font-semibold tracking-wide text-text-subtle uppercase">
-                        {plano.nome}
-                      </h3>
-                      <p className="mt-3 flex items-baseline gap-1">
-                        <span className="text-4xl font-semibold tracking-tight text-text">
-                          {precoLegivelNoMercado(id, mercado)}
-                        </span>
-                        <span className="text-sm text-text-muted">{t("/mês")}</span>
+                      <div className={styles.planHeading}>
+                        <h3>{t(plano.nome)}</h3>
+                        {destaque && <span>{t("Recomendado")}</span>}
+                      </div>
+                      <p className={styles.price}>
+                        {precoLegivelNoMercado(id, mercado)}
+                        <small>{t("/mês")}</small>
                       </p>
-                      <ul className="mt-6 space-y-3 text-sm text-text-muted">
+                      <ul>
                         {plano.destaques.map((d) => (
-                          <li key={d} className="flex items-start gap-2">
-                            <Check className="mt-0.5 size-4 shrink-0 text-accent" />
-                            {/*
-                              `t(d)` com identificador: o guarda de i18n só
-                              enxerga chave LITERAL, então estas traduções são
-                              obrigação manual — vivem no bloco de cobrança de
-                              `lib/i18n/dicionario.ts`, ao lado das da tela de
-                              planos, que renderiza as MESMAS frases.
-                            */}
-                            <span>{t(d)}</span>
+                          <li key={d}>
+                            <Check size={17} aria-hidden />
+                            {t(d)}
                           </li>
                         ))}
                       </ul>
                       <Link
                         href="/signup"
-                  data-medir={`plano-${id}`}
-                        className={
-                          destaque
-                            ? "mt-8 inline-flex h-11 w-full items-center justify-center rounded-sm bg-accent text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
-                            : "mt-8 inline-flex h-11 w-full items-center justify-center rounded-sm border border-border text-sm font-medium text-text transition-colors hover:border-accent hover:text-accent"
-                        }
+                        data-medir={`plano-${id}`}
+                        className={destaque ? styles.buttonLight : styles.buttonOutline}
                       >
                         {t("Começar agora")}
+                        <ArrowRight size={17} aria-hidden />
                       </Link>
-                    </CartaoComLuz>
+                      <p className={styles.planTerms}>{condicoes}</p>
+                    </article>
                   );
                 })}
               </div>
+              <p className={styles.conditions}>{condicoes}</p>
             </div>
           </section>
-        ) : null}
+        )}
 
-        {/* ── Perguntas ────────────────────────────────────────────────── */}
-        <section id="perguntas" className="scroll-mt-20 border-y border-border bg-surface-elevated">
-          <div className="mx-auto w-full max-w-3xl px-6 py-20 lg:py-24">
-            <Titulo olho={t("Perguntas")} titulo={t("O que costumam perguntar antes de assinar")} />
-            <div className="mt-10 divide-y divide-border border-y border-border">
+        <section id="perguntas" className={styles.section}>
+          <div className={`${styles.container} ${styles.faqLayout}`}>
+            <div className={styles.sectionHeading}>
+              <h2>{t("Respostas antes do primeiro passo.")}</h2>
+              <p>{t("O que costumam perguntar antes de assinar")}</p>
+              <Link href="/contato" className={styles.textLink}>
+                {t("Fale com a gente")}
+                <ArrowRight size={17} aria-hidden />
+              </Link>
+            </div>
+            <div className={styles.faq}>
               <Pergunta
                 pergunta={t("Preciso trocar de número?")}
                 resposta={t(
@@ -597,93 +569,61 @@ export default async function HomePage() {
               <Pergunta
                 pergunta={t("Onde ficam os dados dos meus clientes?")}
                 resposta={t(
-                  "Em base isolada por empresa, com registro de quem acessou o quê. Você pode exportar ou apagar os seus dados quando quiser.",
+                  "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.",
+                )}
+              />
+              <Pergunta
+                pergunta={t("O uso de IA tem alguma configuração adicional?")}
+                resposta={t(
+                  "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.",
                 )}
               />
             </div>
           </div>
         </section>
 
-        {/* ── Chamada final ────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(60% 100% at 50% 100%, var(--color-accent-100), transparent 70%)",
-            }}
-          />
-          <div className="relative mx-auto w-full max-w-3xl px-6 py-20 text-center lg:py-28">
-            <h2 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">
-              {t("A próxima pessoa que te chamar no WhatsApp merece resposta agora")}
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-text-muted">
-              {t(
-                "Crie a conta, conecte o número e veja o primeiro atendimento acontecer sozinho ainda hoje.",
-              )}
-            </p>
-            <Link
-              href="/signup"
-              data-medir="cta-final"
-              className="mt-8 inline-flex h-12 items-center gap-2 rounded-sm bg-accent px-7 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
-            >
-              {`${t("Começar com")} ${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`}
-              <ArrowRight className="size-4" />
+        <section className={styles.finalSection}>
+          <div className={styles.container}>
+            <h2>{t("A próxima conversa pode ser o começo de uma venda.")}</h2>
+            <p>{t("Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.")}</p>
+            <Link href="/signup" data-medir="cta-final" className={styles.buttonLight}>
+              {`${t("Começar com")} ${trial}`}
+              <ArrowRight size={18} aria-hidden />
             </Link>
+            <p className={styles.finalConditions}>{condicoes}</p>
           </div>
         </section>
       </main>
-
-      <footer className="border-t border-border bg-surface">
-        {/* A segunda porta de entrada, e a calma: quem chegou ao rodapé leu a
-            página inteira e não clicou em "criar conta". Pedir o e-mail aqui
-            é perguntar a alguém que já decidiu que ainda não decidiu. */}
-        <div className="mx-auto w-full max-w-6xl border-b border-border/60 px-6 py-10">
-          <div className="max-w-xl">
-            <h2 className="text-base font-semibold tracking-tight">{t("Ainda pensando?")}</h2>
-            <p className="mt-1 text-sm text-text-muted">
+      <footer className={styles.footer}>
+        <div className={`${styles.container} ${styles.footerLead}`}>
+          <div>
+            <h2>{t("Ainda pensando?")}</h2>
+            <p>
               {t(
                 "Deixe seu e-mail. Mandamos o que aprendemos sobre atender por WhatsApp sem perder o cliente — e nada além disso.",
               )}
             </p>
-            <CapturaDeLead
-              textos={textosDaCaptura}
-              idioma={visitante.idioma}
-              moeda={mercado.moeda}
-              origem="rodape"
-              className="mt-4"
-            />
           </div>
+          <CapturaDeLead
+            textos={textosDaCaptura}
+            idioma={visitante.idioma}
+            moeda={mercado.moeda}
+            origem="rodape"
+            className={styles.capture}
+          />
         </div>
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
+        <div className={`${styles.container} ${styles.footerBottom}`}>
+          <div>
             <Marca marca={marca} />
-            <span className="text-sm text-text-subtle">
-              {t("Atendimento e vendas por WhatsApp")}
-            </span>
+            <p>{t("Atendimento e vendas por WhatsApp")}</p>
           </div>
-          <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted">
-            <Link className="link-sublinha transition-colors hover:text-text" href="/legal/terms">
-              {t("Termos de uso")}
-            </Link>
-            <Link className="link-sublinha transition-colors hover:text-text" href="/legal/privacy">
-              {t("Política de Privacidade")}
-            </Link>
-            <Link className="link-sublinha transition-colors hover:text-text" href="/legal">
-              {t("Documentos")}
-            </Link>
-            <Link className="link-sublinha transition-colors hover:text-text" href="/contato">
-              {t("Fale com a gente")}
-            </Link>
-            {suporte ? (
-              <a className="link-sublinha transition-colors hover:text-text" href={`mailto:${suporte}`}>
-                {suporte}
-              </a>
-            ) : null}
-            <Link className="link-sublinha transition-colors hover:text-text" href="/login">
-              {t("Entrar")}
-            </Link>
+          <nav aria-label={t("Informações e contato")}>
+            <Link href="/legal/terms">{t("Termos de uso")}</Link>
+            <Link href="/legal/privacy">{t("Política de Privacidade")}</Link>
+            <Link href="/legal">{t("Documentos")}</Link>
+            <Link href="/contato">{t("Fale com a gente")}</Link>
+            {suporte && <a href={`mailto:${suporte}`}>{suporte}</a>}
+            <Link href="/login">{t("Entrar")}</Link>
           </nav>
         </div>
       </footer>
@@ -691,244 +631,27 @@ export default async function HomePage() {
   );
 }
 
-/**
- * O nome — ou o logo — de quem OPERA esta instalação.
- *
- * Mesma pilha da fachada de acesso (`app/(public)/layout.tsx`): banco acima,
- * `.env` embaixo, nunca uma marca escrita no código. Um revendedor que hospeda
- * isto para os clientes dele precisa que a página de vendas seja a DELE.
- */
 function Marca({ marca }: { marca: MarcaDeSaida }) {
-  if (marca.logoUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={marca.logoUrl}
-        alt={marca.nome}
-        className="h-8 w-auto max-w-[10rem] object-contain"
-      />
-    );
-  }
-  if (marcaEhADoProduto({ name: marca.nome, logoUrl: null })) {
+  if (marca.logoUrl)
+    return <img src={marca.logoUrl} alt={marca.nome} className={styles.brandImage} />; // eslint-disable-line @next/next/no-img-element
+  if (marcaEhADoProduto({ name: marca.nome, logoUrl: null }))
     return <LogotipoDoProduto nome={marca.nome} className="h-7 w-auto" />;
-  }
-  // Marca de terceiro sem logo: se ela tem arte no registro de desenhos, o
-  // símbolo entra ao lado do nome. Sem arte, segue só o nome — que é o que
-  // todo revendedor já via, sem regressão.
   return (
-    <span className="flex items-center gap-2">
-      <SimboloDaMarca nome={marca.nome} className="size-7" decorativo />
-      <span className="text-base font-semibold tracking-tight text-text">{marca.nome}</span>
+    <span className={styles.brand}>
+      <SimboloDaMarca nome={marca.nome} className="size-8" decorativo />
+      <span>{marca.nome}</span>
     </span>
-  );
-}
-
-function ItemDeConfianca({ texto }: { texto: string }) {
-  return (
-    <li className="flex items-center gap-1.5">
-      <Check className="size-4 text-accent" />
-      {texto}
-    </li>
-  );
-}
-
-function Titulo({ olho, titulo, apoio }: { olho: string; titulo: string; apoio?: string }) {
-  return (
-    <div className="max-w-2xl">
-      <span className="text-xs font-semibold tracking-[0.12em] text-accent uppercase">{olho}</span>
-      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-text sm:text-3xl">{titulo}</h2>
-      {apoio ? <p className="mt-3 text-base text-text-muted">{apoio}</p> : null}
-    </div>
-  );
-}
-
-/**
- * O passo, dentro de um balão.
- *
- * O número virou um selo redondo sobre o ícone, e não uma linha à parte: num
- * balão o espaço vertical é caro, e "1" solto acima do título lia como se
- * fosse parte do texto da mensagem.
- */
-function PassoNaConversa({
-  numero,
-  Icone,
-  titulo,
-  texto,
-}: {
-  numero: string;
-  Icone: React.ComponentType<{ className?: string }>;
-  titulo: string;
-  texto: string;
-}) {
-  return (
-    <div className="flex gap-4">
-      <span className="relative flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
-        <Icone className="size-5" />
-        <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full border border-accent-200 bg-surface font-mono text-[10px] text-text-subtle">
-          {numero}
-        </span>
-      </span>
-      <div className="min-w-0">
-        <h3 className="text-base font-semibold text-text">{titulo}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{texto}</p>
-      </div>
-    </div>
-  );
-}
-
-/** Um recurso dentro do balão que reúne os seis. */
-function RecursoNaConversa({
-  Icone,
-  titulo,
-  texto,
-}: {
-  Icone: React.ComponentType<{ className?: string }>;
-  titulo: string;
-  texto: string;
-}) {
-  return (
-    <div className="flex gap-3">
-      <Icone className="mt-0.5 size-5 shrink-0 text-accent" />
-      <div className="min-w-0">
-        <h3 className="text-sm font-semibold text-text">{titulo}</h3>
-        <p className="mt-1 text-sm leading-relaxed text-text-muted">{texto}</p>
-      </div>
-    </div>
   );
 }
 
 function Pergunta({ pergunta, resposta }: { pergunta: string; resposta: string }) {
   return (
-    <div className="py-5">
-      <h3 className="text-base font-semibold text-text">{pergunta}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-text-muted">{resposta}</p>
-    </div>
-  );
-}
-
-/**
- * A demonstração do produto em quatro balões.
- *
- * É desenho, não captura de tela: uma imagem envelheceria na primeira mudança
- * de interface e pesaria no carregamento da primeira tela que a pessoa vê. O
- * que ela precisa entender em três segundos é o que este produto faz de
- * diferente — responder na hora e virar um card no funil —, e isso cabe em
- * quatro balões e uma faixa.
- *
- * Os balões CHEGAM, um depois do outro, quando a seção entra na tela. A faixa
- * ao pé afirma "Respondido na hora" ao lado de um diálogo que, estático, já
- * terminou antes de a pessoa chegar — encenar a chegada é a única forma de a
- * afirmação ser demonstrada em vez de escrita. Quem esconde e revela é
- * `EntraEmSequencia`; o HTML que sai do servidor continua trazendo os quatro
- * balões visíveis, e o porquê disso está no cabeçalho de lá.
- */
-function ConversaDeExemplo({ t }: { t: (texto: string) => string }) {
-  return (
-    <div className="relative">
-      <div aria-hidden className="absolute -inset-4 rounded-xl bg-accent-100/40 blur-2xl" />
-      <div className="relative overflow-hidden rounded-xl border border-border bg-surface shadow-xl">
-        <div className="flex items-center gap-3 border-b border-border bg-surface-elevated px-5 py-3.5">
-          <span className="flex size-9 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-700">
-            M
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-text">Mariana</p>
-            <p className="truncate text-xs text-text-subtle">{t("Novo contato · 22h14")}</p>
-          </div>
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-success-bg px-2.5 py-1 text-xs font-medium text-success-fg">
-            <Bot className="size-3.5" />
-            {t("IA atendendo")}
-          </span>
-        </div>
-
-        <ConversaAoVivo
-          className="space-y-3 px-5 py-6"
-          falas={[
-            // A primeira fala não tem "digitando": ninguém vê o cliente
-            // escrevendo antes de a conversa existir. Ela simplesmente chega,
-            // que é como uma mensagem de WhatsApp chega.
-            {
-              lado: "cliente",
-              digitandoMs: 0,
-              balao: (
-                <Balao lado="cliente" texto={t("Oi! Vocês entregam hoje ainda? 😊")} hora="22:14" />
-              ),
-            },
-            // 1,1 s é o que o agente de fato leva. Fingir mais venderia um
-            // produto mais lento do que o que se entrega — e a faixa ao pé
-            // deste quadro promete "Respondido na hora".
-            {
-              lado: "agente",
-              digitandoMs: 1100,
-              balao: (
-                <Balao
-                  lado="agente"
-                  texto={t(
-                    "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.",
-                  )}
-                  hora="22:14"
-                />
-              ),
-            },
-            // Gente digitando no celular demora mais que uma IA. Dar ao
-            // cliente o mesmo 1,1 s do agente faria os dois parecerem a mesma
-            // coisa — e o que este quadro mostra é justamente a diferença.
-            {
-              lado: "cliente",
-              digitandoMs: 1600,
-              balao: <Balao lado="cliente" texto={t("Sou do centro 🙏")} hora="22:15" />,
-            },
-            {
-              lado: "agente",
-              digitandoMs: 1100,
-              balao: (
-                <Balao
-                  lado="agente"
-                  texto={t("No centro chega em até 2 horas. Quer que eu já reserve para você?")}
-                  hora="22:15"
-                />
-              ),
-            },
-          ]}
-        />
-
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border bg-surface-elevated px-5 py-3.5 text-xs text-text-muted">
-          <span className="inline-flex items-center gap-1.5">
-            <SquareKanban className="size-3.5 text-accent" />
-            {t("Card criado no funil")}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-3.5 text-accent" />
-            {t("Respondido na hora")}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Balao({ lado, texto, hora }: { lado: "cliente" | "agente"; texto: string; hora: string }) {
-  const doAgente = lado === "agente";
-  return (
-    <div className={doAgente ? "flex justify-end" : "flex justify-start"}>
-      <div
-        className={
-          doAgente
-            ? "max-w-[85%] rounded-lg rounded-br-sm bg-accent px-3.5 py-2.5 text-sm leading-relaxed text-accent-foreground shadow-xs"
-            : "max-w-[85%] rounded-lg rounded-bl-sm bg-surface-elevated px-3.5 py-2.5 text-sm leading-relaxed text-text shadow-xs"
-        }
-      >
-        {texto}
-        <span
-          className={
-            doAgente
-              ? "mt-1 block text-right font-mono text-[10px] opacity-70"
-              : "mt-1 block text-right font-mono text-[10px] text-text-subtle"
-          }
-        >
-          {hora}
-        </span>
-      </div>
-    </div>
+    <details>
+      <summary>
+        {pergunta}
+        <span aria-hidden>+</span>
+      </summary>
+      <p>{resposta}</p>
+    </details>
   );
 }

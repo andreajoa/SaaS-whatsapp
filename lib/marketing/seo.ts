@@ -252,8 +252,8 @@ export function schemaDoVideo(nome: string, base: string) {
     description:
       "Demonstração ilustrativa: caixa de entrada compartilhada, conhecimento do agente de IA, atendimento humano e funil de vendas. Áudio e legendas em português.",
     thumbnailUrl: new URL("/media/atenza/explainer-thumbnail.webp", base).toString(),
-    uploadDate: "2026-10-10T21:36:18-03:00",
-    duration: "PT48S",
+    uploadDate: "2026-10-11T18:00:00-03:00",
+    duration: "PT53S",
     inLanguage: "pt-BR",
     contentUrl: new URL("/media/atenza/atenza-explica.mp4", base).toString(),
     mainEntityOfPage: new URL("/demonstracao", base).toString(),

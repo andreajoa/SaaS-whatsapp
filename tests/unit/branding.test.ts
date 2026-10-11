@@ -340,7 +340,7 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "ATENZA",
     motivo:
       "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
-    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza", "atenza-home.module.css"],
+    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza", "atenza", "atenza-home.module.css"],
   },
   "components/branding/MarcaDoProduto.tsx": {
     categoria: "ATENZA",
@@ -424,6 +424,8 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
       "atenza",
       "atenza",
       "atenza",
+      "atenza",
+      "atenza",
     ],
   },
   "lib/marketing/conteudo-seo.ts": {
@@ -488,7 +490,7 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "ATENZA",
     motivo:
       "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
-    marcas: ["atenza", "atenza", "atenza", "atenza"],
+    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza", "atenza"],
   },
   "components/site/RodapeDoSite.tsx": {
     categoria: "ATENZA",

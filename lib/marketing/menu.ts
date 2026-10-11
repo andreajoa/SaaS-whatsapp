@@ -126,7 +126,7 @@ export function montarMenu(t: (texto: string) => string, comPlanos: boolean): Me
         destaque: {
           href: "/demonstracao",
           imagem: "/media/atenza/explainer-thumbnail.webp",
-          titulo: t("Veja em 48 segundos"),
+          titulo: t("Veja em menos de 1 minuto"),
           texto: t("Conversas, agentes de IA e funil de vendas na prática."),
           acao: t("Assistir à demonstração"),
         },

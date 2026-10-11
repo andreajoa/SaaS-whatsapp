@@ -37,6 +37,15 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a Atenza, o seu WhatsApp atende e vende vinte e quatro horas por dia.":
+    "Eleven forty-seven at night. A customer asks for the price. Who answers? With Atenza, your WhatsApp serves and sells twenty-four hours a day.",
+  "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.":
+    "The AI agent answers right away with your business information: price, stock, hours, delivery. When the conversation needs a person, it goes to your team with the full history. Nobody asks everything again.",
+  "Cada conversa vira uma oportunidade no funil. E o follow-up automático volta a falar com quem parou de responder. Precisa marcar horário? A Atenza agenda pela própria conversa, direto na sua agenda do Google.":
+    "Every conversation becomes an opportunity in the pipeline, and automatic follow-up reaches back to people who stopped replying. Need to book a time? Atenza schedules it right in the chat, straight into your Google Calendar.",
+  "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.":
+    "Several agents on one number, the official WhatsApp API and your data protected under Brazil's LGPD. Atenza: WhatsApp that serves and sells 24/7. Try seven days free of charge.",
+  "Veja em menos de 1 minuto": "See it in under a minute",
   "O que é a": "What is",
   "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.":
     "is a Brazilian WhatsApp customer service and sales platform that brings together, in one system, several agents on the same number, AI agents trained on your business information, a CRM with a sales pipeline, automatic follow-up, campaigns and scheduling integrated with Google.",
@@ -113,7 +122,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Teste 7 dias sem cobrança": "Try 7 days free of charge",
   "Triagem e histórico com sigilo.": "Triage and history, confidentially.",
   "Uma conta por cliente, com a sua marca.": "One account per client, with your brand.",
-  "Veja em 48 segundos": "See it in 48 seconds",
   "Ver integrações": "See integrations",
   "Volta a falar com quem parou.": "Re-engages people who went quiet.",
   "Vários atendentes no mesmo número.": "Several agents on one number.",
@@ -329,14 +337,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Ler a explicação": "Read the explanation",
   "O vídeo não carregou. Você pode ler a explicação abaixo.":
     "The video didn't load. You can read the explanation below.",
-  "Seu cliente mandou uma mensagem. E agora? Com o Atenza, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.":
-    "Your customer sent a message. What happens next? With Atenza, your team organizes WhatsApp support in a shared inbox. Conversations have context, owners, and a clear next step.",
-  "Configure seu agente de IA com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.":
-    "Set up your AI agent with your business knowledge and your provider's credentials. It helps with routine questions, and your team takes over when support needs a human touch.",
-  "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.":
-    "Then follow opportunities in the pipeline and organize follow-ups. Available integrations connect your operation according to each service's configuration.",
-  "Menos improviso. Mais atenção em cada conversa. Conheça os planos do Atenza. Comece com sete dias sem cobrança. É necessário cartão.":
-    "Less improvisation. More care in every conversation. Explore Atenza's plans. Start with seven days with no charge. A card is required.",
   "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.":
     "Card required. Automatically renews after the trial. Cancel anytime.",
   "Comércio e e-commerce": "Retail and e-commerce",

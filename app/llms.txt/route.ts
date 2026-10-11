@@ -68,7 +68,7 @@ ${planos}
 
 - [Início](${url("/")}): visão geral do produto
 - [Preços e planos](${url("/precos")}): planos, comparação e como funciona a assinatura
-- [Demonstração em vídeo](${url("/demonstracao")}): 48 segundos, com legendas
+- [Demonstração em vídeo](${url("/demonstracao")}): menos de 1 minuto, com legendas
 ${paginas}
 - [Contato](${url("/contato")}): falar com o suporte
 - [Instagram @atenzaon](https://www.instagram.com/atenzaon/): novidades e conteúdo da Atenza

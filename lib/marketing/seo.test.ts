@@ -84,7 +84,7 @@ describe("identidade e dados estruturados verdadeiros", () => {
   });
   it("o vídeo descreve o arquivo real com capa própria e duração real", () => {
     const video = schemaDoVideo("Minha marca", base);
-    expect(video.duration).toBe("PT48S");
+    expect(video.duration).toBe("PT53S");
     expect(video.contentUrl).toBe(`${base}/media/atenza/atenza-explica.mp4`);
     expect(video.thumbnailUrl).toBe(`${base}/media/atenza/explainer-thumbnail.webp`);
     expect(video.mainEntityOfPage).toBe(`${base}/demonstracao`);

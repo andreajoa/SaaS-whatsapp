@@ -167,16 +167,16 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     transcricao: t("Ler a explicação"),
     indisponivel: t("O vídeo não carregou. Você pode ler a explicação abaixo."),
     paragrafo1: t(
-      "Seu cliente mandou uma mensagem. E agora? Com o Atenza, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.",
+      "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a Atenza, o seu WhatsApp atende e vende vinte e quatro horas por dia.",
     ),
     paragrafo2: t(
-      "Configure seu agente de IA com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.",
+      "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.",
     ),
     paragrafo3: t(
-      "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.",
+      "Cada conversa vira uma oportunidade no funil. E o follow-up automático volta a falar com quem parou de responder. Precisa marcar horário? A Atenza agenda pela própria conversa, direto na sua agenda do Google.",
     ),
     paragrafo4: t(
-      "Menos improviso. Mais atenção em cada conversa. Conheça os planos do Atenza. Comece com sete dias sem cobrança. É necessário cartão.",
+      "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.",
     ),
   };
   const trial = `${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`;

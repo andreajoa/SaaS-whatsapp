@@ -18,7 +18,7 @@ export const INTERFACE_SEO = {
   privacy: "Privacidade",
   terms: "Termos de uso",
   content: "Conteúdo e soluções",
-  demo: "WhatsApp, IA e CRM em 48 segundos.",
+  demo: "WhatsApp, IA e CRM em menos de 1 minuto.",
   demoIntro:
     "Assista à explicação de como as conversas, o conhecimento do agente e o funil se conectam. Demonstração ilustrativa, com áudio e legendas em português.",
   transcript: "Transcrição do vídeo",
@@ -26,11 +26,11 @@ export const INTERFACE_SEO = {
   demoStep2: "Configure o conhecimento",
   demoStep3: "Acompanhe as oportunidades",
   demoP1:
-    "Seu cliente mandou uma mensagem. E agora? Com o produto, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.",
+    "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a plataforma, o seu WhatsApp atende e vende vinte e quatro horas por dia.",
   demoP2:
-    "Configure seu agente de inteligência artificial com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.",
+    "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.",
   demoP3:
-    "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.",
+    "Cada conversa vira uma oportunidade no funil. E o follow-up automático volta a falar com quem parou de responder. Precisa marcar horário? A plataforma agenda pela própria conversa, direto na sua agenda do Google.",
   demoP4:
-    "Menos improviso. Mais atenção em cada conversa. Conheça os planos. Comece com sete dias sem cobrança. É necessário cartão.",
+    "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Teste sete dias sem cobrança.",
 };

@@ -38,6 +38,23 @@ import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translat
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a Atenza, o seu WhatsApp atende e vende vinte e quatro horas por dia.":
+    {
+      es: "Once y cuarenta y siete de la noche. Un cliente pregunta el precio. ¿Quién responde? Con Atenza, tu WhatsApp atiende y vende las veinticuatro horas del día.",
+    },
+  "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.":
+    {
+      es: "El agente de inteligencia artificial responde al instante con la información de tu negocio: precio, stock, horario, entrega. Cuando la conversación necesita una persona, pasa a tu equipo con todo el historial. Nadie pregunta todo de nuevo.",
+    },
+  "Cada conversa vira uma oportunidade no funil. E o follow-up automático volta a falar com quem parou de responder. Precisa marcar horário? A Atenza agenda pela própria conversa, direto na sua agenda do Google.":
+    {
+      es: "Cada conversación se convierte en una oportunidad en el embudo, y el seguimiento automático vuelve a hablar con quien dejó de responder. ¿Necesitas agendar? Atenza agenda en la propia conversación, directo en tu Google Calendar.",
+    },
+  "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.":
+    {
+      es: "Varios agentes en el mismo número, la API oficial de WhatsApp y tus datos protegidos por la LGPD. Atenza: WhatsApp que atiende y vende 24h. Prueba siete días sin cobro.",
+    },
+  "Veja em menos de 1 minuto": { es: "Míralo en menos de 1 minuto" },
   "O que é a": { es: "¿Qué es" },
   "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.":
     {
@@ -131,7 +148,6 @@ export const DICIONARIO: Traducoes = {
   "Teste 7 dias sem cobrança": { es: "Prueba 7 días sin cobro" },
   "Triagem e histórico com sigilo.": { es: "Clasificación e historial con confidencialidad." },
   "Uma conta por cliente, com a sua marca.": { es: "Una cuenta por cliente, con tu marca." },
-  "Veja em 48 segundos": { es: "Míralo en 48 segundos" },
   "Ver integrações": { es: "Ver integraciones" },
   "Volta a falar com quem parou.": { es: "Vuelve a hablar con quien se detuvo." },
   "Vários atendentes no mesmo número.": { es: "Varios agentes en el mismo número." },
@@ -223,22 +239,6 @@ export const DICIONARIO: Traducoes = {
   "O vídeo não carregou. Você pode ler a explicação abaixo.": {
     es: "El vídeo no se cargó. Puedes leer la explicación abajo.",
   },
-  "Seu cliente mandou uma mensagem. E agora? Com o Atenza, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.":
-    {
-      es: "Tu cliente envió un mensaje. ¿Y ahora? Con Atenza, tu equipo organiza la atención por WhatsApp en una bandeja de entrada compartida. Las conversaciones tienen contexto, responsables y un siguiente paso claro.",
-    },
-  "Configure seu agente de IA com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.":
-    {
-      es: "Configura tu agente de IA con el conocimiento de tu negocio y las credenciales de tu proveedor. Ayuda con las dudas habituales, y tu equipo asume cuando la atención necesita intervención humana.",
-    },
-  "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.":
-    {
-      es: "Después, sigue las oportunidades en el embudo y organiza los seguimientos. Las integraciones disponibles conectan tu operación según la configuración de cada servicio.",
-    },
-  "Menos improviso. Mais atenção em cada conversa. Conheça os planos do Atenza. Comece com sete dias sem cobrança. É necessário cartão.":
-    {
-      es: "Menos improvisación. Más atención en cada conversación. Conoce los planes de Atenza. Empieza con siete días sin cobro. Se necesita tarjeta.",
-    },
   "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.": {
     es: "Tarjeta necesaria. Renovación automática después de la prueba. Cancela cuando quieras.",
   },

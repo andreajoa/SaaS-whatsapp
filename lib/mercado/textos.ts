@@ -123,7 +123,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
 
   // ── Fechamento e rodapé ────────────────────────────────────────────────
 
-  "Atendimento e vendas por WhatsApp": "WhatsApp support and sales",
   "Termos de uso": "Terms of use",
   "Política de Privacidade": "Privacy Policy",
 

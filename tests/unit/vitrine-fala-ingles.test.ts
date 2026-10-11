@@ -59,6 +59,9 @@ const TELAS_DA_VITRINE = [
   // no topo de um contrato em inglês é a meia-tradução que este gate existe
   // para impedir.
   "app/legal/layout.tsx",
+  // O rodapé de toda página pública: selo de segurança, planos e documentos
+  // aparecem nos três idiomas da vitrine.
+  "components/site/RodapeDoSite.tsx",
 ];
 
 /** Toda chave literal passada a `t()` / `textoDoSite()` nas telas da vitrine. */

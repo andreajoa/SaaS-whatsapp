@@ -131,9 +131,9 @@ export async function dispararTransacional(pedido: PedidoDeDisparo): Promise<Res
   const lead = await acharOuCriarLead(admin, email, pedido);
   if (!lead) return { tipo: "sem_lead" };
 
-  if (lead.status === "bounce" || lead.status === "reclamou") return {tipo:"suprimido"};
+  if (lead.status === "bounce" || lead.status === "reclamou") return { tipo: "suprimido" };
   if (aviso.ehPropaganda && lead.descadastrado_em) return { tipo: "descadastrado" };
-  if (aviso.ehPropaganda && !lead.marketing_opt_in_em) return {tipo:"sem_consentimento"};
+  if (aviso.ehPropaganda && !lead.marketing_opt_in_em) return { tipo: "sem_consentimento" };
 
   const declarado = pedido.idioma ?? lead.idioma ?? "";
   const idioma = ehIdiomaDoSite(declarado) ? declarado : IDIOMA_DO_SITE_PADRAO;
@@ -155,11 +155,22 @@ export async function dispararTransacional(pedido: PedidoDeDisparo): Promise<Res
     ...(editavel ? { campanha: aviso.id } : {}),
   });
   if (!envioId) {
-    const {data:existente,error} = await admin.from("email_envios").select("status").eq("lead_id",lead.id).eq("mensagem",mensagem).maybeSingle();
-    if(error) return {tipo:"falhou",erro:"não foi possível ler o recibo"};
-    if(existente && ["enviado","entregue","aberto","clicado","bounce","reclamou","descadastrou"].includes(existente.status)) return {tipo:"ja_enviado"};
-    if(existente?.status === "agendado") return {tipo:"pendente"};
-    return {tipo:"adiado"};
+    const { data: existente, error } = await admin
+      .from("email_envios")
+      .select("status")
+      .eq("lead_id", lead.id)
+      .eq("mensagem", mensagem)
+      .maybeSingle();
+    if (error) return { tipo: "falhou", erro: "não foi possível ler o recibo" };
+    if (
+      existente &&
+      ["enviado", "entregue", "aberto", "clicado", "bounce", "reclamou", "descadastrou"].includes(
+        existente.status,
+      )
+    )
+      return { tipo: "ja_enviado" };
+    if (existente?.status === "agendado") return { tipo: "pendente" };
+    return { tipo: "adiado" };
   }
 
   // ── 2. O envio ──────────────────────────────────────────────────────────

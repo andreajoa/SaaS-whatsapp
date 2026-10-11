@@ -21,7 +21,8 @@ import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { IntegracoesDaHome } from "@/components/site/IntegracoesDaHome";
 import { Medidor } from "@/components/site/Medidor";
-import { NavegacaoDaHome } from "@/components/site/NavegacaoDaHome";
+import { MegaMenu } from "@/components/site/MegaMenu";
+import { montarMenu } from "@/lib/marketing/menu";
 import { ProdutoDemonstracao, type TextosDoProduto } from "@/components/site/ProdutoDemonstracao";
 import {
   VideoDeContexto,
@@ -81,6 +82,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  const menu = montarMenu(t, vendidos.length > 0);
   const textosDaCaptura = {
     rotulo: t("Seu e-mail"),
     exemplo: t("seu@email.com"),
@@ -217,13 +219,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           <Link href="/" aria-label={marca.nome} className={styles.brandLink}>
             <Marca marca={marca} />
           </Link>
-          <nav className={styles.desktopNav} aria-label={t("Navegação principal")}>
-            <a href="#como-funciona">{t("Como funciona")}</a>
-            <a href="#recursos">{t("Recursos")}</a>
-            <a href="#integracoes">{t("Integrações")}</a>
-            {vendidos.length > 0 && <a href={`#${ID_DA_SECAO_DE_PLANOS}`}>{t("Planos")}</a>}
-            <a href="#perguntas">{t("Perguntas")}</a>
-          </nav>
+          <MegaMenu menu={menu} />
           <div className={styles.headerActions}>
             <Link href="/login" className={styles.login}>
               {t("Entrar")}
@@ -232,20 +228,6 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
               {t("Criar conta")}
               <ArrowRight size={16} aria-hidden />
             </Link>
-            <NavegacaoDaHome
-              abrir={t("Abrir navegação")}
-              rotulo={t("Navegação principal")}
-              itens={[
-                { href: "#como-funciona", texto: t("Como funciona") },
-                { href: "#recursos", texto: t("Recursos") },
-                { href: "#integracoes", texto: t("Integrações") },
-                ...(vendidos.length
-                  ? [{ href: `#${ID_DA_SECAO_DE_PLANOS}`, texto: t("Planos") }]
-                  : []),
-                { href: "#perguntas", texto: t("Perguntas") },
-                { href: "/login", texto: t("Entrar") },
-              ]}
-            />
           </div>
         </div>
       </header>

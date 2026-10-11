@@ -1,3 +1,4 @@
+import { PAGES_RECURSOS, PAGES_SEGMENTOS } from "./conteudo-recursos";
 /** Conteúdo editorial público; marca e condições comerciais resolvidas na página. */
 export type PaginaSeo = {
   readonly slug: string;
@@ -14,10 +15,10 @@ export type PaginaSeo = {
   }[];
   readonly faq: readonly { readonly question: string; readonly answer: string }[];
   readonly relatedSlugs: readonly string[];
-  readonly kind: "solution" | "guide" | "regional";
+  readonly kind: "solution" | "guide" | "regional" | "feature" | "segment";
 };
 
-export const PAGES_SEO: readonly PaginaSeo[] = [
+const PAGES_BASE: readonly PaginaSeo[] = [
   {
     slug: "atendimento-whatsapp",
     title: "Atendimento no WhatsApp com equipe, histórico e IA",
@@ -442,4 +443,11 @@ export const PAGES_SEO: readonly PaginaSeo[] = [
     ],
     kind: "guide",
   },
+];
+
+/** Toda página editorial pública: soluções, guia, região, recursos e segmentos. */
+export const PAGES_SEO: readonly PaginaSeo[] = [
+  ...PAGES_BASE,
+  ...PAGES_RECURSOS,
+  ...PAGES_SEGMENTOS,
 ];

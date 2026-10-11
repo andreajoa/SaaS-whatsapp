@@ -62,6 +62,8 @@ const TELAS_DA_VITRINE = [
   // O rodapé de toda página pública: selo de segurança, planos e documentos
   // aparecem nos três idiomas da vitrine.
   "components/site/RodapeDoSite.tsx",
+  // O mega menu da vitrine: os rótulos saem de `montarMenu(t)`.
+  "lib/marketing/menu.ts",
 ];
 
 /** Toda chave literal passada a `t()` / `textoDoSite()` nas telas da vitrine. */

@@ -200,7 +200,5 @@ export function Medidor({
     };
   }, [visitaId]);
 
-
-
   return null;
 }

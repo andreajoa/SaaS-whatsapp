@@ -1,3 +1,4 @@
+import { CabecalhoDoSite } from "@/components/site/CabecalhoDoSite";
 import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,14 +40,7 @@ export default async function Page() {
       <a href="#conteudo" className={styles.skip}>
         {ui.skip}
       </a>
-      <header className={styles.header}>
-        <Link href="/" aria-label={marca.nome}>
-          <LogotipoDoProduto nome={marca.nome} decorativo className={styles.logo} />
-        </Link>
-        <Link href="/#planos" className={styles.primary}>
-          {ui.plans}
-        </Link>
-      </header>
+      <CabecalhoDoSite nome={marca.nome} />
       <main id="conteudo" className={styles.watch}>
         <p className={styles.eyebrow}>{marca.nome}</p>
         <h1>{ui.demo}</h1>

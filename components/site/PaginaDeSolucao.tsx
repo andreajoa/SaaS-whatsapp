@@ -1,3 +1,4 @@
+import { CabecalhoDoSite } from "@/components/site/CabecalhoDoSite";
 import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,18 +63,7 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
       <a href="#conteudo" className={styles.skip}>
         {ui.skip}
       </a>
-      <header className={styles.header}>
-        <Link href="/" aria-label={marca.nome}>
-          <LogotipoDoProduto nome={marca.nome} decorativo className={styles.logo} />
-        </Link>
-        <nav aria-label={ui.content}>
-          <Link href="/demonstracao">{ui.video}</Link>
-          <Link href="/#planos" className={styles.primary}>
-            {ui.plans}
-            <ArrowRight size={16} aria-hidden />
-          </Link>
-        </nav>
-      </header>
+      <CabecalhoDoSite nome={marca.nome} />
       <main id="conteudo">
         <section className={styles.hero}>
           <div>

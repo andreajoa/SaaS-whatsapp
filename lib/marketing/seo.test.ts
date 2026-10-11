@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isPublicPath } from "@/lib/auth/public-paths";
 import { PAGES_SEO } from "./conteudo-seo";
+import { montarMenu } from "./menu";
 import {
   idiomaDaUrlPublica,
   jsonLdSeguro,
@@ -46,7 +47,11 @@ describe("URLs comerciais rastreáveis", () => {
     const slugs = new Set(PAGES_SEO.map((p) => p.slug));
     expect(slugs.size).toBe(PAGES_SEO.length);
     for (const p of PAGES_SEO) {
-      expect(LINKS_SEO.some((l) => l.href === `/${p.slug}`)).toBe(true);
+      // Alcançável pelo rodapé (LINKS_SEO) ou pelo mega menu.
+      const noMenu = montarMenu((t) => t, true).grupos.some(
+        (g) => g.itens.some((i) => i.href === `/${p.slug}`) || g.destaque.href === `/${p.slug}`,
+      );
+      expect(LINKS_SEO.some((l) => l.href === `/${p.slug}`) || noMenu, p.slug).toBe(true);
       expect(p.relatedSlugs.every((slug) => slugs.has(slug) && slug !== p.slug)).toBe(true);
     }
   });

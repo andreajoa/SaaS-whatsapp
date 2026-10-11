@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
+import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
 import { IDIOMAS_PUBLICOS } from "@/lib/marketing/seo";
 
 /**
@@ -49,15 +50,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ),
       },
     })),
-    ...[
-      "/atendimento-whatsapp",
-      "/chatbot-para-whatsapp",
-      "/agentes-ia-whatsapp",
-      "/crm-whatsapp",
-      "/atendimento-whatsapp-sao-paulo",
-      "/guias/como-escolher-atendimento-whatsapp",
-      "/demonstracao",
-    ].map((path) => ({ url: url(path), lastModified: "2026-10-10" })),
+    // Toda página editorial vem da lista fechada — página nova entra sozinha.
+    ...PAGES_SEO.map((p) => ({ url: url(`/${p.slug}`), lastModified: "2026-10-11" })),
+    { url: url("/demonstracao"), lastModified: "2026-10-10" },
     // Quem procura "como falar com o suporte" antes de assinar procura esta.
     { url: url("/contato"), changeFrequency: "yearly", priority: 0.5 },
     { url: url("/legal"), changeFrequency: "yearly", priority: 0.4 },

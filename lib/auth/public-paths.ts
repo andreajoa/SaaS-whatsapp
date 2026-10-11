@@ -7,6 +7,8 @@ export const PUBLIC_PATHS: RegExp[] = [
   // Conteúdo comercial sem dados de clientes; cada tela exige cobrança ligada.
   /^\/(?:en|es|atendimento-whatsapp|chatbot-para-whatsapp|agentes-ia-whatsapp|crm-whatsapp|atendimento-whatsapp-sao-paulo|demonstracao)$/,
   /^\/guias\/como-escolher-atendimento-whatsapp$/,
+  // Páginas de recurso e de segmento do mega menu (lista fechada em conteudo-recursos.ts).
+  /^\/(?:recursos|segmentos)\/[a-z0-9-]+$/,
   // Resumo para buscadores de IA; só texto público do produto.
   /^\/llms\.txt$/,
   /^\/login(\/.*)?$/,

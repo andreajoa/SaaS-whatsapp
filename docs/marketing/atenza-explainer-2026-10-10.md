@@ -27,7 +27,19 @@ Fonte editável local: `design-preview/atenza-video/`. Original renderizado: `re
 - Voz normalizada em duas passagens de loudnorm: saída integrada −16,0 LUFS, pico real −1,6 dBTP e LRA 3,4 LU. Vídeo preservado sem recodificar os quadros nessa etapa.
 - O Whisper inicial com alinhamento DTW excedeu o limite automático de 454s. A etapa de legendas foi refeita em CPU, sem DTW e sem flash attention, com o modelo multilíngue tiny oficial e beam 1. O render concluído foi preservado. Modelo de transcrição local: https://huggingface.co/ggerganov/whisper.cpp; não há upload do áudio para transcrever.
 - Legendas concluídas pelo Whisper tiny multilíngue local em 188,6 segundos. Nome Atenza, flexões e pontuação foram conferidos com o texto original; três fragmentos curtos foram unidos às frases anteriores, preservando as fronteiras acústicas. O texto concatenado das 17 legendas corresponde exatamente ao roteiro original. Máximo de duas linhas e 42 caracteres por linha, tempos ordenados, sem sobreposição e dentro dos 48 segundos.
-- Integração no site: somente um clique inicia o player com áudio; há controles, legenda e transcrição. A verificação da integração e a publicação pertencem ao gate da página.
+- Integração no site: somente um clique inicia o player com áudio no mesmo bloco da capa; há controles, legenda e transcrição. Não abre modal. O CTA da abertura aponta para esse bloco.
+
+## Capa própria
+
+`public/media/atenza/explainer-thumbnail.webp`: fotografia ilustrativa gerada
+pelo recurso integrado `image_gen` em 10/10/2026, otimizada em WebP 1280 × 720.
+A pessoa retratada não representa integrante da equipe, depoente ou narradora.
+Direção: profissional brasileira com headset e blusa verde, à direita de um
+escritório com luz natural, madeira clara, plantas e espaço verde à esquerda.
+Sem texto, logos ou controles incorporados à fotografia. Título e botão de
+play são HTML, legíveis no celular; a capa é substituída pelo vídeo sem mudar
+o enquadramento do bloco. O arquivo anterior de pôster permanece como registro
+da edição original, sem uso como thumbnail na página.
 
 ## Roteiro falado
 

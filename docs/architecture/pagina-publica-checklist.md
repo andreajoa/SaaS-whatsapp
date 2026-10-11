@@ -10,6 +10,8 @@
 4. **Tela:** raiz pública com demonstração identificada, exemplos, integrações,
    preços e mídia. A captação confirma resultado ou mostra erro no formulário.
 5. **Porta:** URL raiz, navegação por âncoras e CTA de vídeo na abertura.
+   O CTA aponta para `#video-explicativo`; o player substitui a capa nesse
+   mesmo bloco, sem modal. Fechar interrompe a reprodução e restaura a capa.
    Os três arquivos públicos de vídeo e legenda têm lista fechada em
    `lib/auth/public-paths.ts`, com regressão que preserva a proteção de mídia
    privada. Não foi criada rota pública adicional.

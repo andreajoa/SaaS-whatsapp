@@ -254,10 +254,10 @@ export default async function HomePage() {
             </h1>
             <p>{t("WhatsApp, agentes de IA e funil de vendas na mesma plataforma.")}</p>
             <div className={styles.heroActions}>
-              <VideoExplicativo textos={video} className={styles.button}>
+              <a href="#video-explicativo" className={styles.button}>
                 <Play size={17} aria-hidden />
                 {t("Ver em ação")}
-              </VideoExplicativo>
+              </a>
               <a
                 href={`#${vendidos.length ? ID_DA_SECAO_DE_PLANOS : "como-funciona"}`}
                 className={styles.buttonOutline}
@@ -460,7 +460,7 @@ export default async function HomePage() {
             </div>
             <VideoExplicativo textos={video} className={styles.explainerCard}>
               <Image
-                src="/media/atenza/explainer-poster.webp"
+                src="/media/atenza/explainer-thumbnail.webp"
                 alt=""
                 fill
                 sizes="(max-width: 767px) 100vw, 52vw"

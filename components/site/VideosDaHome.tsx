@@ -1,9 +1,8 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Pause, Play, VolumeX, X } from "lucide-react";
+import { Pause, Play, VolumeX } from "lucide-react";
 
 import styles from "./atenza-home.module.css";
 
@@ -139,7 +138,7 @@ export interface TextosDoVideo {
   paragrafo4: string;
 }
 
-/** O áudio só começa depois do clique. Radix mantém foco, Escape e retorno ao disparador. */
+/** A capa dá lugar ao player no mesmo bloco; a mídia só carrega após o clique. */
 export function VideoExplicativo({
   children,
   textos,
@@ -149,31 +148,48 @@ export function VideoExplicativo({
   readonly textos: TextosDoVideo;
   readonly className?: string;
 }) {
-  const [aberto, setAberto] = useState(false);
+  const [iniciado, setIniciado] = useState(false);
   const [erro, setErro] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const capaRef = useRef<HTMLButtonElement>(null);
+  const iniciadoAntes = useRef(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (iniciado) video?.focus();
+    else if (iniciadoAntes.current) capaRef.current?.focus();
+    iniciadoAntes.current = iniciado;
+    return () => video?.pause();
+  }, [iniciado]);
+
   return (
-    <Dialog.Root open={aberto} onOpenChange={setAberto}>
-      <Dialog.Trigger className={className}>{children}</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className={styles.videoOverlay} />
-        <Dialog.Content className={styles.videoDialog}>
-          <div className={styles.dialogHeading}>
-            <Dialog.Title>{textos.titulo}</Dialog.Title>
-            <Dialog.Close className={styles.dialogClose} aria-label={textos.fechar}>
-              <X size={23} aria-hidden />
-            </Dialog.Close>
-          </div>
-          <Dialog.Description className={styles.dialogDescription}>
-            {textos.descricao}
-          </Dialog.Description>
-          {aberto && (
+    <div id="video-explicativo" className={styles.inlinePlayer}>
+      {!iniciado ? (
+        <button
+          ref={capaRef}
+          type="button"
+          className={className}
+          onClick={() => {
+            setErro(false);
+            setIniciado(true);
+          }}
+        >
+          {children}
+        </button>
+      ) : (
+        <div role="region" aria-label={textos.titulo}>
+          <p className="sr-only">{textos.descricao}</p>
+          <div className={styles.inlineVideoFrame}>
             <video
+              ref={videoRef}
+              tabIndex={0}
+              aria-label={textos.titulo}
               controls
               autoPlay
               playsInline
               preload="metadata"
-              poster={`${MEDIA}/explainer-poster.webp`}
-              className={styles.explainerVideo}
+              poster={`${MEDIA}/explainer-thumbnail.webp`}
+              className={styles.inlineVideo}
               onError={() => setErro(true)}
             >
               <source src={`${MEDIA}/atenza-explica.mp4`} type="video/mp4" />
@@ -185,8 +201,13 @@ export function VideoExplicativo({
                 default
               />
             </video>
-          )}
+          </div>
           {erro && <p role="alert">{textos.indisponivel}</p>}
+          <div className={styles.inlineVideoActions}>
+            <button type="button" onClick={() => setIniciado(false)}>
+              {textos.fechar}
+            </button>
+          </div>
           <details className={styles.transcript}>
             <summary>{textos.transcricao}</summary>
             {[textos.paragrafo1, textos.paragrafo2, textos.paragrafo3, textos.paragrafo4].map(
@@ -195,8 +216,8 @@ export function VideoExplicativo({
               ),
             )}
           </details>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </div>
+      )}
+    </div>
   );
 }

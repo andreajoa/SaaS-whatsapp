@@ -139,12 +139,13 @@ describe("vídeo de contexto: autonomia e consumo no celular", () => {
 });
 
 describe("o filme narrado só existe após a escolha do visitante", () => {
-  it("abre pelo botão, oferece legenda e transcrição, e remove o vídeo ao fechar", async () => {
-    render(<VideoExplicativo textos={explicacao}>Assistir</VideoExplicativo>);
+  it("toca no bloco da página, sem diálogo, e encerra ao voltar para o poster", async () => {
+    const { container } = render(<VideoExplicativo textos={explicacao}>Assistir</VideoExplicativo>);
     expect(document.querySelector("video")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Assistir" }));
     const elemento = video();
-    expect(screen.getByRole("dialog")).toBeTruthy();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(container.contains(elemento)).toBe(true);
     expect(elemento.controls).toBe(true);
     expect(elemento.querySelector("track")?.getAttribute("srcLang")).toBe("pt-BR");
     expect(screen.getByText(explicacao.transcricao)).toBeTruthy();

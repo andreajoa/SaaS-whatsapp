@@ -38,6 +38,15 @@ import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translat
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  "O que é a": { es: "¿Qué es" },
+  "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.":
+    {
+      es: "es una plataforma brasileña de atención y ventas por WhatsApp que reúne, en un único sistema, varios agentes en el mismo número, agentes de inteligencia artificial entrenados con la información de tu negocio, CRM con embudo de ventas, seguimiento automático, campañas y agenda integrada con Google.",
+    },
+  "A conexão é pela API oficial do WhatsApp, da Meta, com integrações para Shopify, WooCommerce e Nuvemshop, além de API e webhooks para qualquer sistema. Atende empresas de todo o Brasil — lojas, clínicas, escolas, imobiliárias, escritórios e prestadores de serviço —, com planos mensais ou anuais e 7 dias sem cobrança para testar.":
+    {
+      es: "La conexión es por la API oficial de WhatsApp, de Meta, con integraciones para Shopify, WooCommerce y Nuvemshop, además de API y webhooks para cualquier sistema. Atiende empresas de todo Brasil — tiendas, clínicas, escuelas, inmobiliarias, oficinas y prestadores de servicios —, con planes mensuales o anuales y 7 días sin cobro para probar.",
+    },
   "Empresa cadastrada no Reclame Aqui": { es: "Empresa registrada en Reclame Aqui" },
   "Veja a nossa página e a nossa reputação.": {
     es: "Mira nuestra página y nuestra reputación.",

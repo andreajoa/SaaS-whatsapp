@@ -37,6 +37,11 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  "O que é a": "What is",
+  "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.":
+    "is a Brazilian WhatsApp customer service and sales platform that brings together, in one system, several agents on the same number, AI agents trained on your business information, a CRM with a sales pipeline, automatic follow-up, campaigns and scheduling integrated with Google.",
+  "A conexão é pela API oficial do WhatsApp, da Meta, com integrações para Shopify, WooCommerce e Nuvemshop, além de API e webhooks para qualquer sistema. Atende empresas de todo o Brasil — lojas, clínicas, escolas, imobiliárias, escritórios e prestadores de serviço —, com planos mensais ou anuais e 7 dias sem cobrança para testar.":
+    "It connects through Meta's official WhatsApp API, integrates with Shopify, WooCommerce and Nuvemshop, and offers an API and webhooks for any system. It serves businesses all over Brazil — stores, clinics, schools, real estate agencies, offices and service providers — with monthly or annual plans and 7 days free of charge to try.",
   "Empresa cadastrada no Reclame Aqui": "Company registered on Reclame Aqui",
   "Veja a nossa página e a nossa reputação.": "See our page and our reputation.",
   "Empresa cadastrada no Reclame Aqui — abrir página":

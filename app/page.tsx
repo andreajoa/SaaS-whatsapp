@@ -325,6 +325,25 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </span>
         </div>
 
+        <section className={styles.oQueE} aria-labelledby="o-que-e">
+          <div className={styles.oQueECard}>
+            <h2 id="o-que-e">
+              {t("O que é a")} {marca.nome}?
+            </h2>
+            <p>
+              {marca.nome}{" "}
+              {t(
+                "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.",
+              )}
+            </p>
+            <p>
+              {t(
+                "A conexão é pela API oficial do WhatsApp, da Meta, com integrações para Shopify, WooCommerce e Nuvemshop, além de API e webhooks para qualquer sistema. Atende empresas de todo o Brasil — lojas, clínicas, escolas, imobiliárias, escritórios e prestadores de serviço —, com planos mensais ou anuais e 7 dias sem cobrança para testar.",
+              )}
+            </p>
+          </div>
+        </section>
+
         <section id="como-funciona" className={`${styles.section} ${styles.productSection}`}>
           <div className={styles.container}>
             <div className={styles.centerHeading}>

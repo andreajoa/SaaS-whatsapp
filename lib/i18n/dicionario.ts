@@ -38,6 +38,27 @@ import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translat
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  "Trocas e devoluções": { es: "Cambios y devoluciones" },
+  "Qual o prazo de entrega para Campinas?": { es: "¿Cuál es el plazo de entrega a Campinas?" },
+  "Vocês aceitam Pix?": { es: "¿Aceptan Pix?" },
+  "Quero trocar o tamanho do pedido.": { es: "Quiero cambiar la talla del pedido." },
+  "Paciente da clínica": { es: "Paciente de la clínica" },
+  "Boa tarde! Queria marcar uma limpeza. Tem horário esta semana?": {
+    es: "¡Buenas tardes! Quisiera agendar una limpieza. ¿Hay horario esta semana?",
+  },
+  "Boa tarde, Ricardo! Temos quinta às 15h ou sexta às 10h. Qual fica melhor?": {
+    es: "¡Buenas tardes, Ricardo! Tenemos el jueves a las 15h o el viernes a las 10h. ¿Cuál te queda mejor?",
+  },
+  "Quinta às 15h, por favor.": { es: "El jueves a las 15h, por favor." },
+  "Confirmar a consulta e enviar o lembrete na véspera.": {
+    es: "Confirmar la cita y enviar el recordatorio el día anterior.",
+  },
+  "Tratamentos e valores": { es: "Tratamientos y precios" },
+  "Convênios aceitos": { es: "Seguros aceptados" },
+  "Preparo e horários": { es: "Preparación y horarios" },
+  "Vocês atendem convênio?": { es: "¿Atienden con seguro?" },
+  "Preciso remarcar minha consulta.": { es: "Necesito reprogramar mi cita." },
+  "Qual o endereço da clínica?": { es: "¿Cuál es la dirección de la clínica?" },
   "API, webhooks e MCP": { es: "API, webhooks y MCP" },
   Advocacia: { es: "Abogacía" },
   "Agenda, lembretes e recepção organizada.": {

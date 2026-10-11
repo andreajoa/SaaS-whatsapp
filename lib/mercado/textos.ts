@@ -37,6 +37,24 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  "Trocas e devoluções": "Exchanges and returns",
+  "Qual o prazo de entrega para Campinas?": "How long does delivery to Campinas take?",
+  "Vocês aceitam Pix?": "Do you accept Pix?",
+  "Quero trocar o tamanho do pedido.": "I'd like to change the size on my order.",
+  "Paciente da clínica": "Clinic patient",
+  "Boa tarde! Queria marcar uma limpeza. Tem horário esta semana?":
+    "Good afternoon! I'd like to book a cleaning. Any openings this week?",
+  "Boa tarde, Ricardo! Temos quinta às 15h ou sexta às 10h. Qual fica melhor?":
+    "Good afternoon, Ricardo! We have Thursday at 3 pm or Friday at 10 am. Which works better?",
+  "Quinta às 15h, por favor.": "Thursday at 3 pm, please.",
+  "Confirmar a consulta e enviar o lembrete na véspera.":
+    "Confirm the appointment and send a reminder the day before.",
+  "Tratamentos e valores": "Treatments and prices",
+  "Convênios aceitos": "Accepted insurance plans",
+  "Preparo e horários": "Preparation and hours",
+  "Vocês atendem convênio?": "Do you take insurance?",
+  "Preciso remarcar minha consulta.": "I need to reschedule my appointment.",
+  "Qual o endereço da clínica?": "What's the clinic's address?",
   "API, webhooks e MCP": "API, webhooks and MCP",
   Advocacia: "Law firms",
   Agenda: "Scheduling",
@@ -269,7 +287,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Histórico compartilhado": "Shared history",
   "Cliente da loja": "Store customer",
   "Sua equipe": "Your team",
-  "Quero mais informações": "I'd like more information",
   "Oi! Vocês têm este modelo em estoque?": "Hi! Do you have this model in stock?",
   "Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?":
     "Hi, Mariana! We do. Can I help you choose a size?",

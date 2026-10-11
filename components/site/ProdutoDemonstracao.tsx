@@ -30,20 +30,12 @@ export interface TextosDoProduto {
   todas: string;
   contato: string;
   historico: string;
-  cliente: string;
   equipe: string;
-  ultima: string;
-  pergunta: string;
-  resposta: string;
-  agradecimento: string;
   escrever: string;
   nota: string;
   atribuida: string;
   conhecimento: string;
   documentos: string;
-  documento1: string;
-  documento2: string;
-  documento3: string;
   limites: string;
   limiteTexto: string;
   transferencia: string;
@@ -54,21 +46,38 @@ export interface TextosDoProduto {
   etapa3: string;
   etapa4: string;
   proximo: string;
-  proximoTexto: string;
   mover: string;
   demonstracaoTexto: string;
 }
 
 /** Uma demonstração local: abas e etapas respondem ao clique, sem dados de clientes ou envio. */
+/**
+ * A história de UM negócio na demonstração. Cada quadro da página recebe a
+ * sua: os dois mostrando a mesma conversa pareciam um print repetido.
+ */
+export type CenarioDaDemonstracao = {
+  readonly nome: string;
+  readonly perfil: string;
+  readonly pergunta: string;
+  readonly resposta: string;
+  readonly segunda: string;
+  readonly proximoTexto: string;
+  readonly documentos: readonly [string, string, string];
+  readonly outros: readonly { nome: string; ultima: string }[];
+};
+
 export function ProdutoDemonstracao({
   textos,
+  cenario,
   compacto = false,
   marca,
 }: {
   readonly textos: TextosDoProduto;
+  readonly cenario: CenarioDaDemonstracao;
   readonly compacto?: boolean;
   readonly marca: string;
 }) {
+  const inicial = cenario.nome.charAt(0);
   const [aba, setAba] = useState(0);
   const [etapa, setEtapa] = useState(1);
   const id = useId();
@@ -161,16 +170,14 @@ export function ProdutoDemonstracao({
                   <span>{textos.todas}</span>
                 </div>
                 {[
-                  ["M", "Mariana", textos.pergunta],
-                  ["P", "Pedro", textos.ultima],
-                  ["C", "Camila", textos.agradecimento],
-                  ["L", "Lucas", textos.ultima],
-                ].map(([inicial, nome, mensagem], i) => (
+                  [inicial, cenario.nome, cenario.pergunta],
+                  ...cenario.outros.map((o) => [o.nome.charAt(0), o.nome, o.ultima]),
+                ].map(([letra, nome, mensagem], i) => (
                   <div
                     key={nome}
                     className={`${styles.contactRow} ${i === 0 ? styles.contactSelected : ""}`}
                   >
-                    <span className={styles.avatar}>{inicial}</span>
+                    <span className={styles.avatar}>{letra}</span>
                     <div>
                       <strong>{nome}</strong>
                       <p>{mensagem}</p>
@@ -180,9 +187,9 @@ export function ProdutoDemonstracao({
               </aside>
               <div className={styles.chat}>
                 <div className={styles.chatHeading}>
-                  <span className={styles.avatar}>M</span>
+                  <span className={styles.avatar}>{inicial}</span>
                   <div>
-                    <strong>Mariana</strong>
+                    <strong>{cenario.nome}</strong>
                     <span>{textos.atribuida}</span>
                   </div>
                   <span className={styles.demoLabel}>{textos.demonstracao}</span>
@@ -201,7 +208,7 @@ export function ProdutoDemonstracao({
                         digitandoMs: 0,
                         balao: (
                           <div className={styles.received}>
-                            {textos.pergunta}
+                            {cenario.pergunta}
                             <small>10:21</small>
                           </div>
                         ),
@@ -211,7 +218,7 @@ export function ProdutoDemonstracao({
                         digitandoMs: 1300,
                         balao: (
                           <div className={styles.sent}>
-                            {textos.resposta}
+                            {cenario.resposta}
                             <small>
                               10:22 <CheckCheck size={13} aria-hidden />
                             </small>
@@ -223,7 +230,7 @@ export function ProdutoDemonstracao({
                         digitandoMs: 2000,
                         balao: (
                           <div className={styles.received}>
-                            {textos.agradecimento}
+                            {cenario.segunda}
                             <small>10:23</small>
                           </div>
                         ),
@@ -240,14 +247,14 @@ export function ProdutoDemonstracao({
               </div>
               <aside className={styles.contactDetails}>
                 <strong>{textos.contato}</strong>
-                <span className={styles.avatarLarge}>M</span>
-                <b>Mariana</b>
-                <p>{textos.cliente}</p>
+                <span className={styles.avatarLarge}>{inicial}</span>
+                <b>{cenario.nome}</b>
+                <p>{cenario.perfil}</p>
                 <hr />
                 <strong>{textos.funil}</strong>
                 <span>{textos.etapa2}</span>
                 <strong>{textos.proximo}</strong>
-                <p>{textos.proximoTexto}</p>
+                <p>{cenario.proximoTexto}</p>
               </aside>
             </div>
           )}
@@ -264,7 +271,7 @@ export function ProdutoDemonstracao({
               </div>
               <div className={styles.agentColumns}>
                 <div className={styles.documents}>
-                  {[textos.documento1, textos.documento2, textos.documento3].map((documento) => (
+                  {cenario.documentos.map((documento) => (
                     <div key={documento}>
                       <FileText size={21} aria-hidden />
                       <span>{documento}</span>
@@ -294,9 +301,9 @@ export function ProdutoDemonstracao({
                     <h4>{nome}</h4>
                     {etapa === i && (
                       <div className={styles.pipelineCard}>
-                        <span>Mariana</span>
-                        <strong>{textos.pergunta}</strong>
-                        <p>{textos.proximoTexto}</p>
+                        <span>{cenario.nome}</span>
+                        <strong>{cenario.pergunta}</strong>
+                        <p>{cenario.proximoTexto}</p>
                         <label>
                           {textos.mover}
                           <select

@@ -23,7 +23,11 @@ import { IntegracoesDaHome } from "@/components/site/IntegracoesDaHome";
 import { Medidor } from "@/components/site/Medidor";
 import { MegaMenu } from "@/components/site/MegaMenu";
 import { montarMenu } from "@/lib/marketing/menu";
-import { ProdutoDemonstracao, type TextosDoProduto } from "@/components/site/ProdutoDemonstracao";
+import {
+  ProdutoDemonstracao,
+  type CenarioDaDemonstracao,
+  type TextosDoProduto,
+} from "@/components/site/ProdutoDemonstracao";
 import {
   VideoDeContexto,
   VideoExplicativo,
@@ -107,20 +111,12 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     todas: t("Todas"),
     contato: t("Dados do contato"),
     historico: t("Histórico compartilhado"),
-    cliente: t("Cliente da loja"),
     equipe: t("Sua equipe"),
-    ultima: t("Quero mais informações"),
-    pergunta: t("Oi! Vocês têm este modelo em estoque?"),
-    resposta: t("Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?"),
-    agradecimento: t("Pode sim! Estou procurando o tamanho 38."),
     escrever: t("Escreva uma mensagem..."),
     nota: t("Demonstração interativa com dados fictícios. Nenhuma mensagem é enviada."),
     atribuida: t("Conversa atribuída à equipe"),
     conhecimento: t("O conhecimento é da sua empresa."),
     documentos: t("Organize os materiais que orientam o agente."),
-    documento1: t("Produtos e serviços"),
-    documento2: t("Prazos e entregas"),
-    documento3: t("Perguntas frequentes"),
     limites: t("Limites definidos por você"),
     limiteTexto: t("Configure instruções, base de conhecimento e quando pedir ajuda ao time."),
     transferencia: t("Uma pessoa assume com contexto"),
@@ -131,9 +127,37 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     etapa3: t("Proposta"),
     etapa4: t("Concluído"),
     proximo: t("Próximo passo"),
-    proximoTexto: t("Confirmar o tamanho e acompanhar a decisão."),
     mover: t("Mover para"),
     demonstracaoTexto: t("Experimente mudar a etapa deste contato no exemplo acima."),
+  };
+  // Dois negócios diferentes, um por quadro: loja no topo, clínica na seção do produto.
+  const cenarioLoja: CenarioDaDemonstracao = {
+    nome: "Mariana",
+    perfil: t("Cliente da loja"),
+    pergunta: t("Oi! Vocês têm este modelo em estoque?"),
+    resposta: t("Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?"),
+    segunda: t("Pode sim! Estou procurando o tamanho 38."),
+    proximoTexto: t("Confirmar o tamanho e acompanhar a decisão."),
+    documentos: [t("Produtos e serviços"), t("Prazos e entregas"), t("Trocas e devoluções")],
+    outros: [
+      { nome: "Pedro", ultima: t("Qual o prazo de entrega para Campinas?") },
+      { nome: "Camila", ultima: t("Vocês aceitam Pix?") },
+      { nome: "Lucas", ultima: t("Quero trocar o tamanho do pedido.") },
+    ],
+  };
+  const cenarioClinica: CenarioDaDemonstracao = {
+    nome: "Ricardo",
+    perfil: t("Paciente da clínica"),
+    pergunta: t("Boa tarde! Queria marcar uma limpeza. Tem horário esta semana?"),
+    resposta: t("Boa tarde, Ricardo! Temos quinta às 15h ou sexta às 10h. Qual fica melhor?"),
+    segunda: t("Quinta às 15h, por favor."),
+    proximoTexto: t("Confirmar a consulta e enviar o lembrete na véspera."),
+    documentos: [t("Tratamentos e valores"), t("Convênios aceitos"), t("Preparo e horários")],
+    outros: [
+      { nome: "Juliana", ultima: t("Vocês atendem convênio?") },
+      { nome: "Fernanda", ultima: t("Preciso remarcar minha consulta.") },
+      { nome: "Bruno", ultima: t("Qual o endereço da clínica?") },
+    ],
   };
   const video: TextosDoVideo = {
     titulo: t("Veja como funciona"),
@@ -275,7 +299,12 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             </div>
           </div>
           <div className={styles.heroProduct}>
-            <ProdutoDemonstracao textos={produto} marca={marca.nome} compacto />
+            <ProdutoDemonstracao
+              textos={produto}
+              cenario={cenarioLoja}
+              marca={marca.nome}
+              compacto
+            />
             <span className={styles.heroDemoNote}>
               {t("Prévia ilustrativa com dados fictícios")}
             </span>
@@ -302,7 +331,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
               <h2>{t("Veja o atendimento acontecer.")}</h2>
               <p>{t("Da primeira mensagem ao próximo passo da venda.")}</p>
             </div>
-            <ProdutoDemonstracao textos={produto} marca={marca.nome} />
+            <ProdutoDemonstracao textos={produto} cenario={cenarioClinica} marca={marca.nome} />
             <div className={styles.productBenefits}>
               <div>
                 <History size={22} aria-hidden />

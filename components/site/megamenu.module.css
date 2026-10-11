@@ -7,7 +7,7 @@
   align-items: center;
   gap: 4px;
 }
-.gatilho {
+.gatilho.gatilho {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -23,9 +23,9 @@
   cursor: pointer;
   transition: background-color 160ms ease;
 }
-.gatilho:hover,
+.gatilho.gatilho:hover,
 .gatilho[data-aberto="true"],
-.gatilho:focus-visible {
+.gatilho.gatilho:focus-visible {
   background: #e7efe3;
 }
 .seta {
@@ -77,7 +77,7 @@
 .lista[data-colunas="2"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.item {
+.item.item {
   display: flex;
   gap: 12px;
   padding: 10px 12px;
@@ -86,17 +86,17 @@
   color: #17212b;
   transition: background-color 140ms ease;
 }
-.item:hover,
-.item:focus-visible {
+.item.item:hover,
+.item.item:focus-visible {
   background: #f3f6f1;
 }
-.item strong {
+.item.item strong {
   display: block;
   font-size: 15px;
   line-height: 21px;
 }
-.item span span,
-.cartao span {
+.item.item span span,
+.cartao.cartao span {
   display: block;
   font-size: 13px;
   line-height: 19px;
@@ -121,7 +121,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
-.cartao {
+.cartao.cartao {
   display: block;
   padding: 8px 8px 12px;
   border-radius: 14px;
@@ -131,8 +131,8 @@
     background-color 140ms ease,
     transform 160ms ease;
 }
-.cartao:hover,
-.cartao:focus-visible {
+.cartao.cartao:hover,
+.cartao.cartao:focus-visible {
   background: #f3f6f1;
   transform: translateY(-2px);
 }
@@ -145,13 +145,13 @@
   border-radius: 10px;
   margin-bottom: 10px;
 }
-.cartao strong {
+.cartao.cartao strong {
   display: block;
   font-size: 14.5px;
   line-height: 20px;
 }
 
-.destaque {
+.destaque.destaque {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -169,16 +169,16 @@
   border-radius: 10px;
   margin-bottom: 6px;
 }
-.destaque strong {
+.destaque.destaque strong {
   font-size: 17px;
   line-height: 23px;
 }
-.destaque > span {
+.destaque.destaque > span {
   font-size: 13.5px;
   line-height: 20px;
   color: #d5e3d0;
 }
-.destaqueAcao {
+.destaqueAcao.destaqueAcao {
   display: inline-flex !important;
   align-items: center;
   gap: 6px;
@@ -187,8 +187,8 @@
   color: #ffffff !important;
   font-weight: 600;
 }
-.destaque:hover .destaqueAcao,
-.destaque:focus-visible .destaqueAcao {
+.destaque.destaque:hover .destaqueAcao,
+.destaque.destaque:focus-visible .destaqueAcao {
   text-decoration: underline;
 }
 
@@ -256,7 +256,7 @@
   display: grid;
   gap: 2px;
 }
-.secao a {
+.secao.secao a {
   display: block;
   padding: 10px 8px;
   border-radius: 10px;
@@ -266,16 +266,16 @@
 .secao a:active {
   background: #f3f6f1;
 }
-.secao a strong {
+.secao.secao a strong {
   display: block;
   font-size: 15px;
 }
-.secao a span {
+.secao.secao a span {
   display: block;
   font-size: 13px;
   color: #5b6656;
 }
-.linkGaveta {
+.linkGaveta.linkGaveta {
   display: block;
   padding: 16px 0;
   border-bottom: 1px solid #e4ebe0;
@@ -289,8 +289,8 @@
   gap: 10px;
   margin-top: 20px;
 }
-.primario,
-.secundario {
+.primario.primario,
+.secundario.secundario {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -300,11 +300,11 @@
   font-weight: 600;
   text-decoration: none;
 }
-.primario {
+.primario.primario {
   background: #173a2c;
   color: #ffffff;
 }
-.secundario {
+.secundario.secundario {
   border: 1px solid #c8d6c1;
   color: #173a2c;
 }
@@ -313,7 +313,7 @@
   .painelInterno {
     grid-template-columns: 1fr;
   }
-  .destaque {
+  .destaque.destaque {
     display: none;
   }
 }
@@ -333,7 +333,7 @@
   .painel[data-aberto="true"] {
     animation: none;
   }
-  .cartao:hover {
+  .cartao.cartao:hover {
     transform: none;
   }
 }
@@ -365,12 +365,12 @@
   align-items: center;
   gap: 14px;
 }
-.entrar {
+.entrar.entrar {
   color: #173a2c;
   font-size: 15px;
   text-decoration: none;
 }
-.criar {
+.criar.criar {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -384,7 +384,7 @@
   white-space: nowrap;
 }
 @media (max-width: 900px) {
-  .entrar {
+  .entrar.entrar {
     display: none;
   }
   .cabecalhoInterno {
@@ -392,7 +392,7 @@
   }
 }
 @media (max-width: 420px) {
-  .criar {
+  .criar.criar {
     padding: 9px 12px;
     font-size: 14px;
   }

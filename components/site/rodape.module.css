@@ -39,7 +39,7 @@
   color: #506d48;
   margin-top: 1px;
 }
-.reclameAqui {
+.reclameAqui.reclameAqui {
   display: inline-flex;
   align-items: center;
   gap: 16px;
@@ -54,8 +54,8 @@
     border-color 160ms ease,
     box-shadow 160ms ease;
 }
-.reclameAqui:hover,
-.reclameAqui:focus-visible {
+.reclameAqui.reclameAqui:hover,
+.reclameAqui.reclameAqui:focus-visible {
   border-color: #7cb342;
   box-shadow: 0 6px 18px -10px rgba(76, 140, 43, 0.6);
 }
@@ -69,11 +69,11 @@
   white-space: nowrap;
 }
 .raLogo span {
-  color: #8bc34a;
+  color: #3f7d1c;
   font-weight: 700;
 }
 .raLogo b {
-  color: #2e7d32;
+  color: #1b5e20;
   font-weight: 900;
 }
 .raTexto strong {
@@ -111,15 +111,15 @@
   display: grid;
   gap: 8px;
 }
-.coluna a {
+.coluna.coluna a {
   font-size: 14px;
   line-height: 20px;
   color: #2f3c2b;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
-.coluna a:hover,
-.coluna a:focus-visible {
+.coluna.coluna a:hover,
+.coluna.coluna a:focus-visible {
   text-decoration: underline;
 }
 .base {

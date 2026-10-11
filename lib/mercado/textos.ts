@@ -398,7 +398,7 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Conversar sobre integrações": "Discuss integrations",
   "Cena de atendimento com uma profissional usando headset":
     "Support scene with a professional wearing a headset",
-  "Vídeo de contexto · sem som": "Context video · no sound",
+  "Sem som": "No sound",
   "Pausar vídeo de contexto": "Pause context video",
   "Reproduzir vídeo de contexto": "Play context video",
   "A imagem continua disponível enquanto o vídeo não carrega.":

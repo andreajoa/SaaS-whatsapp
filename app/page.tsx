@@ -435,7 +435,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             <VideoDeContexto
               textos={{
                 alt: t("Cena de atendimento com uma profissional usando headset"),
-                semSom: t("Vídeo de contexto · sem som"),
+                semSom: t("Sem som"),
                 pausar: t("Pausar vídeo de contexto"),
                 tocar: t("Reproduzir vídeo de contexto"),
                 indisponivel: t("A imagem continua disponível enquanto o vídeo não carrega."),

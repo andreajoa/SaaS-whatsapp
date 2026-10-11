@@ -322,7 +322,7 @@ export const DICIONARIO: Traducoes = {
   "Cena de atendimento com uma profissional usando headset": {
     es: "Escena de atención con una profesional usando auriculares",
   },
-  "Vídeo de contexto · sem som": { es: "Vídeo de contexto · sin sonido" },
+  "Sem som": { es: "Sin sonido" },
   "Pausar vídeo de contexto": { es: "Pausar vídeo de contexto" },
   "Reproduzir vídeo de contexto": { es: "Reproducir vídeo de contexto" },
   "A imagem continua disponível enquanto o vídeo não carrega.": {

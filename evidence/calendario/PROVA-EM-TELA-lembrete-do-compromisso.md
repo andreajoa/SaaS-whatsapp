@@ -2,7 +2,7 @@
 
 **Régua:** worktree `/Users/rafaelmelgaco/wt/rsky` (exclusivo), branch
 `resgate/rafaesky` @ `cb388641`, árvore limpa. Ambiente fresco estilo VPS:
-Supabase local do projeto `deskcomm-crm` com a cadeia de migrations movida para
+Supabase local do projeto `atenza-crm` com a cadeia de migrations movida para
 fora e **só o `supabase/baseline.sql`** aplicado (`ON_ERROR_STOP=1`) — o mesmo
 que o `install.sh` do kit aplica —, `scripts/seed-e2e-credentials.ts`, app de
 **produção** (`pnpm e2e:build` + `next start`) na 3007. Login pelo formulário,

@@ -1,6 +1,6 @@
 ---
 type: index
-project: DeskcommCRM
+project: Atenza
 status: draft
 last_updated: 2026-07-29
 generated_by: auditoria documental (Claude Code)
@@ -8,7 +8,7 @@ confidence: alta (inventário de arquivos é CONFIRMADO; agrupamento temático �
 audited_against: origin/main @ 789dfa6 (v1.0.0, 2026-07-27)
 ---
 
-# Índice da documentação — DeskcommCRM
+# Índice da documentação — Atenza
 
 Mapa dos **154** arquivos `.md` de `docs/`, espalhados por **20** subpastas — medido em
 2026-08-14, com as réguas ao lado: `git ls-files 'docs/**/*.md' | wc -l` e
@@ -38,7 +38,7 @@ de menor precedência e registre.
 | [`CONTRIBUTING.md`](../CONTRIBUTING.md) | Como contribuir |
 | [`CHANGELOG.md`](../CHANGELOG.md) | Mudanças por versão (SemVer). **Quem roda VPS lê antes de `update.sh`** — mudança que exige ação manual aparece sob "⚠️ Requer atenção" |
 | [`docs/current-state.md`](current-state.md) | **O que está pronto, incompleto e quebrado hoje** |
-| [`.agents/skills/`](../.agents/skills/deskcomm-instalar/SKILL.md) | **Guias do assistente** — instalar, montar cliente por nicho, métricas, prompt, contribuir. Skills lidas por Claude Code, Codex, Cursor, OpenCode e Antigravity (não confundir com as *Skills* do agente de IA, na tela IA › Skills) |
+| [`.agents/skills/`](../.agents/skills/atenza-instalar/SKILL.md) | **Guias do assistente** — instalar, montar cliente por nicho, métricas, prompt, contribuir. Skills lidas por Claude Code, Codex, Cursor, OpenCode e Antigravity (não confundir com as *Skills* do agente de IA, na tela IA › Skills) |
 
 ## 2. Produto e intenção
 

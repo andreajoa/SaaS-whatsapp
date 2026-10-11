@@ -507,7 +507,7 @@ export async function runVoiceCallsBridgeLoop(
   while (!signal.aborted) {
     try {
       const res = await fetch(`${cfg.baseUrl}/api/events`, {
-        headers: { 'X-Client-Id': 'deskcomm-worker' },
+        headers: { 'X-Client-Id': 'atenza-worker' },
         signal,
       });
       if (!res.ok || !res.body) {

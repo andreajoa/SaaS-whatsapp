@@ -74,7 +74,7 @@ supabase/.branches/
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/sistema-vivo/
-!.claude/skills/deskcomm-*/
+!.claude/skills/atenza-*/
 
 # Local docker volumes (WAHA)
 .waha-data/
@@ -89,7 +89,7 @@ inbox-with-real-msgs.png
 test-results/
 playwright-report/
 .vercel
-deskcommcrm-setup-kit.zip
+atenza-setup-kit.zip
 
 # gov-loop — estado operacional fica FORA do git (a resposta do humano na inbox
 # e a linha 'started' do sessions.log não podem sujar o working tree; a guarda de

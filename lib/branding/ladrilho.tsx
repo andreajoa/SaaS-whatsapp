@@ -1,6 +1,6 @@
 import { marcaEhADoProduto } from "@/lib/branding";
 
-import { CORES_DA_MARCA, SIMBOLO, simboloDaMarca } from "./desenho";
+import { SIMBOLO_ATENZA, simboloDaMarca } from "./desenho";
 import { letraDoIcone } from "./icone";
 import { NEUTROS_DE_SAIDA, type MarcaDeSaida } from "./saida";
 
@@ -20,7 +20,7 @@ import { NEUTROS_DE_SAIDA, type MarcaDeSaida } from "./saida";
  *
  * A cascata é a mesma dos três lugares, e a ordem importa:
  *
- *  1. marca do PRODUTO (ninguém configurou nada) → o símbolo do produto;
+ *  1. marca do PRODUTO (ninguém configurou nada) → o símbolo da Atenza;
  *  2. marca NOMEADA com arte no registro → a arte dela;
  *  3. qualquer outra → cor de destaque + a inicial.
  *
@@ -38,23 +38,10 @@ export function LadrilhoDaMarca({ marca, lado }: { marca: MarcaDeSaida; lado: nu
     justifyContent: "center",
   } as const;
 
-  if (marcaEhADoProduto({ name: marca.nome, logoUrl: marca.logoUrl })) {
-    // 78% da aresta: o D ocupa ~75% do próprio viewBox, então sobra o mesmo
-    // respiro que a letra tem no ramo de baixo.
-    const tamanho = Math.round(lado * 0.78);
-    return (
-      <div style={{ ...moldura, background: NEUTROS_DE_SAIDA.fundo }}>
-        <svg viewBox={SIMBOLO.viewBox} width={tamanho} height={tamanho}>
-          <g fill={CORES_DA_MARCA.claro.simbolo} transform={SIMBOLO.transform}>
-            <path d={SIMBOLO.d} />
-            <rect {...SIMBOLO.modulo} />
-          </g>
-        </svg>
-      </div>
-    );
-  }
-
-  const desenho = simboloDaMarca(marca.nome);
+  // Marca do produto (ninguém configurou nada) É a Atenza desde 11/10/2026.
+  const desenho = marcaEhADoProduto({ name: marca.nome, logoUrl: marca.logoUrl })
+    ? SIMBOLO_ATENZA
+    : simboloDaMarca(marca.nome);
   if (desenho) {
     // 86% e não 78%: o símbolo de dois balões já nasce com respiro dentro do
     // próprio viewBox (a arte ocupa 63% da largura), então repetir a margem

@@ -201,7 +201,7 @@ describe("a substituição dos marcadores", () => {
   it("nenhum documento nomeia pessoa, marca ou domínio", () => {
     // A doutrina de marca própria vale aqui com força extra: um contrato que
     // nomeia o software inverte os papéis de controlador e operador.
-    const proibido = /deskcomm|atenza|\.com\b|\.online\b|https?:\/\//i;
+    const proibido = /atenza|atenza|\.com\b|\.online\b|https?:\/\//i;
     const vazando = todasAsFrases()
       .filter(({ f }) => proibido.test(f.pt) || proibido.test(f.es) || proibido.test(f.en))
       .map(({ onde }) => onde);

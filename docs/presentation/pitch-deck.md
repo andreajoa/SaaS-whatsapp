@@ -3,12 +3,12 @@ marp: true
 theme: default
 class: invert
 paginate: true
-title: DeskcommCRM — Pitch Deck v0.1
+title: Atenza — Pitch Deck v0.1
 description: CRM operacional com IA pra e-commerce brasileiro
 date: 2026-04-29
 ---
 
-# DeskcommCRM
+# Atenza
 
 ### O CRM operacional onde **IA e humanos atendem juntos** os clientes finais de PMEs de e-commerce no WhatsApp.
 
@@ -34,7 +34,7 @@ PME de e-commerce brasileiro hoje atende cliente final num caos:
 
 ## 2. A nossa visão
 
-DeskcommCRM é a plataforma onde:
+Atenza é a plataforma onde:
 
 | Atendimento | Tecnologia | Compliance |
 |---|---|---|
@@ -287,8 +287,8 @@ Adotamos integralmente o **bundle herdado** da referência *Aula CRM Nichado WAH
 
 > "**Não é mais um CRM. É a plataforma onde IA e humanos atendem juntos.**"
 
-📧 rafael@maudibrasil.com.br
+📧 info@atenza.online
 📍 São Paulo, BR
-🔗 docs: github.com/melgarafael/DeskcommCRM (em breve)
+🔗 docs: github.com/andreajoa/SaaS-whatsapp (em breve)
 
 **Perguntas?**

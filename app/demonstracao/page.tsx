@@ -7,7 +7,13 @@ import { instalacaoCobra } from "@/lib/billing/planos";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { INTERFACE_SEO as ui } from "@/lib/marketing/interface-seo";
-import { jsonLdSeguro, LINKS_SEO, metadadosPublicos, schemaDoVideo } from "@/lib/marketing/seo";
+import {
+  instagramOficial,
+  jsonLdSeguro,
+  LINKS_SEO,
+  metadadosPublicos,
+  schemaDoVideo,
+} from "@/lib/marketing/seo";
 import { visitanteAtual } from "@/lib/mercado/visitante";
 
 export const dynamic = "force-dynamic";
@@ -91,6 +97,15 @@ export default async function Page() {
               {p.label}
             </Link>
           ))}
+          {instagramOficial(env.NEXT_PUBLIC_APP_URL) && (
+            <a
+              href={instagramOficial(env.NEXT_PUBLIC_APP_URL)!}
+              target="_blank"
+              rel="noopener noreferrer me"
+            >
+              Instagram
+            </a>
+          )}
         </nav>
       </footer>
     </div>

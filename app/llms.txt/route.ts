@@ -70,6 +70,7 @@ ${planos}
 - [Demonstração em vídeo](${url("/demonstracao")}): 48 segundos, com legendas
 ${paginas}
 - [Contato](${url("/contato")}): falar com o suporte
+- [Instagram @atenzaon](https://www.instagram.com/atenzaon/): novidades e conteúdo da Atenza
 - [Termos e privacidade](${url("/legal")}): documentos legais
 
 ## Versões em outros idiomas

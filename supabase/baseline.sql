@@ -19,7 +19,7 @@ CREATE SCHEMA IF NOT EXISTS "public";
 ALTER SCHEMA "public" OWNER TO "pg_database_owner";
 
 
-COMMENT ON SCHEMA "public" IS 'DeskcommCRM v0.1 - Migration 0001 platform_base applied 2026-04-28';
+COMMENT ON SCHEMA "public" IS 'Atenza v0.1 - Migration 0001 platform_base applied 2026-04-28';
 
 
 
@@ -1753,7 +1753,7 @@ CREATE TABLE IF NOT EXISTS "public"."organizations" (
 ALTER TABLE "public"."organizations" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."organizations" IS 'Tenants do DeskcommCRM. Cada linha = 1 e-commerce cliente.';
+COMMENT ON TABLE "public"."organizations" IS 'Tenants do Atenza. Cada linha = 1 e-commerce cliente.';
 
 
 
@@ -24437,7 +24437,7 @@ notify pgrst, 'reload schema';
 
 -- ---- memória do relógio: quando cada cron rodou (migration 0241) ----
 --
--- Existe para o deploy HOSPEDADO. No self-host o contêiner `deskcomm-scheduler`
+-- Existe para o deploy HOSPEDADO. No self-host o contêiner `atenza-scheduler`
 -- tem `crond` de verdade e esta tabela fica vazia — o que é correto e barato.
 --
 -- No hospedado não há esse contêiner, e o plano Hobby da Vercel só aceita cron

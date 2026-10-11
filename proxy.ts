@@ -9,7 +9,7 @@ import {
   IMPERSONATE_COOKIE_NAME_EDGE,
 } from "@/lib/impersonate/cookie-edge";
 
-const COOKIE_NAME = "sb-deskcomm-auth";
+const COOKIE_NAME = "sb-atenza-auth";
 
 export async function proxy(request: NextRequest) {
   const publicHeaders = new Headers(request.headers);
@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
   request.headers.set("x-pathname", pathname);
 
   // EPIC-11: in dev we route by path (`/admin/*`); in prod the
-  // `admin.deskcomm.com` sub-domain is mapped via Vercel rewrites to the same
+  // `admin.atenza.online` sub-domain is mapped via Vercel rewrites to the same
   // `/admin/*` paths. The host-based branch below stays a NOOP today and only
   // exists as documentation of the intended deploy topology.
   const host = request.headers.get("host") ?? "";

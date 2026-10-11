@@ -157,7 +157,7 @@ test.describe("ciclo de vida do convite (ponta a ponta + adversarial)", () => {
     }
     // compila o endpoint de convite (agent → 403, mas compila a rota)
     await page.request
-      .post("/api/v1/team/invite", { data: { invitations: [{ email: "warm@deskcomm.test", role: "agent" }] } })
+      .post("/api/v1/team/invite", { data: { invitations: [{ email: "warm@atenza.test", role: "agent" }] } })
       .catch(() => {});
     // compila a tela de aceite (token dummy → inválido, mas compila a página)
     await page.goto("/team/accept-invite/warmup").catch(() => {});
@@ -197,7 +197,7 @@ test.describe("ciclo de vida do convite (ponta a ponta + adversarial)", () => {
     // Sem membership ainda: o login não cai em /app. Esperamos a SESSÃO (cookie)
     // se firmar antes de ir ao accept_url — senão a página cai no estado não-logado.
     await expect
-      .poll(async () => (await inviteeCtx.cookies()).some((c) => c.name.startsWith("sb-deskcomm-auth")), {
+      .poll(async () => (await inviteeCtx.cookies()).some((c) => c.name.startsWith("sb-atenza-auth")), {
         timeout: 40_000, // 1º login no dev (webpack) compila signInWithPassword — pode levar ~16s
       })
       .toBe(true);
@@ -233,7 +233,7 @@ test.describe("ciclo de vida do convite (ponta a ponta + adversarial)", () => {
   test("3. permissão pós-aceite: agent NÃO consegue convidar (403)", async ({ page }) => {
     await login(page, inv.invitee_email);
     const res = await page.request.post("/api/v1/team/invite", {
-      data: { invitations: [{ email: "outro.invite@deskcomm.test", role: "agent" }] },
+      data: { invitations: [{ email: "outro.invite@atenza.test", role: "agent" }] },
     });
     expect(res.status()).toBe(403);
   });
@@ -402,7 +402,7 @@ test.describe("ciclo de vida do convite (ponta a ponta + adversarial)", () => {
    * status, o e-mail que não saiu vira aviso + link copiável, e reenviar /
    * revogar funcionam — com a revogação barrando o token ainda dentro do prazo.
    */
-  const FRESH_EMAIL = `convite.pendente.${randomUUID().slice(0, 8)}@deskcomm.test`;
+  const FRESH_EMAIL = `convite.pendente.${randomUUID().slice(0, 8)}@atenza.test`;
 
   test.beforeAll(async () => {
     // Conta para o convidado do caso 16 (aceite do link revogado). Sufixo
@@ -500,7 +500,7 @@ test.describe("ciclo de vida do convite (ponta a ponta + adversarial)", () => {
     await expect
       .poll(
         async () =>
-          (await inviteeCtx.cookies()).some((c) => c.name.startsWith("sb-deskcomm-auth")),
+          (await inviteeCtx.cookies()).some((c) => c.name.startsWith("sb-atenza-auth")),
         { timeout: 40_000 },
       )
       .toBe(true);

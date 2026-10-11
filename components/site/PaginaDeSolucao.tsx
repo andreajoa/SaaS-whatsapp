@@ -11,6 +11,7 @@ import { env } from "@/lib/env";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
 import { INTERFACE_SEO as ui } from "@/lib/marketing/interface-seo";
 import {
+  instagramOficial,
   jsonLdSeguro,
   LINKS_SEO,
   metadadosPublicos,
@@ -189,6 +190,15 @@ export async function PaginaDeSolucao({ slug }: { readonly slug: string }) {
               {p.label}
             </Link>
           ))}
+          {instagramOficial(env.NEXT_PUBLIC_APP_URL) && (
+            <a
+              href={instagramOficial(env.NEXT_PUBLIC_APP_URL)!}
+              target="_blank"
+              rel="noopener noreferrer me"
+            >
+              Instagram
+            </a>
+          )}
           <Link href="/legal/privacy">{ui.privacy}</Link>
           <Link href="/legal/terms">{ui.terms}</Link>
           <Link href="/contato">{ui.contact}</Link>

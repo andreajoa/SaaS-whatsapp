@@ -1,4 +1,9 @@
-import { LOGOTIPO, SIMBOLO, simboloDaMarca } from "@/lib/branding/desenho";
+import {
+  LOGOTIPO,
+  SIMBOLO_ATENZA,
+  simboloDaMarca,
+  type DesenhoDeSimbolo,
+} from "@/lib/branding/desenho";
 import { cn } from "@/lib/utils";
 
 /**
@@ -46,20 +51,34 @@ function acessibilidade(nome: string, decorativo: boolean) {
     : ({ role: "img", "aria-label": nome } as const);
 }
 
-/** O símbolo sozinho — para a barra recolhida, avatar e cantos apertados. */
+/**
+ * O símbolo sozinho — para a barra recolhida, avatar e cantos apertados.
+ *
+ * Desde 11/10/2026 o produto É a Atenza: o "D" antigo saiu, e o símbolo padrão
+ * é o desenho da Atenza (dois balões e a lente), o mesmo de `SimboloDaMarca`.
+ */
 export function SimboloDoProduto({ nome, className, decorativo = false }: Props) {
   return (
     <svg
-      viewBox={SIMBOLO.viewBox}
-      className={cn("shrink-0", className)}
+      viewBox={SIMBOLO_ATENZA.viewBox}
+      className={cn("shrink-0 text-accent", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      <g className={SIMBOLO_CLARO_ESCURO} transform={SIMBOLO.transform}>
-        <path d={SIMBOLO.d} />
-        <rect {...SIMBOLO.modulo} />
-      </g>
+      <CamadasDoSimbolo desenho={SIMBOLO_ATENZA} />
     </svg>
   );
+}
+
+function CamadasDoSimbolo({ desenho }: { desenho: DesenhoDeSimbolo }) {
+  return desenho.camadas.map((camada) => (
+    <path
+      key={camada.d}
+      d={camada.d}
+      fill="currentColor"
+      fillOpacity={OPACIDADE_DA_TINTA[camada.tinta]}
+      fillRule={camada.regra}
+    />
+  ));
 }
 
 /**
@@ -85,15 +104,7 @@ export function SimboloDaMarca({ nome, className, decorativo = false }: Props) {
       className={cn("shrink-0 text-accent", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      {desenho.camadas.map((camada) => (
-        <path
-          key={camada.d}
-          d={camada.d}
-          fill="currentColor"
-          fillOpacity={OPACIDADE_DA_TINTA[camada.tinta]}
-          fillRule={camada.regra}
-        />
-      ))}
+      <CamadasDoSimbolo desenho={desenho} />
     </svg>
   );
 }
@@ -108,28 +119,32 @@ export function SimboloDaMarca({ nome, className, decorativo = false }: Props) {
  */
 const OPACIDADE_DA_TINTA = { clara: 0.55, principal: 1, detalhe: 1 } as const;
 
-/** Símbolo + nome — para a barra aberta e a fachada de entrada. */
+/**
+ * Símbolo + nome — para a barra aberta e a fachada de entrada.
+ *
+ * O nome é TEXTO, na fonte do produto, e não caminhos fixos: o logotipo antigo
+ * trazia "Atenza CRM" desenhado em vetor e aparecia assim em toda página que
+ * o usava, mesmo com a marca Atenza resolvida. Texto segue o `nome` da tela.
+ */
 export function LogotipoDoProduto({ nome, className, decorativo = false }: Props) {
   return (
     <svg
       viewBox={LOGOTIPO.viewBox}
-      className={cn("shrink-0", className)}
+      className={cn("shrink-0 text-accent", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      <g className={SIMBOLO_CLARO_ESCURO} transform={LOGOTIPO.simbolo.transform}>
-        <path d={LOGOTIPO.simbolo.d} />
-        <rect {...LOGOTIPO.simbolo.modulo} />
-      </g>
-      <g className={NOME_CLARO_ESCURO}>
-        {LOGOTIPO.nome.map((g) => (
-          <path key={g.transform} transform={g.transform} d={g.d} />
-        ))}
-      </g>
-      <g className={SUFIXO_CLARO_ESCURO}>
-        {LOGOTIPO.sufixo.map((g) => (
-          <path key={g.transform} transform={g.transform} d={g.d} />
-        ))}
-      </g>
+      <CamadasDoSimbolo desenho={SIMBOLO_ATENZA} />
+      <text
+        x={LOGOTIPO.texto.x}
+        y={LOGOTIPO.texto.y}
+        fontSize={LOGOTIPO.texto.tamanho}
+        fontWeight={700}
+        letterSpacing={-2}
+        className={NOME_CLARO_ESCURO}
+        style={{ fontFamily: "var(--font-sans, inherit)" }}
+      >
+        {nome}
+      </text>
     </svg>
   );
 }

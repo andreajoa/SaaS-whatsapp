@@ -12,7 +12,7 @@ describe("resolveBranding", () => {
     expect(resolveBranding(undefined, undefined)).toEqual({
       name: DEFAULT_APP_NAME,
       logoUrl: null,
-      initial: "D",
+      initial: "A",
     });
   });
 
@@ -48,10 +48,7 @@ describe("resolveBranding", () => {
 
 describe("guarda de white-label (self-host)", () => {
   const branding = fs.readFileSync(path.join(RAIZ, "lib/branding.ts"), "utf8");
-  const publicEnvScript = fs.readFileSync(
-    path.join(RAIZ, "app/public-env-script.tsx"),
-    "utf8",
-  );
+  const publicEnvScript = fs.readFileSync(path.join(RAIZ, "app/public-env-script.tsx"), "utf8");
   const layoutRaiz = fs.readFileSync(path.join(RAIZ, "app/layout.tsx"), "utf8");
 
   it("não usa prefixo NEXT_PUBLIC_ para a marca", () => {
@@ -101,7 +98,7 @@ describe("guarda de white-label (self-host)", () => {
       layoutRaiz.match(/await marcaResolvida\(\)/g) ?? [],
       "os quatro consumidores do layout raiz são `generateMetadata` (aba), " +
         "`EstiloDaMarca` (cor), `MarcaNoNavegador` (`window.__PUBLIC_ENV__`) e " +
-        "`MarcaDosClientComponents` (o contexto que os `\"use client\"` leem). " +
+        '`MarcaDosClientComponents` (o contexto que os `"use client"` leem). ' +
         "Consumidor a mais é legítimo — atualize o número. Consumidor a MENOS " +
         "significa que alguém voltou a montar a pilha por fora.",
     ).toHaveLength(4);
@@ -131,7 +128,7 @@ describe("nome do arquivo de códigos de recuperação", () => {
   it("deriva o prefixo da marca, sem acento e sem espaço", () => {
     expect(prefixoDoArquivo("Vendas Turbo")).toBe("vendas-turbo");
     expect(prefixoDoArquivo("Ótima Gestão")).toBe("otima-gestao");
-    expect(prefixoDoArquivo(DEFAULT_APP_NAME)).toBe("deskcommcrm");
+    expect(prefixoDoArquivo(DEFAULT_APP_NAME)).toBe("atenza");
   });
 
   it("não devolve hífen pendurado nem repetido", () => {
@@ -153,9 +150,9 @@ describe("nome do arquivo de códigos de recuperação", () => {
  * A versão anterior deste gate ficava VERDE enquanto a marca vazava, por dois
  * furos independentes, e os dois só apareceram quando alguém foi olhar:
  *
- *  1. o padrão era `/Deskcomm/` — **case-sensitive**. Passavam
- *     `support@deskcomm.com.br` (tela de conta suspensa), `suporte@deskcomm.app`
- *     (tela de cobrança) e `deskcommcrm-recovery-codes.txt` (o arquivo que o
+ *  1. o padrão era `/Atenza/` — **case-sensitive**. Passavam
+ *     `support@atenza.online` (tela de conta suspensa), `suporte@atenza.online`
+ *     (tela de cobrança) e `atenza-recovery-codes.txt` (o arquivo que o
  *     usuário baixa e guarda por anos). Endereço e nome de arquivo são
  *     minúsculos por natureza — ou seja, o gate era cego justamente na forma em
  *     que a marca de fato aparece;
@@ -165,7 +162,7 @@ describe("nome do arquivo de códigos de recuperação", () => {
  *     DENTRO de `app/` e escapava pela extensão. Esse é o pior deles: o nome vai
  *     para o app autenticador e fica no celular do usuário para sempre.
  *
- * MECANISMO. A varredura é `/deskcomm/i` sobre `.ts` e `.tsx` de `app/`,
+ * MECANISMO. A varredura é `/atenza/i` sobre `.ts` e `.tsx` de `app/`,
  * `components/`, `lib/` e `workers/`. Cada arquivo com ocorrência precisa de uma
  * entrada em `MARCA_CONGELADA` com categoria, motivo escrito e o conjunto EXATO
  * de marcas encontradas. Arquivo novo reprova; marca nova em arquivo já
@@ -174,8 +171,8 @@ describe("nome do arquivo de códigos de recuperação", () => {
  *
  * MARCA ≠ PROTOCOLO — a distinção que precisa estar escrita, não subentendida.
  * Boa parte das ocorrências abaixo NÃO é marca: é identificador técnico.
- * `X-Deskcomm-Signature` é contrato de fio com receptores de terceiros, o cookie
- * `sb-deskcomm-auth` é a sessão de quem já está logado. Quem "completar o
+ * `X-Atenza-Signature` é contrato de fio com receptores de terceiros, o cookie
+ * `sb-atenza-auth` é a sessão de quem já está logado. Quem "completar o
  * whitelabel" renomeando isso derruba integração de cliente em produção — em
  * silêncio, porque o receptor não erra: ele apenas deixa de reconhecer. Por isso
  * a categoria é campo obrigatório: sem ela, a lista viraria uma pilha de
@@ -195,7 +192,11 @@ type CategoriaDeMarca =
   /** Só desenvolvimento: fixture de teste. Não embarca na imagem. */
   | "DEV"
   /** A definição do nome padrão do produto. Tem de existir em UM lugar. */
-  | "PADRAO";
+  | "PADRAO"
+  /** Código que É da Atenza de propósito (site comercial, SEO, desenho do logo):
+   *  só roda na instalação que cobra ou desenha a arte registrada da marca.
+   *  Rebrand de 11/10/2026: o produto passou a se chamar Atenza. */
+  | "ATENZA";
 
 type EntradaDeMarca = {
   categoria: CategoriaDeMarca;
@@ -213,49 +214,43 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "PROTOCOLO",
     motivo:
       "header que o webhook de ENTRADA exige de quem envia. Renomear invalida a assinatura de todo integrador já configurado, e o sintoma para ele é 401 sem explicação",
-    marcas: ["x-deskcomm-signature"],
+    marcas: ["x-atenza-signature"],
   },
   "lib/automation/actions/call-webhook.ts": {
     categoria: "PROTOCOLO",
     motivo:
       "headers do webhook de SAÍDA. O receptor do cliente lê o nome exato para rotear e para conferir o HMAC; renomear faz o payload chegar e ser descartado calado",
-    marcas: ["x-deskcomm-event", "x-deskcomm-signature"],
+    marcas: ["x-atenza-event", "x-atenza-signature"],
   },
   "lib/automation/actions/call-webhook.test.ts": {
     categoria: "PROTOCOLO",
     motivo:
       "é a guarda do contrato acima: este teste é o que reprova quem renomear o header. Trocar a string aqui para 'limpar a marca' desarmaria a única proteção que o contrato tem",
-    marcas: ["x-deskcomm-event", "x-deskcomm-signature", "x-deskcomm-signature"],
+    marcas: ["x-atenza-event", "x-atenza-signature", "x-atenza-signature"],
   },
   "lib/mcp/server.ts": {
     categoria: "PROTOCOLO",
     motivo:
       "nome do servidor MCP, que o cliente (Claude Desktop e afins) grava na própria configuração. Renomear derruba as conexões já configuradas de quem usa",
-    marcas: ["deskcomm-crm"],
+    marcas: ["atenza-crm"],
   },
   "lib/supabase/admin.ts": {
     categoria: "PROTOCOLO",
     motivo:
       "`X-Client-Info` enviado ao Supabase — identifica o cliente nos logs e na telemetria DELES. Não é texto de interface e nunca chega ao usuário",
-    marcas: ["deskcomm-crm"],
+    marcas: ["atenza-crm"],
   },
   "lib/wacalls/events-bridge.ts": {
     categoria: "PROTOCOLO",
     motivo:
       "X-Client-Id enviado ao processo WaCalls (spec 18) — identifica o worker como o operador dono da conexão SSE nos logs e na lógica de exclusividade de chamada dele. Não é texto de interface e nunca chega ao usuário",
-    marcas: ["deskcomm-worker"],
+    marcas: ["atenza-worker"],
   },
   "lib/nuvemshop/config.ts": {
     categoria: "PROTOCOLO",
     motivo:
       "User-Agent exigido pela Nuvemshop, que identifica a aplicação registrada na plataforma deles. Trocar pelo nome do revendedor descreveria uma aplicação que não existe lá",
-    marcas: ["deskcommcrm"],
-  },
-  "lib/agenda/google/evento.ts": {
-    categoria: "PROTOCOLO",
-    motivo:
-      "sufixo do `iCalUID` e prefixo das `extendedProperties` que GRAVAMOS dentro do Google Calendar do cliente. É por essa string que reconhecemos, meses depois, quais eventos daquela agenda vieram do CRM — e é o que impede o laço de eco. Trocar pela marca do revendedor faz todo evento já criado deixar de ser reconhecido, e o sintoma é compromisso fantasma ocupando horário, sem erro nenhum",
-    marcas: ["deskcomm", "deskcomm.app"],
+    marcas: ["atenza", "info@atenza.online"],
   },
 
   // ─── INFRA — cookie/storage/contêiner. Renomear desloga ou perde estado. ───
@@ -263,41 +258,41 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "INFRA",
     motivo:
       "chave de localStorage do tema, lida no script anti-flash. Renomear faz todo mundo voltar ao tema claro no próximo acesso — e o par com lib/theme.tsx tem de mudar junto",
-    marcas: ["deskcomm-theme"],
+    marcas: ["atenza-theme"],
   },
   "lib/theme.tsx": {
     categoria: "INFRA",
     motivo: "a mesma chave de localStorage do script do layout; as duas são um par só",
-    marcas: ["deskcomm-theme"],
+    marcas: ["atenza-theme"],
   },
   "lib/supabase/browser.ts": {
     categoria: "INFRA",
     motivo:
       "nome do cookie de sessão. Renomear invalida a sessão de todo usuário logado no momento da atualização — o `update.sh` do clone viraria um logout em massa",
-    marcas: ["sb-deskcomm-auth"],
+    marcas: ["sb-atenza-auth"],
   },
   "lib/supabase/server.ts": {
     categoria: "INFRA",
     motivo: "o mesmo cookie de sessão, lido no servidor; tem de casar com o do browser",
-    marcas: ["sb-deskcomm-auth"],
+    marcas: ["sb-atenza-auth"],
   },
   "lib/impersonate/cookie.ts": {
     categoria: "INFRA",
     motivo:
       "nome do cookie de impersonação. Renomear deixa órfã a sessão de suporte já aberta, e o operador fica preso na conta do tenant sem o cookie que o traz de volta",
-    marcas: ["deskcomm-impersonate"],
+    marcas: ["atenza-impersonate"],
   },
   "lib/impersonate/cookie-edge.ts": {
     categoria: "INFRA",
     motivo: "o mesmo cookie de impersonação, na cópia que o middleware edge consegue importar",
-    marcas: ["deskcomm-impersonate"],
+    marcas: ["atenza-impersonate"],
   },
 
   "hooks/ai/useDebugToggle.ts": {
     categoria: "INFRA",
     motivo:
-      "chave de localStorage do modo de depuração das citações da IA — irmã de `deskcomm-theme` em lib/theme.tsx. Não é texto de interface: renomear só faz quem já tinha o modo ligado perdê-lo, e o par leitura/escrita teria de mudar junto",
-    marcas: ["deskcomm.show_ai_citations"],
+      "chave de localStorage do modo de depuração das citações da IA — irmã de `atenza-theme` em lib/theme.tsx. Não é texto de interface: renomear só faz quem já tinha o modo ligado perdê-lo, e o par leitura/escrita teria de mudar junto",
+    marcas: ["atenza.show_ai_citations"],
   },
 
   // ─── DIVIDA — vazamento real. Cada linha declara a fase que a apaga. ───
@@ -306,28 +301,204 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     fase: 7,
     motivo:
       "template sem caminho de produção: sem rota em app/api/v1/cron/, sem linha no docker/scheduler/entrypoint.sh e, desde a limpeza do teto de orçamento (0159), sem chamador NENHUM — o único era workers/ai-budget-checker.cron.ts, que foi apagado por nunca ter tido agendador. Marcar isto não muda nada que um usuário veja, e a única 'prova' possível seria invocar a função à mão — o que prova a função, não o produto. Sai quando o alarme ganhar cron de verdade (ou quando o template for apagado junto)",
-    marcas: ["deskcommcrm"],
+    marcas: ["atenza"],
   },
 
   // ─── DEV — fixture de teste; não embarca. ───
   "lib/agent-engine/agent/draft-reply.test.ts": {
     categoria: "DEV",
-    motivo: "nome de agente numa fixture de teste ('Bot Deskcomm'); não sai da suíte",
-    marcas: ["deskcomm"],
+    motivo: "nome de agente numa fixture de teste ('Bot Atenza'); não sai da suíte",
+    marcas: ["atenza"],
   },
   "lib/system/changelog.test.ts": {
     categoria: "DEV",
     motivo:
       "fixture que reproduz o CHANGELOG real, incluindo as URLs do repositório no GitHub. A marca aqui é o nome do repositório upstream, que o clone não renomeia",
-    marcas: ["deskcommcrm", "deskcommcrm", "deskcommcrm"],
+    marcas: ["atenza"],
   },
 
+  // ─── ATENZA — código que pertence à marca oficial (rebrand 11/10/2026). ───
+  "app/app/settings/api-tokens/_components/ApiTokensClient.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza", "mcp_servers.atenza"],
+  },
+  "app/demonstracao/page.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza-explica.mp4", "atenza-explica.vtt"],
+  },
+  "app/llms.txt/route.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["@atenzaon", "atenza", "atenzaon"],
+  },
+  "app/page.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza", "atenza-home.module.css"],
+  },
+  "components/branding/MarcaDoProduto.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["simbolo_atenza", "simbolo_atenza", "simbolo_atenza", "simbolo_atenza.viewbox"],
+  },
+  "components/site/ConviteDeLead.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza_convite_fechado_em", "atenza_convite_inscrito"],
+  },
+  "components/site/IntegracoesDaHome.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza-home.module.css"],
+  },
+  "components/site/NavegacaoDaHome.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza-home.module.css"],
+  },
+  "components/site/ProdutoDemonstracao.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza-home.module.css"],
+  },
+  "components/site/VideosDaHome.test.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza"],
+  },
+  "components/site/VideosDaHome.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza-explica.mp4", "atenza-explica.vtt", "atenza-home.module.css"],
+  },
+  "lib/auth/public-paths.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza-explica"],
+  },
+  "lib/branding/desenho.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: [
+      "atenza",
+      "atenza_balao_claro",
+      "atenza_balao_claro",
+      "atenza_balao_escuro",
+      "atenza_balao_escuro",
+      "atenza_lente",
+      "atenza_lente",
+      "atenza_lente",
+      "atenza_pontos",
+      "atenza_pontos",
+      "simbolo_atenza",
+      "simbolo_atenza",
+    ],
+  },
+  "lib/branding/ladrilho.tsx": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["simbolo_atenza", "simbolo_atenza"],
+  },
+  "lib/i18n/dicionario.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: [
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza",
+    ],
+  },
+  "lib/marketing/conteudo-seo.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza", "atenza"],
+  },
+  "lib/marketing/schema-do-produto.test.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: [
+      "atenza",
+      "atenza.online",
+      "atenza.online",
+      "atenza.online.golpe.com",
+      "www.atenza.online",
+      "www.atenza.online",
+      "www.atenza.online",
+    ],
+  },
+  "lib/marketing/seo.test.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza-explica.mp4", "atenza.online"],
+  },
+  "lib/marketing/seo.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: [
+      "atenza",
+      "atenza",
+      "atenza",
+      "atenza-explica.mp4",
+      "atenza.online",
+      "atenzaon",
+      "instagram_atenza",
+      "instagram_atenza",
+      "verificacao_google_atenza",
+      "verificacao_google_atenza",
+    ],
+  },
+  "lib/marketing/sequencia.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza"],
+  },
+  "lib/mcp/tools/atendimento-externo.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza"],
+  },
+  "lib/mercado/textos.ts": {
+    categoria: "ATENZA",
+    motivo:
+      "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
+    marcas: ["atenza", "atenza", "atenza", "atenza"],
+  },
   // ─── PADRAO — a marca padrão precisa existir em algum lugar. ───
   "lib/branding.ts": {
     categoria: "PADRAO",
     motivo:
       "é a DEFINIÇÃO de DEFAULT_APP_NAME — o valor que aparece quando o operador não configurou marca nenhuma. Se esta linha sumir, some o padrão",
-    marcas: ["deskcommcrm"],
+    marcas: ["atenza"],
   },
 };
 
@@ -356,14 +527,14 @@ const RAIZES_VARRIDAS = ["app", "components", "hooks", "lib", "workers"] as cons
 /**
  * Extrai as marcas de um texto, uma por ocorrência.
  *
- * Casa `deskcomm` em qualquer caixa e leva junto o identificador inteiro em volta
- * (`x-deskcomm-signature`, `support@deskcomm.com.br`), porque é o identificador —
+ * Casa `atenza` em qualquer caixa e leva junto o identificador inteiro em volta
+ * (`x-atenza-signature`, `support@atenza.online`), porque é o identificador —
  * não a palavra solta — que distingue contrato de fio de vazamento de marca.
  *
  * Linha que ABRE com `//`, `*` ou `/*` é comentário e não conta: comentário não
  * chega ao usuário, e contá-lo encheria a lista de entradas inertes até ninguém
  * mais ler as que importam. O teste olha só o início da linha DE PROPÓSITO —
- * procurar `//` em qualquer posição descartaria `"https://deskcomm.app"`, que é
+ * procurar `//` em qualquer posição descartaria `"https://atenza.online"`, que é
  * exatamente um vazamento de verdade.
  */
 function marcasNoTexto(fonte: string): string[] {
@@ -371,10 +542,15 @@ function marcasNoTexto(fonte: string): string[] {
   for (const linha of fonte.split("\n")) {
     const inicio = linha.trimStart();
     if (inicio.startsWith("//") || inicio.startsWith("*") || inicio.startsWith("/*")) continue;
-    for (const casada of linha.matchAll(/[\w@.-]*deskcomm[\w@.-]*/gi)) {
-      // Pontuação encostada (o ponto final de "no DeskcommCRM.") não faz parte
+    for (const casada of linha.matchAll(/[\w@.-]*atenza[\w@.-]*/gi)) {
+      // Pontuação encostada (o ponto final de "no Atenza.") não faz parte
       // do identificador e faria a lista mudar por causa de uma vírgula.
-      achadas.push(casada[0].toLowerCase().replace(/^[.-]+/, "").replace(/[.-]+$/, ""));
+      achadas.push(
+        casada[0]
+          .toLowerCase()
+          .replace(/^[.-]+/, "")
+          .replace(/[.-]+$/, ""),
+      );
     }
   }
   return achadas.sort();
@@ -413,22 +589,22 @@ describe("catraca de marca hardcoded", () => {
   });
 
   it("pega a marca em qualquer caixa e dentro de identificador", () => {
-    // O furo nº 1 do gate antigo, agora com asserção: `/Deskcomm/` deixava passar
+    // O furo nº 1 do gate antigo, agora com asserção: `/Atenza/` deixava passar
     // as três formas de baixo, que são as formas em que a marca de fato aparece.
-    expect(marcasNoTexto(`a.download = "deskcommcrm-recovery-codes.txt";`)).toEqual([
-      "deskcommcrm-recovery-codes.txt",
+    expect(marcasNoTexto(`a.download = "atenza-recovery-codes.txt";`)).toEqual([
+      "atenza-recovery-codes.txt",
     ]);
-    expect(marcasNoTexto(`href="mailto:suporte@deskcomm.app"`)).toEqual(["suporte@deskcomm.app"]);
-    expect(marcasNoTexto(`const k = "sb-DESKCOMM-auth";`)).toEqual(["sb-deskcomm-auth"]);
+    expect(marcasNoTexto(`href="mailto:suporte@atenza.online"`)).toEqual(["suporte@atenza.online"]);
+    expect(marcasNoTexto(`const k = "sb-ATENZA-auth";`)).toEqual(["sb-atenza-auth"]);
   });
 
   it("ignora comentário, mas não confunde `//` de URL com comentário", () => {
     // A regra de comentário é uma exceção, e exceção sem guarda vira buraco:
     // procurar `//` em qualquer posição da linha esconderia justamente a URL.
-    expect(marcasNoTexto(`  // fala do DeskcommCRM`)).toEqual([]);
-    expect(marcasNoTexto(` * fala do DeskcommCRM`)).toEqual([]);
-    expect(marcasNoTexto(`const u = "https://deskcomm.app/x";`)).toEqual(["deskcomm.app"]);
-    expect(marcasNoTexto(`fetch(url); // manda pro DeskcommCRM`)).toEqual(["deskcommcrm"]);
+    expect(marcasNoTexto(`  // fala do Atenza`)).toEqual([]);
+    expect(marcasNoTexto(` * fala do Atenza`)).toEqual([]);
+    expect(marcasNoTexto(`const u = "https://atenza.online/x";`)).toEqual(["atenza.online"]);
+    expect(marcasNoTexto(`fetch(url); // manda pro Atenza`)).toEqual(["atenza"]);
   });
 
   it("nenhum arquivo fora da lista fixa a marca", () => {
@@ -448,7 +624,9 @@ describe("catraca de marca hardcoded", () => {
       const atual = encontrado.get(arquivo) ?? [];
       const congelado = [...entrada.marcas].sort();
       if (JSON.stringify(atual) !== JSON.stringify(congelado)) {
-        divergentes.push(`  ${arquivo}\n    lista: ${JSON.stringify(congelado)}\n    disco: ${JSON.stringify(atual)}`);
+        divergentes.push(
+          `  ${arquivo}\n    lista: ${JSON.stringify(congelado)}\n    disco: ${JSON.stringify(atual)}`,
+        );
       }
     }
     expect(
@@ -472,11 +650,14 @@ describe("catraca de marca hardcoded", () => {
   });
 
   it("toda entrada declara categoria e explica o porquê", () => {
-    const validas: CategoriaDeMarca[] = ["PROTOCOLO", "INFRA", "DIVIDA", "DEV", "PADRAO"];
+    const validas: CategoriaDeMarca[] = ["PROTOCOLO", "INFRA", "DIVIDA", "DEV", "PADRAO", "ATENZA"];
     const ruins = Object.entries(MARCA_CONGELADA)
       .filter(([, e]) => !validas.includes(e.categoria) || e.motivo.trim().length < 40)
       .map(([f]) => f);
-    expect(ruins, `entrada sem categoria válida ou sem justificativa escrita:\n  ${ruins.join("\n  ")}`).toEqual([]);
+    expect(
+      ruins,
+      `entrada sem categoria válida ou sem justificativa escrita:\n  ${ruins.join("\n  ")}`,
+    ).toEqual([]);
   });
 
   it("a Fase 4 fechou: sobra uma dívida, e ela declara por que sobrou", () => {
@@ -502,7 +683,10 @@ describe("catraca de marca hardcoded", () => {
     const semFase = Object.entries(MARCA_CONGELADA)
       .filter(([, e]) => (e.categoria === "DIVIDA") !== (typeof e.fase === "number"))
       .map(([f]) => f);
-    expect(semFase, `DIVIDA sem fase, ou fase declarada onde não é dívida:\n  ${semFase.join("\n  ")}`).toEqual([]);
+    expect(
+      semFase,
+      `DIVIDA sem fase, ou fase declarada onde não é dívida:\n  ${semFase.join("\n  ")}`,
+    ).toEqual([]);
   });
 });
 
@@ -513,7 +697,7 @@ describe("catraca de marca hardcoded", () => {
  * o código que embarca na imagem. Ela é cega para `supabase/templates/*.html` e
  * `supabase/config.toml`, e essa cegueira tinha consequência medida: dava para
  * zerar a lista de dívidas, ver a suíte inteira verde, e o cliente do
- * revendedor continuar recebendo "Confirme seu e-mail — DeskcommCRM" no
+ * revendedor continuar recebendo "Confirme seu e-mail — Atenza" no
  * PRIMEIRO e-mail que ele abre na vida.
  *
  * Estes arquivos não são renderizados por nenhum TypeScript nosso: quem os
@@ -557,8 +741,8 @@ describe("catraca de marca no que o GoTrue renderiza", () => {
     "supabase/config.toml": {
       categoria: "DEV",
       motivo:
-        "config do Supabase LOCAL (o `supabase start` de dev e do CI). NÃO embarca na imagem e NÃO alcança clone nenhum: um self-hoster usa um projeto na nuvem do Supabase, cuja config de auth vem do marca-emails.sh, ou um GoTrue próprio, que lê env. `project_id` ainda nomeia os contêineres locais (supabase_auth_deskcomm-crm) e os assuntos são o que a suíte local envia",
-      marcas: ["deskcomm-crm", "deskcommcrm", "deskcommcrm"],
+        "config do Supabase LOCAL (o `supabase start` de dev e do CI). NÃO embarca na imagem e NÃO alcança clone nenhum: um self-hoster usa um projeto na nuvem do Supabase, cuja config de auth vem do marca-emails.sh, ou um GoTrue próprio, que lê env. `project_id` ainda nomeia os contêineres locais (supabase_auth_atenza-crm) e os assuntos são o que a suíte local envia",
+      marcas: ["atenza-crm", "atenza", "atenza"],
     },
   };
 
@@ -576,7 +760,10 @@ describe("catraca de marca no que o GoTrue renderiza", () => {
     for (const { arquivo } of ALVOS) {
       expect(fs.existsSync(path.join(RAIZ, arquivo)), `${arquivo} sumiu`).toBe(true);
     }
-    for (const modelo of ["supabase/templates/confirmation.html", "supabase/templates/recovery.html"]) {
+    for (const modelo of [
+      "supabase/templates/confirmation.html",
+      "supabase/templates/recovery.html",
+    ]) {
       const texto = fs.readFileSync(path.join(RAIZ, modelo), "utf8");
       expect(texto, `${modelo} não substitui a marca`).toContain("__APP_NAME__");
       expect(texto, `${modelo} não substitui o accent`).toContain("__ACCENT__");
@@ -584,22 +771,22 @@ describe("catraca de marca no que o GoTrue renderiza", () => {
   });
 
   it("comentário de HTML não conta, e `-->` no meio da linha não engole o resto", () => {
-    expect(marcasNoTexto(semComentariosHtml("<!-- fala do DeskcommCRM -->"))).toEqual([]);
-    expect(marcasNoTexto(semComentariosHtml("<!--\n  DeskcommCRM\n  em várias linhas\n-->"))).toEqual([]);
+    expect(marcasNoTexto(semComentariosHtml("<!-- fala do Atenza -->"))).toEqual([]);
+    expect(marcasNoTexto(semComentariosHtml("<!--\n  Atenza\n  em várias linhas\n-->"))).toEqual(
+      [],
+    );
     // O caso que a regra de `//` erraria: marca REAL depois do fecho.
-    expect(marcasNoTexto(semComentariosHtml("<!-- nota --> Sua conta no DeskcommCRM"))).toEqual([
-      "deskcommcrm",
+    expect(marcasNoTexto(semComentariosHtml("<!-- nota --> Sua conta no Atenza"))).toEqual([
+      "atenza",
     ]);
     // E a marca fora de comentário nenhum continua contando.
-    expect(marcasNoTexto(semComentariosHtml("<p>conta no DeskcommCRM</p>"))).toEqual(["deskcommcrm"]);
+    expect(marcasNoTexto(semComentariosHtml("<p>conta no Atenza</p>"))).toEqual(["atenza"]);
   });
 
   it("comentário de TOML não conta, mas `#` dentro de string não vira comentário", () => {
-    expect(marcasNoTexto(semComentariosToml("# Supabase CLI config — DeskcommCRM"))).toEqual([]);
-    expect(marcasNoTexto(semComentariosToml('cor = "#506d48"  # DeskcommCRM'))).toEqual([
-      "deskcommcrm",
-    ]);
-    expect(marcasNoTexto(semComentariosToml('subject = "Olá — DeskcommCRM"'))).toEqual(["deskcommcrm"]);
+    expect(marcasNoTexto(semComentariosToml("# Supabase CLI config — Atenza"))).toEqual([]);
+    expect(marcasNoTexto(semComentariosToml('cor = "#506d48"  # Atenza'))).toEqual(["atenza"]);
+    expect(marcasNoTexto(semComentariosToml('subject = "Olá — Atenza"'))).toEqual(["atenza"]);
   });
 
   it("nenhum arquivo do GoTrue fixa a marca fora da lista", () => {
@@ -614,7 +801,10 @@ describe("catraca de marca no que o GoTrue renderiza", () => {
 
   it("a lista do GoTrue não guarda arquivo que já não tem marca", () => {
     const obsoletos = Object.keys(CONGELADO_SUPABASE).filter((f) => !encontradoAqui.has(f));
-    expect(obsoletos, `apague a linha destes de CONGELADO_SUPABASE:\n  ${obsoletos.join("\n  ")}`).toEqual([]);
+    expect(
+      obsoletos,
+      `apague a linha destes de CONGELADO_SUPABASE:\n  ${obsoletos.join("\n  ")}`,
+    ).toEqual([]);
   });
 
   it("arquivo congelado do GoTrue não mudou de conjunto sem a lista acompanhar", () => {
@@ -625,7 +815,7 @@ describe("catraca de marca no que o GoTrue renderiza", () => {
 
   it("os dois modelos de e-mail não têm marca nenhuma — é o estado que se defende", () => {
     // Explícito, e não só implícito na ausência de linha na allowlist: é ESTE
-    // caso que falha quando alguém reescreve "no DeskcommCRM" num template.
+    // caso que falha quando alguém reescreve "no Atenza" num template.
     expect(encontradoAqui.has("supabase/templates/confirmation.html")).toBe(false);
     expect(encontradoAqui.has("supabase/templates/recovery.html")).toBe(false);
   });

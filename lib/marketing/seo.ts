@@ -130,9 +130,19 @@ export function jsonLdSeguro(valor: unknown): string {
  */
 const VERIFICACAO_GOOGLE_ATENZA = "CrYhy8LdJsnENi_wtvU3A8ECgveVLBX03mIeApnm3Yc";
 
+/** Perfis oficiais da Atenza; como a meta do Google, só valem no domínio oficial. */
+const INSTAGRAM_ATENZA = "https://www.instagram.com/atenzaon/";
+
+function ehDominioOficial(base: string): boolean {
+  return new URL(base).hostname.replace(/^www\./, "") === "atenza.online";
+}
+
+export function instagramOficial(base: string): string | null {
+  return ehDominioOficial(base) ? INSTAGRAM_ATENZA : null;
+}
+
 export function verificacaoDoBuscador(base: string): Metadata["verification"] {
-  const host = new URL(base).hostname.replace(/^www\./, "");
-  return host === "atenza.online" ? { google: VERIFICACAO_GOOGLE_ATENZA } : undefined;
+  return ehDominioOficial(base) ? { google: VERIFICACAO_GOOGLE_ATENZA } : undefined;
 }
 
 /**
@@ -173,6 +183,8 @@ export function identidadePublica(nome: string, base: string, logoUrl: string | 
       ...(logoUrl ? { logo: new URL(logoUrl, base).toString() } : {}),
       areaServed: AREA_ATENDIDA,
       knowsLanguage: ["pt-BR", "en", "es"],
+      // sameAs liga a marca ao perfil social no Knowledge Graph e nas respostas de IA.
+      ...(instagramOficial(base) ? { sameAs: [instagramOficial(base)] } : {}),
     },
     {
       "@type": "WebSite",

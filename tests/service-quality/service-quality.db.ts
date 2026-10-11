@@ -1,6 +1,6 @@
 /** Banco descartável COPIADO do molde do harness central. Nenhuma mudança no
  * baseline nem no banco compartilhado. Rodar após template instalado:
- * TEST_DB_PORT=<porta> TEST_DB_TEMPLATE=deskcomm_baseline
+ * TEST_DB_PORT=<porta> TEST_DB_TEMPLATE=atenza_baseline
  * ./node_modules/.bin/vitest run --config tests/service-quality/vitest.db.config.ts --maxWorkers=1
  * A ausência do ambiente falha, não gera falso verde/skip de RLS.
  */

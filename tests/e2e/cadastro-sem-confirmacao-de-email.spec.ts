@@ -13,7 +13,7 @@
  *     Abra o e-mail e clique no link para ativar sua conta.
  *
  * E-mail nenhum foi enviado. Medido na `origin/main` @ `4d50f63f`, dirigindo
- * esta mesma jornada: o texto acima aparecia, o cookie `sb-deskcomm-auth` já
+ * esta mesma jornada: o texto acima aparecia, o cookie `sb-atenza-auth` já
  * estava no browser, e `user_organizations` do usuário novo vinha `[]`. A saída
  * existe desde o PR #465 (`/get-started`), mas a pessoa não tem motivo nenhum
  * para descobri-la: ela foi mandada esperar. Fica parada, autenticada e sem
@@ -56,7 +56,7 @@ const svc = createClient(URL_SUPABASE, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
   auth: { persistSession: false },
 });
 
-const SENHA = "CadastroSemConfirmar!2026#Deskcomm";
+const SENHA = "CadastroSemConfirmar!2026#Atenza";
 const NOME_DA_EMPRESA = "Plata Iphones E2E";
 
 /** Usuários e organizações criados pela jornada — limpos no fim. */

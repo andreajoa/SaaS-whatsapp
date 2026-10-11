@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { cabecalhosDeDescadastro, urlDeDescadastro } from "@/lib/marketing/descadastro";
+import { instagramOficial } from "@/lib/marketing/seo";
 import type { IdiomaDoSite } from "@/lib/mercado/paises";
 
 /**
@@ -176,9 +177,7 @@ function montar(
   // MESMO host, senão um e-mail levaria a dois sites diferentes.
   const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
 
-  const alvo = corpo.acao
-    ? `${base}${corpo.acao.caminho}`
-    : "";
+  const alvo = corpo.acao ? `${base}${corpo.acao.caminho}` : "";
 
   const paragrafos = corpo.paragrafos
     .map(
@@ -322,7 +321,11 @@ function pesDePagina(base: string, legal: string): string {
           ${link("/contato", "Contato")} &nbsp;·&nbsp;
           ${link("/legal", "Documentos")} &nbsp;·&nbsp;
           ${link("/legal/privacy", "Privacidade")} &nbsp;·&nbsp;
-          ${link("/legal/terms", "Termos")}
+          ${link("/legal/terms", "Termos")}${
+            instagramOficial(base)
+              ? ` &nbsp;·&nbsp; <a href="${esc(instagramOficial(base)!)}" style="color:${TINTA.leve};text-decoration:underline">Instagram</a>`
+              : ""
+          }
         </p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr><td height="1" bgcolor="${TINTA.borda}" style="background-color:${TINTA.borda};height:1px;line-height:1px;font-size:0">&nbsp;</td></tr>

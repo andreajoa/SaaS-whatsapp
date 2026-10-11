@@ -1,6 +1,6 @@
-# DeskcommCRM — Kit de Instalação (HostGator)
+# Atenza — Kit de Instalação (HostGator)
 
-Este kit sobe o **DeskcommCRM** no seu servidor VPS da HostGator. Você tem dois caminhos:
+Este kit sobe o **Atenza** no seu servidor VPS da HostGator. Você tem dois caminhos:
 
 > **Ainda nem tem servidor?** Comece por `comecar.sh` — ele roda **no seu computador**, antes
 > de existir VPS, e responde a pergunta que trava todo mundo no início: *o que eu preciso
@@ -22,10 +22,10 @@ Este kit sobe o **DeskcommCRM** no seu servidor VPS da HostGator. Você tem dois
 ## 🤖 Caminho fácil: deixe o assistente de código fazer
 
 1. Contrate um **VPS na HostGator** e acesse-o por SSH.
-2. Clone o repositório (`git clone --depth 1 https://github.com/melgarafael/DeskcommCRM.git deskcommcrm`)
+2. Clone o repositório (`git clone --depth 1 https://github.com/andreajoa/SaaS-whatsapp.git atenza`)
    e abra a pasta no **Claude Code, Codex, Cursor, OpenCode ou Antigravity** dentro do VPS —
    ou jogue só esta pasta no chat: o `CLAUDE.md` daqui manda clonar e abre o guia.
-3. Diga: *"instala o DeskcommCRM pra mim"*. O guia `deskcomm-instalar` conduz tudo —
+3. Diga: *"instala o Atenza pra mim"*. O guia `atenza-instalar` conduz tudo —
    cria o banco, gera as senhas, sobe o CRM e te ajuda a conectar o WhatsApp.
 
 ## ⚙️ Caminho manual: um comando

@@ -84,8 +84,8 @@ describe("o desenho na barra lateral", () => {
     // O e2e `marca-logo.spec.ts` lê "barra sem <img>" como "sem logo do
     // revendedor"; um <img> do produto aqui faria a spec medir a coisa errada.
     expect(document.querySelector("img")).toBeNull();
-    // Nem o nome em texto: o logotipo já o escreve.
-    expect(screen.queryByText(DEFAULT_APP_NAME)).toBeNull();
+    // Nem o nome em texto FORA do logotipo: o nome mora dentro do próprio SVG.
+    expect(screen.queryAllByText(DEFAULT_APP_NAME).every((el) => el.closest("svg"))).toBe(true);
   });
 
   it("recolhida, mostra só o símbolo — e não a inicial em texto", () => {
@@ -162,7 +162,8 @@ describe("o favicon segue a mesma regra", () => {
     expect(ladrilho).toMatch(
       /marcaEhADoProduto\(\{ name: marca\.nome, logoUrl: marca\.logoUrl \}\)/,
     );
-    expect(ladrilho).toMatch(/<path d=\{SIMBOLO\.d\}/);
+    // Marca do produto = Atenza: o ladrilho desenha o símbolo registrado dela.
+    expect(ladrilho).toMatch(/\? SIMBOLO_ATENZA/);
     expect(ladrilho).toMatch(/letraDoIcone\(marca\.nome\)/);
   });
 

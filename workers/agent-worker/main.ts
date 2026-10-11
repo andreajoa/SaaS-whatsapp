@@ -7,7 +7,7 @@ import { avisarRespostaDeCasoObsoleto } from "@/lib/atendimento/aviso-caso-obsol
 import { withServiceJob } from "@/lib/atendimento/fronteira-server";
 import { StaleServiceBoundaryError } from "@/lib/atendimento/fronteira";
 /**
- * Worker 24/7 do agent-engine (fusão Vendaval → DeskcommCRM) — o processo
+ * Worker 24/7 do agent-engine (fusão Vendaval → Atenza) — o processo
  * long-running que o CRM não tinha: fila durável, cron/follow-up, drain do
  * event_log e os turnos do agente rico.
  *

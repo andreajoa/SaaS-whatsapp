@@ -31,7 +31,7 @@
  *    esta linha junto. O que ele garante é que a mudança seja DELIBERADA e
  *    legível no diff, em vez de carona em 56 arquivos.
  *  - Ele não varre marca ESTRANGEIRA. A varredura de `tests/unit/branding.test.ts`
- *    procura `/deskcomm/i` — ela vê a marca da casa saindo, nunca a de fora
+ *    procura `/atenza/i` — ela vê a marca da casa saindo, nunca a de fora
  *    entrando. Uma marca qualquer hardcoded num `.tsx` continua invisível.
  *  - `app/design/` é pulado por aquela varredura (`branding.test.ts`, a linha
  *    `if (rel.startsWith("app/design")) continue`), e o showcase renderiza o
@@ -54,7 +54,7 @@ import { DEFAULT_APP_NAME, resolveBranding } from "@/lib/branding";
  * importado de `lib/branding`, de propósito: um teste que compara a constante
  * com ela mesma passa sempre.
  */
-const MARCA_DO_PRODUTO = "DeskcommCRM";
+const MARCA_DO_PRODUTO = "Atenza";
 
 const COMO_PERSONALIZAR =
   "Para personalizar a marca da SUA instalação, não edite esta constante: " +
@@ -64,7 +64,7 @@ const COMO_PERSONALIZAR =
   "e some com a sua marca no próximo `git pull`.";
 
 describe("a marca padrão do produto", () => {
-  it("é DeskcommCRM — e trocá-la aqui é mudar o produto, não a sua instalação", () => {
+  it("é Atenza — e trocá-la aqui é mudar o produto, não a sua instalação", () => {
     expect(DEFAULT_APP_NAME, COMO_PERSONALIZAR).toBe(MARCA_DO_PRODUTO);
   });
 

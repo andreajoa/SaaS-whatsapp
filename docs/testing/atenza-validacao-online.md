@@ -66,7 +66,7 @@ confere os papéis Supabase e instala/reaplica o baseline. Um marcador com
 expiração limita a execução dos testes ao ambiente preparado pelo runner.
 O config `vitest.online-db.config.ts` cobre isolamento de comércio, ações e
 campanhas e os nove casos SQL de qualidade, incluindo disputa do token.
-O proprietário confirmou que `deskcomm` era o mesmo projeto local e autorizou
+O proprietário confirmou que `atenza` era o mesmo projeto local e autorizou
 sua pausa. Foi criado o projeto `atenza-validacao-free`
 (`zaagoawswxlwzwhmtzyi`) na organização `whatsapp`, no plano Free. Nenhum
 upgrade foi contratado e nenhum projeto Lovable foi excluído.

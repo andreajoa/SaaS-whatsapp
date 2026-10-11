@@ -27,7 +27,7 @@ const RAIZ = join(__dirname, "..", "..");
 const DIR_CRON = join(RAIZ, "app", "api", "v1", "cron");
 const VERCEL_JSON = join(RAIZ, "vercel.json");
 // O crontab saiu do `command:` inline do compose e virou o entrypoint da imagem
-// `deskcomm-scheduler` — o `apk add curl tzdata` a cada start amarrava a volta
+// `atenza-scheduler` — o `apk add curl tzdata` a cada start amarrava a volta
 // do cron à internet da VPS. A cerca continua a mesma; só a fonte da verdade do
 // "o que roda" mudou de arquivo.
 const CRONTAB = join(RAIZ, "docker", "scheduler", "entrypoint.sh");
@@ -119,7 +119,7 @@ describe("rotas de cron × agendamento no self-host", () => {
  * Aqui existem DOIS jeitos válidos de os crons rodarem, e exatamente um jeito
  * de eles não rodarem em silêncio:
  *
- *   (a) **Agendador externo** — o contêiner `deskcomm-scheduler` aponta o seu
+ *   (a) **Agendador externo** — o contêiner `atenza-scheduler` aponta o seu
  *       `APP_ORIGIN` para o domínio hospedado e chama as rotas por HTTP, igual
  *       faz na VPS. `vercel.json` NÃO declara `crons`. É o estado atual, e é o
  *       estado que o plano Hobby obriga (ver abaixo).
@@ -190,7 +190,7 @@ describe("crons no deploy hospedado (Vercel)", () => {
       `vercel.json declara cron(s) que rodam mais de 1×/dia: ${proibidas.join(", ")}.\n` +
         `No plano Hobby isso NÃO degrada — reprova o deploy inteiro com ` +
         `"Hobby accounts are limited to daily cron jobs".\n` +
-        `Ou suba o projeto para o Pro, ou deixe o contêiner 'deskcomm-scheduler' ` +
+        `Ou suba o projeto para o Pro, ou deixe o contêiner 'atenza-scheduler' ` +
         `com APP_ORIGIN apontando para o domínio (que é o arranjo atual).`,
     ).toEqual([]);
   });

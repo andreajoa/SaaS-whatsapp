@@ -20,9 +20,9 @@
 # trabalho que não é dele e ninguém confere depois. Duas provas valem:
 #
 #   1. A API do GitHub associa o commit a uma conta:
-#      `gh api repos/melgarafael/DeskcommCRM/commits/<sha> --jq .author.login`
+#      `gh api repos/andreajoa/SaaS-whatsapp/commits/<sha> --jq .author.login`
 #   2. O PR é de um handle e seus commits carregam a assinatura em questão:
-#      `gh api repos/melgarafael/DeskcommCRM/pulls/<n>/commits \
+#      `gh api repos/andreajoa/SaaS-whatsapp/pulls/<n>/commits \
 #         --jq '[.[].commit.author.email] | unique'`
 #
 # Para conferir que este arquivo não é decorativo:
@@ -65,7 +65,7 @@ jmpo <pompa.07@gmail.com> Juan <pompa.07@gmail.com>
 # canônico é o de 2.545 dos commits.
 #
 # Prova de duas naturezas, e a diferença importa:
-#   - `rafael@maudibrasil.com.br` e `119944436+melgarafael@users.noreply...`
+#   - `info@atenza.online` e `119944436+melgarafael@users.noreply...`
 #     a API associa os dois a @melgarafael;
 #   - `rafael@automatiklabs.com.br` resolve para **@rafaelmelgaco**, uma conta
 #     DIFERENTE. Aqui a API não decide nada: ela só diz que são duas contas,
@@ -77,8 +77,8 @@ jmpo <pompa.07@gmail.com> Juan <pompa.07@gmail.com>
 # Fica escrito porque a natureza da prova não é detalhe: quem reler isto daqui
 # a um ano precisa saber que este mapeamento repousa numa resposta humana, e
 # não em algo que se possa reverificar rodando um comando.
-Rafael Melgaço <rafael@maudibrasil.com.br> <119944436+melgarafael@users.noreply.github.com>
-Rafael Melgaço <rafael@maudibrasil.com.br> <rafael@automatiklabs.com.br>
+Rafael Melgaço <info@atenza.online> <119944436+melgarafael@users.noreply.github.com>
+Rafael Melgaço <info@atenza.online> <rafael@automatiklabs.com.br>
 
 # @automatikpg-ux — PRs #569, #570, #571 (e os anteriores dele).
 # Prova: os três PRs são da conta @automatikpg-ux e TODOS os commits deles

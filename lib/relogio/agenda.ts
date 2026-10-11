@@ -3,7 +3,7 @@
  *
  * ─── Por que este arquivo existe ────────────────────────────────────────────
  *
- * O self-host tem o contêiner `deskcomm-scheduler`, que escreve um crontab de
+ * O self-host tem o contêiner `atenza-scheduler`, que escreve um crontab de
  * verdade (`docker/scheduler/entrypoint.sh`) e chama as 22 rotas. O deploy
  * hospedado NÃO tem esse contêiner, e o plano Hobby da Vercel só aceita cron
  * DIÁRIO — doze destas rotas rodam sub-diário, então declarar `crons` no

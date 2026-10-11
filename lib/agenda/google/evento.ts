@@ -57,6 +57,8 @@ import { instanteDaParede, primeiroInstanteDoDia } from "./tempo";
  * dali, todo evento criado antes da troca de marca deixaria de ser reconhecido.
  * O sintoma seria compromisso fantasma ocupando horário, sem erro nenhum.
  */
+// Valor legado de antes do rebrand para Atenza (11/10/2026), mantido de propósito:
+// é o que está gravado nos eventos que já existem nas agendas dos clientes.
 export const SUFIXO_ICAL_UID = "deskcomm.app";
 
 /** Prefixo das `extendedProperties.private` que carregam a identidade do tenant. */

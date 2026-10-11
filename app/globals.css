@@ -25,7 +25,7 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ─────────────────────────────────────────────────────────────────────────
-   DeskcommCRM — Design System tokens (Sage palette · density Aerada)
+   Atenza — Design System tokens (Sage palette · density Aerada)
    Source of truth: /app/design/lib/tokens.ts (PALETTES.sage)
    Light + dark drawn separately (NOT inverted).
    ───────────────────────────────────────────────────────────────────────── */
@@ -838,7 +838,7 @@
    desenha para dentro da própria caixa e não depende do overflow do pai.
    Provado na tela nos três cenários (claro, escuro, reduce) —
    `evidence/wave3-pulso/`. */
-@keyframes deskcomm-card-pulse {
+@keyframes atenza-card-pulse {
   from {
     border-color: var(--color-accent);
   }
@@ -851,7 +851,7 @@
    evento (key = contador de pulsos), e é a remontagem que faz a animação
    recomeçar. Alternar classe no mesmo nó não reinicia animação em CSS. */
 .card-pulse {
-  animation: deskcomm-card-pulse var(--duration-slow) var(--ease-out) 1;
+  animation: atenza-card-pulse var(--duration-slow) var(--ease-out) 1;
   border: 2px solid transparent;
   border-radius: inherit;
   box-sizing: border-box;
@@ -976,7 +976,7 @@
 }
 
 .sequencia-viva[data-em-cena="true"] > * {
-  animation: deskcomm-balao-entra 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: atenza-balao-entra 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Quatro balões é o que a conversa tem; os dois extras existem para que
@@ -1014,7 +1014,7 @@
 .sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(5) { animation-delay: 360ms; }
 .sequencia-viva[data-ritmo="cascata"][data-em-cena="true"] > *:nth-child(n + 6) { animation-delay: 450ms; }
 
-@keyframes deskcomm-balao-entra {
+@keyframes atenza-balao-entra {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -1046,10 +1046,10 @@
    agente da direita. Entrar todas do mesmo lugar apagaria a única informação
    que o movimento carrega de graça — quem está falando. */
 .conversa-fala {
-  animation: deskcomm-fala-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: atenza-fala-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes deskcomm-fala-entra {
+@keyframes atenza-fala-entra {
   from {
     opacity: 0;
     transform: translateY(8px) scale(0.98);
@@ -1064,7 +1064,7 @@
    indicador que todo mundo já viu em mensageiro — copiá-lo é o que faz o olho
    reconhecer "alguém está digitando" sem ler legenda nenhuma. */
 .conversa-ponto {
-  animation: deskcomm-ponto-pula 1200ms ease-in-out infinite;
+  animation: atenza-ponto-pula 1200ms ease-in-out infinite;
 }
 .conversa-ponto[data-ponto="1"] {
   animation-delay: 160ms;
@@ -1073,7 +1073,7 @@
   animation-delay: 320ms;
 }
 
-@keyframes deskcomm-ponto-pula {
+@keyframes atenza-ponto-pula {
   0%,
   60%,
   100% {
@@ -1111,7 +1111,7 @@
 }
 
 .barra-beneficios-trilho {
-  animation: deskcomm-beneficios 38s linear infinite;
+  animation: atenza-beneficios 38s linear infinite;
   will-change: transform;
 }
 
@@ -1122,7 +1122,7 @@
   animation-play-state: paused;
 }
 
-@keyframes deskcomm-beneficios {
+@keyframes atenza-beneficios {
   to {
     transform: translateX(-50%);
   }

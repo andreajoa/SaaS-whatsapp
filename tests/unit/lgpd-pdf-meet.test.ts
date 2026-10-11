@@ -123,7 +123,7 @@ it("PDF efetivamente entregue contém registros, datas, estados e controlador se
     "CLAIM-PRIVADO",
     "MARCA_DO_REVENDEDOR_NAO_USAR",
     "Link enviado",
-    "DeskcommCRM",
+    "Atenza",
   ])
     expect(pdf.text).not.toContain(value);
   // Artefatos opcionais do runner; o teste funciona em qualquer checkout/CI.

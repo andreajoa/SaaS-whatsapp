@@ -5,7 +5,7 @@ titulo: O relógio HTTP passa a cobrir as 22 rotas de cron, não quatro
 ---
 
 Quem instala numa VPS não muda de comportamento nesta versão, e é bom que não
-mude: no self-host quem dispara os crons é o contêiner `deskcomm-scheduler`,
+mude: no self-host quem dispara os crons é o contêiner `atenza-scheduler`,
 com `crond` de verdade, e ele já chamava as 22 rotas. A tabela nova
 (`relogio_execucoes`) nasce em todo clone para que as migrations sejam as
 mesmas em todo lugar, e num self-host ela fica **vazia** — tabela vazia não

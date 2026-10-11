@@ -1,0 +1,6 @@
+interface:
+  display_name: "Instalar o Atenza"
+  short_description: "Instala, atualiza e conserta o CRM numa VPS, passo a passo, para quem não é técnico"
+  default_prompt: "Use a skill atenza-instalar e me conduza na instalação do Atenza na minha VPS."
+policy:
+  allow_implicit_invocation: true

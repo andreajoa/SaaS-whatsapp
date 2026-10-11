@@ -1,6 +1,6 @@
 # Prova de acionamento das skills embutidas — 10/set/2026
 
-**O que se prova aqui:** que os guias (`.agents/skills/deskcomm-*`) carregam **sozinhos**, pela
+**O que se prova aqui:** que os guias (`.agents/skills/atenza-*`) carregam **sozinhos**, pela
 descrição, quando uma pessoa leiga faz uma pergunta comum — sem citar o nome da skill e sem saber
 que ela existe — em três CLIs sem interface. Teste automatizado não prova acionamento; sessão real
 prova.
@@ -17,21 +17,21 @@ inválido para o `gh` não denunciar o mantenedor), e resume ferramentas usadas,
 
 | pergunta | CLI | guia acionou sozinho | ferramentas | turnos | tempo | custo |
 |---|---|---|---|---|---|---|
-| instalar (clínica, VPS HostGator) | claude | sim (deskcomm-instalar) | 1 | 3 | 40 s | US$ 1.76 |
-| instalar (clínica, VPS HostGator) | codex | sim (deskcomm-instalar) | 1 | 1 | 15 s | n/d |
-| instalar (clínica, VPS HostGator) | opencode | sim (deskcomm-instalar) | 1 | 2 | 54 s | n/d |
-| montar clínica odontológica | claude | sim (deskcomm-cliente-novo) | 8 | 10 | 90 s | US$ 2.27 |
-| montar clínica odontológica | codex | sim (deskcomm-cliente-novo) | 2 | 1 | 24 s | n/d |
-| montar clínica odontológica | opencode | sim (deskcomm-cliente-novo) | 1 | 2 | 15 s | n/d |
-| analisar desempenho e custo | claude | sim (deskcomm-metricas) | 12 | 14 | 175 s | US$ 2.63 |
-| analisar desempenho e custo | codex | sim (deskcomm-metricas) | 2 | 1 | 22 s | n/d |
-| analisar desempenho e custo | opencode | sim (deskcomm-metricas) | 1 | 2 | 22 s | n/d |
-| agente da imobiliária não marca visita | claude | sim (deskcomm-prompt) | 7 | 9 | 88 s | US$ 2.16 |
-| agente da imobiliária não marca visita | codex | sim (deskcomm-prompt) | 2 | 1 | 26 s | n/d |
-| agente da imobiliária não marca visita | opencode | sim (deskcomm-prompt) | 1 | 2 | 35 s | n/d |
-| corrigir bug e abrir PR | claude | sim (deskcomm-contribuir) | 11 | 13 | 100 s | US$ 2.42 |
-| corrigir bug e abrir PR | codex | sim (deskcomm-contribuir) | 5 | 1 | 64 s | n/d |
-| corrigir bug e abrir PR | opencode | sim (deskcomm-contribuir) | 2 | 3 | 39 s | n/d |
+| instalar (clínica, VPS HostGator) | claude | sim (atenza-instalar) | 1 | 3 | 40 s | US$ 1.76 |
+| instalar (clínica, VPS HostGator) | codex | sim (atenza-instalar) | 1 | 1 | 15 s | n/d |
+| instalar (clínica, VPS HostGator) | opencode | sim (atenza-instalar) | 1 | 2 | 54 s | n/d |
+| montar clínica odontológica | claude | sim (atenza-cliente-novo) | 8 | 10 | 90 s | US$ 2.27 |
+| montar clínica odontológica | codex | sim (atenza-cliente-novo) | 2 | 1 | 24 s | n/d |
+| montar clínica odontológica | opencode | sim (atenza-cliente-novo) | 1 | 2 | 15 s | n/d |
+| analisar desempenho e custo | claude | sim (atenza-metricas) | 12 | 14 | 175 s | US$ 2.63 |
+| analisar desempenho e custo | codex | sim (atenza-metricas) | 2 | 1 | 22 s | n/d |
+| analisar desempenho e custo | opencode | sim (atenza-metricas) | 1 | 2 | 22 s | n/d |
+| agente da imobiliária não marca visita | claude | sim (atenza-prompt) | 7 | 9 | 88 s | US$ 2.16 |
+| agente da imobiliária não marca visita | codex | sim (atenza-prompt) | 2 | 1 | 26 s | n/d |
+| agente da imobiliária não marca visita | opencode | sim (atenza-prompt) | 1 | 2 | 35 s | n/d |
+| corrigir bug e abrir PR | claude | sim (atenza-contribuir) | 11 | 13 | 100 s | US$ 2.42 |
+| corrigir bug e abrir PR | codex | sim (atenza-contribuir) | 5 | 1 | 64 s | n/d |
+| corrigir bug e abrir PR | opencode | sim (atenza-contribuir) | 2 | 3 | 39 s | n/d |
 
 Custo: só o Claude reporta; Codex (ChatGPT) e OpenCode (modelo gratuito) não. Em todas as 15
 corridas o guia esperado foi carregado — no Claude pela ferramenta `Skill`, no Codex lendo o

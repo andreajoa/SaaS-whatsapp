@@ -160,7 +160,7 @@ describe("o default do compose diz o mesmo que o kit", () => {
 
 describe("o kit aponta para o que o CI realmente publica", () => {
   it("os defaults de código e os labels de origem apontam para este repositório", () => {
-    const repo = "https://github.com/melgarafael/DeskcommCRM";
+    const repo = "https://github.com/andreajoa/SaaS-whatsapp";
     for (const script of ["install.sh", "comecar.sh"]) {
       const texto = fs.readFileSync(path.join(RAIZ, "hostgator-setup-kit", script), "utf8");
       expect(texto).toContain(`REPO_URL="\${REPO_URL:-${repo}.git}"`);
@@ -198,7 +198,7 @@ describe("o kit aponta para o que o CI realmente publica", () => {
         log=$(mktemp)
         trap 'rm -f "$log"' EXIT
         # O dublê registra em arquivo porque a função captura stdout do curl.
-        ghcr_status deskcommcrm 1.2.3
+        ghcr_status atenza 1.2.3
         printf '\\n'
         cat "$log"
       `,
@@ -209,8 +209,8 @@ describe("o kit aponta para o que o CI realmente publica", () => {
       );
       expect(saida.trim().split("\n")).toEqual([
         "200",
-        `https://${registry}/token?scope=repository:${owner}/deskcommcrm:pull&service=${registry}`,
-        `https://${registry}/v2/${owner}/deskcommcrm/manifests/1.2.3`,
+        `https://${registry}/token?scope=repository:${owner}/atenza:pull&service=${registry}`,
+        `https://${registry}/v2/${owner}/atenza/manifests/1.2.3`,
       ]);
     },
   );

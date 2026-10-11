@@ -1,4 +1,4 @@
-# CLAUDE.md — DeskcommCRM
+# CLAUDE.md — Atenza
 
 > Instruções pra futuras sessões Claude trabalhando neste repo. Leitura obrigatória antes de qualquer task de código.
 
@@ -14,7 +14,7 @@
 
 ## Visão (1 parágrafo)
 
-DeskcommCRM é um sistema operacional de vendas open source com agentes de IA nativos — multi-nicho (e-commerce, clínicas, imobiliárias, infoprodutos, serviços), com WhatsApp como canal primário (via WAHA). Agentes com RAG por tenant atendem, qualificam e movem o funil junto com humanos; CRM inteiro exposto via MCP. Monetização = self-host em VPS (parceria HostGator), não assinatura. Arquitetura multi-tenant com RLS desde o dia 1; LGPD nativa. Posicionamento completo: `VISION.md`.
+Atenza é um sistema operacional de vendas open source com agentes de IA nativos — multi-nicho (e-commerce, clínicas, imobiliárias, infoprodutos, serviços), com WhatsApp como canal primário (via WAHA). Agentes com RAG por tenant atendem, qualificam e movem o funil junto com humanos; CRM inteiro exposto via MCP. Monetização = self-host em VPS (parceria HostGator), não assinatura. Arquitetura multi-tenant com RLS desde o dia 1; LGPD nativa. Posicionamento completo: `VISION.md`.
 
 ---
 
@@ -372,7 +372,7 @@ Checks **obrigatórios** na branch protection da `main` (verificado na configura
 Todos os **cinco** são **obrigatórios** — medido em 2026-08-14 na branch protection:
 
 ```console
-$ gh api repos/melgarafael/DeskcommCRM/branches/main/protection --jq '.required_status_checks.contexts|join(", ")'
+$ gh api repos/andreajoa/SaaS-whatsapp/branches/main/protection --jq '.required_status_checks.contexts|join(", ")'
 verify, build-and-size, invariants, e2e, imagens-ok
 ```
 
@@ -388,7 +388,7 @@ Ao mexer em schema, RLS, RBAC, atribuição, escopo, roteamento, follow-up, webh
 
 ## QA Visual com Recursos Reais — DOUTRINA (produto self-host)
 
-**O DeskcommCRM é distribuído open-source: a experiência de quem instala numa VPS É o produto.** Toda feature nova (ou fix de comportamento visível) DEVE ser provada como um **usuário leigo a usaria de verdade** — pelo frontend, num ambiente que imita a instalação fresca — antes de "pronto". Não é opcional; é critério de aceite de toda sessão que toca UI ou fluxo de usuário.
+**O Atenza é distribuído open-source: a experiência de quem instala numa VPS É o produto.** Toda feature nova (ou fix de comportamento visível) DEVE ser provada como um **usuário leigo a usaria de verdade** — pelo frontend, num ambiente que imita a instalação fresca — antes de "pronto". Não é opcional; é critério de aceite de toda sessão que toca UI ou fluxo de usuário.
 
 **O que "recurso real" significa (e o que NÃO conta):**
 - **Conta.** Prova pela tela, dirigindo o browser (Playwright), logando com conta de teste real. `curl`/chamada de API **não** provam UX — validam o backend, mas não o que o usuário vê, clica e entende. Use curl só como diagnóstico.
@@ -463,12 +463,12 @@ Processo padrão (siga sempre):
 **Guias embutidos neste repositório** (`.claude/skills/`, espelho gerado de `.agents/skills/` — a
 mesma tabela vale para Codex, Cursor, OpenCode e Antigravity; ver `AGENTS.md`):
 
-- `deskcomm-instalar` — instalar, atualizar ou consertar a instalação numa VPS
-- `deskcomm-cliente-novo` — configurar o CRM para um cliente ou nicho (agentes, roteadores, follow-ups, conhecimento)
-- `deskcomm-metricas` — desempenho, conversão, custo de IA, funil, relatório
-- `deskcomm-prompt` — afinar o prompt de um agente que não performa
-- `deskcomm-contribuir` — o espelho da triagem, antes do PR; fica quieto para o mantenedor
-- `deskcomm-doutrina` — as três regras que mais custam, antes de escrever código
+- `atenza-instalar` — instalar, atualizar ou consertar a instalação numa VPS
+- `atenza-cliente-novo` — configurar o CRM para um cliente ou nicho (agentes, roteadores, follow-ups, conhecimento)
+- `atenza-metricas` — desempenho, conversão, custo de IA, funil, relatório
+- `atenza-prompt` — afinar o prompt de um agente que não performa
+- `atenza-contribuir` — o espelho da triagem, antes do PR; fica quieto para o mantenedor
+- `atenza-doutrina` — as três regras que mais custam, antes de escrever código
 
 - `superpowers:brainstorming` — antes de implementar feature não-trivial
 - `superpowers:writing-plans` — pra task com mais de 1 etapa de DB/API

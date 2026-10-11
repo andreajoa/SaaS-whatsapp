@@ -1,4 +1,4 @@
-# DeskcommCRM self-hosted — instalação em VPS (com agente de IA)
+# Atenza self-hosted — instalação em VPS (com agente de IA)
 
 > Sistema operacional de vendas open source com agente SDR de IA integrado
 > (WhatsApp via WAHA) — pra qualquer negócio que vende conversando.
@@ -23,7 +23,7 @@
 ## 1. Clonar e configurar
 
 ```bash
-git clone https://github.com/melgarafael/DeskcommCRM.git && cd DeskcommCRM
+git clone https://github.com/andreajoa/SaaS-whatsapp.git && cd Atenza
 cp .env.hostgator.example .env   # o template de produção (o .env.example é o de dev)
 ```
 
@@ -249,7 +249,7 @@ conta própria — num caminho HTTP seu, nunca como caminho de arquivo.
 ## 6. Operação
 
 - **Backup diário** (do seu crontab na VPS):
-  `0 3 * * * /caminho/repo/scripts/backup-db.sh /var/backups/deskcomm`
+  `0 3 * * * /caminho/repo/scripts/backup-db.sh /var/backups/atenza`
   (restaure com
   `pg_restore --clean --no-owner -d "${SUPABASE_DB_ADMIN_URL:-$SUPABASE_DB_URL}" arquivo.dump`
   — `--clean` derruba e recria objetos, o que é trabalho de dono do banco)

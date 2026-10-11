@@ -130,7 +130,7 @@ create policy tenant_isolation_voice_calls_all on voice_calls
 
 ### 3.1 Imagem
 
-`Dockerfile.wacalls` (multi-stage, non-root, Go 1.26+ build stage + client React/Vite build stage servido estático pelo binário — `-static client/dist`). WaCalls é vendorizado por **commit fixo** (`edeb31f0427aba896639db503153b777a405eccf`, HEAD da `main` em 2026-09-02), clonado dentro do Dockerfile — mesmo princípio de tag imutável da doutrina de packaging (invariante 4), aplicado a uma dependência sem release/tag própria. Publicado como `ghcr.io/melgarafael/deskcomm-wacalls:stable`, 4ª imagem na matriz de `publish-image.yml`. **Sem `build:`-only** — doutrina de packaging.
+`Dockerfile.wacalls` (multi-stage, non-root, Go 1.26+ build stage + client React/Vite build stage servido estático pelo binário — `-static client/dist`). WaCalls é vendorizado por **commit fixo** (`edeb31f0427aba896639db503153b777a405eccf`, HEAD da `main` em 2026-09-02), clonado dentro do Dockerfile — mesmo princípio de tag imutável da doutrina de packaging (invariante 4), aplicado a uma dependência sem release/tag própria. Publicado como `ghcr.io/andreajoa/atenza-wacalls:stable`, 4ª imagem na matriz de `publish-image.yml`. **Sem `build:`-only** — doutrina de packaging.
 
 Build e boot **provados localmente**: imagem constrói (client Vite + Go `CGO_ENABLED=0`, binário estático), container sobe, `GET /api/sessions` responde `200 {"sessions":[]}`, roda como uid 1001 (non-root).
 
@@ -139,7 +139,7 @@ Build e boot **provados localmente**: imagem constrói (client Vite + Go `CGO_EN
 ```yaml
 wacalls:
   mem_limit: 256m   # medir em staging antes de fixar — placeholder
-  image: ${WACALLS_IMAGE:-ghcr.io/melgarafael/deskcomm-wacalls:stable}
+  image: ${WACALLS_IMAGE:-ghcr.io/andreajoa/atenza-wacalls:stable}
   pull_policy: ${WACALLS_PULL_POLICY:-always}
   restart: unless-stopped
   command: ["-addr", ":8080", "-db", "/data/wacalls.db", "-static", "/app/client/dist"]
@@ -169,7 +169,7 @@ Opções pra produção (decidir antes de sair de LAN/staging):
 
 Todas exigem `getUser()` + verificação de organização (nunca confiar em `organization_id` do body). Traduzem pra chamada server-to-server em `http://wacalls:8080/...` — contrato medido no código-fonte (`cmd/server/httpapi.go`, não no README, que não lista os shapes):
 
-| Rota DeskcommCRM | WaCalls | Body / resposta upstream |
+| Rota Atenza | WaCalls | Body / resposta upstream |
 |---|---|---|
 | `POST /api/v1/voice/sessions/pair` | `POST /api/sessions` + `POST /api/sessions/{sid}/pair` | `{name}` → `{id}`; pair não devolve QR direto — o QR chega por SSE (`session-qr`, ver §4.2) |
 | `GET /api/v1/voice/sessions/status` | `GET /api/sessions` (filtrado pela org) | `{sessions: [{id,name,jid,state,paired}]}` — campo é `state`, não `status` como o README da tabela de API sugere |
@@ -180,7 +180,7 @@ Todas exigem `getUser()` + verificação de organização (nunca confiar em `org
 | `DELETE /api/v1/voice/calls/:id` | `DELETE .../calls/{id}` | → 204 |
 | `GET /api/v1/voice/calls/history` | `GET .../history` | → `{rows: CallRecord[]}` |
 
-**`X-Client-Id`** (header ou `?clientId=`) é como o WaCalls identifica o OPERADOR dono de uma chamada (exclusividade — um atendente só segura uma chamada ativa por vez, `409 operator already on a call` senão). A rota DeskcommCRM injeta o `user.id` da sessão autenticada aqui — nunca deixa o frontend escolher esse valor.
+**`X-Client-Id`** (header ou `?clientId=`) é como o WaCalls identifica o OPERADOR dono de uma chamada (exclusividade — um atendente só segura uma chamada ativa por vez, `409 operator already on a call` senão). A rota Atenza injeta o `user.id` da sessão autenticada aqui — nunca deixa o frontend escolher esse valor.
 
 `sessionId` do WaCalls nunca vaza pro frontend sem passar pela verificação de org — igual o `webhook_path_token` do WAHA não expõe `session_name` direto.
 

@@ -4,7 +4,7 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
-Se você roda o DeskcommCRM numa VPS, **leia a seção da versão para a qual está atualizando antes de rodar `bash update.sh`**. Mudanças que exigem ação manual aparecem sob **⚠️ Requer atenção**.
+Se você roda o Atenza numa VPS, **leia a seção da versão para a qual está atualizando antes de rodar `bash update.sh`**. Mudanças que exigem ação manual aparecem sob **⚠️ Requer atenção**.
 
 ## [Não lançado]
 
@@ -178,7 +178,7 @@ Se você roda o DeskcommCRM numa VPS, **leia a seção da versão para a qual es
 ### Alterado
 
 - **A marca do produto ganha símbolo e logotipo** Instalação que não configurou marca própria passa a mostrar o logotipo do
-  Deskcomm no menu lateral, na tela de entrada e no ícone da aba do navegador —
+  Atenza no menu lateral, na tela de entrada e no ícone da aba do navegador —
   no lugar do nome em texto e da letra "D" sobre a cor de destaque. Quem já
   definiu nome ou logo próprio em Marca não vê nenhuma diferença: a marca
   configurada continua valendo em todos esses lugares.
@@ -1319,7 +1319,7 @@ Se você roda o DeskcommCRM numa VPS, **leia a seção da versão para a qual es
   **Se você já tinha instalado antes desta versão**, a próxima atualização mostra
   esse mesmo passo uma vez, com o seu domínio preenchido, e não repete depois.
 
-- **Sete alertas de segurança em bibliotecas de terceiros foram fechados** O GitHub apontava sete alertas de segurança em bibliotecas que o DeskcommCRM não
+- **Sete alertas de segurança em bibliotecas de terceiros foram fechados** O GitHub apontava sete alertas de segurança em bibliotecas que o Atenza não
   usa diretamente — elas chegam junto com outras que ele usa. São quatro em
   `fast-uri` (confusão de endereço ao normalizar uma URL malformada), dois em `qs`
   (contorno do limite de tamanho de lista e travamento por entrada preparada) e um
@@ -1498,7 +1498,7 @@ Se você roda o DeskcommCRM numa VPS, **leia a seção da versão para a qual es
   O achado é de @prevprocesso-maker, que percebeu o furo instalando o sistema para
   um cliente.
 
-- **Instalar pelo canal padrão não mistura mais versões entre os serviços** O DeskcommCRM roda três serviços que saem do mesmo código — o aplicativo, o
+- **Instalar pelo canal padrão não mistura mais versões entre os serviços** O Atenza roda três serviços que saem do mesmo código — o aplicativo, o
   trabalhador de fundo e o agendador. Quem instala pelo canal padrão espera os
   três na mesma versão.
 
@@ -2543,7 +2543,7 @@ Se você roda o DeskcommCRM numa VPS, **leia a seção da versão para a qual es
 
   **Você não precisa fazer nada.** A opção de Push continua podendo ser ligada dos
   dois jeitos: mesmo sem as chaves, o aviso na bandeja do sistema já funciona
-  enquanto o DeskcommCRM está aberto numa aba.
+  enquanto o Atenza está aberto numa aba.
 
 - **A Agenda passa a mostrar só a organização que está selecionada** Quem administra mais de uma empresa na mesma instalação via a Agenda somando as
   duas: os tipos de agendamento apareciam repetidos, e clicar em metade deles
@@ -3360,7 +3360,7 @@ servidor continuaria onde está. A segunda execução fixa tudo na mesma versão
 Para saber em que pé você está, sem mexer em nada:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/melgarafael/DeskcommCRM/main/hostgator-setup-kit/diagnostico.sh | bash
+curl -fsSL https://raw.githubusercontent.com/andreajoa/SaaS-whatsapp/main/hostgator-setup-kit/diagnostico.sh | bash
 ```
 
 Ele só lê e explica — não escreve, não reinicia, não atualiza. Se disser que está afetada,
@@ -3371,7 +3371,7 @@ novas têm valor padrão e o próprio `update.sh` as acrescenta.
 
 ## [1.2.1] — 2026-08-12
 
-**Versão de segurança. Se você roda o DeskcommCRM numa VPS, atualize.**
+**Versão de segurança. Se você roda o Atenza numa VPS, atualize.**
 
 Um usuário da comunidade auditou o código e mandou um relatório. Parte do que ele apontou já
 tinha sido corrigida nas versões seguintes à que ele analisou — mas **seis** problemas estavam
@@ -3579,7 +3579,7 @@ Depois disso, nunca mais é preciso o terminal.
 
 ## [1.0.0] — 2026-07-27
 
-Primeira versão marcada do DeskcommCRM. O projeto vinha sendo desenvolvido publicamente desde abril de 2026 sem tags; esta release estabelece o ponto a partir do qual toda mudança passa a ser versionada e descrita — porque quem hospeda o próprio sistema precisa saber o que muda antes de atualizar.
+Primeira versão marcada do Atenza. O projeto vinha sendo desenvolvido publicamente desde abril de 2026 sem tags; esta release estabelece o ponto a partir do qual toda mudança passa a ser versionada e descrita — porque quem hospeda o próprio sistema precisa saber o que muda antes de atualizar.
 
 ### Plataforma
 
@@ -3634,7 +3634,7 @@ Primeira versão marcada do DeskcommCRM. O projeto vinha sendo desenvolvido publ
 - `hostgator-setup-kit`: instalação completa (app + WAHA + banco) com um comando.
 - `baseline.sql` idempotente e auto-curativo — atualização não quebra clone com dados legados.
 - 8 scripts de operação: `install`, `update`, `backup`, `restore`, `reset-password`, `reset-mfa`, `healthcheck` e o assistente de instalação em IA.
-- Imagem publicada em `ghcr.io/melgarafael/deskcommcrm` — a VPS não compila nada.
+- Imagem publicada em `ghcr.io/andreajoa/atenza` — a VPS não compila nada.
 
 ### Qualidade
 
@@ -3646,33 +3646,33 @@ Primeira versão marcada do DeskcommCRM. O projeto vinha sendo desenvolvido publ
 
 - **Node 22 é obrigatório para desenvolvimento.** A suíte de invariantes instancia o cliente do Supabase, que exige o `WebSocket` global — nativo apenas a partir do Node 22. Isso não afeta quem apenas hospeda: a VPS roda a imagem pronta.
 
-[Não lançado]: https://github.com/melgarafael/DeskcommCRM/compare/v1.20.0...HEAD
-[1.20.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.19.0...v1.20.0
-[1.19.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.18.1...v1.19.0
-[1.18.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.18.0...v1.18.1
-[1.18.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.17.0...v1.18.0
-[1.17.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.16.1...v1.17.0
-[1.16.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.16.0...v1.16.1
-[1.16.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.15.1...v1.16.0
-[1.15.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.15.0...v1.15.1
-[1.15.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.14.0...v1.15.0
-[1.14.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.13.0...v1.14.0
-[1.13.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.12.0...v1.13.0
-[1.12.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.11.1...v1.12.0
-[1.11.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.11.0...v1.11.1
-[1.11.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.10.2...v1.11.0
-[1.10.2]: https://github.com/melgarafael/DeskcommCRM/compare/v1.10.1...v1.10.2
-[1.10.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.10.0...v1.10.1
-[1.10.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.9.1...v1.10.0
-[1.9.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.9.0...v1.9.1
-[1.9.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.8.0...v1.9.0
-[1.8.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.7.0...v1.8.0
-[1.7.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.6.0...v1.7.0
-[1.5.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.4.1...v1.5.0
-[1.4.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.4.0...v1.4.1
-[1.4.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.2.1...v1.3.0
-[1.2.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.2.0...v1.2.1
-[1.2.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/melgarafael/DeskcommCRM/releases/tag/v1.0.0
+[Não lançado]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.20.0...HEAD
+[1.20.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.19.0...v1.20.0
+[1.19.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.18.1...v1.19.0
+[1.18.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.18.0...v1.18.1
+[1.18.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.17.0...v1.18.0
+[1.17.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.16.1...v1.17.0
+[1.16.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.16.0...v1.16.1
+[1.16.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.15.1...v1.16.0
+[1.15.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.15.0...v1.15.1
+[1.15.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.14.0...v1.15.0
+[1.14.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.13.0...v1.14.0
+[1.13.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.12.0...v1.13.0
+[1.12.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.11.1...v1.12.0
+[1.11.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.11.0...v1.11.1
+[1.11.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.10.2...v1.11.0
+[1.10.2]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.10.1...v1.10.2
+[1.10.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.10.0...v1.10.1
+[1.10.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.9.1...v1.10.0
+[1.9.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.9.0...v1.9.1
+[1.9.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.6.0...v1.7.0
+[1.5.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.2.1...v1.3.0
+[1.2.1]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/andreajoa/SaaS-whatsapp/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/andreajoa/SaaS-whatsapp/releases/tag/v1.0.0

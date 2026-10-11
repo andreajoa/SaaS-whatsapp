@@ -9,7 +9,7 @@ import { AGENDA, estaVencida, ultimaOcorrencia } from "@/lib/relogio/agenda";
  * A AGENDA DO HOSPEDADO TEM DE SER A MESMA DA VPS.
  *
  * Existem duas listas do que roda e quando: o crontab do contêiner
- * `deskcomm-scheduler` (`docker/scheduler/entrypoint.sh`, que é o self-host) e
+ * `atenza-scheduler` (`docker/scheduler/entrypoint.sh`, que é o self-host) e
  * `lib/relogio/agenda.ts` (que é o deploy hospedado, onde não há contêiner
  * nenhum e o Hobby da Vercel só aceita cron diário).
  *

@@ -3,11 +3,11 @@
 🇧🇷 Português · [🇺🇸 English](README.en.md) · [🇪🇸 Español](README.es.md)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/deskcomm-logo-dark.svg">
-  <img src="docs/brand/deskcomm-logo.svg" alt="Deskcomm CRM" width="420">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/atenza-logo-dark.svg">
+  <img src="docs/brand/atenza-logo.svg" alt="Atenza CRM" width="420">
 </picture>
 
-# 🛠️ DeskcommCRM — o Sistema Operacional de Vendas com IA, open source, pro WhatsApp
+# 🛠️ Atenza — o Sistema Operacional de Vendas com IA, open source, pro WhatsApp
 
 **Agentes de IA que atendem, qualificam e vendem no WhatsApp — dentro de um CRM open source rodando no seu servidor.**
 **Sem mensalidade, sem feature travada, seus dados com você. A alternativa aberta a Kommo, Octadesk e Intercom.**
@@ -16,7 +16,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript)](https://www.typescriptlang.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres%2BAuth%2BStorage-3ecf8e?logo=supabase)](https://supabase.com)
 [![Self-hosted](https://img.shields.io/badge/self--hosted-1%20comando-orange)](hostgator-setup-kit/)
-[![CI](https://github.com/melgarafael/DeskcommCRM/actions/workflows/ci.yml/badge.svg)](https://github.com/melgarafael/DeskcommCRM/actions/workflows/ci.yml)
+[![CI](https://github.com/andreajoa/SaaS-whatsapp/actions/workflows/ci.yml/badge.svg)](https://github.com/andreajoa/SaaS-whatsapp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [**⚡ Instalar**](#-instalar-na-sua-vps-o-caminho-principal) · [**🔄 Atualizar**](#-atualizar) · [**🧭 Visão**](VISION.md) · [**🏗️ Arquitetura**](ARCHITECTURE.md) · [**🤝 Contribuir**](CONTRIBUTING.md) · [**🗺️ Roadmap**](#%EF%B8%8F-roadmap)
@@ -27,7 +27,7 @@
 
 > ### ☁️ Rode este CRM em produção com 1 comando
 >
-> O DeskcommCRM foi desenvolvido em **parceria com a HostGator**: o [`hostgator-setup-kit/`](hostgator-setup-kit/)
+> O Atenza foi desenvolvido em **parceria com a HostGator**: o [`hostgator-setup-kit/`](hostgator-setup-kit/)
 > instala o CRM completo (app + WhatsApp + banco) numa VPS com um único comando, e o
 > [runbook de produção](docs/runbooks/waha-hostgator.md) já assume esse ambiente.
 >
@@ -39,7 +39,7 @@
 > comando certo pro seu caso:
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/melgarafael/DeskcommCRM/main/hostgator-setup-kit/comecar.sh | bash
+> curl -fsSL https://raw.githubusercontent.com/andreajoa/SaaS-whatsapp/main/hostgator-setup-kit/comecar.sh | bash
 > ```
 >
 > *(prefere ler antes de executar? clone o repo e rode `bash hostgator-setup-kit/comecar.sh` —
@@ -72,8 +72,8 @@ travamento: é o terminal escondendo a senha. Digite (ou cole) e dê Enter.
 Já dentro da VPS:
 
 ```bash
-git clone https://github.com/melgarafael/DeskcommCRM.git
-cd DeskcommCRM
+git clone https://github.com/andreajoa/SaaS-whatsapp.git
+cd Atenza
 bash hostgator-setup-kit/install.sh
 ```
 
@@ -129,7 +129,7 @@ escaneie o QR code com o WhatsApp do seu número.
 ### 🤖 Prefere que uma IA instale pra você?
 
 Jogue a pasta `hostgator-setup-kit/` no chat do **Claude Code** rodando dentro da VPS e diga
-*"instala o DeskcommCRM pra mim"*. Ele lê o [`CLAUDE.md`](hostgator-setup-kit/CLAUDE.md) do kit
+*"instala o Atenza pra mim"*. Ele lê o [`CLAUDE.md`](hostgator-setup-kit/CLAUDE.md) do kit
 — que traz o passo a passo e as armadilhas já mapeadas — e conduz tudo em português.
 
 ---
@@ -138,7 +138,7 @@ Jogue a pasta `hostgator-setup-kit/` no chat do **Claude Code** rodando dentro d
 
 Saiu versão nova? Há dois caminhos, e o primeiro **não exige terminal**.
 
-Com o repositório clonado, o **guia de instalação** já vem dentro — `.agents/skills/deskcomm-instalar/` —
+Com o repositório clonado, o **guia de instalação** já vem dentro — `.agents/skills/atenza-instalar/` —
 e carrega sozinho no Claude Code, Codex, Cursor, OpenCode ou Antigravity aberto na pasta. Diga só
 *"quero instalar o CRM na minha VPS"*. Há guias também para montar um cliente por nicho, analisar
 métricas, afinar o prompt do agente e contribuir (`AGENTS.md`, seção "Guias do assistente").
@@ -161,7 +161,7 @@ volta no `.env` — sem isso, o próximo restart traria o app quebrado de novo, 
 ### Pelo terminal
 
 ```bash
-cd /caminho/do/DeskcommCRM
+cd /caminho/do/Atenza
 bash hostgator-setup-kit/update.sh
 ```
 
@@ -209,7 +209,7 @@ Passo a passo em linguagem simples: [`docs/ATUALIZANDO.md`](docs/ATUALIZANDO.md)
 
 ## ✨ O que é
 
-**Deskcomm** vem de **Desk** (mesa) + **comm** (comércio): **o comercial de mesa** — toda a operação de vendas do seu negócio numa mesa só, operada por pessoas e agentes de IA juntos.
+**Atenza** vem de **Desk** (mesa) + **comm** (comércio): **o comercial de mesa** — toda a operação de vendas do seu negócio numa mesa só, operada por pessoas e agentes de IA juntos.
 
 O projeto nasceu como CRM de e-commerce e a comunidade o levou muito além: hoje roda em **clínicas, imobiliárias, infoprodutos, agências, lojas e prestadores de serviço** — qualquer negócio que vende pelo WhatsApp. O produto acompanhou essa virada e virou um **sistema operacional de vendas**: agentes de IA com RAG por tenant atendem, qualificam, movem leads no funil, disparam automações e sabem a hora de passar pra um humano — com o CRM inteiro exposto via **MCP** pros agentes operarem de verdade. A história completa está em [`VISION.md`](VISION.md).
 
@@ -278,8 +278,8 @@ Detalhes: [`ARCHITECTURE.md`](ARCHITECTURE.md).
 > Esta seção é pra quem vai mexer no código.
 
 ```bash
-git clone https://github.com/melgarafael/DeskcommCRM.git
-cd DeskcommCRM
+git clone https://github.com/andreajoa/SaaS-whatsapp.git
+cd Atenza
 
 nvm use                     # Node 22
 npm install -g pnpm && pnpm install
@@ -315,7 +315,7 @@ App: <http://localhost:3000> · Health check: <http://localhost:3000/api/v1/heal
 ## 📁 Estrutura
 
 ```
-DeskcommCRM/
+Atenza/
 ├── app/                    # Next.js App Router
 │   ├── (admin)/            # Rotas super-admin (impersonate, tenants)
 │   ├── (public)/           # Login, recovery
@@ -349,7 +349,7 @@ pnpm test:e2e      # Playwright (requer dev server)
 **Estes checks são obrigatórios** pra mergear na `main`. A lista abaixo já disse "quatro" e depois "cinco" — **meça, não confie nela**:
 
 ```bash
-gh api repos/melgarafael/DeskcommCRM/branches/main/protection \
+gh api repos/andreajoa/SaaS-whatsapp/branches/main/protection \
   --jq '.required_status_checks.contexts|join(", ")'
 # em 2026-08-14: verify, build-and-size, invariants, e2e, imagens-ok
 ```
@@ -422,9 +422,9 @@ o `imagens-ok` (constrói as três imagens Docker). Verde na sua máquina não �
 
 ## 🐛 Reportando bugs
 
-Abra uma [issue](https://github.com/melgarafael/DeskcommCRM/issues/new/choose) — o template pede o que precisamos (ambiente, `/api/v1/health`, steps). Rodar `bash hostgator-setup-kit/healthcheck.sh` e colar a saída ajuda muito.
+Abra uma [issue](https://github.com/andreajoa/SaaS-whatsapp/issues/new/choose) — o template pede o que precisamos (ambiente, `/api/v1/health`, steps). Rodar `bash hostgator-setup-kit/healthcheck.sh` e colar a saída ajuda muito.
 
-Pra **vulnerabilidades de segurança**, **NÃO abra issue pública** — use o [relato privado de vulnerabilidades](https://github.com/melgarafael/DeskcommCRM/security/advisories/new). Detalhes em [`SECURITY.md`](SECURITY.md).
+Pra **vulnerabilidades de segurança**, **NÃO abra issue pública** — use o [relato privado de vulnerabilidades](https://github.com/andreajoa/SaaS-whatsapp/security/advisories/new). Detalhes em [`SECURITY.md`](SECURITY.md).
 
 ---
 
@@ -446,7 +446,7 @@ Pra **vulnerabilidades de segurança**, **NÃO abra issue pública** — use o [
 
 ### 🔮 Próximo
 
-- **MCP público** — capabilities do CRM expostas pro ecossistema de agentes: plugue o agente que quiser e ele opera o Deskcomm.
+- **MCP público** — capabilities do CRM expostas pro ecossistema de agentes: plugue o agente que quiser e ele opera o Atenza.
 - **Templates por nicho** — pipelines e vocabulários prontos pra clínica, imobiliária, infoproduto e serviços (e-commerce já entregue).
 - **Integrações** — VTEX e Shopify via adapter pattern (Nuvemshop já entregue).
 - **Identity probabilística** — unificação de contatos entre canais.
@@ -455,8 +455,8 @@ Pra **vulnerabilidades de segurança**, **NÃO abra issue pública** — use o [
 
 ## 💬 Comunidade
 
-- **Discussões:** [GitHub Discussions](https://github.com/melgarafael/DeskcommCRM/discussions) — pra perguntas, ideias, showcase.
-- **Issues:** [GitHub Issues](https://github.com/melgarafael/DeskcommCRM/issues) — bugs e tasks.
+- **Discussões:** [GitHub Discussions](https://github.com/andreajoa/SaaS-whatsapp/discussions) — pra perguntas, ideias, showcase.
+- **Issues:** [GitHub Issues](https://github.com/andreajoa/SaaS-whatsapp/issues) — bugs e tasks.
 - **Instagram:** [@melgarafael](https://www.instagram.com/melgarafael)
 - **YouTube:** [youtube.com/@melgarafael](https://www.youtube.com/@melgarafael)
 
@@ -476,8 +476,8 @@ Este é um projeto **self-host**: cada pessoa roda o CRM na **própria infraestr
 (VPS, banco Supabase e chave de IA próprios). Isso implica:
 
 - **Suporte é comunitário e "as-is".** Dúvidas e bugs entram como
-  [Issues](https://github.com/melgarafael/DeskcommCRM/issues) ou
-  [Discussions](https://github.com/melgarafael/DeskcommCRM/discussions). Não há SLA nem
+  [Issues](https://github.com/andreajoa/SaaS-whatsapp/issues) ou
+  [Discussions](https://github.com/andreajoa/SaaS-whatsapp/discussions). Não há SLA nem
   suporte garantido — é open source mantido por boa vontade.
 - **Você é responsável pela sua instalação.** Atualizações não são automáticas (você clica
   ou roda `update.sh` quando quiser), e manter/backup do seu servidor é com você.

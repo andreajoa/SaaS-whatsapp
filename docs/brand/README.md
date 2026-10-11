@@ -4,9 +4,9 @@
 
 | Arquivo | O que é |
 |---|---|
-| `deskcomm-icon.svg` | O símbolo: D aberto com um módulo quadrado destacado. Quadrado de 216. |
-| `deskcomm-logo.svg` | Logotipo para fundo claro — símbolo em sálvia `#506d48`, nome em `#1c1a16`, "CRM" em `#5d594f`. |
-| `deskcomm-logo-dark.svg` | Logotipo para fundo escuro — sálvia `#82a077`, nome em `#f5f4ef`, "CRM" em `#8e8b7f`. |
+| `atenza-icon.svg` | O símbolo: D aberto com um módulo quadrado destacado. Quadrado de 216. |
+| `atenza-logo.svg` | Logotipo para fundo claro — símbolo em sálvia `#506d48`, nome em `#1c1a16`, "CRM" em `#5d594f`. |
+| `atenza-logo-dark.svg` | Logotipo para fundo escuro — sálvia `#82a077`, nome em `#f5f4ef`, "CRM" em `#8e8b7f`. |
 
 O texto do logotipo já está convertido em caminhos: nenhum arquivo depende de fonte.
 
@@ -20,7 +20,7 @@ três arquivos aqui **e** o `desenho.ts`; `tests/unit/marca-do-produto.test.tsx`
 que as cores dos dois lados coincidam.
 
 Os READMEs (pt, en, es) usam os arquivos diretamente, num `<picture>` que troca para a
-versão escura conforme o tema do GitHub. A LP (`deskcomm-site`) tem a própria cópia em
+versão escura conforme o tema do GitHub. A LP (`atenza-site`) tem a própria cópia em
 `components/Marca.tsx` e `app/icon.svg`.
 
 Prova pela tela (2026-09-08, Supabase local fresco do `baseline.sql`, marca sem configurar):
@@ -36,7 +36,7 @@ Prova pela tela (2026-09-08, Supabase local fresco do `baseline.sql`, marca sem 
 | `evidence/marca/favicon-produto.png` | `/icon` gerado em runtime com o símbolo |
 | `evidence/marca/crm-login-revendedor.png` | Controle negativo: com `platform_branding.app_name` gravado, a fachada fica sem o desenho |
 | `evidence/marca/favicon-revendedor.png` | Controle negativo: o favicon volta à inicial sobre a cor de destaque |
-| `evidence/marca/lp-cabecalho.png` | Cabeçalho da LP (`deskcomm-site`) com o logotipo |
+| `evidence/marca/lp-cabecalho.png` | Cabeçalho da LP (`atenza-site`) com o logotipo |
 | `evidence/marca/lp-rodape.png` | Rodapé da LP com o símbolo |
 
 ## Social preview (Open Graph)
@@ -76,4 +76,4 @@ mentindo, ou é refeito do zero com outra identidade.
   demanda deixa ao atravessar o sistema, terminando no follow-up — o mecanismo
   anti-morte. É o argumento do produto mostrado, não adjetivado.
 - Card de compartilhamento **sempre** carrega o logotipo (inline no HTML, lido de
-  `deskcomm-logo.svg`). Sem ele, quem vê a imagem não sabe de quem ela é.
+  `atenza-logo.svg`). Sem ele, quem vê a imagem não sabe de quem ela é.

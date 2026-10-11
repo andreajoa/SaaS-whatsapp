@@ -41,6 +41,7 @@ import {
 import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
 import {
   identidadePublica,
+  instagramOficial,
   jsonLdSeguro,
   metadadosDaHome,
   LINKS_SEO,
@@ -80,6 +81,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
   const suporte = emailDeSuporte();
+  const instagram = instagramOficial(env.NEXT_PUBLIC_APP_URL);
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
   const textosDaCaptura = {
     rotulo: t("Seu e-mail"),
@@ -666,6 +668,11 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             <Link href="/legal">{t("Documentos")}</Link>
             <Link href="/contato">{t("Fale com a gente")}</Link>
             {suporte && <a href={`mailto:${suporte}`}>{suporte}</a>}
+            {instagram && (
+              <a href={instagram} target="_blank" rel="noopener noreferrer me">
+                Instagram
+              </a>
+            )}
             <Link href="/login">{t("Entrar")}</Link>
           </nav>
         </div>

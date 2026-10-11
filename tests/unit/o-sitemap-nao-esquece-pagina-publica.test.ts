@@ -47,6 +47,8 @@ const FORA_DO_SITEMAP: Readonly<Record<string, string>> = {
   "support-ended": "estado de conta de quem já é cliente",
   dashboard:
     "painel do operador, atrás de senha própria — sem PAINEL_SENHA ele responde 404, e com ela não é conteúdo público",
+  "dashboard/automacoes":
+    "editor de automações do operador, atrás da mesma senha do painel — não é conteúdo público",
   design: "página interna de referência visual, sem texto que responda a uma busca",
   "descadastrar/[token]":
     "endereço pessoal com token: indexá-lo publicaria o link de descadastro de quem o recebeu",

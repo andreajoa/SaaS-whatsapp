@@ -92,6 +92,10 @@ CRONS="
 # escrevem para a mesma lista e disputariam o limite de 2 req/s do Resend.
 # Numa VPS as duas consultas voltam vazias pelo mesmo motivo da de cima.
 47 * * * *|90|api/v1/cron/checkout-abandonado
+# CAMPANHAS DE CALENDARIO (Black Friday, Natal, Ano Novo). Quatro minutos depois
+# da sequencia, pelo mesmo limite do Resend. Fora do periodo de cada campanha,
+# ou com a automacao desligada no painel, a rodada nao manda nada.
+41 * * * *|120|api/v1/cron/marketing-calendario
 0 12 * * *|60|api/v1/cron/lgpd-sla-watcher
 30 3 * * *|120|api/v1/cron/kb-conversations-batch
 15 4 * * *|60|api/v1/cron/sync-model-catalog

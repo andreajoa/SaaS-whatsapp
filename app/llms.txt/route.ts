@@ -10,48 +10,31 @@ import { mercadoDoPais, precoLegivelNoMercado } from "@/lib/mercado/paises";
  * Era um arquivo estático em `public/` descrevendo o projeto open-source sem
  * plano pago — e em www.atenza.online nem chegava a ser servido: o proxy
  * mandava `/llms.txt` para o login (307). Agora a instalação que cobra fala do
- * produto que vende, com os preços reais do Brasil; o self-host mantém o texto
- * do projeto aberto.
+ * produto que vende, com os preços reais do Brasil; o self-host ganha um resumo
+ * curto com o nome da própria instalação.
  */
 export const dynamic = "force-dynamic";
 
-const TEXTO_SELF_HOST = `# DeskcommCRM
+/** Clone self-host: o nome é o da instalação, nunca o do projeto de origem. */
+function textoSelfHost(nome: string, base: string): string {
+  return `# ${nome}
 
-> Open-source AI sales OS: a self-hosted, multi-tenant CRM where AI agents natively operate sales and support over WhatsApp. An open alternative to Kommo, Octadesk and Intercom — for any business that sells through conversations (e-commerce, clinics, real estate, info-products, agencies, services). MIT-licensed, no paid tier; the recommended production path is a one-command install on a HostGator VPS.
+> ${nome} é um CRM de atendimento por WhatsApp com agentes de IA, instalado e operado pela própria empresa: caixa de entrada compartilhada, base de conhecimento por empresa, passagem para atendimento humano com histórico e funil de vendas.
 
-Key facts:
-- Category: open-source CRM / AI sales operating system / WhatsApp customer platform
-- AI: per-tenant RAG agents (pgvector) that answer, qualify and move leads; sentiment analysis; audited AI→human handoff; AI as first-class assignee; per-org AI budget; self-improvement loop (resolved conversations feed the knowledge base)
-- MCP: internal MCP server today; public MCP contract on the roadmap — any AI agent can operate the CRM
-- WhatsApp: via WAHA (multi-number, anti-ban throttling, media, STOP detection)
-- Multi-niche: configurable vocabulary per pipeline (lead = Customer/Patient/Buyer; won = Paid/Booked/Closed); Nuvemshop integration for the e-commerce vertical
-- Compliance: multi-tenant Postgres RLS (isolation tested in CI), LGPD by design (redact, data_request, anonymization), append-only audit log
-- Stack: Next.js 16, React 19, TypeScript, Supabase (Postgres + Auth + Realtime + Storage), Vercel AI SDK, WAHA
-- License: MIT. Fully self-hosted; your data stays on your VPS.
-
-## Docs
-
-- [README (Portuguese)](https://github.com/melgarafael/DeskcommCRM/blob/main/README.md): visão geral, quickstart, stack
-- [README (English)](https://github.com/melgarafael/DeskcommCRM/blob/main/README.en.md): project overview, quickstart, stack
-- [README (Spanish)](https://github.com/melgarafael/DeskcommCRM/blob/main/README.es.md): visión general en español
-- [Vision & positioning](https://github.com/melgarafael/DeskcommCRM/blob/main/VISION.md): what the project believes about self-improving AI agents
-- [Architecture](https://github.com/melgarafael/DeskcommCRM/blob/main/ARCHITECTURE.md): one-page architecture
-- [Setup guide](https://github.com/melgarafael/DeskcommCRM/blob/main/docs/SETUP.md): step-by-step setup of every integration
-- [Self-host on a VPS](https://github.com/melgarafael/DeskcommCRM/blob/main/docs/deploy-selfhost/README.md): docker compose deploy on any VPS
-
-## Repository
-
-- [GitHub](https://github.com/melgarafael/DeskcommCRM): source code, issues, discussions
+- Acesso: ${new URL("/login", base).toString()}
+- Contato: ${new URL("/contato", base).toString()}
+- Termos e privacidade: ${new URL("/legal", base).toString()}
 `;
+}
 
 export async function GET() {
+  const { nome } = await marcaDaSaida(null);
+  const base = env.NEXT_PUBLIC_APP_URL;
   if (!instalacaoCobra()) {
-    return new Response(TEXTO_SELF_HOST, {
+    return new Response(textoSelfHost(nome, base), {
       headers: { "content-type": "text/plain; charset=utf-8" },
     });
   }
-  const { nome } = await marcaDaSaida(null);
-  const base = env.NEXT_PUBLIC_APP_URL;
   const url = (caminho: string) => new URL(caminho, base).toString();
   const brasil = mercadoDoPais("BR");
   const planos = ORDEM_DOS_PLANOS.map(

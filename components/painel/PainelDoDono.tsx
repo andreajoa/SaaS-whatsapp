@@ -21,10 +21,12 @@ import {
 } from "lucide-react";
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
 import { marcaEhADoProduto } from "@/lib/branding";
+import { tagDeIdioma } from "@/lib/i18n/datas";
 import type { LeadResumido, LinhaContada, Painel, Segmento } from "@/lib/painel/metricas";
 import styles from "./painel.module.css";
 const NUMERO = new Intl.NumberFormat("pt-BR");
-const DATA = new Intl.DateTimeFormat("pt-BR", {
+// O painel do dono é só em português; a tag sai da camada de data, não fixa aqui.
+const DATA = new Intl.DateTimeFormat(tagDeIdioma("pt-BR"), {
   day: "2-digit",
   month: "short",
   hour: "2-digit",

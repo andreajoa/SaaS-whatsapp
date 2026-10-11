@@ -1871,8 +1871,9 @@
     bottom: 23px;
   }
   .playCircle {
-    width: 66px;
-    height: 66px;
+    width: 48px;
+    height: 48px;
+    top: 25%;
   }
   .steps {
     gap: 18px;

@@ -121,3 +121,23 @@ proprietário no chat. O remetente e o destinatário eram o mesmo número; esse
 teste não certifica entrega entre números distintos. O número próprio entrou
 temporariamente na lista permitida do canal de teste, cuja
 configuração original foi restaurada. Não houve geração de IA nem campanha.
+
+
+## Aquisição orgânica e análise do proprietário
+
+- Entrada: links do rodapé da homepage e sitemap para as soluções, guia e vídeo.
+- Saída: demonstração, contato e planos reais; nenhum CTA simula conversão.
+- Registro: Medidor grava visita e pulso de tempo visível/cliques; URLs editoriais
+  brasileiras fixam idioma, e o mercado mantém moeda conforme país.
+- Tela e porta: conteúdo público no idioma da URL; proprietário usa `/dashboard`
+  com senha própria, antes de qualquer consulta aos dados de aquisição.
+- Anti-morte: páginas exigem cobrança ligada; listas de URLs são fechadas,
+  caminhos privados ficam noindex; links, schema seguro e sitemap têm gates.
+- Configuração: `NEXT_PUBLIC_APP_URL` e marca resolvida alimentam canonical,
+  metadados e identidade; não há segredo no JSON-LD ou conteúdo público.
+- Retorno: consultas/impressões do Search Console e conversões medidas no painel
+  orientam uma revisão explícita do conteúdo e da jornada; não há promessa de
+  posição, citação ou geração automática de páginas regionais duplicadas.
+- Mapa: `aquisicao-publica.architecture.json`, com entrada e saída das peças novas.
+- Documentação de operação: `docs/marketing/search-console-atenza.md` e a análise
+  de concorrentes em `docs/marketing/seo-concorrentes-2026-10-10.md`.

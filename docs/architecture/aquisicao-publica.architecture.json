@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Aquisição pública: conteúdo, medição e revisão", "output": "aquisicao-publica.html" },
+  "lanes": [{ "id": "publico", "label": "Páginas públicas" }, { "id": "dados", "label": "Descoberta e medição" }, { "id": "operador", "label": "Proprietário" }],
+  "mainPath": ["home", "conteudo", "medicao", "painel", "revisao"],
+  "nodes": [
+    { "id": "home", "lane": "publico", "label": "Homepage: /, /en e /es" },
+    { "id": "conteudo", "lane": "publico", "label": "Soluções, guia brasileiro e demonstração" },
+    { "id": "seo", "lane": "dados", "label": "Canonical, alternates e JSON-LD seguro" },
+    { "id": "sitemap", "lane": "dados", "label": "Sitemap público + robots" },
+    { "id": "medicao", "lane": "dados", "label": "Medidor → site_visits → cliques e tempo visível" },
+    { "id": "painel", "lane": "operador", "label": "Dashboard e CRM: porta própria antes da consulta" },
+    { "id": "revisao", "lane": "operador", "label": "Search Console + métricas reais orientam revisão" }
+  ],
+  "edges": [
+    { "id": "links", "from": "home", "to": "conteudo" },
+    { "id": "retorno", "from": "conteudo", "to": "home" },
+    { "id": "meta", "from": "conteudo", "to": "seo" },
+    { "id": "urls", "from": "seo", "to": "sitemap" },
+    { "id": "descoberta", "from": "sitemap", "to": "conteudo" },
+    { "id": "visita", "from": "conteudo", "to": "medicao" },
+    { "id": "leitura", "from": "medicao", "to": "painel" },
+    { "id": "decisao", "from": "painel", "to": "revisao" },
+    { "id": "ajuste", "from": "revisao", "to": "conteudo" }
+  ]
+}

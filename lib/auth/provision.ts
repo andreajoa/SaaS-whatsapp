@@ -1,3 +1,5 @@
+import { registrarCadastroReal } from "@/lib/marketing/funil";
+import { instalacaoCobra } from "@/lib/billing/planos";
 import { llmDeNascimento } from "@/lib/ai/llm-de-nascimento";
 import { settingsDoMercado } from "@/lib/mercado/organizacao";
 import type { Mercado } from "@/lib/mercado/paises";
@@ -69,7 +71,15 @@ export async function ensureTenantForUser(
     .is("revoked_at", null)
     .limit(1)
     .maybeSingle();
-  if (existing) return { provisioned: false, organizationId: existing.organization_id };
+  if (existing) {
+    if (instalacaoCobra() && user.email)
+      await registrarCadastroReal({
+        email: user.email,
+        userId: user.id,
+        organizationId: existing.organization_id,
+      });
+    return { provisioned: false, organizationId: existing.organization_id };
+  }
 
   const orgName =
     (user.user_metadata?.org_name as string | undefined)?.trim() ||
@@ -137,5 +147,7 @@ export async function ensureTenantForUser(
     metadata: { slug: org.slug },
   });
 
+  if (instalacaoCobra() && user.email)
+    await registrarCadastroReal({ email: user.email, userId: user.id, organizationId: org.id });
   return { provisioned: true, organizationId: org.id };
 }

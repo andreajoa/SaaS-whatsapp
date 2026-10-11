@@ -519,6 +519,12 @@ export const AUDIT_ACTIONS = [
   // consultas voltam vazias de hora em hora, e auditar isso encheria a tabela
   // com a prova de que nada aconteceu.
   "marketing.abandono_run",
+  // Rodada das campanhas de calendário (Black Friday, Natal, Ano Novo) — mesma
+  // regra: só audita a rodada que mandou alguma coisa.
+  "marketing.calendario_run",
+  // O dono editou texto, público, período ou ligou/desligou uma automação no
+  // painel `/dashboard/automacoes`.
+  "marketing.automacao_updated",
 
   // Ciclo de conexão e sincronização das lojas no atendimento.
   "commerce.connected",

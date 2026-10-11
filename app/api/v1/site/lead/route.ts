@@ -34,6 +34,7 @@ import { COOKIE_DO_VISITANTE } from "@/lib/mercado/visitante";
 export const dynamic = "force-dynamic";
 
 const schema = z.object({
+  marketing_opt_in: z.boolean().optional().default(false),
   email: z.string().trim().email().max(200),
   nome: z.string().trim().max(120).optional().default(""),
   /** Só `popup` e `rodape` entram por aqui: as outras origens são de dentro. */
@@ -108,6 +109,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const resultado = await registrarLead({
     email: dados.email,
+    marketingOptIn: dados.marketing_opt_in,
     nome: dados.nome,
     origem: dados.origem,
     visitorId: req.cookies.get(COOKIE_DO_VISITANTE)?.value ?? null,

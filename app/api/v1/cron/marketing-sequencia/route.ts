@@ -48,6 +48,7 @@ import { marcaDaSaida } from "@/lib/branding/saida";
 import { sendEmail } from "@/lib/email/resend";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { reivindicarEnvio, registrarResultadoEnvio } from "@/lib/marketing/automacoes-envio";
 import { montarEmail } from "@/lib/marketing/molde";
 import { MENSAGENS, mensagemPorId } from "@/lib/marketing/sequencia";
 import { ehIdiomaDoSite, IDIOMA_DO_SITE_PADRAO } from "@/lib/mercado/paises";
@@ -78,13 +79,11 @@ const PAUSA_MS = 600;
 /**
  * A distância mínima entre dois e-mails para a MESMA pessoa.
  *
- * Vinte horas, e não vinte e quatro, porque o relógio que bate esta rota
- * atrasa (5 a 15 minutos é normal no agendador de graça). Com 24 h exatas, uma
- * rodada que chegasse atrasada empurraria o passo para o dia seguinte, e o
- * atraso se acumularia até a sequência de 45 dias virar uma de 60. Com 20 h, a
- * pessoa nunca recebe dois no mesmo dia e a série não escorrega.
+ * Vinte e quatro horas entre mensagens comerciais. O mesmo relógio é
+ * reservado no banco pela sequência e pelo calendário, inclusive em rodadas
+ * concorrentes. Uma batida atrasada adia o próximo passo, sem concentrar envios.
  */
-const INTERVALO_MINIMO_MS = 20 * 60 * 60 * 1000;
+const INTERVALO_MINIMO_MS = 24 * 60 * 60 * 1000;
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 
@@ -130,6 +129,7 @@ async function handle(req: NextRequest): Promise<Response> {
     .select("id, email, idioma, created_at, proximo_passo, ultimo_envio_em, token_descadastro")
     .in("status", ["inscrito", "confirmado"])
     .is("descadastrado_em", null)
+    .not("marketing_opt_in_em", "is", null)
     .lt("proximo_passo", MENSAGENS.length)
     .or(`ultimo_envio_em.is.null,ultimo_envio_em.lte.${corteDoIntervalo}`)
     .order("ultimo_envio_em", { ascending: true, nullsFirst: true })
@@ -156,64 +156,36 @@ async function handle(req: NextRequest): Promise<Response> {
     // O `dia` é ESPERA MÍNIMA desde a inscrição, não uma data. Quem se
     // inscreveu hoje recebe o passo 0 hoje; quem se inscreveu há 50 dias e
     // está no passo 3 recebe o passo 3 agora, não os três de uma vez — o teto
-    // de um passo por rodada e o intervalo de 20 h cuidam disso.
+    // de um passo por rodada e o intervalo de 24 h cuidam disso.
     if (agora - new Date(lead.created_at).getTime() < passo.dia * DIA_MS) continue;
 
     const declarado = lead.idioma ?? "";
     const idioma = ehIdiomaDoSite(declarado) ? declarado : IDIOMA_DO_SITE_PADRAO;
     const conteudo = passo.texto[idioma];
 
-    // ── 1. A linha ANTES do envio ─────────────────────────────────────────
-    const { data: criado, error: erroInsert } = await admin
-      .from("email_envios")
-      .insert({
-        lead_id: lead.id,
-        mensagem: passo.id,
-        assunto: conteudo.assunto,
-        status: "agendado",
-        agendado_para: new Date(agora).toISOString(),
-      })
-      .select("id")
-      .maybeSingle();
-
-    let envioId = criado?.id as string | undefined;
-
-    if (erroInsert) {
-      if (erroInsert.code !== "23505") {
-        logger.error("[marketing-sequencia] insert falhou", {
-          error: erroInsert.message,
-          lead: lead.id,
-          requestId,
-        });
-        falhas++;
-        continue;
-      }
-      // Colidiu: este (lead, mensagem) já tem linha. Ou ela saiu — e o cursor
-      // é que está atrasado, e corrigi-lo é a coisa certa a fazer sem mandar
-      // nada —, ou ela FALHOU numa rodada anterior e a retentativa é devida.
+    const envioId = await reivindicarEnvio(admin, {
+      leadId: lead.id,
+      mensagem: passo.id,
+      assunto: conteudo.assunto,
+      marketing: true,
+    });
+    if (!envioId) {
       const { data: existente } = await admin
         .from("email_envios")
-        .select("id, status")
+        .select("status")
         .eq("lead_id", lead.id)
         .eq("mensagem", passo.id)
         .maybeSingle();
-
-      if (!existente || existente.status !== "falhou") {
+      if (existente && ["enviado", "entregue", "aberto", "clicado"].includes(existente.status))
         await avancar(admin, lead, passo.id, null);
-        pulados++;
-        continue;
-      }
-      envioId = existente.id as string;
-    }
-
-    if (!envioId) {
-      falhas++;
+      pulados++;
       continue;
     }
 
     // ── 2. O envio ────────────────────────────────────────────────────────
     const email = montarEmail(conteudo.corpo, idioma, lead.token_descadastro, marca.nome);
     const resultado = await sendEmail({
+      idempotencyKey: `email/${envioId}`,
       to: lead.email,
       subject: conteudo.assunto,
       html: email.html,
@@ -223,34 +195,12 @@ async function handle(req: NextRequest): Promise<Response> {
       tags: [{ name: "sequencia", value: passo.id }],
     });
 
-    if (!resultado.ok) {
-      // Fica em `falhou` DE PROPÓSITO, e o cursor não anda: a rodada seguinte
-      // reencontra esta linha pelo status e tenta a mesma mensagem outra vez.
-      await admin
-        .from("email_envios")
-        .update({ status: "falhou", erro: `${resultado.error}: ${resultado.details ?? ""}`.trim() })
-        .eq("id", envioId);
-      logger.warn("[marketing-sequencia] envio falhou", {
-        erro: resultado.error,
-        lead: lead.id,
-        mensagem: passo.id,
-        requestId,
-      });
+    const gravado = await registrarResultadoEnvio(admin, envioId, resultado);
+    if (!resultado.ok || !gravado) {
       falhas++;
       await pausa();
       continue;
     }
-
-    // ── 3. Só agora o cursor anda ─────────────────────────────────────────
-    await admin
-      .from("email_envios")
-      .update({
-        status: "enviado",
-        provider_id: resultado.id ?? null,
-        enviado_em: new Date().toISOString(),
-        erro: null,
-      })
-      .eq("id", envioId);
 
     await avancar(admin, lead, passo.id, new Date().toISOString());
     enviados++;

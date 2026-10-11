@@ -3,6 +3,7 @@ import { cookieSecure } from "@/lib/supabase/cookie-secure";
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import { isPublicPath } from "@/lib/auth/public-paths";
+import { idiomaDaUrlPublica } from "@/lib/marketing/seo";
 import {
   verifyImpersonateCookieEdge,
   IMPERSONATE_COOKIE_NAME_EDGE,
@@ -11,7 +12,10 @@ import {
 const COOKIE_NAME = "sb-deskcomm-auth";
 
 export async function proxy(request: NextRequest) {
-  const response = NextResponse.next({ request: { headers: request.headers } });
+  const publicHeaders = new Headers(request.headers);
+  // Sobrescreve qualquer valor enviado pelo visitante: idioma vem da URL.
+  publicHeaders.set("x-site-language", idiomaDaUrlPublica(request.nextUrl.pathname));
+  const response = NextResponse.next({ request: { headers: publicHeaders } });
 
   // Inject X-Request-Id for downstream correlation (audit log, error wrappers).
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

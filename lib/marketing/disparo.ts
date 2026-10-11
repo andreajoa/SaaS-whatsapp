@@ -44,6 +44,8 @@
  * antes, num link que prometia parar a PROPAGANDA. Por isso a consulta do
  * descadastro só acontece no ramo de propaganda, e o outro ramo nem a faz.
  */
+import { lerAutomacao } from "@/lib/marketing/automacoes";
+import { reivindicarEnvio, registrarResultadoEnvio } from "@/lib/marketing/automacoes-envio";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { sendEmail } from "@/lib/email/resend";
 import { env } from "@/lib/env";
@@ -78,6 +80,10 @@ export type ResultadoDoDisparo =
   /** Propaganda para quem pediu para sair. Não sai, e isso é o certo. */
   | { readonly tipo: "descadastrado" }
   | { readonly tipo: "sem_lead" }
+  | { readonly tipo: "sem_consentimento" }
+  | { readonly tipo: "suprimido" }
+  | { readonly tipo: "adiado" }
+  | { readonly tipo: "pendente" }
   | { readonly tipo: "falhou"; readonly erro: string };
 
 export interface PedidoDeDisparo {
@@ -125,52 +131,36 @@ export async function dispararTransacional(pedido: PedidoDeDisparo): Promise<Res
   const lead = await acharOuCriarLead(admin, email, pedido);
   if (!lead) return { tipo: "sem_lead" };
 
+  if (lead.status === "bounce" || lead.status === "reclamou") return {tipo:"suprimido"};
   if (aviso.ehPropaganda && lead.descadastrado_em) return { tipo: "descadastrado" };
+  if (aviso.ehPropaganda && !lead.marketing_opt_in_em) return {tipo:"sem_consentimento"};
 
   const declarado = pedido.idioma ?? lead.idioma ?? "";
   const idioma = ehIdiomaDoSite(declarado) ? declarado : IDIOMA_DO_SITE_PADRAO;
-  const conteudo = aviso.texto[idioma];
+  const editavel = aviso.id === "pagamento-falhou" || aviso.id === "pagamento-recebido";
+  const config = editavel
+    ? await lerAutomacao(aviso.id as "pagamento-falhou" | "pagamento-recebido")
+    : null;
+  if (editavel && (!config || !config.enabled)) return { tipo: "sem_email" };
+  const conteudo = config?.textos[idioma] ?? aviso.texto[idioma];
   const mensagem = pedido.chave ? `${aviso.id}${SEPARADOR}${pedido.chave}` : aviso.id;
 
-  // ── 1. A linha ANTES do envio ───────────────────────────────────────────
-  const { data: criado, error: erroInsert } = await admin
-    .from("email_envios")
-    .insert({
-      lead_id: lead.id,
-      mensagem,
-      assunto: conteudo.assunto,
-      status: "agendado",
-      agendado_para: new Date().toISOString(),
-    })
-    .select("id")
-    .maybeSingle();
-
-  let envioId = criado?.id as string | undefined;
-
-  if (erroInsert) {
-    if ((erroInsert as { code?: string }).code !== "23505") {
-      logger.error("[disparo] insert falhou", {
-        erro: erroInsert.message,
-        lead: lead.id,
-        mensagem,
-      });
-      return { tipo: "falhou", erro: erroInsert.message };
-    }
-    // Já existe linha para (lead, este fato). Ou o aviso saiu — e a segunda
-    // entrega do webhook não deve mandar nada —, ou falhou, e a retentativa é
-    // devida na MESMA linha.
-    const { data: existente } = await admin
-      .from("email_envios")
-      .select("id, status")
-      .eq("lead_id", lead.id)
-      .eq("mensagem", mensagem)
-      .maybeSingle();
-
-    if (!existente || existente.status !== "falhou") return { tipo: "ja_enviado" };
-    envioId = existente.id as string;
+  const envioId = await reivindicarEnvio(admin, {
+    leadId: lead.id,
+    mensagem,
+    assunto: conteudo.assunto,
+    marketing: aviso.ehPropaganda,
+    // Os avisos existentes funcionam sem linha de configuração; o novo
+    // agradecimento só funciona depois de salvo/ativado pelo dono.
+    ...(editavel ? { campanha: aviso.id } : {}),
+  });
+  if (!envioId) {
+    const {data:existente,error} = await admin.from("email_envios").select("status").eq("lead_id",lead.id).eq("mensagem",mensagem).maybeSingle();
+    if(error) return {tipo:"falhou",erro:"não foi possível ler o recibo"};
+    if(existente && ["enviado","entregue","aberto","clicado","bounce","reclamou","descadastrou"].includes(existente.status)) return {tipo:"ja_enviado"};
+    if(existente?.status === "agendado") return {tipo:"pendente"};
+    return {tipo:"adiado"};
   }
-
-  if (!envioId) return { tipo: "falhou", erro: "sem id de envio" };
 
   // ── 2. O envio ──────────────────────────────────────────────────────────
   const marca = await marcaDaSaida(null);
@@ -179,6 +169,7 @@ export async function dispararTransacional(pedido: PedidoDeDisparo): Promise<Res
     : montarEmailTransacional(conteudo.corpo, idioma, marca.nome);
 
   const resultado = await sendEmail({
+    idempotencyKey: `email/${envioId}`,
     to: email,
     subject: conteudo.assunto,
     html: montado.html,
@@ -188,27 +179,18 @@ export async function dispararTransacional(pedido: PedidoDeDisparo): Promise<Res
     tags: [{ name: "transacional", value: aviso.id }],
   });
 
-  if (!resultado.ok) {
-    await admin
-      .from("email_envios")
-      .update({ status: "falhou", erro: `${resultado.error}: ${resultado.details ?? ""}`.trim() })
-      .eq("id", envioId);
-    logger.warn("[disparo] envio falhou", { erro: resultado.error, lead: lead.id, mensagem });
-    return { tipo: "falhou", erro: resultado.error ?? "envio recusado" };
+  const gravado = await registrarResultadoEnvio(admin, envioId, resultado);
+  if (!resultado.ok || !gravado) {
+    logger.warn("[disparo] envio não confirmado", {
+      erro: resultado.error,
+      lead: lead.id,
+      mensagem,
+    });
+    return { tipo: "falhou", erro: resultado.error ?? "registro do envio pendente" };
   }
-
   const quando = new Date().toISOString();
-  await admin
-    .from("email_envios")
-    .update({
-      status: "enviado",
-      provider_id: resultado.id ?? null,
-      enviado_em: quando,
-      erro: null,
-    })
-    .eq("id", envioId);
 
-  // O relógio dos 20 h é da PESSOA, não do canal.
+  // O relógio dos 24 h é da PESSOA, não do canal.
   //
   // Sem esta linha, alguém que se inscreve às 14h recebe "bem-vindo" na hora e
   // o passo 0 da sequência na batida das :37 — dois e-mails do mesmo remetente
@@ -227,6 +209,8 @@ interface LeadDoDisparo {
   readonly token_descadastro: string;
   readonly idioma: string | null;
   readonly descadastrado_em: string | null;
+  readonly status: string;
+  readonly marketing_opt_in_em: string | null;
 }
 
 /**
@@ -244,7 +228,7 @@ async function acharOuCriarLead(
   const buscar = async (): Promise<LeadDoDisparo | null> => {
     const { data } = await admin
       .from("site_leads")
-      .select("id, token_descadastro, idioma, descadastrado_em")
+      .select("id, token_descadastro, idioma, descadastrado_em, status, marketing_opt_in_em")
       .eq("email", email)
       .maybeSingle();
     return (data as LeadDoDisparo | null) ?? null;

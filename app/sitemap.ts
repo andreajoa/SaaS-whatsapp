@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
+import { IDIOMAS_PUBLICOS } from "@/lib/marketing/seo";
 
 /**
  * As páginas que existem para quem ainda não tem conta.
@@ -40,7 +41,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const url = (caminho: string) => new URL(caminho, env.NEXT_PUBLIC_APP_URL).toString();
 
   return [
-    { url: url("/"), changeFrequency: "weekly", priority: 1 },
+    ...["/", "/en", "/es"].map((path) => ({
+      url: url(path),
+      alternates: {
+        languages: Object.fromEntries(
+          Object.entries(IDIOMAS_PUBLICOS).map(([lang, path]) => [lang, url(path)]),
+        ),
+      },
+    })),
+    ...[
+      "/atendimento-whatsapp",
+      "/chatbot-para-whatsapp",
+      "/agentes-ia-whatsapp",
+      "/crm-whatsapp",
+      "/atendimento-whatsapp-sao-paulo",
+      "/guias/como-escolher-atendimento-whatsapp",
+      "/demonstracao",
+    ].map((path) => ({ url: url(path), lastModified: "2026-10-10" })),
     // Quem procura "como falar com o suporte" antes de assinar procura esta.
     { url: url("/contato"), changeFrequency: "yearly", priority: 0.5 },
     { url: url("/legal"), changeFrequency: "yearly", priority: 0.4 },

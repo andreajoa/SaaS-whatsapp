@@ -37,6 +37,7 @@ import { audit } from "@/lib/audit";
 import { instalacaoCobra, type PlanoId, type StatusAssinatura } from "@/lib/billing/planos";
 import { sincronizarAssinatura } from "@/lib/billing/sincronizar";
 import { lerAssinatura, verificarWebhook, type StripeSubscription } from "@/lib/billing/stripe";
+import { agradecerFaturaPaga } from "@/lib/marketing/automacoes-cobranca";
 import { dispararTransacional } from "@/lib/marketing/disparo";
 import { concluirTentativa, marcarAssinatura } from "@/lib/marketing/funil";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -134,10 +135,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // ─── O funil e os dois avisos ────────────────────────────────────────
     //
     // Depois de `aplicar`, e não no lugar dele: o acesso da pessoa não pode
-    // depender de o e-mail sair. Soltos e sem `await` porque o Stripe conta
-    // segundos até o 200 — um webhook lento é reentregue, e reentrega é
-    // trabalho em dobro que só o índice único de `email_envios` segura.
-    void avisar(evento.type, evento.data.object, resultado).catch(() => {});
+    // depender de o e-mail sair. Esperar a tentativa mantém seu ciclo de vida
+    // dentro da execução serverless; falha do e-mail não desfaz o pagamento.
+    // O índice de email_envios e a chave do provedor protegem uma reentrega.
+    await avisar(evento.type, evento.data.object, resultado).catch(() => {});
 
     return ok({ recebido: true, aplicado: Boolean(resultado.organizationId) }, { requestId });
   } catch (e) {
@@ -180,7 +181,7 @@ async function avisar(
   const email = emailDoEvento(objeto);
   if (!email) return;
 
-  if (tipo === "checkout.session.completed") {
+  if (tipo === "checkout.session.completed" && resultado.organizationId) {
     const sessao = typeof objeto.id === "string" ? objeto.id : null;
     if (sessao) await concluirTentativa(sessao);
     await marcarAssinatura({
@@ -194,14 +195,26 @@ async function avisar(
       chave: idDaAssinatura(tipo, objeto) ?? sessao,
       origem: "checkout",
     });
+    // O disparo pode ter criado o lead de quem comprou diretamente. Fechar
+    // o vínculo também nesse caso evita tratá-lo como prospect na campanha.
+    await marcarAssinatura({
+      email,
+      plano: resultado.plano,
+      organizationId: resultado.organizationId,
+    });
     return;
   }
 
-  if (tipo === "invoice.payment_failed") {
+  if (tipo === "invoice.paid") {
+    await agradecerFaturaPaga(objeto, resultado.organizationId);
+    return;
+  }
+
+  if (tipo === "invoice.payment_failed" && resultado.organizationId && typeof objeto.id === "string") {
     await dispararTransacional({
       email,
       transacionalId: "pagamento-falhou",
-      chave: typeof objeto.id === "string" ? objeto.id : null,
+      chave: objeto.id,
       origem: "checkout",
     });
   }

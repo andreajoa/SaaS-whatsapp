@@ -50,6 +50,46 @@ export interface EmailTransacional {
 }
 
 export const TRANSACIONAIS: readonly EmailTransacional[] = [
+  {
+    id: "pagamento-recebido",
+    ehPropaganda: false,
+    texto: {
+      "pt-BR": {
+        assunto: "Pagamento recebido — obrigado",
+        corpo: {
+          titulo: "Recebemos seu pagamento",
+          paragrafos: [
+            "Obrigado. O pagamento da sua fatura foi confirmado.",
+            "Você pode consultar as faturas e a assinatura na tela de cobrança.",
+          ],
+          acao: { rotulo: "Consultar cobrança", caminho: "/app/settings/billing" },
+        },
+      },
+      en: {
+        assunto: "Payment received — thank you",
+        corpo: {
+          titulo: "We received your payment",
+          paragrafos: [
+            "Thank you. Payment for your invoice has been confirmed.",
+            "You can review invoices and your subscription in billing settings.",
+          ],
+          acao: { rotulo: "View billing", caminho: "/app/settings/billing" },
+        },
+      },
+      es: {
+        assunto: "Pago recibido — gracias",
+        corpo: {
+          titulo: "Recibimos su pago",
+          paragrafos: [
+            "Gracias. El pago de su factura fue confirmado.",
+            "Puede consultar las facturas y la suscripción en la pantalla de cobro.",
+          ],
+          acao: { rotulo: "Consultar cobro", caminho: "/app/settings/billing" },
+        },
+      },
+    },
+  },
+
   // ─────────────────────────────────────────────────────────────────────────
   // 1. Acabou de entrar na lista. Sai na hora, e não no dia seguinte: quem
   //    deixou o e-mail há trinta segundos ainda está na página.

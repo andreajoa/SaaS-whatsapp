@@ -11,7 +11,7 @@ import { IDIOMAS_DO_SITE, type IdiomaDoSite } from "@/lib/mercado/paises";
 /**
  * O E-MAIL QUE CHEGA — medido no HTML que sai, não no molde que o produz.
  *
- * Todo caso aqui RENDERIZA as vinte mensagens nos três idiomas e olha o texto
+ * Todo caso aqui RENDERIZA as vinte e uma mensagens nos três idiomas e olha o texto
  * final. É de propósito: ler o `molde.ts` e ver que ele não escreve `<img>`
  * prova que o molde não escreve — não prova que nenhuma das sessenta
  * combinações de conteúdo escreveu, e é o conteúdo que muda toda semana.
@@ -54,10 +54,10 @@ const RENDERIZADOS = tudo();
 // Controle positivo. Sem ele, um `tudo()` que devolvesse lista vazia deixaria
 // todos os `for` abaixo passarem sem ter olhado nada — o modo de falha que já
 // custou caro neste repo (ver `suporte-cobertura-de-efeitos.test.ts`).
-it("a varredura renderiza as vinte mensagens nos três idiomas", () => {
+it("a varredura renderiza as vinte e uma mensagens nos três idiomas", () => {
   expect(MENSAGENS.length).toBe(15);
-  expect(TRANSACIONAIS.length).toBe(5);
-  expect(RENDERIZADOS.length).toBe(20 * IDIOMAS_DO_SITE.length);
+  expect(TRANSACIONAIS.length).toBe(6);
+  expect(RENDERIZADOS.length).toBe(21 * IDIOMAS_DO_SITE.length);
 });
 
 describe("o que o cliente de e-mail bloqueia", () => {
@@ -159,15 +159,15 @@ describe("a porta de saída", () => {
     }
   });
 
-  it("os dois avisos que respondem a dinheiro são os que não têm saída", () => {
+  it("os avisos que respondem a dinheiro são os que não têm saída", () => {
     // Congelado de propósito: mover `assinatura-ativa` ou `pagamento-falhou`
     // para o lado da propaganda é a mudança que ninguém percebe no diff.
     const semSaida = TRANSACIONAIS.filter((t) => !t.ehPropaganda).map((t) => t.id);
-    expect(semSaida.sort()).toEqual(["assinatura-ativa", "pagamento-falhou"]);
+    expect(semSaida.sort()).toEqual(["assinatura-ativa", "pagamento-falhou", "pagamento-recebido"]);
   });
 });
 
-describe("o conteúdo das vinte", () => {
+describe("o conteúdo das vinte e uma", () => {
   it("todo id é único e estável — é ele que vai para email_envios.mensagem", () => {
     // `email_envios.mensagem` guarda o id, e nunca um índice: inserir uma
     // mensagem no meio da série deslocaria todos os índices, e o

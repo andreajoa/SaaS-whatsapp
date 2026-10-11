@@ -19,6 +19,7 @@ import {
   type MarcaResolvida,
 } from "@/lib/branding/resolve";
 import { env } from "@/lib/env";
+import { verificacaoDoBuscador } from "@/lib/marketing/seo";
 import { logger } from "@/lib/logger";
 import { ThemeProvider } from "@/lib/theme";
 import { Providers } from "./providers";
@@ -56,10 +57,7 @@ async function marcaResolvida(): Promise<{
   readonly marca: MarcaResolvida;
 }> {
   const linha = await marcaDaInstalacao();
-  const marca = resolverMarca(
-    [camadaDaInstalacao(linha), camadaDoAmbiente(env)],
-    REGUA_DO_PRODUTO,
-  );
+  const marca = resolverMarca([camadaDaInstalacao(linha), camadaDoAmbiente(env)], REGUA_DO_PRODUTO);
   return { linha, marca };
 }
 
@@ -94,14 +92,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "Centralize o atendimento por WhatsApp num funil só. Agentes de IA resolvem o que dá pra resolver e passam para o time humano o que importa — com tudo registrado. Multi-tenant, LGPD-nativo, feito para operações brasileiras.",
     applicationName: name,
     authors: [{ name }],
-    keywords: [
-      "CRM",
-      "atendimento",
-      "WhatsApp",
-      "IA conversacional",
-      "LGPD",
-      "multi-tenant",
-    ],
+    keywords: ["CRM", "atendimento", "WhatsApp", "IA conversacional", "LGPD", "multi-tenant"],
     robots: { index: false, follow: false },
     // Sem esta linha o navegador pede `/favicon.ico`, que não existe: medido em
     // produção, o 404 é a `app/not-found.tsx` INTEIRA (19.435 bytes de HTML)
@@ -110,6 +101,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // instalação em runtime — ver o cabeçalho daquele arquivo para por que ele
     // não pode ser um arquivo estático em `public/`.
     icons: { icon: "/icon" },
+    verification: verificacaoDoBuscador(env.NEXT_PUBLIC_APP_URL),
   };
 }
 
@@ -275,12 +267,12 @@ async function MarcaDosClientComponents({ children }: { children: React.ReactNod
   );
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const idiomaPublico = (await headers()).get("x-site-language");
+  const idiomaHtml = idiomaPublico === "en" || idiomaPublico === "es" ? idiomaPublico : "pt-BR";
   return (
     <html
-      lang="pt-BR"
+      lang={idiomaHtml}
       data-theme="light"
       suppressHydrationWarning
       className={`${atkinson.variable} ${plexMono.variable}`}
@@ -298,12 +290,7 @@ export default function RootLayout({
           <MarcaDosClientComponents>
             <ThemeProvider>{children}</ThemeProvider>
           </MarcaDosClientComponents>
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            duration={4000}
-          />
+          <Toaster position="top-right" richColors closeButton duration={4000} />
         </Providers>
       </body>
     </html>

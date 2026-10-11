@@ -38,7 +38,11 @@ import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translat
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
-  "Português": { es: "Portugués" },
+  "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.":
+    {
+      es: "Quiero recibir consejos, novedades y campañas de temporada por correo, como máximo un mensaje comercial al día. Puedo cancelar cuando quiera.",
+    },
+  Português: { es: "Portugués" },
   Essencial: { es: "Esencial" },
   // Vitrine: textos traduzidos no servidor e enviados às ilhas por prop.
   "Explore o produto": { es: "Explora el producto" },
@@ -49,102 +53,196 @@ export const DICIONARIO: Traducoes = {
   "Sua equipe": { es: "Tu equipo" },
   "Quero mais informações": { es: "Quiero más información" },
   "Oi! Vocês têm este modelo em estoque?": { es: "¡Hola! ¿Tienen este modelo en stock?" },
-  "Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?": { es: "¡Hola, Mariana! Sí, lo tenemos. ¿Te ayudo a elegir la talla?" },
+  "Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?": {
+    es: "¡Hola, Mariana! Sí, lo tenemos. ¿Te ayudo a elegir la talla?",
+  },
   "Pode sim! Estou procurando o tamanho 38.": { es: "¡Sí! Estoy buscando la talla 38." },
   "Escreva uma mensagem...": { es: "Escribe un mensaje..." },
-  "Demonstração interativa com dados fictícios. Nenhuma mensagem é enviada.": { es: "Demostración interactiva con datos ficticios. No se envían mensajes." },
+  "Demonstração interativa com dados fictícios. Nenhuma mensagem é enviada.": {
+    es: "Demostración interactiva con datos ficticios. No se envían mensajes.",
+  },
   "Conversa atribuída à equipe": { es: "Conversación asignada al equipo" },
   "O conhecimento é da sua empresa.": { es: "El conocimiento es de tu empresa." },
-  "Organize os materiais que orientam o agente.": { es: "Organiza los materiales que orientan al agente." },
+  "Organize os materiais que orientam o agente.": {
+    es: "Organiza los materiales que orientan al agente.",
+  },
   "Produtos e serviços": { es: "Productos y servicios" },
   "Prazos e entregas": { es: "Plazos y entregas" },
   "Perguntas frequentes": { es: "Preguntas frecuentes" },
   "Limites definidos por você": { es: "Límites definidos por ti" },
-  "Configure instruções, base de conhecimento e quando pedir ajuda ao time.": { es: "Configura las instrucciones, la base de conocimiento y cuándo pedir ayuda al equipo." },
+  "Configure instruções, base de conhecimento e quando pedir ajuda ao time.": {
+    es: "Configura las instrucciones, la base de conocimiento y cuándo pedir ayuda al equipo.",
+  },
   "Uma pessoa assume com contexto": { es: "Una persona asume con contexto" },
-  "O histórico acompanha a conversa quando ela passa da IA para a equipe.": { es: "El historial acompaña la conversación cuando pasa de la IA al equipo." },
+  "O histórico acompanha a conversa quando ela passa da IA para a equipe.": {
+    es: "El historial acompaña la conversación cuando pasa de la IA al equipo.",
+  },
   "A conversa tem um próximo passo.": { es: "La conversación tiene un siguiente paso." },
-  "Proposta": { es: "Propuesta" },
-  "Confirmar o tamanho e acompanhar a decisão.": { es: "Confirmar la talla y acompañar la decisión." },
+  Proposta: { es: "Propuesta" },
+  "Confirmar o tamanho e acompanhar a decisão.": {
+    es: "Confirmar la talla y acompañar la decisión.",
+  },
   "Mover para": { es: "Mover a" },
-  "Experimente mudar a etapa deste contato no exemplo acima.": { es: "Prueba a cambiar la etapa de este contacto en el ejemplo de arriba." },
+  "Experimente mudar a etapa deste contato no exemplo acima.": {
+    es: "Prueba a cambiar la etapa de este contacto en el ejemplo de arriba.",
+  },
   "Veja como funciona": { es: "Mira cómo funciona" },
-  "Um passeio pelo atendimento, pela IA e pelo funil. Vídeo com áudio e legendas em português.": { es: "Un recorrido por la atención, la IA y el embudo. Vídeo con audio y subtítulos en portugués." },
+  "Um passeio pelo atendimento, pela IA e pelo funil. Vídeo com áudio e legendas em português.": {
+    es: "Un recorrido por la atención, la IA y el embudo. Vídeo con audio y subtítulos en portugués.",
+  },
   "Fechar vídeo": { es: "Cerrar vídeo" },
   "Ler a explicação": { es: "Leer la explicación" },
-  "O vídeo não carregou. Você pode ler a explicação abaixo.": { es: "El vídeo no se cargó. Puedes leer la explicación abajo." },
-  "Seu cliente mandou uma mensagem. E agora? Com o Atenza, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.": { es: "Tu cliente envió un mensaje. ¿Y ahora? Con Atenza, tu equipo organiza la atención por WhatsApp en una bandeja de entrada compartida. Las conversaciones tienen contexto, responsables y un siguiente paso claro." },
-  "Configure seu agente de IA com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.": { es: "Configura tu agente de IA con el conocimiento de tu negocio y las credenciales de tu proveedor. Ayuda con las dudas habituales, y tu equipo asume cuando la atención necesita intervención humana." },
-  "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.": { es: "Después, sigue las oportunidades en el embudo y organiza los seguimientos. Las integraciones disponibles conectan tu operación según la configuración de cada servicio." },
-  "Menos improviso. Mais atenção em cada conversa. Conheça os planos do Atenza. Comece com sete dias sem cobrança. É necessário cartão.": { es: "Menos improvisación. Más atención en cada conversación. Conoce los planes de Atenza. Empieza con siete días sin cobro. Se necesita tarjeta." },
-  "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.": { es: "Tarjeta necesaria. Renovación automática después de la prueba. Cancela cuando quieras." },
+  "O vídeo não carregou. Você pode ler a explicação abaixo.": {
+    es: "El vídeo no se cargó. Puedes leer la explicación abajo.",
+  },
+  "Seu cliente mandou uma mensagem. E agora? Com o Atenza, seu time organiza o atendimento pelo WhatsApp em uma caixa de entrada compartilhada. As conversas têm contexto, responsáveis e um próximo passo claro.":
+    {
+      es: "Tu cliente envió un mensaje. ¿Y ahora? Con Atenza, tu equipo organiza la atención por WhatsApp en una bandeja de entrada compartida. Las conversaciones tienen contexto, responsables y un siguiente paso claro.",
+    },
+  "Configure seu agente de IA com o conhecimento do seu negócio e as credenciais do seu provedor. Ele ajuda com as dúvidas da rotina, e sua equipe assume quando o atendimento precisa de atenção humana.":
+    {
+      es: "Configura tu agente de IA con el conocimiento de tu negocio y las credenciales de tu proveedor. Ayuda con las dudas habituales, y tu equipo asume cuando la atención necesita intervención humana.",
+    },
+  "Depois, acompanhe as oportunidades no funil e organize os retornos. As integrações disponíveis conectam sua operação, conforme a configuração de cada serviço.":
+    {
+      es: "Después, sigue las oportunidades en el embudo y organiza los seguimientos. Las integraciones disponibles conectan tu operación según la configuración de cada servicio.",
+    },
+  "Menos improviso. Mais atenção em cada conversa. Conheça os planos do Atenza. Comece com sete dias sem cobrança. É necessário cartão.":
+    {
+      es: "Menos improvisación. Más atención en cada conversación. Conoce los planes de Atenza. Empieza con siete días sin cobro. Se necesita tarjeta.",
+    },
+  "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.": {
+    es: "Tarjeta necesaria. Renovación automática después de la prueba. Cancela cuando quieras.",
+  },
   "Comércio e e-commerce": { es: "Comercio y e-commerce" },
   "A dúvida chega. A conversa continua.": { es: "Llega una duda. La conversación continúa." },
-  "Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja.": { es: "Reúne las preguntas sobre productos, pedidos y entregas con el contexto de tu tienda." },
-  "Empreendedora organizando pedidos de uma loja": { es: "Emprendedora organizando pedidos de una tienda" },
+  "Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja.": {
+    es: "Reúne las preguntas sobre productos, pedidos y entregas con el contexto de tu tienda.",
+  },
+  "Empreendedora organizando pedidos de uma loja": {
+    es: "Emprendedora organizando pedidos de una tienda",
+  },
   "Clínicas e saúde": { es: "Clínicas y salud" },
   "Mais atenção a quem precisa agendar.": { es: "Más atención para quien necesita una cita." },
-  "Organize o primeiro contato e encaminhe dúvidas para a equipe responsável.": { es: "Organiza el primer contacto y dirige las dudas al equipo responsable." },
+  "Organize o primeiro contato e encaminhe dúvidas para a equipe responsável.": {
+    es: "Organiza el primer contacto y dirige las dudas al equipo responsable.",
+  },
   "Profissional de recepção em uma clínica": { es: "Profesional de recepción en una clínica" },
-  "Educação": { es: "Educación" },
+  Educação: { es: "Educación" },
   "Do interesse à próxima conversa.": { es: "Del interés a la próxima conversación." },
-  "Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil.": { es: "Centraliza las dudas sobre cursos y sigue a los interesados en el embudo." },
-  "Profissional de educação acompanhando informações no computador": { es: "Profesional de educación revisando información en un ordenador" },
+  "Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil.": {
+    es: "Centraliza las dudas sobre cursos y sigue a los interesados en el embudo.",
+  },
+  "Profissional de educação acompanhando informações no computador": {
+    es: "Profesional de educación revisando información en un ordenador",
+  },
   "Serviços e B2B": { es: "Servicios y B2B" },
   "O contexto acompanha cada proposta.": { es: "El contexto acompaña cada propuesta." },
-  "Qualifique os contatos e mantenha o próximo passo visível para o time.": { es: "Califica a los contactos y mantén el siguiente paso visible para el equipo." },
-  "Profissional de serviços conversando com um cliente": { es: "Profesional de servicios conversando con un cliente" },
+  "Qualifique os contatos e mantenha o próximo passo visível para o time.": {
+    es: "Califica a los contactos y mantén el siguiente paso visible para el equipo.",
+  },
+  "Profissional de serviços conversando com um cliente": {
+    es: "Profesional de servicios conversando con un cliente",
+  },
   "Ir para o conteúdo": { es: "Ir al contenido" },
   "Seu atendimento cresce.": { es: "Tu atención crece." },
   "Seu cliente não espera.": { es: "Tu cliente no espera." },
-  "WhatsApp, agentes de IA e funil de vendas na mesma plataforma.": { es: "WhatsApp, agentes de IA y embudo de ventas en una misma plataforma." },
+  "WhatsApp, agentes de IA e funil de vendas na mesma plataforma.": {
+    es: "WhatsApp, agentes de IA y embudo de ventas en una misma plataforma.",
+  },
   "Ver em ação": { es: "Ver en acción" },
   "Conhecer os planos": { es: "Conocer los planes" },
   "Prévia ilustrativa com dados fictícios": { es: "Vista previa ilustrativa con datos ficticios" },
   "O controle continua com você": { es: "El control sigue en tus manos" },
   "Veja o atendimento acontecer.": { es: "Mira la atención en acción." },
-  "Da primeira mensagem ao próximo passo da venda.": { es: "Del primer mensaje al siguiente paso de la venta." },
+  "Da primeira mensagem ao próximo passo da venda.": {
+    es: "Del primer mensaje al siguiente paso de la venta.",
+  },
   "Um histórico para o time inteiro": { es: "Un historial para todo el equipo" },
-  "Todos acompanham o que já foi conversado.": { es: "Todos pueden seguir lo que ya se ha conversado." },
+  "Todos acompanham o que já foi conversado.": {
+    es: "Todos pueden seguir lo que ya se ha conversado.",
+  },
   "IA e pessoas, na mesma conversa": { es: "IA y personas en la misma conversación" },
-  "O time assume quando o atendimento pede.": { es: "El equipo asume cuando la atención lo necesita." },
+  "O time assume quando o atendimento pede.": {
+    es: "El equipo asume cuando la atención lo necesita.",
+  },
   "O próximo passo fica à vista": { es: "El siguiente paso queda a la vista" },
-  "Organize os contatos e acompanhe as oportunidades.": { es: "Organiza los contactos y sigue las oportunidades." },
+  "Organize os contatos e acompanhe as oportunidades.": {
+    es: "Organiza los contactos y sigue las oportunidades.",
+  },
   "No ritmo do seu negócio.": { es: "Al ritmo de tu negocio." },
-  "Veja onde a plataforma entra na sua rotina.": { es: "Mira dónde encaja la plataforma en tu rutina." },
-  "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.": { es: "Ejemplos de uso. La configuración debe respetar los procesos y las responsabilidades de tu empresa." },
+  "Veja onde a plataforma entra na sua rotina.": {
+    es: "Mira dónde encaja la plataforma en tu rutina.",
+  },
+  "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.":
+    {
+      es: "Ejemplos de uso. La configuración debe respetar los procesos y las responsabilidades de tu empresa.",
+    },
   "Conecte o que sua operação já usa.": { es: "Conecta lo que tu operación ya utiliza." },
-  "Lojas, APIs e webhooks para trazer mais contexto ao atendimento.": { es: "Tiendas, APIs y webhooks para aportar más contexto a la atención." },
-  "Ferramentas e formas de conexão disponíveis": { es: "Herramientas y formas de conexión disponibles" },
+  "Lojas, APIs e webhooks para trazer mais contexto ao atendimento.": {
+    es: "Tiendas, APIs y webhooks para aportar más contexto a la atención.",
+  },
+  "Ferramentas e formas de conexão disponíveis": {
+    es: "Herramientas y formas de conexión disponibles",
+  },
   "Pausar animação": { es: "Pausar animación" },
   "Continuar animação": { es: "Continuar animación" },
-  "As conexões dependem do plano, das credenciais e das permissões de cada ferramenta.": { es: "Las conexiones dependen del plan, las credenciales y los permisos de cada herramienta." },
+  "As conexões dependem do plano, das credenciais e das permissões de cada ferramenta.": {
+    es: "Las conexiones dependen del plan, las credenciales y los permisos de cada herramienta.",
+  },
   "Conversar sobre integrações": { es: "Hablar sobre integraciones" },
-  "Cena de atendimento com uma profissional usando headset": { es: "Escena de atención con una profesional usando auriculares" },
+  "Cena de atendimento com uma profissional usando headset": {
+    es: "Escena de atención con una profesional usando auriculares",
+  },
   "Vídeo de contexto · sem som": { es: "Vídeo de contexto · sin sonido" },
   "Pausar vídeo de contexto": { es: "Pausar vídeo de contexto" },
   "Reproduzir vídeo de contexto": { es: "Reproducir vídeo de contexto" },
-  "A imagem continua disponível enquanto o vídeo não carrega.": { es: "La imagen sigue disponible mientras el vídeo no se carga." },
+  "A imagem continua disponível enquanto o vídeo não carrega.": {
+    es: "La imagen sigue disponible mientras el vídeo no se carga.",
+  },
   "Automatize a rotina.": { es: "Automatiza la rutina." },
   "Mantenha o cuidado.": { es: "Mantén el cuidado." },
-  "A IA ajuda no repetitivo. Sua equipe entra com atenção, contexto e autonomia quando o cliente precisa.": { es: "La IA ayuda con lo repetitivo. Tu equipo aporta atención, contexto y autonomía cuando el cliente lo necesita." },
+  "A IA ajuda no repetitivo. Sua equipe entra com atenção, contexto e autonomia quando o cliente precisa.":
+    {
+      es: "La IA ayuda con lo repetitivo. Tu equipo aporta atención, contexto y autonomía cuando el cliente lo necesita.",
+    },
   "Acesso por pessoa": { es: "Acceso por persona" },
-  "Cada integrante entra com o próprio acesso e as permissões definidas pela empresa.": { es: "Cada integrante entra con su propio acceso y los permisos definidos por la empresa." },
-  "O contexto fica na conversa, mesmo quando muda quem atende.": { es: "El contexto permanece en la conversación, incluso cuando cambia quien atiende." },
-  "Configure o conhecimento, as instruções e a passagem para o time.": { es: "Configura el conocimiento, las instrucciones y el traspaso al equipo." },
+  "Cada integrante entra com o próprio acesso e as permissões definidas pela empresa.": {
+    es: "Cada integrante entra con su propio acceso y los permisos definidos por la empresa.",
+  },
+  "O contexto fica na conversa, mesmo quando muda quem atende.": {
+    es: "El contexto permanece en la conversación, incluso cuando cambia quien atiende.",
+  },
+  "Configure o conhecimento, as instruções e a passagem para o time.": {
+    es: "Configura el conocimiento, las instrucciones y el traspaso al equipo.",
+  },
   "Conhecer a política de privacidade": { es: "Conocer la política de privacidad" },
   "Conheça antes de decidir.": { es: "Conoce antes de decidir." },
-  "Dê o play e entenda como as conversas, a IA e o funil se conectam no dia a dia.": { es: "Dale al play y descubre cómo las conversaciones, la IA y el embudo se conectan en el día a día." },
+  "Dê o play e entenda como as conversas, a IA e o funil se conectam no dia a dia.": {
+    es: "Dale al play y descubre cómo las conversaciones, la IA y el embudo se conectan en el día a día.",
+  },
   "Assistir à explicação": { es: "Ver la explicación" },
   "Com áudio e legendas em português": { es: "Con audio y subtítulos en portugués" },
   "Um plano para o seu momento.": { es: "Un plan para tu momento." },
   "Escolha o tamanho da sua operação.": { es: "Elige el tamaño de tu operación." },
   "Respostas antes do primeiro passo.": { es: "Respuestas antes del primer paso." },
-  "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.": { es: "Los datos están separados por empresa, con controles de acceso. La plataforma ofrece herramientas de exportación y para atender solicitudes de privacidad." },
-  "O uso de IA tem alguma configuração adicional?": { es: "¿El uso de IA requiere configuración adicional?" },
-  "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.": { es: "Sí. El agente necesita una base de conocimiento, instrucciones y credenciales del proveedor de IA configuradas en tu operación. El consumo del proveedor puede tener costes propios." },
-  "A próxima conversa pode ser o começo de uma venda.": { es: "La próxima conversación puede ser el comienzo de una venta." },
-  "Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.": { es: "Organiza la atención. Da contexto al equipo. Sigue el siguiente paso." },
+  "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.":
+    {
+      es: "Los datos están separados por empresa, con controles de acceso. La plataforma ofrece herramientas de exportación y para atender solicitudes de privacidad.",
+    },
+  "O uso de IA tem alguma configuração adicional?": {
+    es: "¿El uso de IA requiere configuración adicional?",
+  },
+  "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.":
+    {
+      es: "Sí. El agente necesita una base de conocimiento, instrucciones y credenciales del proveedor de IA configuradas en tu operación. El consumo del proveedor puede tener costes propios.",
+    },
+  "A próxima conversa pode ser o começo de uma venda.": {
+    es: "La próxima conversación puede ser el comienzo de una venta.",
+  },
+  "Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.": {
+    es: "Organiza la atención. Da contexto al equipo. Sigue el siguiente paso.",
+  },
   "Informações e contato": { es: "Información y contacto" },
 
   // O mapa das ações usa o mesmo consumidor das telas: useT() → traduzir().
@@ -152,9 +250,10 @@ export const DICIONARIO: Traducoes = {
 
   // ── Integrações de lojas ─────────────────────────────────────────────────
   "Sua operação conectada": { es: "Tu operación conectada" },
-  "Traga o catálogo e os pedidos da sua loja para a conversa. A IA e a equipe usam os mesmos dados para responder com mais precisão e ajudar o cliente a comprar.": {
-    es: "Lleva el catálogo y los pedidos de tu tienda a la conversación. La IA y el equipo usan los mismos datos para responder con más precisión y ayudar al cliente a comprar.",
-  },
+  "Traga o catálogo e os pedidos da sua loja para a conversa. A IA e a equipe usam os mesmos dados para responder com mais precisão e ajudar o cliente a comprar.":
+    {
+      es: "Lleva el catálogo y los pedidos de tu tienda a la conversación. La IA y el equipo usan los mismos datos para responder con más precisión y ayudar al cliente a comprar.",
+    },
   "Atualizar status": { es: "Actualizar estado" },
   "Lojas disponíveis": { es: "Tiendas disponibles" },
   "Precisa de atenção": { es: "Necesita atención" },
@@ -174,7 +273,9 @@ export const DICIONARIO: Traducoes = {
   },
   "Última sincronização:": { es: "Última sincronización:" },
   "Aguardando a primeira": { es: "Esperando la primera" },
-  "Atualização automática por eventos da loja": { es: "Actualización automática mediante eventos de la tienda" },
+  "Atualização automática por eventos da loja": {
+    es: "Actualización automática mediante eventos de la tienda",
+  },
   "Sincronização manual disponível": { es: "Sincronización manual disponible" },
   produtos: { es: "productos" },
   pedidos: { es: "pedidos" },
@@ -182,18 +283,21 @@ export const DICIONARIO: Traducoes = {
     es: "Conecta una tienda para consultar información real sin salir de la conversación.",
   },
   "Conecte outras ferramentas": { es: "Conecta otras herramientas" },
-  "Consulte um ERP, registre dados no CRM ou execute uma ação na ferramenta que sua equipe já usa.": {
-    es: "Consulta un ERP, registra datos en el CRM o ejecuta una acción en la herramienta que tu equipo ya usa.",
-  },
+  "Consulte um ERP, registre dados no CRM ou execute uma ação na ferramenta que sua equipe já usa.":
+    {
+      es: "Consulta un ERP, registra datos en el CRM o ejecuta una acción en la herramienta que tu equipo ya usa.",
+    },
   "Ações por API": { es: "Acciones por API" },
   "Webhooks e automações": { es: "Webhooks y automatizaciones" },
   "Dados que ajudam a vender": { es: "Datos que ayudan a vender" },
-  "Os produtos sincronizados entram no catálogo que o assistente consulta. Os pedidos associados ao contato aparecem no histórico de compras.": {
-    es: "Los productos sincronizados se incorporan al catálogo que consulta el asistente. Los pedidos asociados al contacto aparecen en el historial de compras.",
-  },
-  "Shopify: os últimos 60 dias de pedidos dependem das permissões do aplicativo. Informações de clientes podem exigir autorização adicional da Shopify. Nenhuma compra ou alteração na loja é feita por estas conexões.": {
-    es: "Shopify: los pedidos de los últimos 60 días dependen de los permisos de la aplicación. La información de los clientes puede requerir autorización adicional de Shopify. Estas conexiones no realizan compras ni cambios en la tienda.",
-  },
+  "Os produtos sincronizados entram no catálogo que o assistente consulta. Os pedidos associados ao contato aparecem no histórico de compras.":
+    {
+      es: "Los productos sincronizados se incorporan al catálogo que consulta el asistente. Los pedidos asociados al contacto aparecen en el historial de compras.",
+    },
+  "Shopify: os últimos 60 dias de pedidos dependem das permissões do aplicativo. Informações de clientes podem exigir autorização adicional da Shopify. Nenhuma compra ou alteração na loja é feita por estas conexões.":
+    {
+      es: "Shopify: los pedidos de los últimos 60 días dependen de los permisos de la aplicación. La información de los clientes puede requerir autorización adicional de Shopify. Estas conexiones no realizan compras ni cambios en la tienda.",
+    },
   "Histórico de sincronização": { es: "Historial de sincronización" },
   "Acompanhe o que foi importado e resolva falhas antes de afetarem o atendimento.": {
     es: "Revisa lo que se importó y resuelve los errores antes de que afecten la atención.",
@@ -201,19 +305,23 @@ export const DICIONARIO: Traducoes = {
   "Verifique as permissões e use Sincronizar para tentar novamente.": {
     es: "Revisa los permisos y usa Sincronizar para volver a intentarlo.",
   },
-  "Sua loja continua funcionando normalmente. Vamos ler o catálogo e os pedidos para ajudar no atendimento.": {
-    es: "Tu tienda sigue funcionando normalmente. Leeremos el catálogo y los pedidos para ayudar durante la atención.",
-  },
+  "Sua loja continua funcionando normalmente. Vamos ler o catálogo e os pedidos para ajudar no atendimento.":
+    {
+      es: "Tu tienda sigue funcionando normalmente. Leeremos el catálogo y los pedidos para ayudar durante la atención.",
+    },
   "Endereço da loja": { es: "Dirección de la tienda" },
-  "Você será levado à Shopify para autorizar o acesso. Depois voltará para acompanhar a sincronização.": {
-    es: "Se te redirigirá a Shopify para autorizar el acceso. Después volverás para seguir la sincronización.",
-  },
-  "Na sua loja: WooCommerce → Configurações → Avançado → REST API. Crie uma chave com permissão de leitura e informe o par abaixo.": {
-    es: "En tu tienda: WooCommerce → Ajustes → Avanzado → API REST. Crea una clave con permiso de lectura e introduce el par de credenciales a continuación.",
-  },
-  "Use a credencial de um aplicativo próprio com leitura de produtos, estoque e pedidos. Para conexão com renovação automática, solicite a ativação da autorização Shopify ao administrador.": {
-    es: "Usa la credencial de una aplicación propia con acceso de lectura a productos, inventario y pedidos. Para una conexión con renovación automática, solicita al administrador que active la autorización de Shopify.",
-  },
+  "Você será levado à Shopify para autorizar o acesso. Depois voltará para acompanhar a sincronização.":
+    {
+      es: "Se te redirigirá a Shopify para autorizar el acceso. Después volverás para seguir la sincronización.",
+    },
+  "Na sua loja: WooCommerce → Configurações → Avançado → REST API. Crie uma chave com permissão de leitura e informe o par abaixo.":
+    {
+      es: "En tu tienda: WooCommerce → Ajustes → Avanzado → API REST. Crea una clave con permiso de lectura e introduce el par de credenciales a continuación.",
+    },
+  "Use a credencial de um aplicativo próprio com leitura de produtos, estoque e pedidos. Para conexão com renovação automática, solicite a ativação da autorização Shopify ao administrador.":
+    {
+      es: "Usa la credencial de una aplicación propia con acceso de lectura a productos, inventario y pedidos. Para una conexión con renovación automática, solicita al administrador que active la autorización de Shopify.",
+    },
   "Consumer key": { es: "Clave de consumidor" },
   "Consumer secret": { es: "Secreto de consumidor" },
   "As credenciais são protegidas e não serão exibidas novamente.": {
@@ -224,9 +332,10 @@ export const DICIONARIO: Traducoes = {
   "Usar autorização Shopify": { es: "Usar autorización de Shopify" },
   "Usar credencial de aplicativo próprio": { es: "Usar credencial de una aplicación propia" },
   "Desconectar a loja?": { es: "¿Desconectar la tienda?" },
-  "Os pedidos já importados serão preservados. Os produtos desta conexão deixarão de ser oferecidos pela IA até você reconectar e sincronizar.": {
-    es: "Los pedidos ya importados se conservarán. La IA dejará de ofrecer los productos de esta conexión hasta que vuelvas a conectarla y sincronizarla.",
-  },
+  "Os pedidos já importados serão preservados. Os produtos desta conexão deixarão de ser oferecidos pela IA até você reconectar e sincronizar.":
+    {
+      es: "Los pedidos ya importados se conservarán. La IA dejará de ofrecer los productos de esta conexión hasta que vuelvas a conectarla y sincronizarla.",
+    },
   "Manter conexão": { es: "Mantener conexión" },
   "Não foi possível carregar suas integrações. Tente novamente.": {
     es: "No se pudieron cargar tus integraciones. Inténtalo de nuevo.",
@@ -235,13 +344,16 @@ export const DICIONARIO: Traducoes = {
   "Shopify conectada. Os produtos e pedidos estão sendo sincronizados.": {
     es: "Shopify conectada. Se están sincronizando los productos y pedidos.",
   },
-  "Shopify conectada. Alguns avisos automáticos precisam de configuração; você pode sincronizar manualmente.": {
-    es: "Shopify conectada. Algunos avisos automáticos necesitan configuración; puedes sincronizar manualmente.",
-  },
+  "Shopify conectada. Alguns avisos automáticos precisam de configuração; você pode sincronizar manualmente.":
+    {
+      es: "Shopify conectada. Algunos avisos automáticos necesitan configuración; puedes sincronizar manualmente.",
+    },
   "Não foi possível concluir a autorização Shopify. Abra a conexão e tente novamente.": {
     es: "No se pudo completar la autorización de Shopify. Abre la conexión e inténtalo de nuevo.",
   },
-  "Não foi possível concluir. Tente novamente.": { es: "No se pudo completar. Inténtalo de nuevo." },
+  "Não foi possível concluir. Tente novamente.": {
+    es: "No se pudo completar. Inténtalo de nuevo.",
+  },
   "Informe sua-loja.myshopify.com.": { es: "Introduce tu-tienda.myshopify.com." },
   "Loja conectada. A sincronização foi colocada na fila.": {
     es: "Tienda conectada. La sincronización se añadió a la cola.",
@@ -259,22 +371,25 @@ export const DICIONARIO: Traducoes = {
   "Selecione contatos com opt-in, confira o modelo aprovado e acompanhe cada envio.": {
     es: "Selecciona contactos que hayan dado su consentimiento, revisa la plantilla aprobada y sigue cada envío.",
   },
-  "Você pode acompanhar as campanhas. Criar e disparar requer permissão de gerente e acompanhamento com acesso completo.": {
-    es: "Puedes consultar las campañas. Para crearlas y enviarlas necesitas permisos de gerente y acceso completo al seguimiento.",
-  },
+  "Você pode acompanhar as campanhas. Criar e disparar requer permissão de gerente e acompanhamento com acesso completo.":
+    {
+      es: "Puedes consultar las campañas. Para crearlas y enviarlas necesitas permisos de gerente y acceso completo al seguimiento.",
+    },
   "Nova campanha": { es: "Nueva campaña" },
   "Preparar campanha": { es: "Preparar campaña" },
   "Nome da campanha": { es: "Nombre de la campaña" },
   "Canal WhatsApp": { es: "Canal de WhatsApp" },
-  "Este canal não tem modelos aprovados sincronizados. Atualize os modelos na Central de Conexões.": {
-    es: "Este canal no tiene plantillas aprobadas sincronizadas. Actualiza las plantillas en la Central de conexiones.",
-  },
+  "Este canal não tem modelos aprovados sincronizados. Atualize os modelos na Central de Conexões.":
+    {
+      es: "Este canal no tiene plantillas aprobadas sincronizadas. Actualiza las plantillas en la Central de conexiones.",
+    },
   "Buscar contatos existentes": { es: "Buscar contactos existentes" },
   " selecionados · ": { es: " seleccionados · " },
   " elegíveis na lista": { es: " aptos en la lista" },
-  "A lista mostra até 500 contatos. Marque explicitamente quem deve receber. Consentimento e bloqueio serão conferidos novamente antes do envio.": {
-    es: "La lista muestra hasta 500 contactos. Selecciona expresamente quién debe recibir el mensaje. El consentimiento y los bloqueos se comprobarán de nuevo antes del envío.",
-  },
+  "A lista mostra até 500 contatos. Marque explicitamente quem deve receber. Consentimento e bloqueio serão conferidos novamente antes do envio.":
+    {
+      es: "La lista muestra hasta 500 contactos. Selecciona expresamente quién debe recibir el mensaje. El consentimiento y los bloqueos se comprobarán de nuevo antes del envío.",
+    },
   "Nenhum contato nesta lista.": { es: "No hay contactos en esta lista." },
   "Intervalo entre destinatários (segundos)": { es: "Intervalo entre destinatarios (segundos)" },
   "Pré-visualizar seleção": { es: "Vista previa de la selección" },
@@ -302,9 +417,10 @@ export const DICIONARIO: Traducoes = {
   "Confirmar e ": { es: "Confirmar y " },
   agendar: { es: "programar" },
   disparar: { es: "enviar" },
-  "Há envios sem confirmação segura. Confira a conversa e a entrega antes de continuar. Esses destinatários não podem ser reenviados pela campanha.": {
-    es: "Hay envíos sin confirmación fiable. Revisa la conversación y la entrega antes de continuar. La campaña no puede volver a enviar mensajes a estos destinatarios.",
-  },
+  "Há envios sem confirmação segura. Confira a conversa e a entrega antes de continuar. Esses destinatários não podem ser reenviados pela campanha.":
+    {
+      es: "Hay envíos sin confirmación fiable. Revisa la conversación y la entrega antes de continuar. La campaña no puede volver a enviar mensajes a estos destinatarios.",
+    },
   "Destinatários, tentativas e entrega": { es: "Destinatarios, intentos y entrega" },
   "Envio / entrega": { es: "Envío / entrega" },
   "Próximo passo": { es: "Siguiente paso" },
@@ -313,9 +429,10 @@ export const DICIONARIO: Traducoes = {
   "Preparar nova tentativa segura": { es: "Preparar un nuevo intento seguro" },
   "Encerrar revisão sem reenviar": { es: "Cerrar revisión sin reenviar" },
   "Encerrar revisão deste destinatário?": { es: "¿Cerrar la revisión de este destinatario?" },
-  "Confira a conversa e o recibo de entrega antes de confirmar. O destinatário será retirado dos pendentes e este envio não será repetido. Uma confirmação tardia ainda poderá atualizar o histórico.": {
-    es: "Revisa la conversación y el recibo de entrega antes de confirmar. El destinatario se retirará de los pendientes y este envío no se repetirá. Una confirmación tardía aún podrá actualizar el historial.",
-  },
+  "Confira a conversa e o recibo de entrega antes de confirmar. O destinatário será retirado dos pendentes e este envio não será repetido. Uma confirmação tardia ainda poderá atualizar o histórico.":
+    {
+      es: "Revisa la conversación y el recibo de entrega antes de confirmar. El destinatario se retirará de los pendientes y este envío no se repetirá. Una confirmación tardía aún podrá actualizar el historial.",
+    },
   "Confirmar encerramento da revisão": { es: "Confirmar cierre de la revisión" },
   "Tentativa preparada. Retome a campanha para enviar.": {
     es: "Intento preparado. Reanuda la campaña para enviar.",
@@ -350,27 +467,65 @@ export const DICIONARIO: Traducoes = {
     es: "Conecta Shopify, WooCommerce, Nuvemshop y otras herramientas a la atención.",
   },
 
-  "Não consegui ler a codificação da página. Envie o texto como documento.": { es: "No pude leer la codificación de la página. Envía el texto como documento." },
-  "Não consegui resolver o endereço público da página. Tente novamente.": { es: "No pude resolver la dirección pública de la página. Inténtalo de nuevo." },
-  "O endereço resolve para uma rede interna ou reservada. A página não foi acessada.": { es: "La dirección resuelve a una red interna o reservada. No se accedió a la página." },
-  "A página redireciona. Informe o endereço HTTPS final para preparar o material.": { es: "La página redirige. Indica la dirección HTTPS final para preparar el material." },
-  "A página não está disponível para leitura pública. Tente novamente.": { es: "La página no está disponible para lectura pública. Inténtalo de nuevo." },
-  "A página precisa responder com HTML ou texto simples.": { es: "La página debe responder con HTML o texto sin formato." },
-  "A página respondeu com conteúdo comprimido. Use uma página que permita leitura em texto.": { es: "La página respondió con contenido comprimido. Usa una página que permita leer el texto." },
+  "Não consegui ler a codificação da página. Envie o texto como documento.": {
+    es: "No pude leer la codificación de la página. Envía el texto como documento.",
+  },
+  "Não consegui resolver o endereço público da página. Tente novamente.": {
+    es: "No pude resolver la dirección pública de la página. Inténtalo de nuevo.",
+  },
+  "O endereço resolve para uma rede interna ou reservada. A página não foi acessada.": {
+    es: "La dirección resuelve a una red interna o reservada. No se accedió a la página.",
+  },
+  "A página redireciona. Informe o endereço HTTPS final para preparar o material.": {
+    es: "La página redirige. Indica la dirección HTTPS final para preparar el material.",
+  },
+  "A página não está disponível para leitura pública. Tente novamente.": {
+    es: "La página no está disponible para lectura pública. Inténtalo de nuevo.",
+  },
+  "A página precisa responder com HTML ou texto simples.": {
+    es: "La página debe responder con HTML o texto sin formato.",
+  },
+  "A página respondeu com conteúdo comprimido. Use uma página que permita leitura em texto.": {
+    es: "La página respondió con contenido comprimido. Usa una página que permita leer el texto.",
+  },
   "A página excede o limite de 1 MB.": { es: "La página supera el límite de 1 MB." },
-  "A leitura da página foi interrompida. Tente novamente.": { es: "Se interrumpió la lectura de la página. Inténtalo de nuevo." },
-  "A página demorou demais para responder. Tente novamente.": { es: "La página tardó demasiado en responder. Inténtalo de nuevo." },
-  "Não consegui acessar a página com segurança. Tente novamente.": { es: "No pude acceder a la página de forma segura. Inténtalo de nuevo." },
-  "A página não contém texto para preparar. Páginas que dependem de scripts precisam ser enviadas como documento.": { es: "La página no contiene texto para preparar. Las páginas que dependen de scripts deben enviarse como documento." },
-  "A estrutura da página é complexa demais. Envie o texto como documento.": { es: "La estructura de la página es demasiado compleja. Envía el texto como documento." },
+  "A leitura da página foi interrompida. Tente novamente.": {
+    es: "Se interrumpió la lectura de la página. Inténtalo de nuevo.",
+  },
+  "A página demorou demais para responder. Tente novamente.": {
+    es: "La página tardó demasiado en responder. Inténtalo de nuevo.",
+  },
+  "Não consegui acessar a página com segurança. Tente novamente.": {
+    es: "No pude acceder a la página de forma segura. Inténtalo de nuevo.",
+  },
+  "A página não contém texto para preparar. Páginas que dependem de scripts precisam ser enviadas como documento.":
+    {
+      es: "La página no contiene texto para preparar. Las páginas que dependen de scripts deben enviarse como documento.",
+    },
+  "A estrutura da página é complexa demais. Envie o texto como documento.": {
+    es: "La estructura de la página es demasiado compleja. Envía el texto como documento.",
+  },
   "Página da internet": { es: "Página de internet" },
-  "O texto de uma página pública HTTPS do seu negócio. Prepare de novo quando a página mudar.": { es: "El texto de una página pública HTTPS de tu negocio. Prepáralo de nuevo cuando cambie la página." },
+  "O texto de uma página pública HTTPS do seu negócio. Prepare de novo quando a página mudar.": {
+    es: "El texto de una página pública HTTPS de tu negocio. Prepáralo de nuevo cuando cambie la página.",
+  },
   "Endereço da página": { es: "Dirección de la página" },
-  "Informe o endereço HTTPS de uma página pública.": { es: "Indica la dirección HTTPS de una página pública." },
-  "Escolha Página da internet para cadastrar um endereço.": { es: "Elige Página de internet para registrar una dirección." },
-  "Use uma página pública HTTPS, sem login. Se ela redirecionar, informe o endereço final. O agente lê o texto; páginas que dependem de scripts devem ser enviadas como documento.": { es: "Usa una página pública HTTPS, sin inicio de sesión. Si redirige, indica la dirección final. El agente lee el texto; las páginas que dependen de scripts deben enviarse como documento." },
-  "Use HTTPS, sem senha no endereço, na porta padrão.": { es: "Usa HTTPS, sin contraseña en la dirección, en el puerto predeterminado." },
-  "O endereço deve apontar para uma página pública, fora da rede interna.": { es: "La dirección debe apuntar a una página pública, fuera de la red interna." },
+  "Informe o endereço HTTPS de uma página pública.": {
+    es: "Indica la dirección HTTPS de una página pública.",
+  },
+  "Escolha Página da internet para cadastrar um endereço.": {
+    es: "Elige Página de internet para registrar una dirección.",
+  },
+  "Use uma página pública HTTPS, sem login. Se ela redirecionar, informe o endereço final. O agente lê o texto; páginas que dependem de scripts devem ser enviadas como documento.":
+    {
+      es: "Usa una página pública HTTPS, sin inicio de sesión. Si redirige, indica la dirección final. El agente lee el texto; las páginas que dependen de scripts deben enviarse como documento.",
+    },
+  "Use HTTPS, sem senha no endereço, na porta padrão.": {
+    es: "Usa HTTPS, sin contraseña en la dirección, en el puerto predeterminado.",
+  },
+  "O endereço deve apontar para uma página pública, fora da rede interna.": {
+    es: "La dirección debe apuntar a una página pública, fuera de la red interna.",
+  },
   // Mensagens das lojas e campanhas exibidas pela interface.
   "Integração não encontrada.": { es: "Integración no encontrada." },
   "Não foi possível carregar a conexão.": { es: "No se pudo cargar la conexión." },
@@ -378,32 +533,69 @@ export const DICIONARIO: Traducoes = {
   "Não foi possível iniciar a sincronização.": { es: "No se pudo iniciar la sincronización." },
   "Não foi possível desconectar a loja.": { es: "No se pudo desconectar la tienda." },
   "Não foi possível carregar as integrações.": { es: "No se pudieron cargar las integraciones." },
-  "Confira o endereço e as credenciais da loja.": { es: "Revisa la dirección y las credenciales de la tienda." },
-  "Não foi possível validar a loja. Confira as credenciais e permissões.": { es: "No se pudo validar la tienda. Revisa las credenciales y los permisos." },
-  "A loja recusou a consulta. Verifique as permissões do aplicativo.": { es: "La tienda rechazó la consulta. Revisa los permisos de la aplicación." },
-  "Autorize leitura de produtos, estoque e pedidos para conectar.": { es: "Autoriza la lectura de productos, inventario y pedidos para conectar." },
-  "A proteção das credenciais ainda não foi configurada pelo administrador da plataforma.": { es: "El administrador de la plataforma aún no ha configurado la protección de las credenciales." },
-  "Não foi possível acessar a credencial. Reconecte a loja.": { es: "No se pudo acceder a la credencial. Vuelve a conectar la tienda." },
-  "A autorização Shopify expirou. Reconecte a loja.": { es: "La autorización de Shopify venció. Vuelve a conectar la tienda." },
-  "Reconecte a loja para renovar a autorização.": { es: "Vuelve a conectar la tienda para renovar la autorización." },
+  "Confira o endereço e as credenciais da loja.": {
+    es: "Revisa la dirección y las credenciales de la tienda.",
+  },
+  "Não foi possível validar a loja. Confira as credenciais e permissões.": {
+    es: "No se pudo validar la tienda. Revisa las credenciales y los permisos.",
+  },
+  "A loja recusou a consulta. Verifique as permissões do aplicativo.": {
+    es: "La tienda rechazó la consulta. Revisa los permisos de la aplicación.",
+  },
+  "Autorize leitura de produtos, estoque e pedidos para conectar.": {
+    es: "Autoriza la lectura de productos, inventario y pedidos para conectar.",
+  },
+  "A proteção das credenciais ainda não foi configurada pelo administrador da plataforma.": {
+    es: "El administrador de la plataforma aún no ha configurado la protección de las credenciales.",
+  },
+  "Não foi possível acessar a credencial. Reconecte a loja.": {
+    es: "No se pudo acceder a la credencial. Vuelve a conectar la tienda.",
+  },
+  "A autorização Shopify expirou. Reconecte a loja.": {
+    es: "La autorización de Shopify venció. Vuelve a conectar la tienda.",
+  },
+  "Reconecte a loja para renovar a autorização.": {
+    es: "Vuelve a conectar la tienda para renovar la autorización.",
+  },
   "Falha ao renovar a autorização.": { es: "Error al renovar la autorización." },
-  "A autorização está sendo renovada. Aguarde alguns segundos.": { es: "Se está renovando la autorización. Espera unos segundos." },
+  "A autorização está sendo renovada. Aguarde alguns segundos.": {
+    es: "Se está renovando la autorización. Espera unos segundos.",
+  },
   "Resposta de renovação inválida.": { es: "Respuesta de renovación no válida." },
-  "A renovação não foi salva. Reconecte a loja.": { es: "No se guardó la renovación. Vuelve a conectar la tienda." },
+  "A renovação não foi salva. Reconecte a loja.": {
+    es: "No se guardó la renovación. Vuelve a conectar la tienda.",
+  },
   "Falha ao associar o cliente do pedido.": { es: "Error al asociar al cliente del pedido." },
   "Loja desconectada.": { es: "Tienda desconectada." },
   "Falha ao salvar a sincronização.": { es: "Error al guardar la sincronización." },
-  "Não foi possível sincronizar a loja. Confira a conexão e tente novamente.": { es: "No se pudo sincronizar la tienda. Revisa la conexión e inténtalo de nuevo." },
-  "Informe a URL HTTPS pública da loja, sem credenciais ou parâmetros.": { es: "Introduce la URL HTTPS pública de la tienda, sin credenciales ni parámetros." },
-  "Use o domínio original da loja: sua-loja.myshopify.com.": { es: "Usa el dominio original de la tienda: tu-tienda.myshopify.com." },
+  "Não foi possível sincronizar a loja. Confira a conexão e tente novamente.": {
+    es: "No se pudo sincronizar la tienda. Revisa la conexión e inténtalo de nuevo.",
+  },
+  "Informe a URL HTTPS pública da loja, sem credenciais ou parâmetros.": {
+    es: "Introduce la URL HTTPS pública de la tienda, sin credenciales ni parámetros.",
+  },
+  "Use o domínio original da loja: sua-loja.myshopify.com.": {
+    es: "Usa el dominio original de la tienda: tu-tienda.myshopify.com.",
+  },
   "Credencial inválida ou expirada.": { es: "Credencial no válida o vencida." },
-  "A loja não autorizou as permissões necessárias.": { es: "La tienda no autorizó los permisos necesarios." },
-  "A loja atingiu o limite de consultas. Tente novamente em alguns minutos.": { es: "La tienda alcanzó el límite de consultas. Inténtalo de nuevo en unos minutos." },
-  "A loja não respondeu à consulta. Tente novamente.": { es: "La tienda no respondió a la consulta. Inténtalo de nuevo." },
+  "A loja não autorizou as permissões necessárias.": {
+    es: "La tienda no autorizó los permisos necesarios.",
+  },
+  "A loja atingiu o limite de consultas. Tente novamente em alguns minutos.": {
+    es: "La tienda alcanzó el límite de consultas. Inténtalo de nuevo en unos minutos.",
+  },
+  "A loja não respondeu à consulta. Tente novamente.": {
+    es: "La tienda no respondió a la consulta. Inténtalo de nuevo.",
+  },
   "Resposta inválida da loja.": { es: "Respuesta de la tienda no válida." },
-  "Esta página da loja excedeu o tempo de sincronização. Revise produtos com muitas variantes e tente novamente.": { es: "Esta página de la tienda superó el tiempo de sincronización. Revisa los productos con muchas variantes e inténtalo de nuevo." },
+  "Esta página da loja excedeu o tempo de sincronização. Revise produtos com muitas variantes e tente novamente.":
+    {
+      es: "Esta página de la tienda superó el tiempo de sincronización. Revisa los productos con muchas variantes e inténtalo de nuevo.",
+    },
   "Página de sincronização inválida.": { es: "Página de sincronización no válida." },
-  "Produto com mais de mil variantes: sincronização interrompida para evitar truncagem.": { es: "Producto con más de mil variantes: sincronización interrumpida para evitar resultados incompletos." },
+  "Produto com mais de mil variantes: sincronização interrompida para evitar truncagem.": {
+    es: "Producto con más de mil variantes: sincronización interrumpida para evitar resultados incompletos.",
+  },
   "Contato bloqueado": { es: "Contacto bloqueado" },
   "Consentimento revogado": { es: "Consentimiento revocado" },
   "Sem opt-in de marketing": { es: "Sin consentimiento para marketing" },
@@ -411,28 +603,65 @@ export const DICIONARIO: Traducoes = {
   "Sem conversa neste canal": { es: "Sin conversación en este canal" },
   "Conversa encerrada": { es: "Conversación cerrada" },
   "Canal indisponível nesta organização.": { es: "Canal no disponible en esta organización." },
-  "Este canal não envia modelos aprovados. Selecione um canal oficial conectado.": { es: "Este canal no envía plantillas aprobadas. Selecciona un canal oficial conectado." },
-  "O envio de componentes deste canal ainda não está disponível.": { es: "El envío de componentes de este canal aún no está disponible." },
+  "Este canal não envia modelos aprovados. Selecione um canal oficial conectado.": {
+    es: "Este canal no envía plantillas aprobadas. Selecciona un canal oficial conectado.",
+  },
+  "O envio de componentes deste canal ainda não está disponível.": {
+    es: "El envío de componentes de este canal aún no está disponible.",
+  },
   "Modelo não encontrado neste canal.": { es: "No se encontró la plantilla en este canal." },
-  "A seleção contém contato fora desta organização.": { es: "La selección contiene un contacto ajeno a esta organización." },
-  "Remova os contatos inelegíveis da seleção antes de salvar.": { es: "Quita los contactos no aptos de la selección antes de guardar." },
+  "A seleção contém contato fora desta organização.": {
+    es: "La selección contiene un contacto ajeno a esta organización.",
+  },
+  "Remova os contatos inelegíveis da seleção antes de salvar.": {
+    es: "Quita los contactos no aptos de la selección antes de guardar.",
+  },
   "Campanha não encontrada.": { es: "Campaña no encontrada." },
-  "Pause a campanha antes de conferir o envio incerto.": { es: "Pausa la campaña antes de comprobar el envío sin confirmar." },
-  "Este destinatário não está aguardando revisão. Atualize a campanha para conferir o recibo atual.": { es: "Este destinatario no está pendiente de revisión. Actualiza la campaña para comprobar el recibo actual." },
-  "Pause a campanha antes de preparar uma nova tentativa.": { es: "Pausa la campaña antes de preparar un nuevo intento." },
-  "Este envio não tem uma falha comprovadamente segura para repetir.": { es: "No se ha comprobado que el fallo de este envío permita repetirlo de forma segura." },
+  "Pause a campanha antes de conferir o envio incerto.": {
+    es: "Pausa la campaña antes de comprobar el envío sin confirmar.",
+  },
+  "Este destinatário não está aguardando revisão. Atualize a campanha para conferir o recibo atual.":
+    {
+      es: "Este destinatario no está pendiente de revisión. Actualiza la campaña para comprobar el recibo actual.",
+    },
+  "Pause a campanha antes de preparar uma nova tentativa.": {
+    es: "Pausa la campaña antes de preparar un nuevo intento.",
+  },
+  "Este envio não tem uma falha comprovadamente segura para repetir.": {
+    es: "No se ha comprobado que el fallo de este envío permita repetirlo de forma segura.",
+  },
   "Escolha um horário futuro.": { es: "Elige una hora futura." },
-  "Confira e encerre os envios incertos antes de retomar os pendentes.": { es: "Revisa y cierra los envíos sin confirmar antes de reanudar los pendientes." },
-  "A campanha não possui destinatários pendentes.": { es: "La campaña no tiene destinatarios pendientes." },
-  "O modelo mudou ou deixou de estar aprovado. Cancele e crie uma campanha com o modelo atual.": { es: "La plantilla cambió o dejó de estar aprobada. Cancela y crea una campaña con la plantilla actual." },
+  "Confira e encerre os envios incertos antes de retomar os pendentes.": {
+    es: "Revisa y cierra los envíos sin confirmar antes de reanudar los pendientes.",
+  },
+  "A campanha não possui destinatários pendentes.": {
+    es: "La campaña no tiene destinatarios pendientes.",
+  },
+  "O modelo mudou ou deixou de estar aprovado. Cancele e crie uma campanha com o modelo atual.": {
+    es: "La plantilla cambió o dejó de estar aprobada. Cancela y crea una campaña con la plantilla actual.",
+  },
   "O modelo precisa estar aprovado.": { es: "La plantilla debe estar aprobada." },
-  "Campanhas ainda não aceitam modelos de carrossel.": { es: "Las campañas aún no admiten plantillas de carrusel." },
-  "Este canal aceita somente parâmetros posicionais no corpo. Escolha um modelo com {{1}}, {{2}} ou use um canal que envie componentes completos.": { es: "Este canal solo admite parámetros posicionales en el cuerpo. Elige una plantilla con {{1}}, {{2}} o usa un canal que envíe componentes completos." },
-  "Este canal aceita somente parâmetros de texto no corpo. Escolha um modelo sem parâmetros no cabeçalho ou nos botões.": { es: "Este canal solo admite parámetros de texto en el cuerpo. Elige una plantilla sin parámetros en el encabezado ni en los botones." },
+  "Campanhas ainda não aceitam modelos de carrossel.": {
+    es: "Las campañas aún no admiten plantillas de carrusel.",
+  },
+  "Este canal aceita somente parâmetros posicionais no corpo. Escolha um modelo com {{1}}, {{2}} ou use um canal que envie componentes completos.":
+    {
+      es: "Este canal solo admite parámetros posicionales en el cuerpo. Elige una plantilla con {{1}}, {{2}} o usa un canal que envíe componentes completos.",
+    },
+  "Este canal aceita somente parâmetros de texto no corpo. Escolha um modelo sem parâmetros no cabeçalho ou nos botões.":
+    {
+      es: "Este canal solo admite parámetros de texto en el cuerpo. Elige una plantilla sin parámetros en el encabezado ni en los botones.",
+    },
   "Parâmetro fora do contrato aprovado.": { es: "Parámetro fuera del contrato aprobado." },
-  "Preencha todos os parâmetros do modelo.": { es: "Completa todos los parámetros de la plantilla." },
-  "Este modelo usa a mesma variável com valores diferentes; escolha outro modelo.": { es: "Esta plantilla usa la misma variable con valores distintos; elige otra plantilla." },
-  "O texto do modelo não pode ser usado nesta campanha.": { es: "El texto de la plantilla no puede usarse en esta campaña." },
+  "Preencha todos os parâmetros do modelo.": {
+    es: "Completa todos los parámetros de la plantilla.",
+  },
+  "Este modelo usa a mesma variável com valores diferentes; escolha outro modelo.": {
+    es: "Esta plantilla usa la misma variable con valores distintos; elige otra plantilla.",
+  },
+  "O texto do modelo não pode ser usado nesta campanha.": {
+    es: "El texto de la plantilla no puede usarse en esta campaña.",
+  },
   "Transição de campanha não permitida.": { es: "Transición de campaña no permitida." },
   "Confira os campos da campanha.": { es: "Revisa los campos de la campaña." },
   "Não foi possível acessar as campanhas.": { es: "No se pudo acceder a las campañas." },
@@ -4654,9 +4883,10 @@ export const DICIONARIO: Traducoes = {
     es: "No se pudo copiar — selecciona el texto.",
   },
   "Conectar Claude Code ou Codex": { es: "Conectar Claude Code o Codex" },
-  "Liga o seu Claude Code ou Codex ao Atenza. Ele passa a ler e preencher o CRM e pode atender os seus clientes no WhatsApp enquanto estiver aberto no seu computador.": {
-    es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
-  },
+  "Liga o seu Claude Code ou Codex ao Atenza. Ele passa a ler e preencher o CRM e pode atender os seus clientes no WhatsApp enquanto estiver aberto no seu computador.":
+    {
+      es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
+    },
   "Gerar conexão": { es: "Generar conexión" },
   "Chave secreta do App (App Secret)": { es: "Clave secreta de la App (App Secret)" },
   "No painel da Meta: Configurações do app › Básico › Chave secreta do app": {
@@ -4668,9 +4898,10 @@ export const DICIONARIO: Traducoes = {
   "Modo teste ligado.": { es: "Modo de prueba activado." },
   "Modo teste desligado.": { es: "Modo de prueba desactivado." },
   "Testar pelo meu próprio número": { es: "Probar con mi propio número" },
-  "Com isto ligado, o que você escreve no chat com você mesmo no WhatsApp conta como mensagem de cliente, e a resposta aparece ali. Desligue depois do teste.": {
-    es: "Con esto activado, lo que escribes en el chat contigo mismo en WhatsApp cuenta como mensaje de cliente, y la respuesta aparece allí. Desactívalo después de la prueba.",
-  },
+  "Com isto ligado, o que você escreve no chat com você mesmo no WhatsApp conta como mensagem de cliente, e a resposta aparece ali. Desligue depois do teste.":
+    {
+      es: "Con esto activado, lo que escribes en el chat contigo mismo en WhatsApp cuenta como mensaje de cliente, y la respuesta aparece allí. Desactívalo después de la prueba.",
+    },
   Ligado: { es: "Activado" },
   Desligado: { es: "Desactivado" },
   "1. Claude Code — cole no terminal": { es: "1. Claude Code — pégalo en la terminal" },
@@ -4678,9 +4909,10 @@ export const DICIONARIO: Traducoes = {
   "2. Para ele atender os clientes — cole dentro do Claude Code": {
     es: "2. Para que atienda a los clientes — pégalo dentro de Claude Code",
   },
-  "Antes de deixar ele atender, pause o agente interno em Agentes de IA — senão o cliente recebe duas respostas. Ele só responde enquanto o Claude Code ou o Codex estiver aberto.": {
-    es: "Antes de dejarlo atender, pausa el agente interno en Agentes de IA — si no, el cliente recibe dos respuestas. Solo responde mientras Claude Code o Codex esté abierto.",
-  },
+  "Antes de deixar ele atender, pause o agente interno em Agentes de IA — senão o cliente recebe duas respostas. Ele só responde enquanto o Claude Code ou o Codex estiver aberto.":
+    {
+      es: "Antes de dejarlo atender, pausa el agente interno en Agentes de IA — si no, el cliente recibe dos respuestas. Solo responde mientras Claude Code o Codex esté abierto.",
+    },
   "Não foi possível copiar — selecione o token acima.": {
     es: "No se pudo copiar — selecciona el token de arriba.",
   },
@@ -6552,9 +6784,10 @@ export const DICIONARIO: Traducoes = {
   "Voltamos em alguns minutos.": { es: "Volvemos en unos minutos." },
   // A recusa por modelo padrão fala com o CLIENTE: o diagnóstico de
   // administrador (script/rotas de template) mora no audit, não na tela.
-  "Não conseguimos confirmar seu e-mail por este link. Clique em «Esqueci minha senha», use o mesmo e-mail e siga o link que vamos enviar — ele confirma sua conta. Se não chegar em alguns minutos, fale com o nosso suporte.": {
-    es: "No pudimos confirmar tu correo con este enlace. Haz clic en «Olvidé mi contraseña», usa el mismo correo y sigue el enlace que te enviaremos — confirma tu cuenta. Si no llega en unos minutos, habla con nuestro soporte.",
-  },
+  "Não conseguimos confirmar seu e-mail por este link. Clique em «Esqueci minha senha», use o mesmo e-mail e siga o link que vamos enviar — ele confirma sua conta. Se não chegar em alguns minutos, fale com o nosso suporte.":
+    {
+      es: "No pudimos confirmar tu correo con este enlace. Haz clic en «Olvidé mi contraseña», usa el mismo correo y sigue el enlace que te enviaremos — confirma tu cuenta. Si no llega en unos minutos, habla con nuestro soporte.",
+    },
   "Conta suspensa": { es: "Cuenta suspendida" },
   // Tela irmã de `/account-suspended`: quem TINHA acesso e não tem mais.
   "Acesso revogado": { es: "Acceso revocado" },
@@ -10132,14 +10365,22 @@ export const DICIONARIO: Traducoes = {
   },
   // ── A faixa de benefícios do topo da vitrine ───────────────────────────
   "Seu número de WhatsApp continua o mesmo": { es: "Tu número de WhatsApp sigue siendo el mismo" },
-  "A IA responde em segundos, 24 horas por dia": { es: "La IA responde en segundos, 24 horas al día" },
-  "Cancele em um clique, sem falar com ninguém": { es: "Cancela con un clic, sin hablar con nadie" },
-  "Conversas, funil e histórico em uma tela só": { es: "Conversaciones, embudo e historial en una sola pantalla" },
-  "Dados isolados por empresa, LGPD desde o primeiro dia": { es: "Datos aislados por empresa, protección de datos desde el primer día" },
+  "A IA responde em segundos, 24 horas por dia": {
+    es: "La IA responde en segundos, 24 horas al día",
+  },
+  "Cancele em um clique, sem falar com ninguém": {
+    es: "Cancela con un clic, sin hablar con nadie",
+  },
+  "Conversas, funil e histórico em uma tela só": {
+    es: "Conversaciones, embudo e historial en una sola pantalla",
+  },
+  "Dados isolados por empresa, LGPD desde o primeiro dia": {
+    es: "Datos aislados por empresa, protección de datos desde el primer día",
+  },
   // ── O olho do hero, com o nicho que alterna ─────────────────────────────
   "Atendimento por WhatsApp para": { es: "Atención por WhatsApp para" },
-  "clínicas": { es: "clínicas" },
-  "imobiliárias": { es: "inmobiliarias" },
+  clínicas: { es: "clínicas" },
+  imobiliárias: { es: "inmobiliarias" },
   "e-commerce": { es: "e-commerce" },
   "prestadores de serviço": { es: "prestadores de servicios" },
   "O problema": { es: "El problema" },
@@ -10147,36 +10388,59 @@ export const DICIONARIO: Traducoes = {
   "Sem a Atenza": { es: "Sin Atenza" },
   "Com a Atenza": { es: "Con Atenza" },
   "O que muda no dia seguinte": { es: "Lo que cambia al día siguiente" },
-  "A pessoa pergunta às 22h e é atendida no dia seguinte.": { es: "Alguien pregunta a las 22h y es atendido al día siguiente." },
-  "Responde em segundos, a qualquer hora, com o que você ensinou.": { es: "Responde en segundos, a cualquier hora, con lo que le enseñaste." },
-  "Cada pessoa do time guarda um pedaço da conversa no próprio celular.": { es: "Cada persona del equipo guarda un pedazo de la conversación en su propio celular." },
-  "Todas as conversas numa tela só, com o histórico inteiro à vista do time.": { es: "Todas las conversaciones en una sola pantalla, con el historial completo a la vista del equipo." },
-  "Quem disse “depois eu vejo” nunca mais é procurado.": { es: "Quien dijo “después lo veo” nunca más es contactado." },
-  "O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar.": { es: "El seguimiento sale solo, en el momento correcto, sin que nadie tenga que acordarse." },
-  "Ninguém sabe quantas conversas viraram venda, nem onde elas param.": { es: "Nadie sabe cuántas conversaciones se volvieron venta, ni dónde se detienen." },
-  "Cada conversa vira um card no funil, e o relatório mostra o que converteu.": { es: "Cada conversación se vuelve una tarjeta en el embudo, y el informe muestra qué convirtió." },
-  "Usar um sistema novo significa trocar o número que os clientes já conhecem.": { es: "Usar un sistema nuevo significa cambiar el número que tus clientes ya conocen." },
-  "O mesmo número de sempre, conectado por um QR code em um minuto.": { es: "El mismo número de siempre, conectado por un código QR en un minuto." },
+  "A pessoa pergunta às 22h e é atendida no dia seguinte.": {
+    es: "Alguien pregunta a las 22h y es atendido al día siguiente.",
+  },
+  "Responde em segundos, a qualquer hora, com o que você ensinou.": {
+    es: "Responde en segundos, a cualquier hora, con lo que le enseñaste.",
+  },
+  "Cada pessoa do time guarda um pedaço da conversa no próprio celular.": {
+    es: "Cada persona del equipo guarda un pedazo de la conversación en su propio celular.",
+  },
+  "Todas as conversas numa tela só, com o histórico inteiro à vista do time.": {
+    es: "Todas las conversaciones en una sola pantalla, con el historial completo a la vista del equipo.",
+  },
+  "Quem disse “depois eu vejo” nunca mais é procurado.": {
+    es: "Quien dijo “después lo veo” nunca más es contactado.",
+  },
+  "O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar.": {
+    es: "El seguimiento sale solo, en el momento correcto, sin que nadie tenga que acordarse.",
+  },
+  "Ninguém sabe quantas conversas viraram venda, nem onde elas param.": {
+    es: "Nadie sabe cuántas conversaciones se volvieron venta, ni dónde se detienen.",
+  },
+  "Cada conversa vira um card no funil, e o relatório mostra o que converteu.": {
+    es: "Cada conversación se vuelve una tarjeta en el embudo, y el informe muestra qué convirtió.",
+  },
+  "Usar um sistema novo significa trocar o número que os clientes já conhecem.": {
+    es: "Usar un sistema nuevo significa cambiar el número que tus clientes ya conocen.",
+  },
+  "O mesmo número de sempre, conectado por um QR code em um minuto.": {
+    es: "El mismo número de siempre, conectado por un código QR en un minuto.",
+  },
   "Comece seus": { es: "Comienza tus" },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
-  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {
-    es: "días con todo funcionando. Pedimos la tarjeta para empezar y la suscripción solo comienza después de ese período — cancela con un clic cuando quieras.",
-  },
+  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.":
+    {
+      es: "días con todo funcionando. Pedimos la tarjeta para empezar y la suscripción solo comienza después de ese período — cancela con un clic cuando quieras.",
+    },
   "Escolha o plano e comece hoje. A cobrança só depois.": {
     es: "Elige el plan y empieza hoy. El cobro viene después.",
   },
   "dias sem cobrança": { es: "días sin cobro" },
-  "Escolha um plano e o seu atendente entra no ar agora. Pedimos o cartão para começar, e nada é cobrado nos primeiros": {
-    es: "Elige un plan y tu agente entra en funcionamiento ahora. Pedimos la tarjeta para empezar, y no se cobra nada durante los primeros",
-  },
+  "Escolha um plano e o seu atendente entra no ar agora. Pedimos o cartão para começar, e nada é cobrado nos primeiros":
+    {
+      es: "Elige un plan y tu agente entra en funcionamiento ahora. Pedimos la tarjeta para empezar, y no se cobra nada durante los primeros",
+    },
   "dias — a assinatura só começa depois disso, e você cancela em um clique quando quiser.": {
     es: "días — la suscripción solo empieza después de eso, y la cancelas con un clic cuando quieras.",
   },
   "Hoje é o último dia sem cobrança": { es: "Hoy es el último día sin cobro" },
   "Falta 1 dia sem cobrança": { es: "Falta 1 día sin cobro" },
-  "Tudo liberado. Quando o período terminar, a assinatura começa automaticamente no cartão cadastrado. Você pode cancelar antes disso, em um clique, sem falar com ninguém.": {
-    es: "Todo habilitado. Cuando termine el período, la suscripción comienza automáticamente en la tarjeta registrada. Puedes cancelar antes de eso, con un clic, sin hablar con nadie.",
-  },
+  "Tudo liberado. Quando o período terminar, a assinatura começa automaticamente no cartão cadastrado. Você pode cancelar antes disso, em um clique, sem falar com ninguém.":
+    {
+      es: "Todo habilitado. Cuando termine el período, la suscripción comienza automáticamente en la tarjeta registrada. Puedes cancelar antes de eso, con un clic, sin hablar con nadie.",
+    },
   "Seu período de avaliação termina hoje": { es: "Tu período de evaluación termina hoy" },
   "Falta 1 dia de avaliação": { es: "Falta 1 día de evaluación" },
   Faltam: { es: "Faltan" },

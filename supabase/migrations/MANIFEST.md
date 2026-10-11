@@ -311,3 +311,5 @@ Implementação em desenvolvimento; esta tabela não afirma aplicação no banco
 | `20261008140000` | `0247_customer_campaigns` | Campanhas, aprovação do público/modelo e execução por destinatário com recibos duráveis. |
 
 O número 0242 está reservado por uma alteração de avatar na árvore original. Conhecimento por URL usa o esquema de fontes existente. Comércio usa 0246 para preservar a 0243 já existente do funil do site.
+
+| `20261010120000` | `0248_automacoes_do_operador` | Editor exclusivo do operador, consentimento explícito sem backfill, claim com supressão e relógio comercial compartilhado, público derivado do billing vigente e retentativa limitada dentro da idempotência do provedor. Não ativa campanhas. |

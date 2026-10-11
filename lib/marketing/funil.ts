@@ -136,3 +136,34 @@ export async function marcarAssinatura(a: Assinatura): Promise<void> {
 
   await cliente.from("site_leads").update(campos).eq("id", lead.id);
 }
+
+/** Cadastro observado no provedor, sem inscrever a pessoa em publicidade. */
+export async function registrarCadastroReal(dados: {
+  email: string;
+  userId: string;
+  visitorId?: string | null;
+  organizationId?: string | null;
+}): Promise<void> {
+  const cliente = admin();
+  if (!cliente) return;
+  try {
+    const { registrarLead } = await import("@/lib/marketing/lead");
+    await registrarLead({ email: dados.email, origem: "signup", visitorId: dados.visitorId });
+    const { data: lead, error } = await cliente
+      .from("site_leads")
+      .select("id,user_id,virou_usuario_em,organization_id")
+      .eq("email", normalizarEmail(dados.email))
+      .maybeSingle();
+    if (error || !lead || (lead.user_id && lead.user_id !== dados.userId)) return;
+    await cliente
+      .from("site_leads")
+      .update({
+        user_id: dados.userId,
+        virou_usuario_em: lead.virou_usuario_em ?? new Date().toISOString(),
+        ...(dados.organizationId ? { organization_id: dados.organizationId } : {}),
+      })
+      .eq("id", lead.id);
+  } catch {
+    logger.warn("[funil] cadastro não registrado", { userId: dados.userId });
+  }
+}

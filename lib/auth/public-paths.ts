@@ -4,6 +4,11 @@
  */
 export const PUBLIC_PATHS: RegExp[] = [
   /^\/$/,
+  // Conteúdo comercial sem dados de clientes; cada tela exige cobrança ligada.
+  /^\/(?:en|es|atendimento-whatsapp|chatbot-para-whatsapp|agentes-ia-whatsapp|crm-whatsapp|atendimento-whatsapp-sao-paulo|demonstracao)$/,
+  /^\/guias\/como-escolher-atendimento-whatsapp$/,
+  // Resumo para buscadores de IA; só texto público do produto.
+  /^\/llms\.txt$/,
   /^\/login(\/.*)?$/,
   /^\/signup$/,
   /^\/auth\/confirm$/,
@@ -139,6 +144,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   // deixariam qualquer sub-path futuro do painel nascer público de carona —
   // aqui isso não seria uma tela a mais exposta, seria a lista inteira.
   /^\/dashboard$/,
+  /^\/dashboard\/automacoes$/,
   /^\/api\/v1\/painel\/entrar$/,
 ];
 

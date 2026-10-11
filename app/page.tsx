@@ -39,7 +39,16 @@ import {
   type PlanoId,
 } from "@/lib/billing/planos";
 import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
-import { precoLegivelNoMercado } from "@/lib/mercado/paises";
+import {
+  identidadePublica,
+  jsonLdSeguro,
+  metadadosDaHome,
+  LINKS_SEO,
+  SELETOR_DE_IDIOMA,
+} from "@/lib/marketing/seo";
+import { env } from "@/lib/env";
+import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
+import { precoLegivelNoMercado, type IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
 import { visitanteAtual } from "@/lib/mercado/visitante";
 import { createClient } from "@/lib/supabase/server";
@@ -47,18 +56,16 @@ import { createClient } from "@/lib/supabase/server";
 // O mesmo interruptor da cobrança preserva o clone self-host sem vitrine de assinatura.
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: { params?: Promise<{ idioma?: string }> } = {}): Promise<Metadata> {
   const marca = await marcaDaSaida(null);
-  return {
-    title: { absolute: `${marca.nome} — atendimento por WhatsApp que não perde cliente` },
-    description:
-      "Centralize o WhatsApp da sua empresa em uma tela só, com agentes de IA, histórico compartilhado e funil de vendas. Automatize a rotina e mantenha o cuidado com cada cliente.",
-    robots: { index: true, follow: true },
-    alternates: { canonical: "/" },
-  };
+  const escolhido = (await params)?.idioma;
+  const idioma = escolhido === "en" || escolhido === "es" ? escolhido : "pt-BR";
+  return metadadosDaHome(marca.nome, env.NEXT_PUBLIC_APP_URL, idioma);
 }
 
-export default async function HomePage() {
+export default async function HomePage({ params }: { params?: Promise<{ idioma?: string }> } = {}) {
   if (!instalacaoCobra()) redirect("/app");
   const supabase = await createClient();
   const {
@@ -66,7 +73,10 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
   if (user) redirect("/app");
 
-  const [visitante, marca] = await Promise.all([visitanteAtual(), marcaDaSaida(null)]);
+  const [origem, marca] = await Promise.all([visitanteAtual(), marcaDaSaida(null)]);
+  const escolhido = (await params)?.idioma;
+  const idioma: IdiomaDoSite = escolhido === "en" || escolhido === "es" ? escolhido : "pt-BR";
+  const visitante = { ...origem, idioma };
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
   const suporte = emailDeSuporte();
@@ -79,6 +89,9 @@ export default async function HomePage() {
     promessa: t("Sem spam. Um clique para sair, em qualquer e-mail."),
     sucesso: t("Pronto. Se houver novidade que valha o seu tempo, ela chega por e-mail."),
     erro: t("Não foi possível inscrever agora. Tente de novo em instantes."),
+    consentimento: t(
+      "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.",
+    ),
   };
   // As ilhas recebem os três idiomas da vitrine por prop, sem importar o dicionário do produto.
   const produto: TextosDoProduto = {
@@ -236,6 +249,18 @@ export default async function HomePage() {
           </div>
         </div>
       </header>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdSeguro({
+            "@context": "https://schema.org",
+            "@graph": [
+              ...identidadePublica(marca.nome, env.NEXT_PUBLIC_APP_URL, marca.logoUrl),
+              schemaDoSoftware(marca.nome, env.NEXT_PUBLIC_APP_URL),
+            ],
+          }),
+        }}
+      />
       <main id="conteudo">
         <section className={styles.hero}>
           <Image
@@ -595,6 +620,24 @@ export default async function HomePage() {
         </section>
       </main>
       <footer className={styles.footer}>
+        <div className={`${styles.container} ${styles.footerBottom}`}>
+          <nav aria-label="Language">
+            {SELETOR_DE_IDIOMA.map((item) => (
+              <Link key={item.lang} href={item.href} hrefLang={item.lang} lang={item.lang}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          {idioma === "pt-BR" && (
+            <nav aria-label={t("Informações e contato")}>
+              {LINKS_SEO.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </div>
         <div className={`${styles.container} ${styles.footerLead}`}>
           <div>
             <h2>{t("Ainda pensando?")}</h2>

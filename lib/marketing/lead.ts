@@ -52,6 +52,7 @@ export type DadosDoLead = {
   readonly empresa?: string | null;
   readonly mensagem?: string | null;
   readonly origem: OrigemDoLead;
+  readonly marketingOptIn?: boolean;
   readonly visitorId?: string | null;
   readonly country?: string | null;
   readonly region?: string | null;
@@ -110,7 +111,7 @@ export async function registrarLead(dados: DadosDoLead): Promise<ResultadoDoLead
   const { data: existente, error: erroBusca } = await admin
     .from("site_leads")
     .select(
-      "id, nome, telefone, empresa, visitor_id, country, region, city, idioma, moeda, descadastrado_em",
+      "id, nome, telefone, empresa, visitor_id, country, region, city, idioma, moeda, descadastrado_em, marketing_opt_in_em",
     )
     .eq("email", email)
     .maybeSingle();
@@ -123,7 +124,12 @@ export async function registrarLead(dados: DadosDoLead): Promise<ResultadoDoLead
   if (existente) {
     if (existente.descadastrado_em) return { tipo: "descadastrado" };
 
-    const remendo = lacunasAPreencher(existente, dados);
+    const remendo: Record<string, string> = lacunasAPreencher(existente, dados);
+    // A lista exige aceite explícito; origem/signup nunca autoriza publicidade.
+    if (dados.marketingOptIn === true && !existente.marketing_opt_in_em) {
+      remendo.marketing_opt_in_em = new Date().toISOString();
+      remendo.marketing_opt_in_origem = `site:${dados.origem}:v1`;
+    }
     if (Object.keys(remendo).length > 0) {
       await admin
         .from("site_leads")
@@ -137,6 +143,12 @@ export async function registrarLead(dados: DadosDoLead): Promise<ResultadoDoLead
     .from("site_leads")
     .insert({
       email,
+      ...(dados.marketingOptIn === true
+        ? {
+            marketing_opt_in_em: new Date().toISOString(),
+            marketing_opt_in_origem: `site:${dados.origem}:v1`,
+          }
+        : {}),
       nome: vazioVira(dados.nome),
       telefone: vazioVira(dados.telefone),
       empresa: vazioVira(dados.empresa),

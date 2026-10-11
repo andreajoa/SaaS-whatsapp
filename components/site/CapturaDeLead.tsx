@@ -45,6 +45,7 @@ export interface TextosDaCaptura {
   promessa: string;
   sucesso: string;
   erro: string;
+  consentimento?: string;
 }
 
 export function CapturaDeLead({
@@ -65,16 +66,25 @@ export function CapturaDeLead({
 }) {
   const [email, setEmail] = useState("");
   const [armadilha, setArmadilha] = useState("");
+  const [aceitou, setAceitou] = useState(false);
   const [estado, setEstado] = useState<"parado" | "enviando" | "pronto" | "erro">("parado");
 
   async function inscrever(evento: React.FormEvent) {
     evento.preventDefault();
+    if (textos.consentimento && !aceitou) return;
     setEstado("enviando");
     try {
       const resposta = await fetch("/api/v1/site/lead", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, origem, idioma, moeda, empresa_site: armadilha }),
+        body: JSON.stringify({
+          email,
+          origem,
+          idioma,
+          moeda,
+          empresa_site: armadilha,
+          marketing_opt_in: aceitou,
+        }),
       });
       if (!resposta.ok) {
         setEstado("erro");
@@ -121,10 +131,29 @@ export function CapturaDeLead({
           onChange={(e) => setArmadilha(e.target.value)}
           className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
         />
-        <Button type="submit" disabled={estado === "enviando" || email.trim() === ""}>
+        <Button
+          type="submit"
+          disabled={
+            estado === "enviando" ||
+            email.trim() === "" ||
+            Boolean(textos.consentimento && !aceitou)
+          }
+        >
           {estado === "enviando" ? textos.enviando : textos.enviar}
         </Button>
       </div>
+      {textos.consentimento && (
+        <label className="flex items-start gap-2 text-sm leading-relaxed text-text-muted">
+          <input
+            type="checkbox"
+            checked={aceitou}
+            onChange={(e) => setAceitou(e.target.checked)}
+            required
+            className="mt-1 h-4 w-4 shrink-0 accent-current"
+          />
+          <span>{textos.consentimento}</span>
+        </label>
+      )}
 
       {estado === "erro" ? (
         <p role="alert" className="text-danger text-sm">

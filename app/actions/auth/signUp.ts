@@ -1,6 +1,6 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -12,6 +12,9 @@ import {
 import { verifyInviteToken } from "@/lib/auth/invite-token";
 import { audit, hashEmail } from "@/lib/audit";
 import { authRateLimited, AUTH_LIMITS } from "@/lib/auth/rate-limit";
+import { registrarCadastroReal } from "@/lib/marketing/funil";
+import { COOKIE_DO_VISITANTE } from "@/lib/mercado/visitante";
+import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 
 export type SignUpResult =
@@ -177,6 +180,17 @@ export async function signUp(
       userAgent,
     });
     return { ok: false, error: "signup_failed" };
+  }
+
+  // identities vazio é a resposta anti-enumeração do GoTrue, não cadastro novo.
+  // Consentimento comercial não se infere desta criação nem da confirmação.
+  if (!convite && instalacaoCobra() && data.user?.identities && data.user.identities.length > 0) {
+    const jar = await cookies();
+    await registrarCadastroReal({
+      email: parsed.data.email,
+      userId: data.user.id,
+      visitorId: jar.get(COOKIE_DO_VISITANTE)?.value ?? null,
+    });
   }
 
   await audit({

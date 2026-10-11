@@ -51,6 +51,8 @@ interface SendArgs {
    * `lib/marketing/descadastro.ts` monta o par; aqui é só o cano.
    */
   headers?: Record<string, string>;
+  /** Identidade durável do email_envios; repetível somente dentro de 24 h. */
+  idempotencyKey?: string;
 }
 
 interface SendResult {
@@ -119,16 +121,19 @@ export async function sendEmail(args: SendArgs): Promise<SendResult> {
   }
 
   try {
-    const { data, error } = await client.emails.send({
-      from,
-      to: args.to,
-      subject: args.subject,
-      html: args.html,
-      text: args.text,
-      replyTo: args.replyTo,
-      tags: args.tags,
-      headers: args.headers,
-    });
+    const { data, error } = await client.emails.send(
+      {
+        from,
+        to: args.to,
+        subject: args.subject,
+        html: args.html,
+        text: args.text,
+        replyTo: args.replyTo,
+        tags: args.tags,
+        headers: args.headers,
+      },
+      args.idempotencyKey ? { idempotencyKey: args.idempotencyKey } : undefined,
+    );
 
     if (error) {
       return {

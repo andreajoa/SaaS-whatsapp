@@ -7,12 +7,16 @@ describe("mídia da vitrine antes do cadastro", () => {
     "/media/atenza/atendimento-loop.mp4",
     "/media/atenza/atenza-explica.mp4",
     "/media/atenza/atenza-explica.vtt",
+    "/media/atenza/atenza-explica-es-mx.mp4",
+    "/media/atenza/atenza-explica-de-de.mp4",
+    "/media/atenza/atenza-explica-en-us.mp4",
   ])("visitante anônimo pode carregar %s", (pathname) => {
     expect(isPublicPath(pathname)).toBe(true);
   });
 
   it.each([
     "/media/atenza/cliente.mp4",
+    "/media/atenza/atenza-explica-xx-yy.mp4",
     "/media/atenza/atenza-explica.mp4/editar",
     "/media/atenza/atenza-explica.vtt/interno",
     "/media/privado/atenza-explica.mp4",

@@ -118,7 +118,8 @@ export const PUBLIC_PATHS: RegExp[] = [
   // Arquivos estáticos da demonstração pública: vídeos e legendas precisam
   // carregar antes do cadastro. Lista fechada: não libera mídia de clientes,
   // rotas do produto ou qualquer arquivo futuro pela extensão.
-  /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt))$/,
+  // As versões por país (lib/marketing/video.ts) entram por locale fechado.
+  /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt)|atenza-explica-(?:es-mx|es-co|es-ar|es-cl|es-pe|es-es|en-us|de-de)\.mp4)$/,
   // A SAÍDA DA LISTA — a tela e a rota que dá baixa.
   //
   // Quem clica para sair de uma lista de e-mails nunca teve sessão, e nunca

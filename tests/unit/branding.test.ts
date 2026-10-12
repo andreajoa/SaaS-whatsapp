@@ -328,7 +328,7 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "ATENZA",
     motivo:
       "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
-    marcas: ["atenza", "atenza", "atenza", "atenza", "atenza-explica.mp4", "atenza-explica.vtt"],
+    marcas: ["atenza", "atenza", "atenza", "atenza-explica.mp4"],
   },
   "app/llms.txt/route.ts": {
     categoria: "ATENZA",
@@ -376,7 +376,7 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "ATENZA",
     motivo:
       "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
-    marcas: ["atenza", "atenza-explica.mp4", "atenza-explica.vtt", "atenza-home.module.css"],
+    marcas: ["atenza", "atenza-explica.mp4", "atenza-home.module.css"],
   },
   "lib/auth/public-paths.ts": {
     categoria: "ATENZA",

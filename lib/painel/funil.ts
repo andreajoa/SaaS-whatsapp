@@ -7,12 +7,14 @@ export interface Janela {
   readonly cookie: string | undefined;
 }
 const TAMANHO = 1000;
+/** Hoje (24 h), semana, mês, trimestre, semestre e ano. */
+export const JANELAS_DO_PAINEL: readonly number[] = [1, 7, 30, 90, 180, 365];
 /** O guard se repete na fronteira de leitura: nem chamada interna pode bypassar a porta. */
 export async function lerPainel({ dias, cookie }: Janela): Promise<Painel> {
   if (!cookieVale(cookie)) throw new Error("Acesso ao painel recusado.");
   const ate = new Date().toISOString();
   const desde = new Date(
-    Date.now() - ([7, 30, 90].includes(dias) ? dias : 7) * 86400000,
+    Date.now() - (JANELAS_DO_PAINEL.includes(dias) ? dias : 7) * 86400000,
   ).toISOString();
   const fontes: Fontes = {
     visitas: null,
@@ -61,7 +63,7 @@ export async function lerPainel({ dias, cookie }: Janela): Promise<Painel> {
       "visitas",
       "site_visits",
       "created_at,visitor_id,session_id,path,referrer_host,utm_source,utm_medium,utm_campaign,country,region,city,postal_code,device,segundos_na_pagina",
-      20000,
+      50000,
       true,
     ),
     ler(
@@ -85,7 +87,7 @@ export async function lerPainel({ dias, cookie }: Janela): Promise<Painel> {
       20000,
       false,
     ),
-    ler("cliques", "site_clicks", "created_at,visitor_id,session_id,path,alvo", 20000, true),
+    ler("cliques", "site_clicks", "created_at,visitor_id,session_id,path,alvo", 50000, true),
   ]);
   // A leitura de billing fica limitada aos tenants que o CRM do operador já vinculou.
   const orgs = [

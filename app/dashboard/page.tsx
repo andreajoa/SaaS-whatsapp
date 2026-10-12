@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { PortaDoPainel } from "@/components/painel/PortaDoPainel";
 import { PainelDoDono } from "@/components/painel/PainelDoDono";
 import { COOKIE_DO_PAINEL, cookieVale, painelHabilitado } from "@/lib/painel/sessao";
-import { lerPainel } from "@/lib/painel/funil";
+import { JANELAS_DO_PAINEL, lerPainel } from "@/lib/painel/funil";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { sairDoPainel } from "./actions";
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function DashboardPage({
   if (!cookieVale(cookie)) return <PortaDoPainel />;
   const params = await searchParams;
   const pedido = Number(Array.isArray(params.dias) ? params.dias[0] : params.dias);
-  const dias = [7, 30, 90].includes(pedido) ? pedido : 7;
+  const dias = JANELAS_DO_PAINEL.includes(pedido) ? pedido : 7;
   const [painel, marca] = await Promise.all([lerPainel({ dias, cookie }), marcaDaSaida(null)]);
   return <PainelDoDono painel={painel} dias={dias} nome={marca.nome} sair={sairDoPainel} />;
 }

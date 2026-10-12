@@ -15,6 +15,7 @@ import {
   LogOut,
   Mail,
   MousePointer2,
+  PlayCircle,
   Search,
   ShieldCheck,
   Users,
@@ -44,6 +45,16 @@ const ROTULOS: Record<Segmento, string> = {
   bloqueado: "Bloqueado",
   indisponivel: "Assinatura indisponível",
 };
+const NOMES_DE_PAIS = new Intl.DisplayNames(["pt-BR"], { type: "region" });
+/** "MX" → "México (MX)"; o que não for código de país volta como veio. */
+function nomeDoPais(codigo: string) {
+  if (!/^[A-Z]{2}$/.test(codigo)) return codigo;
+  try {
+    return `${NOMES_DE_PAIS.of(codigo) ?? codigo} (${codigo})`;
+  } catch {
+    return codigo;
+  }
+}
 function formatarData(valor: string | null) {
   if (!valor || !Number.isFinite(new Date(valor).getTime())) return "Não registrado";
   return DATA.format(new Date(valor));
@@ -162,8 +173,10 @@ function Lista({
   );
 }
 function Grafico({ serie, indisponiveis }: { serie: Painel["serie"]; indisponiveis: string[] }) {
-  const [metrica, setMetrica] = useState<"visitas" | "leads" | "clientes">("visitas");
-  const fonteIndisponivel = indisponiveis.includes(metrica === "visitas" ? "visitas" : "leads");
+  const [metrica, setMetrica] = useState<"visitas" | "plays" | "leads" | "clientes">("visitas");
+  const fonteIndisponivel = indisponiveis.includes(
+    metrica === "visitas" ? "visitas" : metrica === "plays" ? "cliques" : "leads",
+  );
   const teto = Math.max(1, ...serie.map((x) => x[metrica] ?? 0));
   const pontos = serie.map((x, i) => ({
     x: 36 + (i * 720) / Math.max(1, serie.length - 1),
@@ -179,14 +192,20 @@ function Grafico({ serie, indisponiveis }: { serie: Painel["serie"]; indisponive
           <span>Eventos por dia · UTC</span>
         </div>
         <div className={styles.switcher}>
-          {(["visitas", "leads", "clientes"] as const).map((m) => (
+          {(["visitas", "plays", "leads", "clientes"] as const).map((m) => (
             <button
               type="button"
               key={m}
               aria-pressed={m === metrica}
               onClick={() => setMetrica(m)}
             >
-              {m === "clientes" ? "Novas assinaturas" : m === "leads" ? "Leads" : "Visitas"}
+              {m === "clientes"
+                ? "Novas assinaturas"
+                : m === "leads"
+                  ? "Leads"
+                  : m === "plays"
+                    ? "Plays do vídeo"
+                    : "Visitas"}
             </button>
           ))}
         </div>
@@ -389,13 +408,20 @@ export function PainelDoDono({
               <ShieldCheck size={14} /> Acesso exclusivo
             </span>
             <div className={styles.period} aria-label="Período">
-              {[7, 30, 90].map((n) => (
+              {[
+                [1, "Hoje"],
+                [7, "7 dias"],
+                [30, "30 dias"],
+                [90, "90 dias"],
+                [180, "6 meses"],
+                [365, "1 ano"],
+              ].map(([n, rotulo]) => (
                 <Link
                   key={n}
                   href={`/dashboard?dias=${n}`}
                   aria-current={dias === n ? "true" : undefined}
                 >
-                  {n} dias
+                  {rotulo}
                 </Link>
               ))}
             </div>
@@ -405,7 +431,7 @@ export function PainelDoDono({
           <span>
             <span className={styles.dot} /> Leitura em {formatarData(p.ate)} · horário de Brasília
           </span>
-          <span>Janela móvel de {dias} dias</span>
+          <span>{dias === 1 ? "Últimas 24 horas" : `Janela móvel de ${dias} dias`}</span>
         </div>
         {p.semBanco ? (
           <div role="status" className={styles.warning}>
@@ -451,6 +477,12 @@ export function PainelDoDono({
                 icone={CircleCheck}
               />
               <Card
+                titulo="Plays do vídeo"
+                valor={p.plays === null ? "—" : contagem(p.plays)}
+                nota={`${contagem(p.visitantesQueDeramPlay)} visitantes · ${taxa(p.visitantesQueDeramPlay, p.visitantes)} de quem visitou`}
+                icone={PlayCircle}
+              />
+              <Card
                 titulo="Tempo visível mediano"
                 valor={disponivel ? duracao(p.segundosMedios) : "—"}
                 nota={`Medido em ${taxa(p.duracoesMedidas, p.visitas)} das visitas`}
@@ -479,7 +511,10 @@ export function PainelDoDono({
                 </div>
                 <p className={styles.footnote}>
                   Conversão exige visitor_id persistido e evento posterior à primeira visita da
-                  janela. Cadastros sem vínculo não entram nessa taxa. {p.identificados === null ? "Identificação indisponível: não é possível distinguir visitantes anônimos e vinculados." : `${contagem(p.identificados)} visitantes têm identidade associada; os demais são anônimos.`}
+                  janela. Cadastros sem vínculo não entram nessa taxa.{" "}
+                  {p.identificados === null
+                    ? "Identificação indisponível: não é possível distinguir visitantes anônimos e vinculados."
+                    : `${contagem(p.identificados)} visitantes têm identidade associada; os demais são anônimos.`}
                 </p>
               </section>
               <section className={styles.card}>
@@ -515,8 +550,50 @@ export function PainelDoDono({
               <Lista titulo="Campanhas" linhas={p.porCampanha} base={p.visitas} />
               <Lista titulo="Dispositivos" linhas={p.porDispositivo} base={p.visitas} />
               <Lista titulo="Países" linhas={p.porPais} base={p.visitas} />
+              <Lista titulo="Estados e regiões" linhas={p.porRegiao} base={p.visitas} />
               <Lista titulo="Cidades aproximadas" linhas={p.porCidade} base={p.visitas} />
+              <Lista titulo="Plays do vídeo por país" linhas={p.playsPorPais} base={p.plays} />
             </div>
+            <section className={styles.card}>
+              <div className={styles.cardHead}>
+                <h2>Por país</h2>
+                <span>Visitas, plays e leads de cada mercado na janela</span>
+              </div>
+              {p.geografia === null ? (
+                <p className={styles.empty}>Dados de visitas indisponíveis.</p>
+              ) : p.geografia.length ? (
+                <div className={styles.tableWrap}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th scope="col">País</th>
+                        <th scope="col">Visitas</th>
+                        <th scope="col">Visitantes</th>
+                        <th scope="col">Plays do vídeo</th>
+                        <th scope="col">Leads</th>
+                        <th scope="col">Principais regiões</th>
+                        <th scope="col">Principais cidades</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {p.geografia.map((g) => (
+                        <tr key={g.pais}>
+                          <th scope="row">{nomeDoPais(g.pais)}</th>
+                          <td>{g.visitas}</td>
+                          <td>{g.visitantes}</td>
+                          <td>{g.plays ?? "—"}</td>
+                          <td>{g.leads ?? "—"}</td>
+                          <td>{g.regioes.map((r) => `${r.chave} (${r.total})`).join(", ")}</td>
+                          <td>{g.cidades.map((c) => `${c.chave} (${c.total})`).join(", ")}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className={styles.empty}>Nenhuma visita registrada na janela.</p>
+              )}
+            </section>
             <section className={styles.card}>
               <div className={styles.cardHead}>
                 <h2>Onde clicaram</h2>
@@ -631,7 +708,9 @@ export function PainelDoDono({
                 >
                   <option value="recente">Mais recentes</option>
                   <option value="nome">Nome: A–Z</option>
-                  <option value="engajamento" disabled={p.indisponiveis.includes("envios")}>Mais engajados</option>
+                  <option value="engajamento" disabled={p.indisponiveis.includes("envios")}>
+                    Mais engajados
+                  </option>
                 </select>
               </div>
               <div className={styles.tableWrap}>

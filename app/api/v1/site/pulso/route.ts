@@ -62,6 +62,17 @@ const ALVOS = [
   "perguntas",
   "contato",
   "login",
+  // Assinatura anual (/precos).
+  "ciclo-mensal",
+  "ciclo-anual",
+  "plano-essencial-anual",
+  "plano-pro-anual",
+  "plano-ilimitado-anual",
+  // Páginas de país: o botão de criar conta (o país sai do caminho da visita).
+  "pais-crear",
+  // O vídeo de apresentação começou a tocar (não é clique: é o evento `play`,
+  // ver components/site/Medidor.tsx). Uma vez por vídeo por carregamento.
+  "video-play",
 ] as const;
 
 const schema = z.object({

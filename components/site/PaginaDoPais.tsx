@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Check, Play } from "lucide-react";
+import { ArrowRight, Check, Play, ShieldCheck, X } from "lucide-react";
 
 import { CabecalhoDoSite } from "@/components/site/CabecalhoDoSite";
 import { Medidor } from "@/components/site/Medidor";
@@ -9,6 +9,7 @@ import { RodapeDoSite } from "@/components/site/RodapeDoSite";
 import { instalacaoCobra, ORDEM_DOS_PLANOS, PLANOS, precoDoPlano } from "@/lib/billing/planos";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
+import { MOLDES_DOS_PAISES, type Molde } from "@/lib/marketing/paises-moldes";
 import { PAGINAS_DE_PAIS, paginaDePais } from "@/lib/marketing/paises-seo";
 import { jsonLdSeguro, metadadosPublicos, schemaDaPagina, schemaDoFaq } from "@/lib/marketing/seo";
 import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
@@ -39,6 +40,21 @@ function ilustracao(slug: string) {
     alt: "Ilustración de atención por WhatsApp con inteligencia artificial",
   };
 }
+
+type Bloco =
+  "faixa" | "confianca" | "dores" | "passos" | "comparacao" | "leitura" | "precos" | "faq";
+
+/**
+ * A ORDEM é a psicologia do molde (ver lib/marketing/paises-moldes.ts): o
+ * argentino vê o preço logo de saída; o espanhol, as garantias; o mexicano,
+ * a dor antes de qualquer número.
+ */
+const ORDEM_DO_MOLDE: Record<Molde, readonly Bloco[]> = {
+  calido: ["confianca", "dores", "passos", "leitura", "precos", "faq"],
+  directo: ["faixa", "comparacao", "dores", "leitura", "precos", "faq"],
+  corporativo: ["confianca", "passos", "comparacao", "dores", "leitura", "precos", "faq"],
+  sobrio: ["confianca", "dores", "passos", "leitura", "precos", "faq"],
+};
 
 export async function metadadosDoPais(slug: string) {
   const pagina = paginaDePais(slug);
@@ -80,12 +96,15 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
   const base = env.NEXT_PUBLIC_APP_URL;
   const caminho = `/es/${slug}`;
   const ui = pagina.ui;
+  const molde = MOLDES_DOS_PAISES[slug] ?? { molde: "sobrio" as Molde, confianca: [] };
+  const ordem = ORDEM_DO_MOLDE[molde.molde];
 
   // O preço do país só aparece quando o checkout consegue cobrá-lo naquela
   // moeda. Mostrar MXN e cobrar BRL é exatamente o erro que esta guarda evita.
   const mercado = mercadoDoPais(pagina.pais);
   const cobravel = moedasCobraveis().has(mercado.moeda);
   const vendidos = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  const primeiro = vendidos[0] ?? null;
   const valorDe = (p: (typeof vendidos)[number]) => {
     const bruto = precoNoMercado(p, mercado);
     return MOEDAS_SEM_CENTAVOS.has(mercado.moeda) ? bruto : bruto / 100;
@@ -137,7 +156,7 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
   const t = (texto: string) => textoDoSite(texto, "es");
 
   return (
-    <div className={styles.page} lang={pagina.hreflang}>
+    <div className={`${styles.page} ${pais.raiz}`} data-molde={molde.molde} lang={pagina.hreflang}>
       <Medidor idioma="es" moeda={visitante.mercado.moeda} dispositivo={visitante.dispositivo} />
       <script
         type="application/ld+json"
@@ -148,108 +167,234 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
       </a>
       <CabecalhoDoSite nome={marca.nome} idioma="es" />
       <main id="conteudo">
-        <section className={styles.hero}>
-          <div>
-            <nav className={styles.breadcrumb} aria-label="Ruta">
-              <Link href="/es">{marca.nome}</Link>
-              <span aria-hidden>/</span>
-              <span>{pagina.nome}</span>
-            </nav>
-            <p className={styles.eyebrow}>
-              {marca.nome} {pagina.eyebrow.toLowerCase()}
-            </p>
-            <h1>{pagina.headline}</h1>
-            <p className={styles.intro}>{pagina.intro.replaceAll("{marca}", marca.nome)}</p>
-            <div className={styles.actions}>
-              <Link href="/signup" className={styles.primary} data-medir={`pais-${slug}-crear`}>
-                {ui.crear}
-                <ArrowRight size={17} aria-hidden />
-              </Link>
-              <Link href="/demonstracao" className={styles.secondary}>
-                <Play size={17} aria-hidden />
-                {ui.video}
-              </Link>
+        <div className={pais.banda}>
+          <section className={styles.hero}>
+            <div>
+              <nav className={styles.breadcrumb} aria-label="Ruta">
+                <Link href="/es">{marca.nome}</Link>
+                <span aria-hidden>/</span>
+                <span>{pagina.nome}</span>
+              </nav>
+              <p className={styles.eyebrow}>
+                {marca.nome} {pagina.eyebrow.toLowerCase()}
+              </p>
+              <h1>{pagina.headline}</h1>
+              <p className={styles.intro}>{pagina.intro.replaceAll("{marca}", marca.nome)}</p>
+              <div className={styles.actions}>
+                <Link href="/signup" className={styles.primary} data-medir="pais-crear">
+                  {ui.crear}
+                  <ArrowRight size={17} aria-hidden />
+                </Link>
+                <Link href="/demonstracao" className={styles.secondary}>
+                  <Play size={17} aria-hidden />
+                  {ui.video}
+                </Link>
+              </div>
+              <p className={styles.trial}>{ui.prueba}</p>
             </div>
-            <p className={styles.trial}>{ui.prueba}</p>
-          </div>
-          <figure className={styles.figure} data-ilustracao="true">
-            <Image
-              src={imagem.src}
-              alt={imagem.alt}
-              width={1000}
-              height={563}
-              sizes="(max-width: 800px) 100vw, 45vw"
-              priority
-            />
-          </figure>
-        </section>
-
-        <section className={pais.bloco} aria-labelledby="dolores">
-          <h2 id="dolores">{ui.dolores}</h2>
-          <div className={pais.dores}>
-            {pagina.dores.map((d) => (
-              <article key={d.titulo}>
-                <h3>{d.titulo}</h3>
-                <p>{d.texto}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <div className={pais.leitura}>
-          {pagina.sections.map((s) => (
-            <section key={s.title} className={styles.chapter}>
-              <h2>{s.title}</h2>
-              {s.paragraphs.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-              {s.bullets && (
+            {molde.conversa ? (
+              <figure className={pais.conversa} aria-label="Conversación de ejemplo">
+                <figcaption className={pais.conversaTopo}>
+                  <span className={pais.avatar} aria-hidden>
+                    {(molde.negocio ?? marca.nome).slice(0, 1)}
+                  </span>
+                  <span>
+                    <strong>{molde.negocio}</strong>
+                    <small>Agente de IA · en línea</small>
+                  </span>
+                </figcaption>
+                <ol>
+                  {molde.conversa.map((m, i) => (
+                    <li key={i} data-de={m.de}>
+                      {m.texto}
+                    </li>
+                  ))}
+                </ol>
+                <p className={pais.conversaNota}>Ejemplo ilustrativo</p>
+              </figure>
+            ) : molde.painel ? (
+              <figure className={pais.painel} aria-label="Panel de ejemplo">
+                <figcaption>
+                  <strong>{molde.painel.titulo}</strong>
+                  <small>Ejemplo ilustrativo</small>
+                </figcaption>
                 <ul>
-                  {s.bullets.map((b) => (
-                    <li key={b}>{b}</li>
+                  {molde.painel.linhas.map((l) => (
+                    <li key={l.cliente}>
+                      <span className={pais.painelAvatar} aria-hidden>
+                        {l.cliente.slice(0, 1)}
+                      </span>
+                      <span>
+                        <strong>{l.cliente}</strong>
+                        <small>{l.assunto}</small>
+                      </span>
+                      <em data-tom={l.tom}>{l.estado}</em>
+                    </li>
                   ))}
                 </ul>
-              )}
-            </section>
-          ))}
+              </figure>
+            ) : (
+              <figure className={styles.figure} data-ilustracao="true">
+                <Image
+                  src={imagem.src}
+                  alt={imagem.alt}
+                  width={1000}
+                  height={563}
+                  sizes="(max-width: 800px) 100vw, 45vw"
+                  priority
+                />
+              </figure>
+            )}
+          </section>
         </div>
 
-        {cobravel && vendidos.length > 0 && (
-          <section className={pais.bloco} aria-labelledby="precios">
-            <h2 id="precios">{ui.precios}</h2>
-            <div className={pais.planos}>
-              {vendidos.map((p) => (
-                <article key={p} data-destaque={p === "pro" ? "true" : undefined}>
-                  <h3>{PLANOS[p].nome}</h3>
-                  <p className={pais.preco}>
-                    {precoLegivelNoMercado(p, mercado)}
-                    <small>{ui.mes}</small>
-                  </p>
-                  <ul>
-                    {PLANOS[p].destaques.map((d) => (
-                      <li key={d}>
-                        <Check size={16} aria-hidden />
-                        {t(d)}
+        {ordem.map((bloco) => {
+          switch (bloco) {
+            case "faixa":
+              return molde.faixa ? (
+                <p key={bloco} className={pais.faixa}>
+                  {cobravel && primeiro && (
+                    <strong>
+                      {PLANOS[primeiro].nome} {precoLegivelNoMercado(primeiro, mercado)}
+                      {ui.mes}
+                    </strong>
+                  )}
+                  <span>{molde.faixa}</span>
+                </p>
+              ) : null;
+            case "confianca":
+              return (
+                <ul key={bloco} className={pais.confianca} aria-label="Garantías">
+                  {molde.confianca.map((c) => (
+                    <li key={c}>
+                      <ShieldCheck size={18} aria-hidden />
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              );
+            case "dores":
+              return (
+                <section key={bloco} className={pais.bloco} aria-labelledby="dolores">
+                  <h2 id="dolores">{ui.dolores}</h2>
+                  <div className={pais.dores}>
+                    {pagina.dores.map((d) => (
+                      <article key={d.titulo}>
+                        <h3>{d.titulo}</h3>
+                        <p>{d.texto}</p>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              );
+            case "passos":
+              return molde.passos ? (
+                <section key={bloco} className={pais.bloco} aria-labelledby="pasos">
+                  <h2 id="pasos">{molde.passos.titulo}</h2>
+                  <ol className={pais.passos}>
+                    {molde.passos.itens.map((it, i) => (
+                      <li key={it.titulo}>
+                        <span className={pais.numero}>{i + 1}</span>
+                        <strong>{it.titulo}</strong>
+                        <p>{it.texto}</p>
                       </li>
                     ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section className={pais.bloco} aria-labelledby="preguntas">
-          <h2 id="preguntas">{ui.preguntas}</h2>
-          <div className={styles.faq}>
-            {pagina.faq.map((p) => (
-              <details key={p.question}>
-                <summary>{p.question}</summary>
-                <p>{p.answer}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+                  </ol>
+                </section>
+              ) : null;
+            case "comparacao":
+              return molde.comparacao ? (
+                <section key={bloco} className={pais.bloco} aria-labelledby="comparacion">
+                  <h2 id="comparacion">
+                    {molde.comparacao.titulo.replaceAll("{marca}", marca.nome)}
+                  </h2>
+                  <div className={pais.tabelaRolagem}>
+                    <table className={pais.tabela}>
+                      <thead>
+                        <tr>
+                          <th scope="col">{molde.comparacao.sin}</th>
+                          <th scope="col">{molde.comparacao.con}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {molde.comparacao.linhas.map((l) => (
+                          <tr key={l.sin}>
+                            <td>
+                              <X size={16} aria-hidden />
+                              {l.sin}
+                            </td>
+                            <td>
+                              <Check size={16} aria-hidden />
+                              {l.con}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ) : null;
+            case "leitura":
+              return (
+                <div key={bloco} className={pais.leitura}>
+                  {pagina.sections.map((sec) => (
+                    <section key={sec.title} className={styles.chapter}>
+                      <h2>{sec.title}</h2>
+                      {sec.paragraphs.map((p) => (
+                        <p key={p}>{p}</p>
+                      ))}
+                      {sec.bullets && (
+                        <ul>
+                          {sec.bullets.map((b) => (
+                            <li key={b}>{b}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </section>
+                  ))}
+                </div>
+              );
+            case "precos":
+              return cobravel && vendidos.length > 0 ? (
+                <section key={bloco} className={pais.bloco} aria-labelledby="precios">
+                  <h2 id="precios">{ui.precios}</h2>
+                  <div className={pais.planos}>
+                    {vendidos.map((p) => (
+                      <article key={p} data-destaque={p === "pro" ? "true" : undefined}>
+                        <h3>{PLANOS[p].nome}</h3>
+                        <p className={pais.preco}>
+                          {precoLegivelNoMercado(p, mercado)}
+                          <small>{ui.mes}</small>
+                        </p>
+                        <ul>
+                          {PLANOS[p].destaques.map((d) => (
+                            <li key={d}>
+                              <Check size={16} aria-hidden />
+                              {t(d)}
+                            </li>
+                          ))}
+                        </ul>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null;
+            case "faq":
+              return (
+                <section key={bloco} className={pais.bloco} aria-labelledby="preguntas">
+                  <h2 id="preguntas">{ui.preguntas}</h2>
+                  <div className={styles.faq}>
+                    {pagina.faq.map((p) => (
+                      <details key={p.question}>
+                        <summary>{p.question}</summary>
+                        <p>{p.answer}</p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              );
+          }
+        })}
 
         <section className={styles.cta}>
           <p className={styles.eyebrow}>{marca.nome}</p>

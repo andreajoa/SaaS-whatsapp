@@ -68,6 +68,10 @@ const PASTAS_IGNORADAS = new Set(["api", "node_modules"]);
 const FORA_DO_PRODUTO: Record<string, string> = {
   "app/design": "vitrine do design system: rota noindex, sem porta na navegação",
   "app/vitrine-agenda": "vitrine do kit visual da Agenda: dado de mentira, noindex",
+  // As páginas por país são ESCRITAS em espanhol (cada uma no registro do
+  // seu país); não há versão portuguesa a traduzir. A régua deste arquivo
+  // confunde espanhol com português cru.
+  "components/site/PaginaDoPais.tsx": "página por país, redigida em espanhol de origem",
   // O PAINEL DO FUNIL e a sua porta. Mesmo argumento das duas linhas acima, e
   // mais forte: não é só "sem porta na navegação" — é uma tela que NENHUM
   // cliente pode abrir. Ela vive fora de `app/app/`, fora da sessão do

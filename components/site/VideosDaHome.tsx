@@ -181,6 +181,7 @@ export function VideoExplicativo({
           <p className="sr-only">{textos.descricao}</p>
           <div className={styles.inlineVideoFrame}>
             <video
+              data-video="apresentacao"
               ref={videoRef}
               tabIndex={0}
               aria-label={textos.titulo}
@@ -193,13 +194,6 @@ export function VideoExplicativo({
               onError={() => setErro(true)}
             >
               <source src={`${MEDIA}/atenza-explica.mp4`} type="video/mp4" />
-              <track
-                src={`${MEDIA}/atenza-explica.vtt`}
-                kind="captions"
-                srcLang="pt-BR"
-                label={textos.legendas}
-                default
-              />
             </video>
           </div>
           {erro && <p role="alert">{textos.indisponivel}</p>}

@@ -7,6 +7,7 @@ import {
   MERCADO_PADRAO,
   mercadoDoPais,
   precoLegivelNoMercado,
+  precoParaQuemCompara,
   type IdiomaDoSite,
 } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
@@ -67,7 +68,7 @@ export function PaisesDisponiveis({ idioma }: { readonly idioma: IdiomaDoSite })
                 <strong>{nomes.of(p.pais)}</strong>
                 {comPreco && (
                   <span className={styles.preco}>
-                    {PLANOS.essencial.nome} {precoLegivelNoMercado("essencial", mercado)}
+                    {PLANOS.essencial.nome} {precoParaQuemCompara("essencial", mercado, "pt-BR")}
                     {t("/mês")}
                   </span>
                 )}

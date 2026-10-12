@@ -46,6 +46,7 @@ export default async function Page() {
         <h1>{ui.demo}</h1>
         <p className={styles.intro}>{ui.demoIntro}</p>
         <video
+          data-video="apresentacao"
           controls
           playsInline
           preload="none"
@@ -53,13 +54,6 @@ export default async function Page() {
           aria-label={ui.video}
         >
           <source src="/media/atenza/atenza-explica.mp4" type="video/mp4" />
-          <track
-            src="/media/atenza/atenza-explica.vtt"
-            kind="captions"
-            srcLang="pt-BR"
-            label={ui.language}
-            default
-          />
         </video>
         <div className={styles.actions}>
           <Link href="/precos" className={styles.primary}>

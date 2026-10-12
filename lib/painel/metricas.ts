@@ -80,13 +80,28 @@ export interface Painel {
   emailsReclamados: number | null;
   emailsAgendados: number | null;
   porPais: LinhaContada[] | null;
+  /** Estado/região com o país, para não misturar "SP" de dois lugares. */
+  porRegiao: LinhaContada[] | null;
+  /** Quantas vezes o vídeo de apresentação começou a tocar (rótulo `video-play`). */
+  plays: number | null;
+  /** Visitantes diferentes que deram play. */
+  visitantesQueDeramPlay: number | null;
+  playsPorPais: LinhaContada[] | null;
+  /** Uma linha por país: visitas, visitantes, plays e leads — o controle por mercado. */
+  geografia: LinhaDePais[] | null;
   porCidade: LinhaContada[] | null;
   porOrigem: LinhaContada[] | null;
   porCampanha: LinhaContada[] | null;
   porPagina: LinhaContada[] | null;
   porClique: LinhaContada[] | null;
   porDispositivo: LinhaContada[] | null;
-  serie: { dia: string; visitas: number | null; leads: number | null; clientes: number | null }[];
+  serie: {
+    dia: string;
+    visitas: number | null;
+    leads: number | null;
+    clientes: number | null;
+    plays: number | null;
+  }[];
   ultimasVisitas: VisitaResumida[] | null;
   ultimosLeads: LeadResumido[] | null;
   jornadas: Jornada[] | null;
@@ -95,6 +110,15 @@ export interface Painel {
   limitados: string[];
   desde: string;
   ate: string;
+}
+export interface LinhaDePais {
+  pais: string;
+  visitas: number;
+  visitantes: number;
+  plays: number | null;
+  leads: number | null;
+  regioes: LinhaContada[];
+  cidades: LinhaContada[];
 }
 export interface Fontes {
   visitas: Linha[] | null;
@@ -140,6 +164,14 @@ function dentro(valor: unknown, desde: string, ate: string): boolean {
   if (!data) return false;
   const instante = Date.parse(data);
   return Number.isFinite(instante) && instante >= Date.parse(desde) && instante <= Date.parse(ate);
+}
+/** A borda manda a cidade em percent-encoding ("S%C3%A3o%20Paulo"). */
+function decodeURIComponentSeguro(valor: string): string {
+  try {
+    return decodeURIComponent(valor);
+  } catch {
+    return valor;
+  }
 }
 function diaUTC(valor: unknown): string | null {
   const instante = typeof valor === "string" ? Date.parse(valor) : NaN;
@@ -256,6 +288,76 @@ export function agregarPainel(
       ultimoEnvio: texto(x.ultimo_envio_em),
     };
   });
+  // O play do vídeo chega como clique de rótulo fechado, ligado à sessão da
+  // visita — é dela que saem país, região e cidade (o clique não guarda local).
+  const plays = cl.filter((x) => x.alvo === "video-play");
+  const localDaSessao = new Map<string, Linha>();
+  for (const x of v) {
+    const chave = `${texto(x.visitor_id)}|${texto(x.session_id)}`;
+    if (!localDaSessao.has(chave)) localDaSessao.set(chave, x);
+  }
+  const localDoVisitante = new Map<string, Linha>();
+  for (const x of v) {
+    const id = texto(x.visitor_id);
+    if (id && !localDoVisitante.has(id)) localDoVisitante.set(id, x);
+  }
+  const localDoPlay = (x: Linha): Linha | null =>
+    localDaSessao.get(`${texto(x.visitor_id)}|${texto(x.session_id)}`) ??
+    localDoVisitante.get(String(texto(x.visitor_id))) ??
+    null;
+  const regiaoComPais = (x: Linha) => {
+    const regiao = texto(x.region);
+    const pais = texto(x.country);
+    return regiao ? `${regiao} · ${pais ?? "?"}` : null;
+  };
+  const cidadeComPais = (x: Linha) => {
+    const cidade = texto(x.city);
+    if (!cidade) return null;
+    return `${decodeURIComponentSeguro(cidade)} · ${texto(x.region) ?? ""}${texto(x.country) ? ` · ${texto(x.country)}` : ""}`;
+  };
+  const contarPor = (
+    linhas: Linha[],
+    chave: (x: Linha) => string | null,
+    vazio = "Não informado",
+  ) => {
+    const mapa = new Map<string, number>();
+    for (const linha of linhas) {
+      const k = chave(linha) ?? vazio;
+      mapa.set(k, (mapa.get(k) ?? 0) + 1);
+    }
+    return [...mapa]
+      .map(([k, total]) => ({ chave: k, total }))
+      .sort((a, b) => b.total - a.total || a.chave.localeCompare(b.chave));
+  };
+  const paises = new Map<string, Linha[]>();
+  for (const x of v) {
+    const pais = texto(x.country) ?? "Não informado";
+    paises.set(pais, [...(paises.get(pais) ?? []), x]);
+  }
+  const geografia: LinhaDePais[] = [...paises]
+    .map(([pais, linhas]) => ({
+      pais,
+      visitas: linhas.length,
+      visitantes: new Set(linhas.map((x) => texto(x.visitor_id)).filter(Boolean)).size,
+      plays:
+        fontes.cliques === null
+          ? null
+          : plays.filter((x) => (texto(localDoPlay(x)?.country) ?? "Não informado") === pais)
+              .length,
+      leads:
+        fontes.leads === null
+          ? null
+          : l.filter(
+              (x) =>
+                dentro(x.created_at, desde, ate) && (texto(x.country) ?? "Não informado") === pais,
+            ).length,
+      regioes: contarPor(linhas, (x) => texto(x.region)).slice(0, 5),
+      cidades: contarPor(linhas, (x) => {
+        const c = texto(x.city);
+        return c ? decodeURIComponentSeguro(c) : null;
+      }).slice(0, 5),
+    }))
+    .sort((a, b) => b.visitas - a.visitas);
   const serie: Painel["serie"] = [];
   // Dias do gráfico em UTC. Nenhum preenchimento de tráfego sintético.
   const inicio = new Date(desde);
@@ -273,6 +375,7 @@ export function agregarPainel(
         ["leads"],
         l.filter((x) => dentro(x.assinou_em, desde, ate) && diaUTC(x.assinou_em) === chave).length,
       ),
+      plays: observar(["cliques"], plays.filter((x) => diaUTC(x.created_at) === chave).length),
     });
   }
   const sessoes = new Map<string, Linha[]>();
@@ -339,7 +442,12 @@ export function agregarPainel(
     emailsReclamados: aceitos.filter((x) => x.status === "reclamou").length,
     emailsAgendados: enviosJanela.filter((x) => x.status === "agendado").length,
     porPais: contar(v, "country"),
-    porCidade: contar(v, "city"),
+    porRegiao: contarPor(v, regiaoComPais),
+    porCidade: contarPor(v, cidadeComPais),
+    plays: plays.length,
+    visitantesQueDeramPlay: new Set(plays.map((x) => texto(x.visitor_id)).filter(Boolean)).size,
+    playsPorPais: contarPor(plays, (x) => texto(localDoPlay(x)?.country)),
+    geografia,
     porOrigem: contar(v, "referrer_host", "Direto / não informado"),
     porCampanha: contar(v, "utm_campaign"),
     porPagina: contar(v, "path"),
@@ -376,6 +484,11 @@ export function agregarPainel(
     revisitantes: observar(["visitas"], resultado.revisitantes),
     porPais: observar(["visitas"], resultado.porPais),
     porCidade: observar(["visitas"], resultado.porCidade),
+    porRegiao: observar(["visitas"], resultado.porRegiao),
+    geografia: observar(["visitas"], resultado.geografia),
+    plays: observar(["cliques"], resultado.plays),
+    visitantesQueDeramPlay: observar(["cliques"], resultado.visitantesQueDeramPlay),
+    playsPorPais: observar(["visitas", "cliques"], resultado.playsPorPais),
     porOrigem: observar(["visitas"], resultado.porOrigem),
     porCampanha: observar(["visitas"], resultado.porCampanha),
     porPagina: observar(["visitas"], resultado.porPagina),

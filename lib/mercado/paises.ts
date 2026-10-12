@@ -339,6 +339,22 @@ export function precoLegivelNoMercado(plano: PlanoId, mercado: Mercado): string 
 }
 
 /**
+ * O preço de um mercado escrito para quem lê de OUTRO país — a comparação da
+ * home. Com o `locale` de quem lê, o símbolo fica inequívoco: um brasileiro lê
+ * "$699" como dólar, e "MX$ 699" como o peso mexicano que é.
+ */
+export function precoParaQuemCompara(plano: PlanoId, mercado: Mercado, locale: string): string {
+  const bruto = precoNoMercado(plano, mercado);
+  const valor = MOEDAS_SEM_CENTAVOS.has(mercado.moeda) ? bruto : bruto / 100;
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: mercado.moeda,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(valor);
+}
+
+/**
  * O preço do ANO no ciclo anual: dez mensalidades (dois meses grátis), escrito
  * como `precoLegivelNoMercado`. Calculado da régua mensal para não existir uma
  * segunda tabela de preço que possa discordar da primeira.

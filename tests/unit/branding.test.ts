@@ -382,7 +382,7 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     categoria: "ATENZA",
     motivo:
       "código da própria Atenza (site comercial, SEO, mídia ou desenho da marca) — não é tela de revendedor",
-    marcas: ["atenza", "atenza-explica"],
+    marcas: ["atenza", "atenza-explica", "atenza-explica"],
   },
   "lib/branding/desenho.ts": {
     categoria: "ATENZA",

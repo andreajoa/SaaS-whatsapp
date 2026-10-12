@@ -3,6 +3,8 @@ import { marcaEhADoProduto } from "@/lib/branding";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { createClient } from "@/lib/supabase/server";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
+import { idiomaDoProduto } from "@/lib/mercado/paises";
+import { visitanteAtual } from "@/lib/mercado/visitante";
 
 /**
  * A casca das telas de acesso — login, cadastro, recuperação, MFA.
@@ -47,7 +49,12 @@ export default async function PublicLayout({ children }: { children: React.React
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const locale = (user?.user_metadata?.locale as string | undefined) ?? null;
+  // Sem sessão, o idioma é o de quem está visitando (país da borda): quem
+  // clicou "Crear mi cuenta" na página do México não pode cair num cadastro
+  // em português.
+  const locale =
+    (user?.user_metadata?.locale as string | undefined) ??
+    idiomaDoProduto((await visitanteAtual()).idioma);
 
   return (
     <IdiomaProvider locale={locale}>

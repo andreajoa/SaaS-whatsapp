@@ -1,3 +1,5 @@
+import { idiomaDoProduto } from "@/lib/mercado/paises";
+import { visitanteAtual } from "@/lib/mercado/visitante";
 import Link from "next/link";
 
 import { SignupForm } from "@/components/auth/SignupForm";
@@ -33,7 +35,8 @@ export default async function SignupPage({
     data: { user },
   } = await supabase.auth.getUser();
   const idioma = normalizarIdioma(
-    (user?.user_metadata?.locale as string | undefined) ?? null,
+    (user?.user_metadata?.locale as string | undefined) ??
+      idiomaDoProduto((await visitanteAtual()).idioma),
   );
   const t = (texto: string) => traduzir(texto, idioma);
 

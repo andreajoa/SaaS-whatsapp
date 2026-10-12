@@ -14,7 +14,11 @@ vi.mock("@/lib/auth/rate-limit", () => ({
 }));
 vi.mock("@/lib/marketing/funil", () => ({ registrarCadastroReal: mocks.registrar }));
 vi.mock("@/lib/billing/planos", () => ({ instalacaoCobra: () => true }));
-vi.mock("@/lib/mercado/visitante", () => ({ COOKIE_DO_VISITANTE: "visitor" }));
+vi.mock("@/lib/mercado/visitante", () => ({
+  COOKIE_DO_VISITANTE: "visitor",
+  paisDosCabecalhos: () => null,
+  idiomaDoVisitante: () => "pt-BR",
+}));
 vi.mock("@/lib/env", () => ({
   env: {
     NEXT_PUBLIC_APP_URL: "https://site.test",

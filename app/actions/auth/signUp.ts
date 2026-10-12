@@ -1,5 +1,7 @@
 "use server";
 
+import { idiomaDoProduto, mercadoDoPais } from "@/lib/mercado/paises";
+import { idiomaDoVisitante, paisDosCabecalhos } from "@/lib/mercado/visitante";
 import { cookies, headers } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
@@ -128,7 +130,14 @@ export async function signUp(
             invite_token: convite,
             full_name: (parsed.data as SignupComConviteInput).full_name,
           }
-        : { org_name: (parsed.data as SignupInput).org_name },
+        : {
+            org_name: (parsed.data as SignupInput).org_name,
+            // O idioma de quem se cadastrou (país da borda): o painel abre
+            // nele desde o primeiro login, sem ninguém procurar o seletor.
+            locale: idiomaDoProduto(
+              idiomaDoVisitante(hdrs, mercadoDoPais(paisDosCabecalhos(hdrs))),
+            ),
+          },
     },
   });
 

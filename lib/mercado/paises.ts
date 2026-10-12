@@ -270,7 +270,9 @@ export const MERCADO_INTERNACIONAL: Mercado = {
   moeda: "USD",
   idioma: "en",
   locale: "en-US",
-  precos: { essencial: 3900, pro: 9900, ilimitado: 19900 },
+  // O MESMO dólar da Argentina: o `price` do Stripe tem UMA opção em USD por
+  // plano, então dois preços em dólar na tela seriam um deles mentindo.
+  precos: { essencial: 2900, pro: 5900, ilimitado: 11900 },
 };
 
 /** O mercado de casa — o que a instalação usa quando não há de onde deduzir. */

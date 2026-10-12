@@ -38,6 +38,16 @@ import { visitanteAtual } from "@/lib/mercado/visitante";
  * o "Entrar", que lê o `.env`). Trocar o texto para este mesmo resolvedor
  * deixaria a spec verde medindo nada.
  */
+/** O idioma do produto para quem ainda não tem conta. Fora de uma requisição
+ *  (testes que montam a fachada direto) não há cabeçalho: cai no padrão. */
+async function idiomaDaVisita(): Promise<string | null> {
+  try {
+    return idiomaDoProduto((await visitanteAtual()).idioma);
+  } catch {
+    return null;
+  }
+}
+
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const marca = await marcaDaSaida(null);
   // A maioria destas telas roda ANTES do login (não há usuário nenhum), mas
@@ -52,9 +62,7 @@ export default async function PublicLayout({ children }: { children: React.React
   // Sem sessão, o idioma é o de quem está visitando (país da borda): quem
   // clicou "Crear mi cuenta" na página do México não pode cair num cadastro
   // em português.
-  const locale =
-    (user?.user_metadata?.locale as string | undefined) ??
-    idiomaDoProduto((await visitanteAtual()).idioma);
+  const locale = (user?.user_metadata?.locale as string | undefined) ?? (await idiomaDaVisita());
 
   return (
     <IdiomaProvider locale={locale}>

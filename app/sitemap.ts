@@ -64,6 +64,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ),
       },
     })),
+    { url: url("/de/impressum"), changeFrequency: "yearly", priority: 0.3 },
     { url: url("/demonstracao"), lastModified: "2026-10-10" },
     { url: url("/precos"), lastModified: "2026-10-11", priority: 0.9 },
     // Quem procura "como falar com o suporte" antes de assinar procura esta.

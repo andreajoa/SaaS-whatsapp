@@ -113,7 +113,8 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
   const caminho = caminhoDaPagina(pagina);
   // O site tem pt, es e en. A página alemã usa cabeçalho e rodapé em inglês —
   // o mais próximo do que o visitante alemão lê sem esforço.
-  const idiomaDoSite = pagina.idioma === "de" ? "en" : "es";
+  const de = pagina.idioma === "de";
+  const idiomaDoSite = de ? "en" : "es";
   const ui = pagina.ui;
   const molde = MOLDES_DOS_PAISES[slug] ?? { molde: "sobrio" as Molde, confianca: [] };
   const ordem = ORDEM_DO_MOLDE[molde.molde];
@@ -241,10 +242,13 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
                 <p className={pais.conversaNota}>Ejemplo ilustrativo</p>
               </figure>
             ) : molde.painel ? (
-              <figure className={pais.painel} aria-label="Panel de ejemplo">
+              <figure
+                className={pais.painel}
+                aria-label={de ? "Beispielansicht" : "Panel de ejemplo"}
+              >
                 <figcaption>
                   <strong>{molde.painel.titulo}</strong>
-                  <small>Ejemplo ilustrativo</small>
+                  <small>{de ? "Beispieldarstellung" : "Ejemplo ilustrativo"}</small>
                 </figcaption>
                 <ul>
                   {molde.painel.linhas.map((l) => (

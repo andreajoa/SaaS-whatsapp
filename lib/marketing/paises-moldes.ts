@@ -171,6 +171,21 @@ export const MOLDES_DOS_PAISES: Readonly<Record<string, MoldeDoPais>> = {
   },
   argentina: {
     molde: "directo",
+    negocio: "Indumentaria Palermo",
+    conversa: [
+      { de: "cliente", texto: "Hola! ¿Cuánto sale la campera de jean?" },
+      {
+        de: "agente",
+        texto:
+          "¡Hola! Sale US$ 49 y tenemos todos los talles. ¿Te la mando por envío o pasás a retirar?",
+      },
+      { de: "cliente", texto: "Por envío a Córdoba. ¿Puedo pagar en cuotas?" },
+      {
+        de: "agente",
+        texto:
+          "Sí, en 3 cuotas sin interés. Llega en 3 a 5 días hábiles. ¿Te paso el link de pago?",
+      },
+    ],
     faixa: "Precio en dólares, sin reajustes mensuales. 7 días sin cargo, cancelás cuando quieras.",
     confianca: [
       "API oficial de WhatsApp",
@@ -244,6 +259,19 @@ export const MOLDES_DOS_PAISES: Readonly<Record<string, MoldeDoPais>> = {
   },
   espana: {
     molde: "sobrio",
+    negocio: "Clínica Dental Retiro",
+    conversa: [
+      { de: "cliente", texto: "Hola, ¿tenéis cita para una limpieza el jueves?" },
+      {
+        de: "agente",
+        texto: "¡Hola! El jueves tenemos hueco a las 10:00 y a las 17:30. ¿Cuál te viene mejor?",
+      },
+      { de: "cliente", texto: "A las 17:30, por favor." },
+      {
+        de: "agente",
+        texto: "Hecho: jueves a las 17:30. Te enviamos un recordatorio el día anterior.",
+      },
+    ],
     confianca: [
       "Sin permanencia",
       "API oficial de WhatsApp",
@@ -254,6 +282,35 @@ export const MOLDES_DOS_PAISES: Readonly<Record<string, MoldeDoPais>> = {
   },
   deutschland: {
     molde: "sachlich",
+    painel: {
+      titulo: "Anfragen heute",
+      linhas: [
+        {
+          cliente: "Praxis Dr. Weber",
+          assunto: "Terminanfrage Donnerstag",
+          estado: "Von der KI beantwortet",
+          tom: "ia",
+        },
+        {
+          cliente: "Autohaus Schulz",
+          assunto: "Angebot für Inspektion",
+          estado: "Bei Mitarbeiter",
+          tom: "equipe",
+        },
+        {
+          cliente: "Café am Markt",
+          assunto: "Öffnungszeiten am Feiertag",
+          estado: "Erledigt",
+          tom: "ok",
+        },
+        {
+          cliente: "Kanzlei Becker",
+          assunto: "Rückruf vereinbart",
+          estado: "Follow-up geplant",
+          tom: "ia",
+        },
+      ],
+    },
     confianca: [],
     passos: {
       titulo: "In drei Schritten startklar",
@@ -304,6 +361,7 @@ export const MOLDES_DOS_PAISES: Readonly<Record<string, MoldeDoPais>> = {
         { rotulo: "Auftragsverarbeitung (AVV/DPA)", href: "/legal/dpa" },
         { rotulo: "Unterauftragsverarbeiter", href: "/legal/subprocessadores" },
         { rotulo: "Sicherheit", href: "/legal/seguranca" },
+        { rotulo: "Impressum", href: "/de/impressum" },
         { rotulo: "Alle rechtlichen Dokumente", href: "/legal" },
       ],
     },

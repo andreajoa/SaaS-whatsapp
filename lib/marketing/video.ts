@@ -10,7 +10,7 @@ import { NARRACOES } from "./video-narracoes";
 
 const MEDIA = "/media/atenza";
 
-export const LOCAIS_COM_VIDEO: ReadonlySet<string> = new Set<string>(["es-mx"]);
+export const LOCAIS_COM_VIDEO: ReadonlySet<string> = new Set<string>(["es-mx", "es-co", "es-ar", "es-cl", "es-pe", "es-es"]);
 
 /** País → locale do vídeo. Hispânico sem versão própria cai no México. */
 const PAIS_PARA_LOCAL: Readonly<Record<string, string>> = {

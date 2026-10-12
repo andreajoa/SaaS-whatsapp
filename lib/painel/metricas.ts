@@ -117,6 +117,10 @@ export interface LinhaDePais {
   visitantes: number;
   plays: number | null;
   leads: number | null;
+  /** Leads do país que criaram conta no produto na janela. */
+  cadastros: number | null;
+  /** Leads do país que assinaram (primeiro pagamento) na janela. */
+  assinaturas: number | null;
   regioes: LinhaContada[];
   cidades: LinhaContada[];
 }
@@ -350,6 +354,21 @@ export function agregarPainel(
           : l.filter(
               (x) =>
                 dentro(x.created_at, desde, ate) && (texto(x.country) ?? "Não informado") === pais,
+            ).length,
+      cadastros:
+        fontes.leads === null
+          ? null
+          : l.filter(
+              (x) =>
+                dentro(x.virou_usuario_em, desde, ate) &&
+                (texto(x.country) ?? "Não informado") === pais,
+            ).length,
+      assinaturas:
+        fontes.leads === null
+          ? null
+          : l.filter(
+              (x) =>
+                dentro(x.assinou_em, desde, ate) && (texto(x.country) ?? "Não informado") === pais,
             ).length,
       regioes: contarPor(linhas, (x) => texto(x.region)).slice(0, 5),
       cidades: contarPor(linhas, (x) => {

@@ -557,7 +557,9 @@ export function PainelDoDono({
             <section className={styles.card}>
               <div className={styles.cardHead}>
                 <h2>Por país</h2>
-                <span>Visitas, plays e leads de cada mercado na janela</span>
+                <span>
+                  Funil de cada mercado na janela: visita → play → lead → cadastro → assinatura
+                </span>
               </div>
               {p.geografia === null ? (
                 <p className={styles.empty}>Dados de visitas indisponíveis.</p>
@@ -571,6 +573,9 @@ export function PainelDoDono({
                         <th scope="col">Visitantes</th>
                         <th scope="col">Plays do vídeo</th>
                         <th scope="col">Leads</th>
+                        <th scope="col">Cadastros</th>
+                        <th scope="col">Assinaturas</th>
+                        <th scope="col">Conversão</th>
                         <th scope="col">Principais regiões</th>
                         <th scope="col">Principais cidades</th>
                       </tr>
@@ -583,6 +588,11 @@ export function PainelDoDono({
                           <td>{g.visitantes}</td>
                           <td>{g.plays ?? "—"}</td>
                           <td>{g.leads ?? "—"}</td>
+                          <td>{g.cadastros ?? "—"}</td>
+                          <td>{g.assinaturas ?? "—"}</td>
+                          <td>
+                            {g.assinaturas === null ? "—" : taxa(g.assinaturas, g.visitantes)}
+                          </td>
                           <td>{g.regioes.map((r) => `${r.chave} (${r.total})`).join(", ")}</td>
                           <td>{g.cidades.map((c) => `${c.chave} (${c.total})`).join(", ")}</td>
                         </tr>

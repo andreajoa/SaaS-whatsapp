@@ -12,7 +12,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * Impressum (§ 5 DDG) da página alemã. Os dados vêm do operador; o endereço é
- * o da sede no Brasil, porque o serviço é 100% online.
+ * o da sede no Brasil, porque o serviço é 100% online. O nome do responsável
+ * aparece AQUI e só aqui — exigência legal alemã, autorizada pelo operador
+ * em 12/10/2026; o resto do site continua sem nomear pessoa.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const marca = await marcaDaSaida(null);
@@ -44,6 +46,8 @@ export default async function Impressum() {
             <br />
             Brasilien
           </p>
+          <h2>Vertreten durch</h2>
+          <p>André Almeida</p>
           <h2>Kontakt</h2>
           <p>
             E-Mail: <a href="mailto:info@atenza.online">info@atenza.online</a>

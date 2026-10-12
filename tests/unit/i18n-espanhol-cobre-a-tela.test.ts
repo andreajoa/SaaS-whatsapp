@@ -72,6 +72,8 @@ const FORA_DO_PRODUTO: Record<string, string> = {
   // seu país); não há versão portuguesa a traduzir. A régua deste arquivo
   // confunde espanhol com português cru.
   "components/site/PaginaDoPais.tsx": "página por país, redigida em espanhol de origem",
+  // Impressum alemão: texto legal escrito em alemão (§ 5 DDG), sem versão a traduzir.
+  "app/de": "página da Alemanha, redigida em alemão de origem",
   // O PAINEL DO FUNIL e a sua porta. Mesmo argumento das duas linhas acima, e
   // mais forte: não é só "sem porta na navegação" — é uma tela que NENHUM
   // cliente pode abrir. Ela vive fora de `app/app/`, fora da sessão do

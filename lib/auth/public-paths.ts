@@ -13,6 +13,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   // Páginas por país, em espanhol (lista fechada em lib/marketing/paises-seo.ts).
   /^\/es\/[a-z-]+$/,
   /^\/de$/,
+  /^\/us$/,
   // Guia da chave de IA (pt, es, en): precisa ser lido ANTES de assinar.
   /^\/(?:ajuda\/chave-de-ia|es\/ayuda\/clave-de-ia|en\/help\/ai-key)$/,
   /^\/de\/impressum$/,

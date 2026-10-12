@@ -618,6 +618,11 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     motivo: "Impressum (§ 5 DDG): o e-mail de contato do operador é exigência legal na Alemanha",
     marcas: ["info@atenza.online", "info@atenza.online"],
   },
+  "components/site/PaginaEUA.tsx": {
+    categoria: "ATENZA",
+    motivo: "página dos EUA reaproveita o card de vídeo da home (atenza-home.module.css)",
+    marcas: ["atenza-home.module.css"],
+  },
   "lib/marketing/ilustracoes.ts": {
     categoria: "ATENZA",
     motivo: "mapa das ilustrações das páginas editoriais, servidas em /media/atenza/ilustracoes",

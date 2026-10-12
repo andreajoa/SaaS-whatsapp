@@ -19,7 +19,7 @@ export type PaginaDePais = {
   /** Caminho próprio — a Alemanha mora em `/de`, não em `/es/...`. */
   readonly caminho?: string;
   /** Idioma da página; o cabeçalho e o rodapé usam o mais próximo que o site tem. */
-  readonly idioma?: "es" | "de";
+  readonly idioma?: "es" | "de" | "en";
   /** ISO-3166-1 alfa-2 — a linha de `MERCADOS`. */
   readonly pais: string;
   /** `hreflang` da página. */
@@ -584,6 +584,37 @@ export const PAGINAS_DE_PAIS: readonly PaginaDePais[] = [
       otros: "Verfügbar in weiteren Ländern",
       saltar: "Zum Inhalt springen",
       ruta: "Navigation",
+    },
+  },
+  {
+    // Os EUA têm página própria (components/site/PaginaEUA.tsx), no padrão
+    // de landing page americano; esta entrada só os põe na lista de países,
+    // no hreflang, no sitemap e no llms.txt.
+    slug: "united-states",
+    caminho: "/us",
+    idioma: "en",
+    pais: "US",
+    hreflang: "en-US",
+    nome: "United States",
+    title: "WhatsApp AI agent & shared inbox for U.S. businesses",
+    description:
+      "For U.S. businesses whose customers use WhatsApp — Hispanic, immigrant and international. Answer every lead in seconds, 24/7, with an AI agent, a shared inbox and a pipeline.",
+    eyebrow: "for the United States",
+    headline: "Never miss a WhatsApp lead again.",
+    intro: "",
+    dores: [],
+    sections: [],
+    faq: [],
+    ui: {
+      planes: "See pricing",
+      crear: "Start free trial",
+      video: "Watch the 1-min demo",
+      prueba: "7-day free trial · cancel anytime",
+      dolores: "",
+      preguntas: "FAQ",
+      precios: "Pricing",
+      mes: "/month",
+      otros: "Available in other countries",
     },
   },
 ];

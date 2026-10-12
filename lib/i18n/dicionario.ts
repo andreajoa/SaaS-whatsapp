@@ -323,6 +323,9 @@ export const DICIONARIO: Traducoes = {
     es: "Escena de atención con una profesional usando auriculares",
   },
   "Sem som": { es: "Sin sonido" },
+  "Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.": {
+    es: "Un recorrido por la atención, la IA y el embudo en menos de 1 minuto.",
+  },
   "Disponível em": { es: "Disponible en" },
   países: { es: "países" },
   "A mesma plataforma que atende empresas no México, na Espanha e na Argentina.": {

@@ -39,7 +39,9 @@ export function RodapeDoSite({ nome, idioma = "pt-BR" }: { nome: string; idioma?
   }
   const suporte = emailDeSuporte();
   const instagram = instagramOficial(env.NEXT_PUBLIC_APP_URL);
-  const reclameAqui = reclameAquiOficial(env.NEXT_PUBLIC_APP_URL);
+  // O Reclame Aqui só existe no Brasil: o selo aparece só no site em português.
+  // Para quem está no México ou na Espanha ele não diz nada — ou soa estranho.
+  const reclameAqui = idioma === "pt-BR" ? reclameAquiOficial(env.NEXT_PUBLIC_APP_URL) : null;
   const selos = [
     {
       icone: LockKeyhole,

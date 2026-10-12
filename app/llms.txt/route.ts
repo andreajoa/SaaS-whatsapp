@@ -2,7 +2,7 @@ import { DIAS_DE_TRIAL, instalacaoCobra, ORDEM_DOS_PLANOS, PLANOS } from "@/lib/
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
-import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
+import { caminhoDaPagina, PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { mercadoDoPais, moedasCobraveis, precoLegivelNoMercado } from "@/lib/mercado/paises";
 
 /**
@@ -47,7 +47,7 @@ export async function GET() {
     const preco = moedasCobraveis().has(m.moeda)
       ? ` Planos desde ${precoLegivelNoMercado("essencial", m)}/mês (${m.moeda}).`
       : "";
-    return `- [${p.nome}](${url(`/es/${p.slug}`)}): ${p.description}${preco}`;
+    return `- [${p.nome}](${url(caminhoDaPagina(p))}): ${p.description}${preco}`;
   }).join("\n");
   const paginas = PAGES_SEO.map(
     (p) => `- [${p.title}](${url(`/${p.slug}`)}): ${p.description}`,
@@ -83,7 +83,7 @@ ${paginas}
 - [Instagram @atenzaon](https://www.instagram.com/atenzaon/): novidades e conteúdo da Atenza
 - [Termos e privacidade](${url("/legal")}): documentos legais
 
-## Páginas por país (espanhol)
+## Páginas por país
 
 ${paises}
 

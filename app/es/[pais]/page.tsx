@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { metadadosDoPais, PaginaDoPais } from "@/components/site/PaginaDoPais";
-import { paginaDePais } from "@/lib/marketing/paises-seo";
+import { paginaEmEspanhol as paginaDePais } from "@/lib/marketing/paises-seo";
 
 export const dynamic = "force-dynamic";
 

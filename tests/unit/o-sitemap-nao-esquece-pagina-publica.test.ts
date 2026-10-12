@@ -130,7 +130,9 @@ describe("o sitemap cobre as páginas públicas que existem", () => {
     // As páginas por país entram pela lista fechada PAGINAS_DE_PAIS, que o
     // sitemap percorre do mesmo jeito.
     const pais =
-      rota === "es/[pais]" && PAGINAS_DE_PAIS.length > 0 && SITEMAP.includes("PAGINAS_DE_PAIS");
+      SITEMAP.includes("PAGINAS_DE_PAIS") &&
+      ((rota === "es/[pais]" && PAGINAS_DE_PAIS.some((p) => !p.caminho)) ||
+        PAGINAS_DE_PAIS.some((p) => p.caminho === `/${rota}`));
     expect(
       editorial || pais || SITEMAP.includes(`"/${rota}"`),
       `\`/${rota}\` tem página e não está em app/sitemap.ts. Se ela não deve ser ` +

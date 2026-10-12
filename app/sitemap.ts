@@ -4,7 +4,7 @@ import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
-import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
+import { caminhoDaPagina, PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { IDIOMAS_PUBLICOS } from "@/lib/marketing/seo";
 
 /**
@@ -55,12 +55,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...PAGES_SEO.map((p) => ({ url: url(`/${p.slug}`), lastModified: "2026-10-11" })),
     // Uma página por país, com hreflang entre todas (es-MX, es-CO…).
     ...PAGINAS_DE_PAIS.map((p) => ({
-      url: url(`/es/${p.slug}`),
+      url: url(caminhoDaPagina(p)),
       lastModified: "2026-10-11",
       priority: 0.8,
       alternates: {
         languages: Object.fromEntries(
-          PAGINAS_DE_PAIS.map((o) => [o.hreflang, url(`/es/${o.slug}`)]),
+          PAGINAS_DE_PAIS.map((o) => [o.hreflang, url(caminhoDaPagina(o))]),
         ),
       },
     })),

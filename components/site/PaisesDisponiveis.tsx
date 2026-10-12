@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { PLANOS } from "@/lib/billing/planos";
-import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
+import { caminhoDaPagina, PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import {
   MERCADO_PADRAO,
   mercadoDoPais,
@@ -63,7 +63,7 @@ export function PaisesDisponiveis({ idioma }: { readonly idioma: IdiomaDoSite })
           const mercado = mercadoDoPais(p.pais);
           return (
             <li key={p.slug}>
-              <Link href={`/es/${p.slug}`} hrefLang={p.hreflang}>
+              <Link href={caminhoDaPagina(p)} hrefLang={p.hreflang}>
                 <span className={styles.codigo}>{p.pais}</span>
                 <strong>{nomes.of(p.pais)}</strong>
                 {comPreco && (

@@ -14,8 +14,12 @@
  */
 
 export type PaginaDePais = {
-  /** Segmento da URL: `/es/<slug>`. */
+  /** Segmento da URL: `/es/<slug>`, salvo quando `caminho` diz outro. */
   readonly slug: string;
+  /** Caminho próprio — a Alemanha mora em `/de`, não em `/es/...`. */
+  readonly caminho?: string;
+  /** Idioma da página; o cabeçalho e o rodapé usam o mais próximo que o site tem. */
+  readonly idioma?: "es" | "de";
   /** ISO-3166-1 alfa-2 — a linha de `MERCADOS`. */
   readonly pais: string;
   /** `hreflang` da página. */
@@ -45,8 +49,14 @@ export type PaginaDePais = {
     readonly precios: string;
     readonly mes: string;
     readonly otros: string;
+    readonly saltar?: string;
+    readonly ruta?: string;
   };
 };
+
+export function caminhoDaPagina(p: PaginaDePais): string {
+  return p.caminho ?? `/es/${p.slug}`;
+}
 
 const UI_TU = {
   planes: "Ver planes",
@@ -494,7 +504,95 @@ export const PAGINAS_DE_PAIS: readonly PaginaDePais[] = [
     ],
     ui: UI_TU,
   },
+  {
+    slug: "deutschland",
+    caminho: "/de",
+    idioma: "de",
+    pais: "DE",
+    hreflang: "de-DE",
+    nome: "Deutschland",
+    title: "WhatsApp-Kundenservice mit KI und CRM für Unternehmen in Deutschland",
+    description:
+      "WhatsApp-Kundenservice über die offizielle WhatsApp Business API: KI-Agent mit Ihrer Wissensdatenbank, mehrere Mitarbeiter auf einer Nummer, CRM. AVV verfügbar, monatlich kündbar.",
+    eyebrow: "für Deutschland",
+    headline:
+      "WhatsApp-Kundenservice mit KI – über die offizielle API, nachvollziehbar und monatlich kündbar.",
+    intro:
+      "Ihre Kunden schreiben per WhatsApp, oft außerhalb der Geschäftszeiten. {marca} beantwortet Anfragen sofort mit den Informationen aus Ihrer Wissensdatenbank, verteilt Gespräche im Team und übergibt an einen Mitarbeiter, sobald es nötig ist – mit vollständigem Verlauf.",
+    dores: [
+      {
+        titulo: "Anfragen außerhalb der Geschäftszeiten",
+        texto:
+          "Abends und am Wochenende bleiben Nachrichten liegen. Der KI-Agent beantwortet Fragen zu Preisen, Verfügbarkeit und Öffnungszeiten sofort und dokumentiert jede Anfrage.",
+      },
+      {
+        titulo: "WhatsApp auf dem privaten Smartphone",
+        texto:
+          "Die WhatsApp-Business-App auf einem einzelnen Gerät ist datenschutzrechtlich heikel und für Teams ungeeignet. Über die offizielle API arbeiten mehrere Mitarbeiter strukturiert am Rechner.",
+      },
+      {
+        titulo: "Angebote ohne Nachfassen",
+        texto:
+          "Das automatische Follow-up meldet sich bei Interessenten, die nicht geantwortet haben – zu dem Zeitpunkt, den Sie festlegen.",
+      },
+    ],
+    sections: [
+      {
+        title: "So funktioniert es",
+        paragraphs: [
+          "Sie verbinden die Nummer Ihres Unternehmens über die offizielle WhatsApp Business API von Meta und behalten dieselbe Nummer. Alle Gespräche landen in einem gemeinsamen Posteingang; jeder Mitarbeiter sieht den Verlauf und weiß, wer zuständig ist.",
+          "Der KI-Agent antwortet ausschließlich auf Basis der Informationen, die Sie hinterlegen: Preise, Öffnungszeiten, Produkte, Lieferbedingungen. Fragt der Kunde nach einem Menschen oder geht die Frage darüber hinaus, wird das Gespräch an Ihr Team übergeben.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Ist der Einsatz DSGVO-konform?",
+        answer:
+          "Die Anbindung erfolgt über die offizielle WhatsApp Business API, nicht über die WhatsApp-Business-App. Wir stellen einen Auftragsverarbeitungsvertrag (AVV) und die Liste der Unterauftragsverarbeiter bereit; Auskunft und Löschung einzelner Kontakte sind im System möglich. Die rechtliche Bewertung Ihres konkreten Einsatzes sollten Sie mit Ihrem Datenschutzbeauftragten abstimmen.",
+      },
+      {
+        question: "In welcher Sprache ist die Oberfläche?",
+        answer:
+          "Die Bedienoberfläche ist derzeit auf Spanisch und Portugiesisch verfügbar; eine deutsche Oberfläche ist in Vorbereitung. Ihr KI-Agent antwortet Ihren Kunden auf Deutsch.",
+      },
+      {
+        question: "Ist die KI im Preis enthalten?",
+        answer:
+          "Die KI nutzt den API-Schlüssel des Anbieters Ihrer Wahl (z. B. OpenAI, Anthropic, Google). Sie zahlen die Nutzung direkt beim Anbieter, ohne Aufschlag von uns, und sehen den Verbrauch im Dashboard.",
+      },
+      {
+        question: "Fallen Gebühren bei Meta an?",
+        answer:
+          "Meta berechnet bestimmte Nachrichten (z. B. Marketing-Kampagnen) direkt über Ihr WhatsApp-Business-Konto. Antworten auf Kundenanfragen innerhalb von 24 Stunden sind bei Meta kostenfrei.",
+      },
+      {
+        question: "Wie lange ist die Vertragslaufzeit?",
+        answer:
+          "Es gibt keine Mindestlaufzeit. Die ersten 7 Tage werden nicht berechnet, danach monatlich; die Kündigung erfolgt mit einem Klick in den Abonnement-Einstellungen.",
+      },
+    ],
+    ui: {
+      planes: "Preise ansehen",
+      crear: "Konto erstellen",
+      video: "Video ansehen (unter 1 Minute)",
+      prueba: "7 Tage ohne Berechnung · monatlich kündbar",
+      dolores: "Typische Herausforderungen",
+      preguntas: "Häufige Fragen",
+      precios: "Preise (monatlich)",
+      mes: "/Monat",
+      otros: "Verfügbar in weiteren Ländern",
+      saltar: "Zum Inhalt springen",
+      ruta: "Navigation",
+    },
+  },
 ];
+
+/** Só as páginas que moram em `/es/<slug>` (a rota dinâmica não serve a alemã). */
+export function paginaEmEspanhol(slug: string): PaginaDePais | null {
+  const p = paginaDePais(slug);
+  return p && !p.caminho ? p : null;
+}
 
 export function paginaDePais(slug: string): PaginaDePais | null {
   return PAGINAS_DE_PAIS.find((p) => p.slug === slug) ?? null;

@@ -55,6 +55,7 @@ import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
 import { type IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
 import { visitanteAtual } from "@/lib/mercado/visitante";
+import { transcricaoDoVideo, videoDaApresentacao } from "@/lib/marketing/video";
 import { PaisesDisponiveis } from "@/components/site/PaisesDisponiveis";
 import { createClient } from "@/lib/supabase/server";
 
@@ -84,6 +85,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
   const visitante = { ...origem, idioma };
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
+  const apresentacao = videoDaApresentacao(idioma, visitante.pais);
   const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
   const menu = montarMenu(t, vendidos.length > 0);
   const textosDaCaptura = {
@@ -179,7 +181,14 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     paragrafo4: t(
       "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.",
     ),
-  };
+  }; // Versão local do vídeo: a transcrição é a da narração que se ouve, e a
+  // descrição não promete legenda em português.
+  const transcricaoLocal = transcricaoDoVideo(apresentacao);
+  if (transcricaoLocal) {
+    video.descricao = t("Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.");
+    [video.paragrafo1, video.paragrafo2, video.paragrafo3, video.paragrafo4] = transcricaoLocal;
+  }
+
   const trial = `${DIAS_DE_TRIAL} ${t("dias sem cobrança")}`;
   const condicoes = t(
     "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.",
@@ -514,13 +523,12 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
                 })}
               </div>
             </div>
-            <VideoExplicativo textos={video} className={styles.explainerCard}>
-              <Image
-                src="/media/atenza/explainer-thumbnail.webp"
-                alt=""
-                fill
-                sizes="(max-width: 767px) 100vw, 52vw"
-              />
+            <VideoExplicativo
+              textos={video}
+              className={styles.explainerCard}
+              arquivo={apresentacao}
+            >
+              <Image src={apresentacao.poster} alt="" fill sizes="(max-width: 767px) 100vw, 52vw" />
               <span className={styles.playCircle}>
                 <Play size={27} fill="currentColor" aria-hidden />
               </span>

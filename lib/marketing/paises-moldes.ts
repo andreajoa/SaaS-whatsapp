@@ -22,7 +22,7 @@
  * condições (sem permanência, API oficial), não gente inventada.
  */
 
-export type Molde = "calido" | "directo" | "corporativo" | "sobrio";
+export type Molde = "calido" | "directo" | "corporativo" | "sobrio" | "sachlich";
 
 export type MoldeDoPais = {
   readonly molde: Molde;
@@ -50,6 +50,17 @@ export type MoldeDoPais = {
       readonly estado: string;
       readonly tom: "ia" | "equipe" | "ok";
     }[];
+  };
+  /** Tabela "Auf einen Blick" (molde `sachlich`). */
+  readonly fatos?: {
+    readonly titulo: string;
+    readonly linhas: readonly { readonly rotulo: string; readonly valor: string }[];
+  };
+  /** Caixa de proteção de dados com links para os documentos (molde `sachlich`). */
+  readonly privacidade?: {
+    readonly titulo: string;
+    readonly itens: readonly string[];
+    readonly links: readonly { readonly rotulo: string; readonly href: string }[];
   };
   /** Faixa logo abaixo do herói no molde `directo`. */
   readonly faixa?: string;
@@ -240,5 +251,61 @@ export const MOLDES_DOS_PAISES: Readonly<Record<string, MoldeDoPais>> = {
       "Pago seguro con Stripe",
     ],
     passos: PASSOS_TU,
+  },
+  deutschland: {
+    molde: "sachlich",
+    confianca: [],
+    passos: {
+      titulo: "In drei Schritten startklar",
+      itens: [
+        { titulo: "Konto erstellen", texto: "Online in wenigen Minuten, ohne Verkaufsgespräch." },
+        {
+          titulo: "WhatsApp verbinden",
+          texto:
+            "Über die offizielle WhatsApp Business API von Meta – mit Ihrer bestehenden Nummer.",
+        },
+        {
+          titulo: "Wissensdatenbank hinterlegen",
+          texto: "Preise, Öffnungszeiten und häufige Fragen. Danach antwortet der KI-Agent.",
+        },
+      ],
+    },
+    fatos: {
+      titulo: "Auf einen Blick",
+      linhas: [
+        { rotulo: "Anbindung", valor: "Offizielle WhatsApp Business API (Meta)" },
+        { rotulo: "Team", valor: "Mehrere Mitarbeiter auf einer Nummer, gemeinsamer Posteingang" },
+        {
+          rotulo: "KI-Agent",
+          valor: "Antwortet mit Ihrer Wissensdatenbank, Übergabe an Mitarbeiter mit Verlauf",
+        },
+        { rotulo: "CRM", valor: "Kontakte, Verlauf, Vertriebspipeline, automatisches Follow-up" },
+        {
+          rotulo: "KI-Kosten",
+          valor: "Eigener API-Schlüssel, Abrechnung direkt beim Anbieter, ohne Aufschlag",
+        },
+        {
+          rotulo: "Laufzeit",
+          valor: "Keine Mindestlaufzeit, monatlich kündbar, 7 Tage ohne Berechnung",
+        },
+        { rotulo: "Zahlung", valor: "Kreditkarte über Stripe" },
+      ],
+    },
+    privacidade: {
+      titulo: "Datenschutz und DSGVO",
+      itens: [
+        "Offizielle WhatsApp Business API statt WhatsApp-Business-App auf einem Privatgerät",
+        "Auftragsverarbeitungsvertrag (AVV) und Liste der Unterauftragsverarbeiter verfügbar",
+        "Auskunft, Export und Anonymisierung einzelner Kontakte",
+        "Widerspruch („Stopp“) wird erkannt und für weitere Nachrichten gesperrt",
+        "Daten jedes Unternehmens getrennt gespeichert, mit Protokollierung der Zugriffe",
+      ],
+      links: [
+        { rotulo: "Auftragsverarbeitung (AVV/DPA)", href: "/legal/dpa" },
+        { rotulo: "Unterauftragsverarbeiter", href: "/legal/subprocessadores" },
+        { rotulo: "Sicherheit", href: "/legal/seguranca" },
+        { rotulo: "Alle rechtlichen Dokumente", href: "/legal" },
+      ],
+    },
   },
 };

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Check, Play, ShieldCheck, X } from "lucide-react";
 
+import { VideoExplicativo } from "@/components/site/VideosDaHome";
+import homeStyles from "@/components/site/atenza-home.module.css";
+
 import { CabecalhoDoSite } from "@/components/site/CabecalhoDoSite";
 import { Medidor } from "@/components/site/Medidor";
 import { RodapeDoSite } from "@/components/site/RodapeDoSite";
@@ -10,7 +13,8 @@ import { instalacaoCobra, ORDEM_DOS_PLANOS, PLANOS, precoDoPlano } from "@/lib/b
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { MOLDES_DOS_PAISES, type Molde } from "@/lib/marketing/paises-moldes";
-import { PAGINAS_DE_PAIS, paginaDePais } from "@/lib/marketing/paises-seo";
+import { transcricaoDoVideo, videoDaApresentacao } from "@/lib/marketing/video";
+import { caminhoDaPagina, PAGINAS_DE_PAIS, paginaDePais } from "@/lib/marketing/paises-seo";
 import { jsonLdSeguro, metadadosPublicos, schemaDaPagina, schemaDoFaq } from "@/lib/marketing/seo";
 import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
 import {
@@ -42,7 +46,16 @@ function ilustracao(slug: string) {
 }
 
 type Bloco =
-  "faixa" | "confianca" | "dores" | "passos" | "comparacao" | "leitura" | "precos" | "faq";
+  | "faixa"
+  | "confianca"
+  | "dores"
+  | "passos"
+  | "comparacao"
+  | "leitura"
+  | "precos"
+  | "faq"
+  | "fatos"
+  | "privacidade";
 
 /**
  * A ORDEM é a psicologia do molde (ver lib/marketing/paises-moldes.ts): o
@@ -54,6 +67,9 @@ const ORDEM_DO_MOLDE: Record<Molde, readonly Bloco[]> = {
   directo: ["faixa", "comparacao", "dores", "leitura", "precos", "faq"],
   corporativo: ["confianca", "passos", "comparacao", "dores", "leitura", "precos", "faq"],
   sobrio: ["confianca", "dores", "passos", "leitura", "precos", "faq"],
+  // Alemanha: fatos e proteção de dados ANTES de qualquer apelo — o leitor
+  // alemão decide pela especificação e pela conformidade, não pela emoção.
+  sachlich: ["fatos", "privacidade", "dores", "passos", "leitura", "precos", "faq"],
 };
 
 export async function metadadosDoPais(slug: string) {
@@ -65,9 +81,9 @@ export async function metadadosDoPais(slug: string) {
     nome: marca.nome,
     titulo: pagina.title,
     descricao: pagina.description,
-    caminho: `/es/${slug}`,
+    caminho: caminhoDaPagina(pagina),
     base,
-    idioma: "es",
+    idioma: pagina.idioma === "de" ? "en" : "es",
     imagem: ilustracao(slug).src,
   });
   // hreflang por país: o Google mostra a versão certa a quem busca do México,
@@ -78,7 +94,7 @@ export async function metadadosDoPais(slug: string) {
       ...meta.alternates,
       languages: {
         ...Object.fromEntries(
-          PAGINAS_DE_PAIS.map((p) => [p.hreflang, new URL(`/es/${p.slug}`, base).toString()]),
+          PAGINAS_DE_PAIS.map((p) => [p.hreflang, new URL(caminhoDaPagina(p), base).toString()]),
         ),
         "pt-BR": new URL("/", base).toString(),
         es: new URL("/es", base).toString(),
@@ -94,7 +110,10 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
   if (!pagina) notFound();
   const [marca, visitante] = await Promise.all([marcaDaSaida(null), visitanteAtual()]);
   const base = env.NEXT_PUBLIC_APP_URL;
-  const caminho = `/es/${slug}`;
+  const caminho = caminhoDaPagina(pagina);
+  // O site tem pt, es e en. A página alemã usa cabeçalho e rodapé em inglês —
+  // o mais próximo do que o visitante alemão lê sem esforço.
+  const idiomaDoSite = pagina.idioma === "de" ? "en" : "es";
   const ui = pagina.ui;
   const molde = MOLDES_DOS_PAISES[slug] ?? { molde: "sobrio" as Molde, confianca: [] };
   const ordem = ORDEM_DO_MOLDE[molde.molde];
@@ -105,6 +124,11 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
   const cobravel = moedasCobraveis().has(mercado.moeda);
   const vendidos = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
   const primeiro = vendidos[0] ?? null;
+  // O vídeo do país, com a voz e o sotaque de lá. Sem versão local publicada,
+  // a seção não aparece e o botão do herói leva à demonstração geral.
+  const apresentacao = videoDaApresentacao(pagina.idioma ?? "es", pagina.pais);
+  const transcricao = transcricaoDoVideo(apresentacao);
+  const temVideo = transcricao !== null;
   const valorDe = (p: (typeof vendidos)[number]) => {
     const bruto = precoNoMercado(p, mercado);
     return MOEDAS_SEM_CENTAVOS.has(mercado.moeda) ? bruto : bruto / 100;
@@ -153,25 +177,29 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
   };
 
   const imagem = ilustracao(slug);
-  const t = (texto: string) => textoDoSite(texto, "es");
+  const t = (texto: string) => textoDoSite(texto, idiomaDoSite);
 
   return (
     <div className={`${styles.page} ${pais.raiz}`} data-molde={molde.molde} lang={pagina.hreflang}>
-      <Medidor idioma="es" moeda={visitante.mercado.moeda} dispositivo={visitante.dispositivo} />
+      <Medidor
+        idioma={pagina.idioma ?? "es"}
+        moeda={visitante.mercado.moeda}
+        dispositivo={visitante.dispositivo}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdSeguro(dados) }}
       />
       <a href="#conteudo" className={styles.skip}>
-        Saltar al contenido
+        {ui.saltar ?? "Saltar al contenido"}
       </a>
-      <CabecalhoDoSite nome={marca.nome} idioma="es" />
+      <CabecalhoDoSite nome={marca.nome} idioma={idiomaDoSite} />
       <main id="conteudo">
         <div className={pais.banda}>
           <section className={styles.hero}>
             <div>
-              <nav className={styles.breadcrumb} aria-label="Ruta">
-                <Link href="/es">{marca.nome}</Link>
+              <nav className={styles.breadcrumb} aria-label={ui.ruta ?? "Ruta"}>
+                <Link href={`/${idiomaDoSite}`}>{marca.nome}</Link>
                 <span aria-hidden>/</span>
                 <span>{pagina.nome}</span>
               </nav>
@@ -185,7 +213,7 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
                   {ui.crear}
                   <ArrowRight size={17} aria-hidden />
                 </Link>
-                <Link href="/demonstracao" className={styles.secondary}>
+                <Link href={temVideo ? "#video" : "/demonstracao"} className={styles.secondary}>
                   <Play size={17} aria-hidden />
                   {ui.video}
                 </Link>
@@ -248,6 +276,41 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
           </section>
         </div>
 
+        {temVideo && transcricao && (
+          <section id="video" className={pais.bloco} aria-labelledby="video-titulo">
+            <h2 id="video-titulo">{ui.video}</h2>
+            <VideoExplicativo
+              arquivo={apresentacao}
+              className={homeStyles.explainerCard}
+              textos={{
+                titulo: ui.video,
+                descricao: pagina.description,
+                fechar: pagina.idioma === "de" ? "Video schließen" : "Cerrar video",
+                legendas: pagina.idioma === "de" ? "Deutsch" : "Español",
+                transcricao: pagina.idioma === "de" ? "Text lesen" : "Leer la transcripción",
+                indisponivel:
+                  pagina.idioma === "de"
+                    ? "Das Video konnte nicht geladen werden. Den Text finden Sie unten."
+                    : "El video no cargó. Puede leer la transcripción abajo.",
+                paragrafo1: transcricao[0],
+                paragrafo2: transcricao[1],
+                paragrafo3: transcricao[2],
+                paragrafo4: transcricao[3],
+              }}
+            >
+              <Image
+                src={apresentacao.poster}
+                alt=""
+                fill
+                sizes="(max-width: 900px) 100vw, 1100px"
+              />
+              <span className={homeStyles.playCircle}>
+                <Play size={27} fill="currentColor" aria-hidden />
+              </span>
+            </VideoExplicativo>
+          </section>
+        )}
+
         {ordem.map((bloco) => {
           switch (bloco) {
             case "faixa":
@@ -264,7 +327,11 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
               ) : null;
             case "confianca":
               return (
-                <ul key={bloco} className={pais.confianca} aria-label="Garantías">
+                <ul
+                  key={bloco}
+                  className={pais.confianca}
+                  aria-label={ui.ruta ? "Garantien" : "Garantías"}
+                >
                   {molde.confianca.map((c) => (
                     <li key={c}>
                       <ShieldCheck size={18} aria-hidden />
@@ -379,6 +446,48 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
                   </div>
                 </section>
               ) : null;
+            case "fatos":
+              return molde.fatos ? (
+                <section key={bloco} className={pais.bloco} aria-labelledby="fakten">
+                  <h2 id="fakten">{molde.fatos.titulo}</h2>
+                  <div className={pais.tabelaRolagem}>
+                    <table className={pais.tabela}>
+                      <tbody>
+                        {molde.fatos.linhas.map((l) => (
+                          <tr key={l.rotulo}>
+                            <th scope="row">{l.rotulo}</th>
+                            <td>{l.valor}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ) : null;
+            case "privacidade":
+              return molde.privacidade ? (
+                <section key={bloco} className={pais.bloco} aria-labelledby="datenschutz">
+                  <div className={pais.privacidade}>
+                    <h2 id="datenschutz">{molde.privacidade.titulo}</h2>
+                    <ul>
+                      {molde.privacidade.itens.map((it) => (
+                        <li key={it}>
+                          <ShieldCheck size={18} aria-hidden />
+                          {it}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className={pais.links}>
+                      {molde.privacidade.links.map((l) => (
+                        <Link key={l.href} href={l.href}>
+                          {l.rotulo}
+                          <ArrowRight size={15} aria-hidden />
+                        </Link>
+                      ))}
+                    </p>
+                  </div>
+                </section>
+              ) : null;
             case "faq":
               return (
                 <section key={bloco} className={pais.bloco} aria-labelledby="preguntas">
@@ -416,7 +525,7 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
           <ul className={pais.paises}>
             {PAGINAS_DE_PAIS.filter((p) => p.slug !== slug).map((p) => (
               <li key={p.slug}>
-                <Link href={`/es/${p.slug}`} hrefLang={p.hreflang}>
+                <Link href={caminhoDaPagina(p)} hrefLang={p.hreflang}>
                   {p.nome}
                   <ArrowRight size={16} aria-hidden />
                 </Link>
@@ -431,7 +540,7 @@ export async function PaginaDoPais({ slug }: { readonly slug: string }) {
           </ul>
         </nav>
       </main>
-      <RodapeDoSite nome={marca.nome} idioma="es" />
+      <RodapeDoSite nome={marca.nome} idioma={idiomaDoSite} />
     </div>
   );
 }

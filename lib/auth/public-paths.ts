@@ -12,6 +12,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/precos$/,
   // Páginas por país, em espanhol (lista fechada em lib/marketing/paises-seo.ts).
   /^\/es\/[a-z-]+$/,
+  /^\/de$/,
   // Resumo para buscadores de IA; só texto público do produto.
   /^\/llms\.txt$/,
   /^\/login(\/.*)?$/,

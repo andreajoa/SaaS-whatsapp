@@ -143,10 +143,13 @@ export function VideoExplicativo({
   children,
   textos,
   className,
+  arquivo,
 }: {
   readonly children: ReactNode;
   readonly textos: TextosDoVideo;
   readonly className?: string;
+  /** A versão do país/idioma (`videoDaApresentacao`); sem ela, a portuguesa. */
+  readonly arquivo?: { readonly mp4: string; readonly poster: string; readonly lang: string };
 }) {
   const [iniciado, setIniciado] = useState(false);
   const [erro, setErro] = useState(false);
@@ -182,6 +185,7 @@ export function VideoExplicativo({
           <div className={styles.inlineVideoFrame}>
             <video
               data-video="apresentacao"
+              lang={arquivo?.lang}
               ref={videoRef}
               tabIndex={0}
               aria-label={textos.titulo}
@@ -189,11 +193,11 @@ export function VideoExplicativo({
               autoPlay
               playsInline
               preload="metadata"
-              poster={`${MEDIA}/explainer-thumbnail.webp`}
+              poster={arquivo?.poster ?? `${MEDIA}/explainer-thumbnail.webp`}
               className={styles.inlineVideo}
               onError={() => setErro(true)}
             >
-              <source src={`${MEDIA}/atenza-explica.mp4`} type="video/mp4" />
+              <source src={arquivo?.mp4 ?? `${MEDIA}/atenza-explica.mp4`} type="video/mp4" />
             </video>
           </div>
           {erro && <p role="alert">{textos.indisponivel}</p>}

@@ -37,6 +37,16 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  "Disponível em": "Available in",
+  países: "countries",
+  "A mesma plataforma que atende empresas no México, na Espanha e na Argentina.":
+    "The same platform serving businesses in Mexico, Spain and Argentina.",
+  "Cada país tem página, idioma e preço do próprio mercado. Compare: aqui no Brasil, o mesmo plano sai pelo menor preço.":
+    "Each country has its own page, language and local price. Compare: here in Brazil, the same plan has the lowest price.",
+  "Cada país tem página, idioma e preço do próprio mercado.":
+    "Each country has its own page, language and local price.",
+  "Menor preço": "Lowest price",
+  "/mês": "/mo",
   "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a Atenza, o seu WhatsApp atende e vende vinte e quatro horas por dia.":
     "Eleven forty-seven at night. A customer asks for the price. Who answers? With Atenza, your WhatsApp serves and sells twenty-four hours a day.",
   "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.":

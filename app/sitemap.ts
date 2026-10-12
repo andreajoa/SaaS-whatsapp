@@ -4,6 +4,7 @@ import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
+import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { IDIOMAS_PUBLICOS } from "@/lib/marketing/seo";
 
 /**
@@ -52,6 +53,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     // Toda página editorial vem da lista fechada — página nova entra sozinha.
     ...PAGES_SEO.map((p) => ({ url: url(`/${p.slug}`), lastModified: "2026-10-11" })),
+    // Uma página por país, com hreflang entre todas (es-MX, es-CO…).
+    ...PAGINAS_DE_PAIS.map((p) => ({
+      url: url(`/es/${p.slug}`),
+      lastModified: "2026-10-11",
+      priority: 0.8,
+      alternates: {
+        languages: Object.fromEntries(
+          PAGINAS_DE_PAIS.map((o) => [o.hreflang, url(`/es/${o.slug}`)]),
+        ),
+      },
+    })),
     { url: url("/demonstracao"), lastModified: "2026-10-10" },
     { url: url("/precos"), lastModified: "2026-10-11", priority: 0.9 },
     // Quem procura "como falar com o suporte" antes de assinar procura esta.

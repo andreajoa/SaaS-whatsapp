@@ -1,6 +1,12 @@
 import { headers } from "next/headers";
 
-import { ehIdiomaDoSite, mercadoDoPais, type IdiomaDoSite, type Mercado } from "./paises";
+import {
+  ehIdiomaDoSite,
+  mercadoDePreco,
+  mercadoDoPais,
+  type IdiomaDoSite,
+  type Mercado,
+} from "./paises";
 
 /**
  * QUEM CHEGOU: país, cidade, origem e idioma, lidos dos cabeçalhos da borda.
@@ -139,8 +145,9 @@ export async function visitanteAtual(): Promise<Visitante> {
     cep: primeiro(h, GEO.cep),
     latitude: primeiro(h, GEO.latitude),
     longitude: primeiro(h, GEO.longitude),
+    // O idioma segue o PAÍS; o preço segue o que o Stripe consegue cobrar.
     idioma: idiomaDoVisitante(h, mercado),
-    mercado,
+    mercado: mercadoDePreco(mercado),
     dispositivo: dispositivoDoAgente(h.get("user-agent") ?? ""),
   };
 }

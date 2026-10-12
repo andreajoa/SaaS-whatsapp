@@ -323,6 +323,19 @@ export const DICIONARIO: Traducoes = {
     es: "Escena de atención con una profesional usando auriculares",
   },
   "Sem som": { es: "Sin sonido" },
+  "Disponível em": { es: "Disponible en" },
+  países: { es: "países" },
+  "A mesma plataforma que atende empresas no México, na Espanha e na Argentina.": {
+    es: "La misma plataforma que atiende a empresas en México, España y Argentina.",
+  },
+  "Cada país tem página, idioma e preço do próprio mercado. Compare: aqui no Brasil, o mesmo plano sai pelo menor preço.":
+    {
+      es: "Cada país tiene su página, su idioma y el precio de su mercado. Compara: en Brasil, el mismo plan tiene el precio más bajo.",
+    },
+  "Cada país tem página, idioma e preço do próprio mercado.": {
+    es: "Cada país tiene su página, su idioma y el precio de su mercado.",
+  },
+  "Menor preço": { es: "Precio más bajo" },
   "Pausar vídeo de contexto": { es: "Pausar vídeo de contexto" },
   "Reproduzir vídeo de contexto": { es: "Reproducir vídeo de contexto" },
   "A imagem continua disponível enquanto o vídeo não carrega.": {

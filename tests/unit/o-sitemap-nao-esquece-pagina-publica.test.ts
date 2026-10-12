@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
 
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
@@ -126,8 +127,12 @@ describe("o sitemap cobre as páginas públicas que existem", () => {
         p.slug === rota ||
         (rota.endsWith("/[slug]") && p.slug.startsWith(rota.replace("[slug]", ""))),
     );
+    // As páginas por país entram pela lista fechada PAGINAS_DE_PAIS, que o
+    // sitemap percorre do mesmo jeito.
+    const pais =
+      rota === "es/[pais]" && PAGINAS_DE_PAIS.length > 0 && SITEMAP.includes("PAGINAS_DE_PAIS");
     expect(
-      editorial || SITEMAP.includes(`"/${rota}"`),
+      editorial || pais || SITEMAP.includes(`"/${rota}"`),
       `\`/${rota}\` tem página e não está em app/sitemap.ts. Se ela não deve ser ` +
         `indexada, acrescente-a a FORA_DO_SITEMAP com o motivo — a lista existe para ` +
         `separar "decidimos não indexar" de "esquecemos".`,

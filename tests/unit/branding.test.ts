@@ -565,6 +565,11 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
       "a página de preços reaproveita o módulo de estilo da vitrine da Atenza (atenza-home.module.css)",
     marcas: ["atenza-home.module.css"],
   },
+  "components/site/PaginaDoPais.tsx": {
+    categoria: "ATENZA",
+    motivo: "ilustração de cada página de país, servida em /media/atenza/ilustracoes",
+    marcas: ["atenza"],
+  },
   "lib/marketing/ilustracoes.ts": {
     categoria: "ATENZA",
     motivo: "mapa das ilustrações das páginas editoriais, servidas em /media/atenza/ilustracoes",

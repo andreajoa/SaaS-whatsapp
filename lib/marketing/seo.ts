@@ -3,7 +3,9 @@ import type { IdiomaDoSite } from "@/lib/mercado/paises";
 
 /** Idioma pertence à URL pública; país continua determinando moeda e checkout. */
 export function idiomaDaUrlPublica(caminho: string): IdiomaDoSite {
-  return caminho === "/en" ? "en" : caminho === "/es" ? "es" : "pt-BR";
+  if (caminho === "/en") return "en";
+  if (caminho === "/es" || caminho.startsWith("/es/")) return "es";
+  return "pt-BR";
 }
 
 export const IDIOMAS_PUBLICOS = { "pt-BR": "/", en: "/en", es: "/es", "x-default": "/" };

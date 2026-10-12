@@ -25,6 +25,7 @@ import { estadoDaCobranca } from "@/lib/billing/assinatura";
 import { DIAS_DE_TRIAL, instalacaoCobra, precoDoPlano } from "@/lib/billing/planos";
 import { criarCheckoutSession, StripeError } from "@/lib/billing/stripe";
 import { env } from "@/lib/env";
+import { mercadoDaOrganizacao } from "@/lib/mercado/organizacao";
 import type { Idioma } from "@/lib/i18n/idiomas";
 import { requireSupportWrite } from "@/lib/impersonate/support";
 import { registrarTentativa } from "@/lib/marketing/funil";
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const { data: org } = await admin
     .from("organizations")
-    .select("created_at")
+    .select("created_at, settings")
     .eq("id", orgId)
     .maybeSingle();
 
@@ -137,6 +138,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const base = baseUrl(req);
 
+  // A moeda é a do mercado da organização — a MESMA que a tela de planos
+  // mostrou —, e `mercadoDaOrganizacao` já devolve o Brasil quando aquela
+  // moeda não está em `STRIPE_MOEDAS`. O anual existe só em real.
+  const mercado = mercadoDaOrganizacao(org?.settings);
+  const moeda = ciclo === "mensal" && mercado.moeda !== "BRL" ? mercado.moeda.toLowerCase() : null;
+
   let clientSecret: string | null;
   let sessionId: string;
   try {
@@ -150,6 +157,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // tela. Ver `redirect_on_completion` em lib/billing/stripe.ts.
       returnUrl: `${base}/app/settings/billing?sessao={CHECKOUT_SESSION_ID}`,
       trialDias,
+      moeda,
       locale: LOCALE_DO_STRIPE[authz.user.idioma],
       // Estável por (org, plano, MINUTO): um duplo-clique reaproveita a MESMA
       // sessão do Stripe em vez de abrir duas. Não usa o requestId, que é novo

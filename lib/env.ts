@@ -327,6 +327,12 @@ const schema = z.object({
   STRIPE_PRICE_PRO_ANUAL: z.string().optional().default(""),
   STRIPE_PRICE_ILIMITADO_ANUAL: z.string().optional().default(""),
   /**
+   * Moedas além do real que os `price_` têm em `currency_options` (ex.:
+   * "MXN,COP,CLP,PEN,USD,EUR"). Moeda fora daqui não aparece em tela nenhuma:
+   * o visitante vê o preço em real, que é o que o checkout cobra.
+   */
+  STRIPE_MOEDAS: z.string().optional().default(""),
+  /**
    * A chave PUBLICÁVEL, e ela é `NEXT_PUBLIC_` de propósito — ao contrário de
    * todas as outras deste bloco. O checkout é EMBUTIDO: o `Stripe.js` monta o
    * formulário no browser e precisa dela lá. `pk_...` é desenhada para ser

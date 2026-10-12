@@ -1,4 +1,4 @@
-import { MERCADO_PADRAO, mercadoDoPais, type Mercado } from "./paises";
+import { MERCADO_PADRAO, mercadoDePreco, mercadoDoPais, type Mercado } from "./paises";
 
 /**
  * O MERCADO DA ORGANIZAÇÃO — decidido uma vez, no cadastro, e guardado.
@@ -53,7 +53,7 @@ export function mercadoDaOrganizacao(settings: unknown): Mercado {
   const bruto = (settings as Record<string, unknown>).mercado;
   if (typeof bruto !== "object" || bruto === null) return MERCADO_PADRAO;
   const pais = (bruto as Record<string, unknown>).pais;
-  return typeof pais === "string" ? mercadoDoPais(pais) : MERCADO_PADRAO;
+  return typeof pais === "string" ? mercadoDePreco(mercadoDoPais(pais)) : MERCADO_PADRAO;
 }
 
 /** O pedaço de `settings` que grava o mercado, para o INSERT do provisionamento. */

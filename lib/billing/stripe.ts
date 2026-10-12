@@ -219,6 +219,12 @@ export function criarCheckoutSession(params: {
    */
   locale: string;
   idempotencyKey: string;
+  /**
+   * A moeda da cobrança (ISO, minúscula), quando não é a do preço. Só funciona
+   * se o `price` tiver essa moeda em `currency_options` — por isso quem chama
+   * só manda moeda que está em `STRIPE_MOEDAS` (ver `moedaCobravel`).
+   */
+  moeda?: string | null;
 }): Promise<StripeCheckoutSession> {
   return chamar<StripeCheckoutSession>("/checkout/sessions", {
     method: "POST",
@@ -228,6 +234,7 @@ export function criarCheckoutSession(params: {
       ui_mode: "embedded",
       locale: params.locale,
       line_items: [{ price: params.priceId, quantity: 1 }],
+      ...(params.moeda ? { currency: params.moeda } : {}),
       redirect_on_completion: "if_required",
       return_url: params.returnUrl,
       // `client_reference_id` E `metadata.organization_id`: o primeiro é o que
@@ -250,9 +257,7 @@ export function criarCheckoutSession(params: {
       // Stripe SEMPRE cria o cliente, e mandar o parâmetro é erro duro
       // ("`customer_creation` can only be used in `payment` mode") — 502 na
       // nossa rota e a tela de pagamento nunca monta. Medido em produção.
-      ...(params.customerId
-        ? { customer: params.customerId }
-        : { customer_email: params.email }),
+      ...(params.customerId ? { customer: params.customerId } : { customer_email: params.email }),
       allow_promotion_codes: true,
     },
   });
@@ -293,8 +298,7 @@ export function lerAssinatura(subscriptionId: string): Promise<StripeSubscriptio
 const TOLERANCIA_S = 300;
 
 export type VerificacaoDeWebhook =
-  | { ok: true; evento: StripeEvent }
-  | { ok: false; motivo: string };
+  { ok: true; evento: StripeEvent } | { ok: false; motivo: string };
 
 export interface StripeEvent {
   id: string;

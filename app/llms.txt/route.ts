@@ -2,7 +2,8 @@ import { DIAS_DE_TRIAL, instalacaoCobra, ORDEM_DOS_PLANOS, PLANOS } from "@/lib/
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
-import { mercadoDoPais, precoLegivelNoMercado } from "@/lib/mercado/paises";
+import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
+import { mercadoDoPais, moedasCobraveis, precoLegivelNoMercado } from "@/lib/mercado/paises";
 
 /**
  * O resumo que buscadores de IA (ChatGPT, Perplexity, Gemini, Claude) leem.
@@ -41,6 +42,13 @@ export async function GET() {
     (id) =>
       `- ${PLANOS[id].nome}: ${precoLegivelNoMercado(id, brasil)}/mês — ${PLANOS[id].destaques.join("; ")}`,
   ).join("\n");
+  const paises = PAGINAS_DE_PAIS.map((p) => {
+    const m = mercadoDoPais(p.pais);
+    const preco = moedasCobraveis().has(m.moeda)
+      ? ` Planos desde ${precoLegivelNoMercado("essencial", m)}/mês (${m.moeda}).`
+      : "";
+    return `- [${p.nome}](${url(`/es/${p.slug}`)}): ${p.description}${preco}`;
+  }).join("\n");
   const paginas = PAGES_SEO.map(
     (p) => `- [${p.title}](${url(`/${p.slug}`)}): ${p.description}`,
   ).join("\n");
@@ -59,6 +67,7 @@ Fatos principais:
 - LGPD: dados isolados por empresa, pedidos de titular e trilha de auditoria
 - Teste: ${DIAS_DE_TRIAL} dias sem cobrança no início
 - Idiomas do site: português (Brasil), inglês e espanhol
+- Países com página própria: Brasil, ${PAGINAS_DE_PAIS.map((p) => p.nome).join(", ")}
 
 ## Planos no Brasil (preço mensal em reais)
 
@@ -73,6 +82,10 @@ ${paginas}
 - [Contato](${url("/contato")}): falar com o suporte
 - [Instagram @atenzaon](https://www.instagram.com/atenzaon/): novidades e conteúdo da Atenza
 - [Termos e privacidade](${url("/legal")}): documentos legais
+
+## Páginas por país (espanhol)
+
+${paises}
 
 ## Versões em outros idiomas
 

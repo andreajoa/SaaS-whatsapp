@@ -64,6 +64,8 @@ const TELAS_DA_VITRINE = [
   "components/site/RodapeDoSite.tsx",
   // O mega menu da vitrine: os rótulos saem de `montarMenu(t)`.
   "lib/marketing/menu.ts",
+  // "Disponível em N países" da home, nos três idiomas.
+  "components/site/PaisesDisponiveis.tsx",
 ];
 
 /** Toda chave literal passada a `t()` / `textoDoSite()` nas telas da vitrine. */

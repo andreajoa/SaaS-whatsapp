@@ -108,7 +108,16 @@ export interface Mercado {
 }
 
 /**
- * A régua de preço, em três degraus e uma razão fixa (1 : 2,5 : 5).
+ * A régua de preço, em três degraus e uma razão fixa (≈ 1 : 2 : 4, a do Brasil).
+ *
+ * Revisada em 11/10/2026 contra o que o concorrente local cobra:
+ * - México: Leadsales MXN 2.363 / 3.240 / 6.017; Kommo US$ 15–45 POR USUÁRIO.
+ *   A Atenza fica abaixo do Leadsales e não parece "barata demais".
+ * - Colômbia: ferramentas locais a partir de COP 350.000; Treble (CO) US$ 399+.
+ * - Chile e Peru: mesmo patamar em moeda local. Argentina em dólar (abaixo).
+ * - Europa: Superchat € 79 / 129 / 249 (3 / 10 / 25 pessoas), Spoki € 19–49,
+ *   Callbell € 15–20 por usuário. A Atenza: € 49 / 99 / 199, com a IA paga
+ *   pelo cliente.
  *
  * A razão é a mesma em todo mercado de propósito: um cliente que compara duas
  * páginas em idiomas diferentes — e eles comparam — vê a MESMA oferta, não uma
@@ -135,7 +144,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "EUR",
     idioma: "pt-BR",
     locale: "pt-PT",
-    precos: { essencial: 4900, pro: 12900, ilimitado: 24900 },
+    precos: { essencial: 4900, pro: 9900, ilimitado: 19900 },
   },
   {
     // Segunda praça a abrir, e não a Índia: a tarifa da Meta aqui é 2× menor
@@ -145,7 +154,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "MXN",
     idioma: "es",
     locale: "es-MX",
-    precos: { essencial: 49900, pro: 129900, ilimitado: 249900 },
+    precos: { essencial: 69900, pro: 139900, ilimitado: 279900 },
   },
   {
     // A melhor razão preço/tarifa da América Latina: a Meta cobra US$ 0,0125
@@ -155,7 +164,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "COP",
     idioma: "es",
     locale: "es-CO",
-    precos: { essencial: 9900000, pro: 24900000, ilimitado: 49900000 },
+    precos: { essencial: 11900000, pro: 23900000, ilimitado: 47900000 },
   },
   {
     // Zero-decimal no Stripe: estes são pesos inteiros, não centavos.
@@ -164,7 +173,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "CLP",
     idioma: "es",
     locale: "es-CL",
-    precos: { essencial: 24900, pro: 64900, ilimitado: 129900 },
+    precos: { essencial: 34900, pro: 69900, ilimitado: 139900 },
   },
   {
     pais: "PE",
@@ -172,7 +181,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "PEN",
     idioma: "es",
     locale: "es-PE",
-    precos: { essencial: 9900, pro: 24900, ilimitado: 49900 },
+    precos: { essencial: 10900, pro: 21900, ilimitado: 43900 },
   },
   {
     // Em DÓLAR, e é a única linha da América Latina que não usa a moeda do
@@ -184,7 +193,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "USD",
     idioma: "es",
     locale: "es-AR",
-    precos: { essencial: 1900, pro: 4900, ilimitado: 9900 },
+    precos: { essencial: 2900, pro: 5900, ilimitado: 11900 },
   },
   {
     pais: "ES",
@@ -192,7 +201,15 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "EUR",
     idioma: "es",
     locale: "es-ES",
-    precos: { essencial: 4900, pro: 12900, ilimitado: 24900 },
+    precos: { essencial: 4900, pro: 9900, ilimitado: 19900 },
+  },
+  {
+    pais: "DE",
+    nome: "Alemanha",
+    moeda: "EUR",
+    idioma: "en",
+    locale: "de-DE",
+    precos: { essencial: 4900, pro: 9900, ilimitado: 19900 },
   },
   {
     pais: "IT",
@@ -200,7 +217,7 @@ export const MERCADOS: readonly Mercado[] = [
     moeda: "EUR",
     idioma: "en",
     locale: "it-IT",
-    precos: { essencial: 4900, pro: 12900, ilimitado: 24900 },
+    precos: { essencial: 4900, pro: 9900, ilimitado: 19900 },
   },
   {
     // Em inglês de propósito — ver o cabeçalho. O gargalo aqui não é preço, é
@@ -270,6 +287,27 @@ const POR_PAIS: ReadonlyMap<string, Mercado> = new Map(MERCADOS.map((m) => [m.pa
  * País desconhecido, vazio ou malformado cai no internacional, que é uma
  * resposta boa — não um erro disfarçado.
  */
+/**
+ * As moedas que o Stripe desta instalação CONSEGUE cobrar: o real sempre (a
+ * conta é brasileira) e as que o operador listou em `STRIPE_MOEDAS` depois de
+ * cadastrá-las em `currency_options` de cada `price`.
+ *
+ * Mostrar um preço numa moeda que o checkout não cobra é anunciar US$ 99 e
+ * cobrar R$ 197 — foi o estado da tela até 11/10/2026.
+ */
+export function moedasCobraveis(): ReadonlySet<Moeda> {
+  const extras = (process.env.STRIPE_MOEDAS ?? "")
+    .split(",")
+    .map((m) => m.trim().toUpperCase())
+    .filter((m) => m.length > 0) as Moeda[];
+  return new Set<Moeda>(["BRL", ...extras]);
+}
+
+/** O mercado cujo PREÇO esta instalação pode cobrar: o próprio, ou o brasileiro. */
+export function mercadoDePreco(mercado: Mercado): Mercado {
+  return moedasCobraveis().has(mercado.moeda) ? mercado : MERCADO_PADRAO;
+}
+
 export function mercadoDoPais(pais: string | null | undefined): Mercado {
   const chave = (pais ?? "").trim().toUpperCase();
   if (chave.length !== 2) return MERCADO_INTERNACIONAL;

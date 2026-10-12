@@ -10,6 +10,8 @@ export const PUBLIC_PATHS: RegExp[] = [
   // Páginas de recurso e de segmento do mega menu (lista fechada em conteudo-recursos.ts).
   /^\/(?:recursos|segmentos)\/[a-z0-9-]+$/,
   /^\/precos$/,
+  // Páginas por país, em espanhol (lista fechada em lib/marketing/paises-seo.ts).
+  /^\/es\/[a-z-]+$/,
   // Resumo para buscadores de IA; só texto público do produto.
   /^\/llms\.txt$/,
   /^\/login(\/.*)?$/,

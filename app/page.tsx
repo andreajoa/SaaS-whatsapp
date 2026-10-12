@@ -55,6 +55,7 @@ import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
 import { type IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
 import { visitanteAtual } from "@/lib/mercado/visitante";
+import { PaisesDisponiveis } from "@/components/site/PaisesDisponiveis";
 import { createClient } from "@/lib/supabase/server";
 
 // O mesmo interruptor da cobrança preserva o clone self-host sem vitrine de assinatura.
@@ -341,6 +342,8 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             </p>
           </div>
         </section>
+
+        <PaisesDisponiveis idioma={visitante.idioma} />
 
         <section id="como-funciona" className={`${styles.section} ${styles.productSection}`}>
           <div className={styles.container}>

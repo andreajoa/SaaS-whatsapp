@@ -52,6 +52,7 @@ const corpoSchema = z.object({
 const LOCALE_DO_STRIPE: Record<Idioma, string> = {
   "pt-BR": "pt-BR",
   es: "es",
+  en: "en",
 };
 
 function baseUrl(req: NextRequest): string {

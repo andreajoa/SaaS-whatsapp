@@ -512,7 +512,7 @@ const EN: GuiaCompleto = {
         {
           titulo: "Paste it into {marca}",
           texto:
-            "In IA › Credenciales (AI › Credentials), click Añadir credencial (Add credential), choose OpenAI, paste the key and save. {marca} checks right away that it works.",
+            "In AI › Credentials, click Add credential, choose OpenAI, paste the key and save. {marca} checks right away that it works.",
           link: { rotulo: "Open Credentials", href: CAMINHO_DAS_CHAVES },
         },
       ],
@@ -546,7 +546,7 @@ const EN: GuiaCompleto = {
         {
           titulo: "Paste it into {marca}",
           texto:
-            "In IA › Credenciales (AI › Credentials), click Añadir credencial (Add credential), choose Anthropic (Claude), paste and save.",
+            "In AI › Credentials, click Add credential, choose Anthropic (Claude), paste and save.",
           link: { rotulo: "Open Credentials", href: CAMINHO_DAS_CHAVES },
         },
       ],
@@ -573,7 +573,7 @@ const EN: GuiaCompleto = {
         {
           titulo: "Paste it into {marca}",
           texto:
-            "In IA › Credenciales (AI › Credentials), click Añadir credencial (Add credential), choose Google (Gemini), paste and save.",
+            "In AI › Credentials, click Add credential, choose Google (Gemini), paste and save.",
           link: { rotulo: "Open Credentials", href: CAMINHO_DAS_CHAVES },
         },
       ],
@@ -607,8 +607,7 @@ const EN: GuiaCompleto = {
         },
         {
           titulo: "Paste it into {marca}",
-          texto:
-            "In IA › Credenciales (AI › Credentials), click Añadir credencial (Add credential), choose OpenRouter, paste and save.",
+          texto: "In AI › Credentials, click Add credential, choose OpenRouter, paste and save.",
           link: { rotulo: "Open Credentials", href: CAMINHO_DAS_CHAVES },
         },
       ],

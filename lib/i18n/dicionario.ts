@@ -31,6 +31,7 @@
  * chave crua nem para erro. Uma tradução incompleta não pode deixar a tela pior
  * do que estava.
  */
+import { DICIONARIO_EN } from "./dicionario-en";
 import type { Idioma } from "./idiomas";
 import { INTEGRATION_ACTION_TRANSLATIONS } from "../integration-actions/translations";
 
@@ -323,6 +324,112 @@ export const DICIONARIO: Traducoes = {
     es: "Escena de atención con una profesional usando auriculares",
   },
   "Sem som": { es: "Sin sonido" },
+  "A chave do provedor de IA que os agentes usam para pensar.": {
+    es: "La clave del proveedor de IA que los agentes usan para pensar.",
+  },
+  "API Tokens": { es: "Tokens de API" },
+  "Acompanhar o agente": { es: "Seguir al agente" },
+  Alertas: { es: "Alertas" },
+  "As ações que o agente pode executar sozinho durante o atendimento.": {
+    es: "Las acciones que el agente puede ejecutar solo durante la atención.",
+  },
+  "As colunas de cada funil, o vocabulário do negócio e os motivos de perda.": {
+    es: "Las columnas de cada embudo, el vocabulario del negocio y los motivos de pérdida.",
+  },
+  "As conversas de WhatsApp, com você e a IA atendendo lado a lado.": {
+    es: "Las conversaciones de WhatsApp, con usted y la IA atendiendo lado a lado.",
+  },
+  "As pessoas do outro lado da conversa e seu histórico.": {
+    es: "Las personas del otro lado de la conversación y su historial.",
+  },
+  "Avise outros sistemas quando algo acontecer aqui dentro.": {
+    es: "Avise a otros sistemas cuando algo pase aquí dentro.",
+  },
+  Billing: { es: "Facturación" },
+  "Como o agente retoma uma conversa que esfriou, para nenhuma morrer no silêncio.": {
+    es: "Cómo el agente retoma una conversación que se enfrió, para que ninguna muera en silencio.",
+  },
+  "Conectar a conta de anúncios para ler o desempenho das campanhas.": {
+    es: "Conectar la cuenta de anuncios para leer el desempeño de las campañas.",
+  },
+  "Conecte a loja para trazer pedidos e clientes para dentro do CRM.": {
+    es: "Conecte la tienda para traer pedidos y clientes al CRM.",
+  },
+  Conhecimento: { es: "Conocimiento" },
+  Credenciais: { es: "Credenciales" },
+  "Devolver ao anúncio as vendas que ele trouxe, para ele aprender a procurar mais clientes parecidos.":
+    {
+      es: "Devolver al anuncio las ventas que trajo, para que aprenda a buscar más clientes parecidos.",
+    },
+  "Funil e performance por atendente nos últimos 30 dias.": {
+    es: "Embudo y desempeño por asesor en los últimos 30 días.",
+  },
+  "Melhorias que a IA sugere para si mesma, esperando sua decisão.": {
+    es: "Mejoras que la IA sugiere para sí misma, esperando su decisión.",
+  },
+  Memória: { es: "Memoria" },
+  "Montar o agente": { es: "Armar el agente" },
+  Nuvemshop: { es: "Nuvemshop" },
+  "O catálogo da loja, com o preço que o atendente de IA responde.": {
+    es: "El catálogo de la tienda, con el precio que responde el agente de IA.",
+  },
+  "O que a IA encontrou e precisa de uma decisão sua.": {
+    es: "Lo que la IA encontró y necesita una decisión suya.",
+  },
+  "O que a IA fez — e, quando falhou, o que aconteceu e o que fazer.": {
+    es: "Lo que hizo la IA — y, cuando falló, qué pasó y qué hacer.",
+  },
+  "O que o agente já aprendeu sobre a sua operação e reaproveita.": {
+    es: "Lo que el agente ya aprendió sobre su operación y reutiliza.",
+  },
+  "O que se pode marcar, quanto dura, onde acontece e quem atende.": {
+    es: "Lo que se puede agendar, cuánto dura, dónde ocurre y quién atiende.",
+  },
+  "Os atendimentos que o agente conduziu, do início ao desfecho.": {
+    es: "Las atenciones que el agente condujo, del inicio al desenlace.",
+  },
+  "Os materiais que o agente consulta antes de responder sobre o seu negócio.": {
+    es: "Los materiales que el agente consulta antes de responder sobre su negocio.",
+  },
+  Provedores: { es: "Proveedores" },
+  "Qual agente pega qual conversa, e quando o humano assume.": {
+    es: "Qué agente toma qué conversación, y cuándo asume la persona.",
+  },
+  "Qual inteligência atende cada parte do sistema — e o que acontece se ela falhar.": {
+    es: "Qué inteligencia atiende cada parte del sistema — y qué pasa si falla.",
+  },
+  "Quanto a IA consumiu e qual é o teto de gasto do mês.": {
+    es: "Cuánto consumió la IA y cuál es el tope de gasto del mes.",
+  },
+  "Quanto custou cada resultado das campanhas que trazem gente para cá.": {
+    es: "Cuánto costó cada resultado de las campañas que traen gente aquí.",
+  },
+  "Quem atende por você: instruções, modelo, ferramentas e publicação.": {
+    es: "Quién atiende por usted: instrucciones, modelo, herramientas y publicación.",
+  },
+  "Quem esfriou e ainda está aberto — o que corre risco de morrer sem resposta.": {
+    es: "Quién se enfrió y sigue abierto — lo que corre riesgo de morir sin respuesta.",
+  },
+  "Quem fez o quê, quando — o histórico que não se apaga.": {
+    es: "Quién hizo qué, y cuándo — el historial que no se borra.",
+  },
+  "Relatório do que a equipe e os agentes fizeram no período: quanto, quem e de que tipo.": {
+    es: "Informe de lo que el equipo y los agentes hicieron en el período: cuánto, quién y de qué tipo.",
+  },
+  "Scripts salvos para responder mais rápido, seus ou da equipe.": {
+    es: "Textos guardados para responder más rápido, suyos o del equipo.",
+  },
+  "Se o agente está melhorando, onde ele erra e o que falta ensinar.": {
+    es: "Si el agente está mejorando, dónde se equivoca y qué falta enseñarle.",
+  },
+  "Seus funis de venda — clique em um para abrir o quadro de clientes.": {
+    es: "Sus embudos de venta — haga clic en uno para abrir el tablero de clientes.",
+  },
+  "Seus números de WhatsApp: por QR ou canal oficial da Meta, com saúde, reconexão e templates.": {
+    es: "Sus números de WhatsApp: por QR o canal oficial de Meta, con estado, reconexión y plantillas.",
+  },
+  Skills: { es: "Skills" },
+  "Uso e orçamento": { es: "Uso y presupuesto" },
   "Como conseguir a chave de IA": { es: "Cómo conseguir la clave de IA" },
   "Não sabe como conseguir a chave? Veja o passo a passo": {
     es: "¿No sabe cómo conseguir la clave? Vea el paso a paso",
@@ -10936,5 +11043,8 @@ export const DICIONARIO: Traducoes = {
  */
 export function traduzir(texto: string, idioma: Idioma): string {
   if (idioma === "pt-BR") return texto;
-  return DICIONARIO[texto]?.[idioma] ?? texto;
+  // Inglês mora em arquivo próprio (gerado do mesmo dicionário, chave a chave):
+  // juntar as duas línguas aqui dobraria um arquivo que já passa de 600 KB.
+  if (idioma === "en") return DICIONARIO_EN[texto] ?? texto;
+  return DICIONARIO[texto]?.[idioma as "es"] ?? texto;
 }

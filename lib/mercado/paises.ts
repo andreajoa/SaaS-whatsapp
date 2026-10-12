@@ -380,7 +380,8 @@ export function precoAnualLegivelNoMercado(plano: PlanoId, mercado: Mercado): st
  * fechar a lacuna trocaria uma falta visível por um erro invisível.
  */
 export function idiomaDoProduto(doSite: IdiomaDoSite): Idioma {
-  return doSite === "pt-BR" ? "pt-BR" : "es";
+  // O produto tem português, espanhol e inglês — cada site abre o seu.
+  return doSite;
 }
 
 /** O `IDIOMA_PADRAO` do produto, como idioma de site — para quem não negociou nada. */

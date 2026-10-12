@@ -1,3 +1,4 @@
+import { DICIONARIO_EN } from "@/lib/i18n/dicionario-en";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
@@ -72,7 +73,8 @@ const FORA_DO_PRODUTO: Record<string, string> = {
   // seu país); não há versão portuguesa a traduzir. A régua deste arquivo
   // confunde espanhol com português cru.
   "components/site/PaginaDoPais.tsx": "página por país, redigida em espanhol de origem",
-  "components/site/PaginaDeArtigo.tsx": "guia de compra por país, redigido em espanhol/inglês de origem",
+  "components/site/PaginaDeArtigo.tsx":
+    "guia de compra por país, redigido em espanhol/inglês de origem",
   // Impressum alemão: texto legal escrito em alemão (§ 5 DDG), sem versão a traduzir.
   "app/de": "página da Alemanha, redigida em alemão de origem",
   // O PAINEL DO FUNIL e a sua porta. Mesmo argumento das duas linhas acima, e
@@ -424,7 +426,8 @@ describe("a chave é o texto em português, e o português não muda", () => {
   it("todo idioma servido, exceto o padrão, tem coluna no dicionário", () => {
     // Guarda contra o defeito que originou esta feature: o seletor oferecia
     // `en-US` e nenhuma tradução existia — escolher não mudava uma letra.
-    const outros = IDIOMAS.filter((i) => i !== "pt-BR");
+    // O inglês mora em arquivo próprio (`dicionario-en.ts`) e tem guarda própria abaixo.
+    const outros = IDIOMAS.filter((i) => i !== "pt-BR" && i !== "en");
     for (const idioma of outros) {
       const comEsse = Object.values(DICIONARIO).filter((v) =>
         Object.prototype.hasOwnProperty.call(v, idioma),
@@ -434,6 +437,16 @@ describe("a chave é o texto em português, e o português não muda", () => {
         `o idioma "${idioma}" é oferecido mas não tem NENHUMA tradução no dicionário`,
       ).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("o inglês cobre o dicionário inteiro", () => {
+  it("toda chave do dicionário tem inglês — nenhuma tela cai no português para quem escolheu inglês", () => {
+    const semIngles = Object.keys(DICIONARIO).filter((chave) => !DICIONARIO_EN[chave]);
+    expect(
+      semIngles.slice(0, 20),
+      `${semIngles.length} chave(s) sem inglês em lib/i18n/dicionario-en.ts`,
+    ).toEqual([]);
   });
 });
 

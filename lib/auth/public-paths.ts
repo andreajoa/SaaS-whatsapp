@@ -14,6 +14,8 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/es\/[a-z-]+$/,
   /^\/de$/,
   /^\/us$/,
+  // Guias de compra por país (lista fechada em lib/marketing/artigos.ts).
+  /^\/(?:es\/guias|en\/guides)\/[a-z0-9-]+$/,
   // Guia da chave de IA (pt, es, en): precisa ser lido ANTES de assinar.
   /^\/(?:ajuda\/chave-de-ia|es\/ayuda\/clave-de-ia|en\/help\/ai-key)$/,
   /^\/de\/impressum$/,

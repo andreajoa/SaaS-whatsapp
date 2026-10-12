@@ -4,6 +4,7 @@ import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
+import { ARTIGOS } from "@/lib/marketing/artigos";
 import { caminhoDaPagina, PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { IDIOMAS_PUBLICOS } from "@/lib/marketing/seo";
 
@@ -65,6 +66,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     })),
     { url: url("/de/impressum"), changeFrequency: "yearly", priority: 0.3 },
+    // Guias de compra por país.
+    ...ARTIGOS.map((a) => ({ url: url(a.caminho), lastModified: "2026-10-12", priority: 0.7 })),
     // O guia da chave de IA nos três idiomas, com hreflang entre eles.
     ...["/ajuda/chave-de-ia", "/es/ayuda/clave-de-ia", "/en/help/ai-key"].map((c) => ({
       url: url(c),

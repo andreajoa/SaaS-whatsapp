@@ -2,6 +2,7 @@ import { DIAS_DE_TRIAL, instalacaoCobra, ORDEM_DOS_PLANOS, PLANOS } from "@/lib/
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { env } from "@/lib/env";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
+import { ARTIGOS } from "@/lib/marketing/artigos";
 import { caminhoDaPagina, PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { mercadoDoPais, moedasCobraveis, precoLegivelNoMercado } from "@/lib/mercado/paises";
 
@@ -86,6 +87,11 @@ ${paginas}
 ## Páginas por país
 
 ${paises}
+
+## Guias de compra
+
+${ARTIGOS.map((a) => `- [${a.title.replaceAll("{marca}", nome)}](${url(a.caminho)}): ${a.description.replaceAll("{marca}", nome)}`).join("\n")}
+- [Como conseguir a chave de IA](${url("/ajuda/chave-de-ia")}): passo a passo para OpenAI, Claude, Gemini e OpenRouter
 
 ## Versões em outros idiomas
 

@@ -72,6 +72,7 @@ const FORA_DO_PRODUTO: Record<string, string> = {
   // seu país); não há versão portuguesa a traduzir. A régua deste arquivo
   // confunde espanhol com português cru.
   "components/site/PaginaDoPais.tsx": "página por país, redigida em espanhol de origem",
+  "components/site/PaginaDeArtigo.tsx": "guia de compra por país, redigido em espanhol/inglês de origem",
   // Impressum alemão: texto legal escrito em alemão (§ 5 DDG), sem versão a traduzir.
   "app/de": "página da Alemanha, redigida em alemão de origem",
   // O PAINEL DO FUNIL e a sua porta. Mesmo argumento das duas linhas acima, e

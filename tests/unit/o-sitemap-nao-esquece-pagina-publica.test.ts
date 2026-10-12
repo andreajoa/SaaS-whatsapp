@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { ARTIGOS } from "@/lib/marketing/artigos";
 import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
 
@@ -130,9 +131,12 @@ describe("o sitemap cobre as páginas públicas que existem", () => {
     // As páginas por país entram pela lista fechada PAGINAS_DE_PAIS, que o
     // sitemap percorre do mesmo jeito.
     const pais =
-      SITEMAP.includes("PAGINAS_DE_PAIS") &&
-      ((rota === "es/[pais]" && PAGINAS_DE_PAIS.some((p) => !p.caminho)) ||
-        PAGINAS_DE_PAIS.some((p) => p.caminho === `/${rota}`));
+      (SITEMAP.includes("PAGINAS_DE_PAIS") &&
+        ((rota === "es/[pais]" && PAGINAS_DE_PAIS.some((p) => !p.caminho)) ||
+          PAGINAS_DE_PAIS.some((p) => p.caminho === `/${rota}`))) ||
+      (SITEMAP.includes("ARTIGOS") &&
+        rota.endsWith("/[slug]") &&
+        ARTIGOS.some((a) => a.caminho.startsWith(`/${rota.replace("[slug]", "")}`)));
     expect(
       editorial || pais || SITEMAP.includes(`"/${rota}"`),
       `\`/${rota}\` tem página e não está em app/sitemap.ts. Se ela não deve ser ` +

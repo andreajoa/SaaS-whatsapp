@@ -568,7 +568,7 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
   "components/site/PaginaDoPais.tsx": {
     categoria: "ATENZA",
     motivo: "ilustração de cada página de país, servida em /media/atenza/ilustracoes",
-    marcas: ["atenza"],
+    marcas: ["atenza", "atenza"],
   },
   "lib/marketing/ilustracoes.ts": {
     categoria: "ATENZA",

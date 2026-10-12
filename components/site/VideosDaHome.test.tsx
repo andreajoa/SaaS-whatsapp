@@ -147,7 +147,10 @@ describe("o filme narrado só existe após a escolha do visitante", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(container.contains(elemento)).toBe(true);
     expect(elemento.controls).toBe(true);
-    expect(elemento.querySelector("track")?.getAttribute("srcLang")).toBe("pt-BR");
+    // A legenda vem GRAVADA no vídeo; uma <track> ligada por padrão desenhava
+    // uma segunda legenda por cima da primeira.
+    expect(elemento.querySelector("track")).toBeNull();
+    expect(elemento.hasAttribute("data-video")).toBe(true);
     expect(screen.getByText(explicacao.transcricao)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: explicacao.fechar }));
     await act(async () => {});

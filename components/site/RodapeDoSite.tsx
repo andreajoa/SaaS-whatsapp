@@ -85,6 +85,15 @@ export function RodapeDoSite({ nome, idioma = "pt-BR" }: { nome: string; idioma?
       titulo: t("Ajuda"),
       links: [
         { href: "/#perguntas", rotulo: t("Perguntas frequentes") },
+        {
+          href:
+            idioma === "es"
+              ? "/es/ayuda/clave-de-ia"
+              : idioma === "en"
+                ? "/en/help/ai-key"
+                : "/ajuda/chave-de-ia",
+          rotulo: t("Como conseguir a chave de IA"),
+        },
         { href: "/contato", rotulo: t("Fale com a gente") },
         ...(suporte ? [{ href: `mailto:${suporte}`, rotulo: suporte, externo: true }] : []),
         ...(instagram ? [{ href: instagram, rotulo: "Instagram @atenzaon", externo: true }] : []),

@@ -7,6 +7,9 @@ import type { CredentialRow } from "@/hooks/ai/useCredentials";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { contarUsoPublicado, type VersaoVinculada } from "@/lib/ai/credenciais/uso";
 import { CredentialsList } from "./_components/CredentialsList";
+import { GuiaDaChaveDeIa } from "@/components/ajuda/GuiaDaChaveDeIa";
+import { guiaNoIdioma } from "@/lib/ajuda/guia-chave-ia";
+import { marcaDaSaida } from "@/lib/branding/saida";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +21,7 @@ export default async function CredentialsPage() {
   const activeOrg = await resolveActiveOrg(user);
   if (!activeOrg) redirect("/app");
   const idioma = user.idioma;
+  const marca = await marcaDaSaida(null);
   if (ROLE_RANK[activeOrg.role] < ROLE_RANK.manager) {
     redirect("/403");
   }
@@ -41,14 +45,19 @@ export default async function CredentialsPage() {
         "id, credential_id, ai_agents!ai_agent_versions_agent_id_fkey!inner(archived_at, published_version_id)",
       )
       .eq("organization_id", activeOrg.orgId)
-      .in("credential_id", credentials.map((c) => c.id));
+      .in(
+        "credential_id",
+        credentials.map((c) => c.id),
+      );
     usageMap = contarUsoPublicado((linked ?? []) as unknown as VersaoVinculada[]);
   }
 
   return (
     <div className="flex h-full flex-col gap-6 p-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">{traduzir("Chaves de acesso à IA", idioma)}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {traduzir("Chaves de acesso à IA", idioma)}
+        </h1>
         <p className="text-sm text-muted-foreground">
           {traduzir(
             "A conta de inteligência artificial é sua: você contrata direto na Anthropic, OpenAI ou Google e cola a chave aqui. Ela é guardada criptografada e nunca mais aparece na tela depois de salva — nem para você.",
@@ -56,11 +65,23 @@ export default async function CredentialsPage() {
           )}
         </p>
       </header>
-      <CredentialsList
-        initialData={credentials}
-        canWrite={canWrite}
-        usageMap={usageMap}
-      />
+      {/*
+        O passo a passo de como conseguir a chave, aqui dentro — é nesta tela
+        que o dono de empresa trava. Aberto enquanto não há chave nenhuma;
+        recolhido depois, para não empurrar a lista para baixo.
+      */}
+      <details
+        open={credentials.length === 0}
+        className="rounded-xl border bg-card p-4 [&_summary]:cursor-pointer"
+      >
+        <summary className="text-sm font-semibold">
+          {traduzir("Não sabe como conseguir a chave? Veja o passo a passo", idioma)}
+        </summary>
+        <div className="mt-4">
+          <GuiaDaChaveDeIa guia={guiaNoIdioma(idioma, marca.nome)} compacto />
+        </div>
+      </details>
+      <CredentialsList initialData={credentials} canWrite={canWrite} usageMap={usageMap} />
     </div>
   );
 }

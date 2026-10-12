@@ -46,6 +46,7 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Cada país tem página, idioma e preço do próprio mercado.":
     "Each country has its own page, language and local price.",
   "Menor preço": "Lowest price",
+  "Como conseguir a chave de IA": "How to get your AI key",
   "Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.":
     "A tour of the inbox, the AI and the pipeline in under a minute.",
   "/mês": "/mo",

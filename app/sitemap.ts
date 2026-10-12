@@ -65,6 +65,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     })),
     { url: url("/de/impressum"), changeFrequency: "yearly", priority: 0.3 },
+    // O guia da chave de IA nos três idiomas, com hreflang entre eles.
+    ...["/ajuda/chave-de-ia", "/es/ayuda/clave-de-ia", "/en/help/ai-key"].map((c) => ({
+      url: url(c),
+      lastModified: "2026-10-12",
+      priority: 0.7,
+      alternates: {
+        languages: {
+          "pt-BR": url("/ajuda/chave-de-ia"),
+          es: url("/es/ayuda/clave-de-ia"),
+          en: url("/en/help/ai-key"),
+        },
+      },
+    })),
     { url: url("/demonstracao"), lastModified: "2026-10-10" },
     { url: url("/precos"), lastModified: "2026-10-11", priority: 0.9 },
     // Quem procura "como falar com o suporte" antes de assinar procura esta.

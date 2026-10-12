@@ -35,6 +35,7 @@ import {
 import { IDS_DE_PROVEDOR, PROVEDORES } from "@/lib/ai/pontos/provedores";
 import { descreverErroDeValidacao } from "@/lib/ai/credenciais/erro-de-validacao";
 import { useT } from "@/hooks/i18n/useT";
+import { useIdioma } from "@/lib/i18n/IdiomaProvider";
 
 const formSchema = z.object({
   // Derivado da lista única (`lib/ai/pontos/provedores.ts`), como a rota.
@@ -56,6 +57,7 @@ interface Props {
 
 export function AddCredentialDialog({ open, onOpenChange }: Props) {
   const t = useT();
+  const idioma = useIdioma();
   const router = useRouter();
   const qc = useQueryClient();
   const [provider, setProvider] = useState<Provider>("anthropic");
@@ -90,10 +92,7 @@ export function AddCredentialDialog({ open, onOpenChange }: Props) {
     setSubmitting(true);
     const validatingToast = toast.loading(t("Credencial salva. Validando…"));
     try {
-      const res = await apiClient.post<CreateResponse>(
-        "/api/v1/ai/credentials",
-        parsed.data,
-      );
+      const res = await apiClient.post<CreateResponse>("/api/v1/ai/credentials", parsed.data);
       toast.dismiss(validatingToast);
       toast.success(t("Credencial salva. Validação em segundo plano."));
       reset();
@@ -159,9 +158,7 @@ export function AddCredentialDialog({ open, onOpenChange }: Props) {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">{t(provedor.quandoUsar)}</p>
-            {errors.provider && (
-              <p className="text-xs text-destructive">{errors.provider}</p>
-            )}
+            {errors.provider && <p className="text-xs text-destructive">{errors.provider}</p>}
           </div>
 
           <div className="space-y-2">
@@ -198,9 +195,15 @@ export function AddCredentialDialog({ open, onOpenChange }: Props) {
               autoComplete="off"
               required
             />
-            {errors.api_key && (
-              <p className="text-xs text-destructive">{errors.api_key}</p>
-            )}
+            <a
+              className="inline-block text-xs font-medium text-accent underline underline-offset-4"
+              href={idioma === "es" ? "/es/ayuda/clave-de-ia" : "/ajuda/chave-de-ia"}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t("Passo a passo para conseguir a chave")}
+            </a>
+            {errors.api_key && <p className="text-xs text-destructive">{errors.api_key}</p>}
           </div>
 
           <DialogFooter>

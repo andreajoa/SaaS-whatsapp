@@ -323,6 +323,11 @@ export const DICIONARIO: Traducoes = {
     es: "Escena de atención con una profesional usando auriculares",
   },
   "Sem som": { es: "Sin sonido" },
+  "Como conseguir a chave de IA": { es: "Cómo conseguir la clave de IA" },
+  "Não sabe como conseguir a chave? Veja o passo a passo": {
+    es: "¿No sabe cómo conseguir la clave? Vea el paso a paso",
+  },
+  "Passo a passo para conseguir a chave": { es: "Paso a paso para conseguir la clave" },
   "Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.": {
     es: "Un recorrido por la atención, la IA y el embudo en menos de 1 minuto.",
   },

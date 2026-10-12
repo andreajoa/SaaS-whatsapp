@@ -309,6 +309,11 @@ export default async function PaginaDePrecos({
               do plano não sobe com o volume de conversas, e quem atende muito sabe exatamente
               quanto gasta.
             </p>
+            <p>
+              <Link href="/ajuda/chave-de-ia" className={styles.linkClaro}>
+                Veja o passo a passo para conseguir a chave (10 minutos) →
+              </Link>
+            </p>
           </div>
         </section>
 

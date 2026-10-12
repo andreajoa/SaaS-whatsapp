@@ -246,3 +246,11 @@
     padding: 28px 22px;
   }
 }
+.linkClaro.linkClaro {
+  display: inline-block;
+  margin-top: 14px;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

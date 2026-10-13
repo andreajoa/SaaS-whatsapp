@@ -676,17 +676,17 @@ export const GUIAS: Readonly<Record<IdiomaDoGuia, GuiaCompleto>> = { "pt-BR": PT
  * Idiomas em que os vídeos dos provedores já foram gravados. O vídeo mostra e
  * fala o nome do produto, então uma instalação de marca própria não o recebe.
  */
-const IDIOMAS_COM_VIDEO: readonly IdiomaDoGuia[] = ["pt-BR"];
+const IDIOMAS_COM_VIDEO: readonly IdiomaDoGuia[] = ["pt-BR", "es"];
 
-function videoDoProvedor(id: ProvedorDoGuia) {
-  return { src: `/media/atenza/chave-${id}.mp4`, poster: `/media/atenza/chave-${id}.webp` };
+function videoDoProvedor(id: ProvedorDoGuia, idioma: IdiomaDoGuia) {
+  const arquivo = idioma === "pt-BR" ? `chave-${id}` : `chave-${id}-${idioma}`;
+  return { src: `/media/atenza/${arquivo}.mp4`, poster: `/media/atenza/${arquivo}.webp` };
 }
 
 export function guiaNoIdioma(idioma: string, marca: string): GuiaCompleto {
   const base = idioma === "es" ? ES : idioma === "en" ? EN : PT;
   const guia = JSON.parse(JSON.stringify(base).replaceAll("{marca}", marca)) as GuiaCompleto;
-  const comVideo =
-    marca === DEFAULT_APP_NAME && IDIOMAS_COM_VIDEO.includes(base === ES ? "es" : base === EN ? "en" : "pt-BR");
-  if (!comVideo) return guia;
-  return { ...guia, provedores: guia.provedores.map((p) => ({ ...p, video: videoDoProvedor(p.id) })) };
+  const doGuia: IdiomaDoGuia = base === ES ? "es" : base === EN ? "en" : "pt-BR";
+  if (marca !== DEFAULT_APP_NAME || !IDIOMAS_COM_VIDEO.includes(doGuia)) return guia;
+  return { ...guia, provedores: guia.provedores.map((p) => ({ ...p, video: videoDoProvedor(p.id, doGuia) })) };
 }

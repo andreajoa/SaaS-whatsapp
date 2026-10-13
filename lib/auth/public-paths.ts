@@ -126,7 +126,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   // rotas do produto ou qualquer arquivo futuro pela extensão.
   // As versões por país (lib/marketing/video.ts) entram por locale fechado,
   // e os passo a passo da chave de IA (lib/ajuda/guia-chave-ia.ts) por provedor.
-  /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt)|atenza-explica-(?:es-mx|es-co|es-ar|es-cl|es-pe|es-es|en-us|de-de)\.mp4|chave-(?:openai|anthropic|google|openrouter)\.mp4)$/,
+  /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt)|atenza-explica-(?:es-mx|es-co|es-ar|es-cl|es-pe|es-es|en-us|de-de)\.mp4|chave-(?:openai|anthropic|google|openrouter)(?:-es|-en)?\.mp4)$/,
   // A SAÍDA DA LISTA — a tela e a rota que dá baixa.
   //
   // Quem clica para sair de uma lista de e-mails nunca teve sessão, e nunca

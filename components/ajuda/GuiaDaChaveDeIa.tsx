@@ -60,6 +60,21 @@ export function GuiaDaChaveDeIa({
 
       <section className={styles.painel} role="tabpanel" aria-label={provedor.nome}>
         <p className={styles.resumo}>{provedor.resumo}</p>
+        {provedor.video && (
+          <figure className={styles.video}>
+            <video
+              key={provedor.id}
+              data-video={`chave-${provedor.id}`}
+              src={provedor.video.src}
+              poster={provedor.video.poster}
+              controls
+              playsInline
+              preload="none"
+              aria-label={`${guia.ui.video}: ${provedor.nome}`}
+            />
+            <figcaption>{guia.ui.video}</figcaption>
+          </figure>
+        )}
         <div className={styles.fatos}>
           <span>
             <CreditCard size={16} aria-hidden /> <b>{guia.ui.custo}:</b> {provedor.custo}

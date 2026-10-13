@@ -11,6 +11,8 @@
  * oficial; quando um deles mudar, é aqui que se corrige.
  */
 
+import { DEFAULT_APP_NAME } from "@/lib/branding";
+
 export type IdiomaDoGuia = "pt-BR" | "es" | "en";
 export type ProvedorDoGuia = "openai" | "anthropic" | "google" | "openrouter";
 
@@ -31,6 +33,8 @@ export interface GuiaDoProvedor {
   readonly tempo: string;
   readonly passos: readonly PassoDoGuia[];
   readonly atencao?: string;
+  /** O passo a passo narrado — só existe para a marca do produto e no idioma gravado. */
+  readonly video?: { readonly src: string; readonly poster: string };
 }
 
 export interface PerguntaDoAssistente {
@@ -53,6 +57,7 @@ export interface GuiaCompleto {
     readonly abrir: string;
     readonly atencao: string;
     readonly copiar: string;
+    readonly video: string;
   };
 }
 
@@ -276,6 +281,7 @@ const PT: GuiaCompleto = {
     abrir: "Abrir",
     atencao: "Atenção",
     copiar: "Copiar link",
+    video: "Assista ao passo a passo",
   },
 };
 
@@ -472,6 +478,7 @@ const ES: GuiaCompleto = {
     abrir: "Abrir",
     atencao: "Atención",
     copiar: "Copiar enlace",
+    video: "Mira el paso a paso",
   },
 };
 
@@ -655,6 +662,7 @@ const EN: GuiaCompleto = {
     abrir: "Open",
     atencao: "Note",
     copiar: "Copy link",
+    video: "Watch the walkthrough",
   },
 };
 
@@ -664,7 +672,21 @@ export const GUIAS: Readonly<Record<IdiomaDoGuia, GuiaCompleto>> = { "pt-BR": PT
  * O guia no idioma pedido, com o nome da marca da instalação no lugar de
  * `{marca}` (marca própria: o revendedor vê o nome dele, não o nosso).
  */
+/**
+ * Idiomas em que os vídeos dos provedores já foram gravados. O vídeo mostra e
+ * fala o nome do produto, então uma instalação de marca própria não o recebe.
+ */
+const IDIOMAS_COM_VIDEO: readonly IdiomaDoGuia[] = ["pt-BR"];
+
+function videoDoProvedor(id: ProvedorDoGuia) {
+  return { src: `/media/atenza/chave-${id}.mp4`, poster: `/media/atenza/chave-${id}.webp` };
+}
+
 export function guiaNoIdioma(idioma: string, marca: string): GuiaCompleto {
   const base = idioma === "es" ? ES : idioma === "en" ? EN : PT;
-  return JSON.parse(JSON.stringify(base).replaceAll("{marca}", marca)) as GuiaCompleto;
+  const guia = JSON.parse(JSON.stringify(base).replaceAll("{marca}", marca)) as GuiaCompleto;
+  const comVideo =
+    marca === DEFAULT_APP_NAME && IDIOMAS_COM_VIDEO.includes(base === ES ? "es" : base === EN ? "en" : "pt-BR");
+  if (!comVideo) return guia;
+  return { ...guia, provedores: guia.provedores.map((p) => ({ ...p, video: videoDoProvedor(p.id) })) };
 }

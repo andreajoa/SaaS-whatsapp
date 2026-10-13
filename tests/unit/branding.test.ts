@@ -575,6 +575,11 @@ const MARCA_CONGELADA: Record<string, EntradaDeMarca> = {
     motivo: "versões do vídeo de apresentação, servidas em /media/atenza",
     marcas: ["atenza", "atenza-explica", "atenza-explica.mp4"],
   },
+  "lib/ajuda/guia-chave-ia.ts": {
+    categoria: "ATENZA",
+    motivo: "vídeos do passo a passo de cada provedor, servidos em /media/atenza (só para a marca do produto)",
+    marcas: ["atenza", "atenza"],
+  },
   "lib/marketing/video-narracoes.ts": {
     categoria: "ATENZA",
     motivo: "transcrição da narração de cada versão do vídeo (o locutor diz o nome do produto)",

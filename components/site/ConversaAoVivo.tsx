@@ -56,9 +56,18 @@ const TETO_MS = 12_000;
 export function ConversaAoVivo({
   falas,
   className,
+  repetirAposMs,
+  classeDaFala,
 }: {
   readonly falas: readonly FalaDaConversa[];
   readonly className?: string;
+  /**
+   * Recomeça a conversa este tanto depois da última fala — para a vitrine do
+   * topo parecer um atendimento acontecendo agora. Sem isto, encena uma vez.
+   */
+  readonly repetirAposMs?: number;
+  /** Classe do invólucro de cada fala (ex.: alinhar à direita a do agente). */
+  readonly classeDaFala?: (lado: FalaDaConversa["lado"]) => string;
 }) {
   const alvo = useRef<HTMLDivElement>(null);
   const [vivo, setVivo] = useState(false);
@@ -85,7 +94,12 @@ export function ConversaAoVivo({
     const encenar = () => {
       if (comecou) return;
       comecou = true;
+      rodada();
+    };
 
+    const rodada = () => {
+      setDigitando(null);
+      setDitas(0);
       // Um acumulador em vez de timers encadeados: encadear faz cada atraso
       // depender do anterior ter disparado, e uma aba em segundo plano (onde o
       // navegador estrangula os timers) desmonta o ritmo inteiro. Agendados de
@@ -108,6 +122,7 @@ export function ConversaAoVivo({
         // dois lêem como um piscar só.
         quando += 420;
       });
+      if (repetirAposMs) timers.push(window.setTimeout(rodada, quando + repetirAposMs));
     };
 
     const observador = new IntersectionObserver(
@@ -121,6 +136,8 @@ export function ConversaAoVivo({
     observador.observe(elemento);
 
     const cinto = window.setTimeout(() => {
+      // Só socorre quem NÃO começou: uma conversa em ciclo está viva de propósito.
+      if (comecou) return;
       setDigitando(null);
       setDitas(falas.length);
     }, TETO_MS);
@@ -130,12 +147,18 @@ export function ConversaAoVivo({
       window.clearTimeout(cinto);
       observador.disconnect();
     };
-  }, [vivo, falas]);
+  }, [vivo, falas, repetirAposMs]);
 
   return (
     <div ref={alvo} className={className}>
       {falas.slice(0, ditas).map((fala, i) => (
-        <div key={i} className={vivo ? "conversa-fala" : undefined}>
+        <div
+          key={i}
+          className={
+            [vivo ? "conversa-fala" : "", classeDaFala?.(fala.lado) ?? ""].join(" ").trim() ||
+            undefined
+          }
+        >
           {fala.balao}
         </div>
       ))}
@@ -158,7 +181,7 @@ export function ConversaAoVivo({
 function Digitando({ lado }: { lado: "cliente" | "agente" }) {
   const doAgente = lado === "agente";
   return (
-    <div className={doAgente ? "flex justify-end" : "flex justify-start"}>
+    <div className={doAgente ? "flex w-full justify-end" : "flex w-full justify-start"}>
       <div
         role="status"
         aria-label={doAgente ? "Respondendo" : "Digitando"}

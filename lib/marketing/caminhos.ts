@@ -26,7 +26,7 @@
 export const ID_DA_SECAO_DE_PLANOS = "planos";
 
 /** O destino de um CTA de e-mail que manda a pessoa ver o preço. */
-export const CAMINHO_DOS_PLANOS = `/#${ID_DA_SECAO_DE_PLANOS}`;
+export const CAMINHO_DOS_PLANOS = `/precos#${ID_DA_SECAO_DE_PLANOS}`;
 
 /**
  * O marco de "chegou à tabela de preço".

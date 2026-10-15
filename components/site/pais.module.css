@@ -1,0 +1,636 @@
+.bloco {
+  width: min(1120px, calc(100% - 32px));
+  margin: 72px auto 0;
+}
+.bloco > h2 {
+  margin: 0 0 24px;
+  font-size: clamp(26px, 3.4vw, 36px);
+  line-height: 1.15;
+  color: #173a2c;
+}
+.dores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.dores article {
+  padding: 26px;
+  border: 1px solid #d6e3d1;
+  border-radius: 18px;
+  background: #ffffff;
+}
+.dores h3 {
+  margin: 0 0 10px;
+  font-size: 19px;
+  line-height: 1.3;
+  color: #173a2c;
+}
+.dores p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #3d4f3f;
+}
+.leitura {
+  width: min(820px, calc(100% - 32px));
+  margin: 72px auto 0;
+}
+.planos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.planos article {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px;
+  border: 1px solid #d6e3d1;
+  border-radius: 18px;
+  background: #ffffff;
+}
+.planos article[data-destaque="true"] {
+  border-color: #2f5a3f;
+  box-shadow: 0 18px 40px -28px rgba(23, 58, 44, 0.55);
+}
+.planos h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #173a2c;
+}
+.preco {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #173a2c;
+}
+.preco small {
+  margin-left: 4px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #506d48;
+}
+.planos ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 15px;
+  color: #3d4f3f;
+}
+.planos li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.planos li svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #2f5a3f;
+}
+.paises {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.paises.paises a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: 1px solid #c8d6c1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #173a2c;
+  font-weight: 600;
+  text-decoration: none;
+}
+.paises.paises a:hover,
+.paises.paises a:focus-visible {
+  border-color: #2f5a3f;
+}
+@media (max-width: 900px) {
+  .dores,
+  .planos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Moldes por país (lib/marketing/paises-moldes.ts) ─────────────────── */
+.raiz {
+  --acento: #2f5a3f;
+  --cartao: #ffffff;
+  --raio: 18px;
+}
+.banda {
+  background: transparent;
+}
+
+/* Cálido — México, Colômbia, Peru: tons de terra, conversa em destaque. */
+.raiz[data-molde="calido"] {
+  --paper: #fbf6ef;
+  --line: #ead9c6;
+  --acento: #b5532c;
+  --raio: 22px;
+}
+.raiz[data-molde="calido"] .banda {
+  background: radial-gradient(ellipse 70% 90% at 80% 30%, #f6e3cf 0%, #fbf6ef 70%);
+}
+.raiz[data-molde="calido"] :is(p, span)[class*="eyebrow"] {
+  color: var(--acento);
+}
+
+/* Directo — Argentina: alto contraste, preço logo de saída. */
+.raiz[data-molde="directo"] {
+  --acento: #c8f169;
+  --raio: 10px;
+}
+.raiz[data-molde="directo"] .banda {
+  background: #0f1f18;
+  color: #ffffff;
+}
+.raiz[data-molde="directo"] .banda :is(h1, p, a, span, nav) {
+  color: #ffffff;
+}
+.raiz[data-molde="directo"] .banda [class*="primary"] {
+  background: var(--acento);
+  color: #0f1f18;
+}
+.raiz[data-molde="directo"] .banda [class*="secondary"] {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.raiz[data-molde="directo"] .banda [class*="trial"],
+.raiz[data-molde="directo"] .banda [class*="intro"] {
+  color: #c9d8cf;
+}
+
+/* Corporativo — Chile: frio, estruturado, cantos retos. */
+.raiz[data-molde="corporativo"] {
+  --ink: #16242c;
+  --muted: #4c5d66;
+  --paper: #f6f8fa;
+  --line: #d7dee4;
+  --acento: #1f6f6a;
+  --raio: 8px;
+}
+.raiz[data-molde="corporativo"] .banda {
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fa 100%);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Sóbrio — Espanha: branco quase puro, linhas finas, pouco ornamento. */
+.raiz[data-molde="sobrio"] {
+  --paper: #fafaf8;
+  --line: #e4e4de;
+  --acento: #2f5a3f;
+  --raio: 6px;
+}
+.raiz[data-molde="sobrio"] h1 {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.raiz .dores article,
+.raiz .planos article,
+.raiz .passos li {
+  border-radius: var(--raio);
+  border-color: var(--line);
+}
+
+/* Conversa de WhatsApp do herói (molde cálido). */
+.conversa {
+  margin: 0;
+  max-width: 440px;
+  justify-self: center;
+  width: 100%;
+  border-radius: 26px;
+  background: #efe7dd;
+  box-shadow: 0 30px 60px -30px rgba(80, 45, 20, 0.45);
+  overflow: hidden;
+}
+.conversaTopo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #1f4d36;
+  color: #ffffff;
+}
+.conversaTopo strong {
+  display: block;
+  font-size: 15px;
+}
+.conversaTopo small {
+  display: block;
+  font-size: 12px;
+  color: #cfe3d4;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #f6e3cf;
+  color: #7a3a1d;
+  font-weight: 700;
+}
+.conversa ol {
+  list-style: none;
+  margin: 0;
+  padding: 18px 16px 8px;
+  display: grid;
+  gap: 10px;
+}
+.conversa li {
+  max-width: 82%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #1d2b22;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+.conversa li[data-de="cliente"] {
+  justify-self: start;
+  background: #ffffff;
+  border-top-left-radius: 4px;
+}
+.conversa li[data-de="agente"] {
+  justify-self: end;
+  background: #d9f5c9;
+  border-top-right-radius: 4px;
+}
+.conversaNota {
+  margin: 0;
+  padding: 4px 16px 14px;
+  font-size: 12px;
+  color: #6b5a4b;
+  text-align: center;
+}
+
+/* Faixa de preço (molde directo). */
+.faixa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+  margin: 0;
+  padding: 16px;
+  background: var(--acento);
+  color: #0f1f18;
+  font-size: 16px;
+  text-align: center;
+}
+.faixa strong {
+  font-size: 20px;
+}
+
+/* Barra de garantias. */
+.confianca {
+  list-style: none;
+  width: min(1120px, calc(100% - 32px));
+  margin: 32px auto 0;
+  padding: 18px 22px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--raio);
+  background: var(--cartao);
+  font-size: 15px;
+  font-weight: 600;
+}
+.confianca li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.confianca svg {
+  color: var(--acento);
+}
+
+/* Passos 1-2-3. */
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.passos li {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--cartao);
+}
+.passos strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+.passos p {
+  margin: 0;
+  color: var(--muted);
+}
+.numero {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--acento);
+  color: #ffffff;
+  font-weight: 700;
+}
+.raiz[data-molde="directo"] .numero {
+  color: #0f1f18;
+}
+
+/* Comparação sem/com. */
+.tabelaRolagem {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--raio);
+  background: var(--cartao);
+}
+.tabela {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+.tabela th,
+.tabela td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.tabela tr:last-child td {
+  border-bottom: 0;
+}
+.tabela th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.tabela td {
+  width: 50%;
+}
+.tabela td svg {
+  margin-right: 8px;
+  vertical-align: -2px;
+}
+.tabela td:first-child {
+  color: var(--muted);
+}
+.tabela td:first-child svg {
+  color: #b54a3a;
+}
+.tabela td:last-child svg {
+  color: #2f7a4f;
+}
+@media (max-width: 900px) {
+  .passos {
+    grid-template-columns: 1fr;
+  }
+  .confianca {
+    justify-content: flex-start;
+  }
+}
+
+/* Painel de exemplo do herói (molde corporativo). */
+.painel {
+  margin: 0;
+  width: 100%;
+  max-width: 520px;
+  justify-self: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 30px 60px -36px rgba(22, 36, 44, 0.45);
+  overflow: hidden;
+}
+.painel figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.painel figcaption small {
+  font-size: 12px;
+  color: var(--muted);
+}
+.painel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.painel li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.painel li:last-child {
+  border-bottom: 0;
+}
+.painel li strong {
+  display: block;
+  font-size: 15px;
+}
+.painel li small {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+}
+.painelAvatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #e6f0ef;
+  color: #1f6f6a;
+  font-weight: 700;
+}
+.painel em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.painel em[data-tom="ia"] {
+  background: #e6f0ef;
+  color: #155a56;
+}
+.painel em[data-tom="equipe"] {
+  background: #fff1dc;
+  color: #7a4a0c;
+}
+.painel em[data-tom="ok"] {
+  background: #e3f4e6;
+  color: #1d6a33;
+}
+@media (max-width: 560px) {
+  .painel li {
+    grid-template-columns: auto 1fr;
+  }
+  .painel em {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* Sachlich — Alemanha: denso, linhas retas, especificação antes de apelo. */
+.raiz[data-molde="sachlich"] {
+  --ink: #1b1f23;
+  --muted: #4a5258;
+  --paper: #ffffff;
+  --line: #d9dde1;
+  --acento: #2f5a3f;
+  --raio: 4px;
+}
+.raiz[data-molde="sachlich"] .banda {
+  border-bottom: 1px solid var(--line);
+}
+.raiz[data-molde="sachlich"] h1 {
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.raiz[data-molde="sachlich"] .tabela th[scope="row"] {
+  width: 32%;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+.privacidade {
+  padding: 28px 30px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--acento);
+  border-radius: var(--raio);
+  background: #f7f9f8;
+}
+.privacidade h2 {
+  margin: 0 0 16px;
+  font-size: clamp(22px, 2.6vw, 28px);
+}
+.privacidade ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.privacidade li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 16px;
+}
+.privacidade li svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--acento);
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 18px 0 0;
+}
+.links.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Sachlich — Alemanha: denso, linhas retas, especificação antes de apelo. */
+.raiz[data-molde="sachlich"] {
+  --ink: #1b1f23;
+  --muted: #4a5258;
+  --paper: #ffffff;
+  --line: #d9dde1;
+  --acento: #2f5a3f;
+  --raio: 4px;
+}
+.raiz[data-molde="sachlich"] .banda {
+  border-bottom: 1px solid var(--line);
+}
+.raiz[data-molde="sachlich"] h1 {
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.raiz[data-molde="sachlich"] .tabela th[scope="row"] {
+  width: 32%;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+.privacidade {
+  padding: 28px 30px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--acento);
+  border-radius: var(--raio);
+  background: #f7f9f8;
+}
+.privacidade h2 {
+  margin: 0 0 16px;
+  font-size: clamp(22px, 2.6vw, 28px);
+}
+.privacidade ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.privacidade li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 16px;
+}
+.privacidade li svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--acento);
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 18px 0 0;
+}
+.links.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

@@ -22,7 +22,7 @@ import type { IdiomaDoSite } from "./paises";
  * significaria traduzir o sistema inteiro antes de a primeira página em inglês
  * subir, ou desligar o guarda. As duas saídas são piores que esta.
  *
- * A vitrine é um recorte pequeno e fechado — as 72 frases de `app/page.tsx` e
+ * A vitrine é um recorte pequeno e fechado — as frases de `app/page.tsx` e
  * as das páginas públicas ao lado dela. Ela pode ter inglês HOJE sem que o
  * produto precise ter.
  *
@@ -37,109 +37,168 @@ import type { IdiomaDoSite } from "./paises";
  * quem lê o componente vê a frase.
  */
 export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
+  "Disponível em": "Available in",
+  países: "countries",
+  "A mesma plataforma que atende empresas no México, na Espanha e na Argentina.":
+    "The same platform serving businesses in Mexico, Spain and Argentina.",
+  "Cada país tem página, idioma e preço do próprio mercado. Compare: aqui no Brasil, o mesmo plano sai pelo menor preço.":
+    "Each country has its own page, language and local price. Compare: here in Brazil, the same plan has the lowest price.",
+  "Cada país tem página, idioma e preço do próprio mercado.":
+    "Each country has its own page, language and local price.",
+  "Menor preço": "Lowest price",
+  "Como conseguir a chave de IA": "How to get your AI key",
+  "Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.":
+    "A tour of the inbox, the AI and the pipeline in under a minute.",
+  "/mês": "/mo",
+  "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a Atenza, o seu WhatsApp atende e vende vinte e quatro horas por dia.":
+    "Eleven forty-seven at night. A customer asks for the price. Who answers? With Atenza, your WhatsApp serves and sells twenty-four hours a day.",
+  "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.":
+    "The AI agent answers right away with your business information: price, stock, hours, delivery. When the conversation needs a person, it goes to your team with the full history. Nobody asks everything again.",
+  "Cada conversa vira uma oportunidade no funil. E o follow-up automático volta a falar com quem parou de responder. Precisa marcar horário? A Atenza agenda pela própria conversa, direto na sua agenda do Google.":
+    "Every conversation becomes an opportunity in the pipeline, and automatic follow-up reaches back to people who stopped replying. Need to book a time? Atenza schedules it right in the chat, straight into your Google Calendar.",
+  "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.":
+    "Several agents on one number, the official WhatsApp API and your data protected under Brazil's LGPD. Atenza: WhatsApp that serves and sells 24/7. Try seven days free of charge.",
+  "Veja em menos de 1 minuto": "See it in under a minute",
+  "O que é a": "What is",
+  "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.":
+    "is a Brazilian WhatsApp customer service and sales platform that brings together, in one system, several agents on the same number, AI agents trained on your business information, a CRM with a sales pipeline, automatic follow-up, campaigns and scheduling integrated with Google.",
+  "A conexão é pela API oficial do WhatsApp, da Meta, com integrações para Shopify, WooCommerce e Nuvemshop, além de API e webhooks para qualquer sistema. Atende empresas de todo o Brasil — lojas, clínicas, escolas, imobiliárias, escritórios e prestadores de serviço —, com planos mensais ou anuais e 7 dias sem cobrança para testar.":
+    "It connects through Meta's official WhatsApp API, integrates with Shopify, WooCommerce and Nuvemshop, and offers an API and webhooks for any system. It serves businesses all over Brazil — stores, clinics, schools, real estate agencies, offices and service providers — with monthly or annual plans and 7 days free of charge to try.",
+  "Empresa cadastrada no Reclame Aqui": "Company registered on Reclame Aqui",
+  "Veja a nossa página e a nossa reputação.": "See our page and our reputation.",
+  "Empresa cadastrada no Reclame Aqui — abrir página":
+    "Company registered on Reclame Aqui — open page",
+  "Trocas e devoluções": "Exchanges and returns",
+  "Qual o prazo de entrega para Campinas?": "How long does delivery to Campinas take?",
+  "Vocês aceitam Pix?": "Do you accept Pix?",
+  "Quero trocar o tamanho do pedido.": "I'd like to change the size on my order.",
+  "Paciente da clínica": "Clinic patient",
+  "Boa tarde! Queria marcar uma limpeza. Tem horário esta semana?":
+    "Good afternoon! I'd like to book a cleaning. Any openings this week?",
+  "Boa tarde, Ricardo! Temos quinta às 15h ou sexta às 10h. Qual fica melhor?":
+    "Good afternoon, Ricardo! We have Thursday at 3 pm or Friday at 10 am. Which works better?",
+  "Quinta às 15h, por favor.": "Thursday at 3 pm, please.",
+  "Confirmar a consulta e enviar o lembrete na véspera.":
+    "Confirm the appointment and send a reminder the day before.",
+  "Tratamentos e valores": "Treatments and prices",
+  "Convênios aceitos": "Accepted insurance plans",
+  "Preparo e horários": "Preparation and hours",
+  "Vocês atendem convênio?": "Do you take insurance?",
+  "Preciso remarcar minha consulta.": "I need to reschedule my appointment.",
+  "Qual o endereço da clínica?": "What's the clinic's address?",
+  "API, webhooks e MCP": "API, webhooks and MCP",
+  Advocacia: "Law firms",
+  Agenda: "Scheduling",
+  "Agenda, lembretes e recepção organizada.": "Scheduling, reminders and an organized front desk.",
+  "Agendamento com Google Agenda e Meet.": "Booking with Google Calendar and Meet.",
+  Agências: "Agencies",
+  "Assistir à demonstração": "Watch the demo",
+  "Avisos e promoções para listas segmentadas.": "Notices and promotions to segmented lists.",
+  "CRM e funil de vendas": "CRM and sales pipeline",
+  "Cada negociação no seu lugar.": "Every deal in its place.",
+  Campanhas: "Campaigns",
+  "Cardápio e reservas no pico.": "Menu and bookings at peak hours.",
+  "Chatbot para WhatsApp": "WhatsApp chatbot",
+  "Clínicas e consultórios": "Clinics and practices",
+  "Como comparar plataformas de atendimento.": "How to compare support platforms.",
+  "Conecte qualquer sistema.": "Connect any system.",
+  "Contatos distribuídos entre corretores.": "Leads distributed among agents.",
+  "Conversas, agentes de IA e funil de vendas na prática.":
+    "Conversations, AI agents and sales pipeline in practice.",
+  "Crie a conta pelo site e conecte o WhatsApp da empresa.":
+    "Sign up online and connect your business WhatsApp.",
+  "Direitos do titular dentro do sistema.": "Data subject rights built in.",
+  "Do interessado à matrícula.": "From inquiry to enrollment.",
+  "Dúvidas antes de assinar.": "Questions before subscribing.",
+  "E-commerce e lojas": "E-commerce and stores",
+  "Escolas e cursos": "Schools and courses",
+  "Exemplos de uso na região.": "Use cases in the region.",
+  "Follow-up automático": "Automatic follow-up",
+  Funcionalidades: "Features",
+  "Guia de escolha": "Buyer's guide",
+  Imobiliárias: "Real estate",
+  Multiatendimento: "Shared inbox",
+  "O produto funcionando, com legendas.": "The product in action, with captions.",
+  "Orçamentos com retorno.": "Quotes that get answered.",
+  "Pedidos e catálogo dentro da conversa.": "Orders and catalog inside the chat.",
+  "Prestadores de serviço": "Service providers",
+  "Relatórios e SLA": "Reports and SLA",
+  "Respondem com as informações do seu negócio.": "They answer with your business information.",
+  "Respostas automáticas 24 horas.": "Automatic replies 24/7.",
+  "Respostas rápidas sobre planos e uso.": "Quick answers about plans and usage.",
+  "Restaurantes e delivery": "Restaurants and delivery",
+  Segmentos: "Industries",
+  "Shopify, WooCommerce, Nuvemshop, API e webhooks.":
+    "Shopify, WooCommerce, Nuvemshop, API and webhooks.",
+  "São Paulo e Grande SP": "São Paulo metro area",
+  "Tempo de resposta e satisfação.": "Response time and satisfaction.",
+  "Teste 7 dias sem cobrança": "Try 7 days free of charge",
+  "Triagem e histórico com sigilo.": "Triage and history, confidentially.",
+  "Uma conta por cliente, com a sua marca.": "One account per client, with your brand.",
+  "Ver integrações": "See integrations",
+  "Volta a falar com quem parou.": "Re-engages people who went quiet.",
+  "Vários atendentes no mesmo número.": "Several agents on one number.",
+  Recursos: "Features",
+  "Pagamento seguro": "Secure payment",
+  "Processado pela Stripe. Não guardamos o número do seu cartão.":
+    "Processed by Stripe. We never store your card number.",
+  "Dados protegidos": "Protected data",
+  "Tratamento conforme a LGPD, com DPA e lista de subprocessadores publicados.":
+    "Handled under Brazil's LGPD, with a published DPA and subprocessor list.",
+  "WhatsApp oficial": "Official WhatsApp",
+  "Conexão pela API oficial do WhatsApp, da Meta.":
+    "Connected through Meta's official WhatsApp API.",
+  "Cancele quando quiser, em um clique, sem falar com ninguém.":
+    "Cancel anytime in one click, without talking to anyone.",
+  Produto: "Product",
+  "Planos e preços": "Plans and pricing",
+  "Demonstração em vídeo": "Video demo",
+  Soluções: "Solutions",
+  Ajuda: "Help",
+  "Cancelamento e reembolso": "Cancellation and refunds",
+  Segurança: "Security",
+  "Acordo de tratamento de dados (DPA)": "Data processing agreement (DPA)",
+  Subprocessadores: "Subprocessors",
+  "Segurança e garantias": "Security and guarantees",
+  "WhatsApp que atende e vende 24h: vários atendentes no mesmo número, agentes de IA com as informações do seu negócio e CRM com histórico de cada cliente.":
+    "WhatsApp that serves and sells 24/7: several agents on one number, AI agents trained on your business and a CRM with every customer's history.",
+  "Atendimento e vendas por WhatsApp para empresas de todo o Brasil.":
+    "WhatsApp customer service and sales for businesses across Brazil.",
+  "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.":
+    "I want tips, news and seasonal email campaigns, with at most one commercial message a day. I can unsubscribe at any time.",
   // ── Navegação e ações ──────────────────────────────────────────────────
   "Como funciona": "How it works",
-  Recursos: "Features",
   Planos: "Pricing",
-  Perguntas: "FAQ",
   Entrar: "Sign in",
   "Criar conta": "Create account",
-  "Já tenho conta": "I already have an account",
+
   "Começar com": "Start with",
-  "Começar agora": "Get started",
-  Recomendado: "Recommended",
-  "/mês": "/month",
-  São: "That's",
 
   // ── Topo ───────────────────────────────────────────────────────────────
-  "Nunca mais perca um cliente por demora na resposta":
-    "Never lose another customer to a slow reply",
-  "Todo o WhatsApp da sua empresa em uma tela só. Um atendente de IA responde na hora, com o que você ensinou, e passa a conversa para uma pessoa do time quando o assunto pede.":
-    "Your whole company's WhatsApp on a single screen. An AI agent answers instantly, using what you taught it, and hands the conversation to a teammate when the subject calls for it.",
+
   // ── O trial passou a pedir cartão (7 dias sem cobrança) ───────────────
   // A chave acima atende telas que ainda a usam; a vitrine fala pelas de
   // baixo. "sem cartão" saiu porque virou mentira — ver lib/billing/planos.ts.
   "dias sem cobrança": "days with no charge",
-  "O problema": "The problem",
+
   // ── Com a Atenza / Sem a Atenza ────────────────────────────────────────
-  "Sem a Atenza": "Without Atenza",
-  "Com a Atenza": "With Atenza",
-  "O que muda no dia seguinte": "What changes the next day",
-  "A pessoa pergunta às 22h e é atendida no dia seguinte.": "Someone asks at 10pm and is answered the next day.",
-  "Responde em segundos, a qualquer hora, com o que você ensinou.": "Answers in seconds, at any hour, with what you taught it.",
-  "Cada pessoa do time guarda um pedaço da conversa no próprio celular.": "Each teammate keeps a piece of the conversation on their own phone.",
-  "Todas as conversas numa tela só, com o histórico inteiro à vista do time.": "Every conversation on one screen, with the full history visible to the team.",
-  "Quem disse “depois eu vejo” nunca mais é procurado.": "Whoever said “I'll think about it” is never contacted again.",
-  "O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar.": "The follow-up goes out on its own, at the right time, with nobody having to remember.",
-  "Ninguém sabe quantas conversas viraram venda, nem onde elas param.": "Nobody knows how many conversations became sales, or where they stall.",
-  "Cada conversa vira um card no funil, e o relatório mostra o que converteu.": "Every conversation becomes a card on the pipeline, and the report shows what converted.",
-  "Usar um sistema novo significa trocar o número que os clientes já conhecem.": "Using a new system means changing the number your customers already know.",
-  "O mesmo número de sempre, conectado por um QR code em um minuto.": "The same number as always, connected by a QR code in one minute.",
+
   Voltar: "Back",
   // ── O olho do hero, com o nicho que alterna ───────────────────────────
-  "Atendimento por WhatsApp para": "WhatsApp support for",
-  "clínicas": "clinics",
-  "imobiliárias": "real estate",
-  "e-commerce": "online stores",
-  "prestadores de serviço": "service providers",
+
   // ── A faixa de benefícios do topo ──────────────────────────────────────
   "Seu número de WhatsApp continua o mesmo": "Your WhatsApp number stays the same",
-  "A IA responde em segundos, 24 horas por dia": "The AI answers in seconds, 24 hours a day",
-  "Cancele em um clique, sem falar com ninguém": "Cancel with one click, no phone call",
-  "Conversas, funil e histórico em uma tela só": "Conversations, pipeline and history on one screen",
-  "Dados isolados por empresa, LGPD desde o primeiro dia": "Data isolated per company, privacy compliance from day one",
-  "Nada é cobrado nos primeiros dias": "Nothing is charged in the first days",
-  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.":
-    "days with everything working. We ask for a card to start, and the subscription only begins after that — cancel with one click whenever you want.",
-  "Escolha o plano e comece hoje. A cobrança só depois.":
-    "Pick a plan and start today. The charge comes later.",
-  "Você usa o número que já tem": "Keep the number you already use",
-  "Cancele quando quiser": "Cancel anytime",
 
   // ── O problema ─────────────────────────────────────────────────────────
-  "A venda raramente se perde no preço. Ela se perde no silêncio.":
-    "Sales are rarely lost on price. They are lost in silence.",
-  "A resposta demora": "The reply takes too long",
-  "Quem pergunta às 22h só é atendido no dia seguinte. Até lá, já comprou de quem respondeu primeiro.":
-    "Someone who asks at 10pm gets an answer the next day. By then they have already bought from whoever replied first.",
-  "A conversa se perde": "The conversation gets lost",
-  "Cada pessoa do time guarda um pedaço da história no próprio celular. Ninguém sabe o que já foi combinado.":
-    "Each teammate keeps a piece of the story on their own phone. Nobody knows what was already agreed.",
-  "O retorno nunca acontece": "The follow-up never happens",
-  "O cliente disse “depois eu vejo” e ninguém voltou nele. É a venda mais barata da empresa, e ela evapora.":
-    "The customer said “I'll think about it” and nobody went back. It is the cheapest sale in the company, and it evaporates.",
 
   // ── Como funciona ──────────────────────────────────────────────────────
   "Conecte o seu WhatsApp": "Connect your WhatsApp",
-  "O mesmo número que a sua empresa já usa, por leitura de QR code. Ninguém troca de número e nenhuma conversa se perde.":
-    "The same number your company already uses, by scanning a QR code. Nobody changes numbers and no conversation is lost.",
+
   "Ensine o atendente": "Teach the agent",
-  "Escreva o que a empresa faz, preço, prazo e as regras. O agente responde a partir disso — e só disso.":
-    "Write down what the company does, prices, delivery times and the rules. The agent answers from that — and only that.",
+
   "Acompanhe pelo funil": "Follow it on the pipeline",
-  "Cada conversa vira um card. Você vê quem está esperando, quem comprou e quem esfriou, sem perguntar a ninguém.":
-    "Every conversation becomes a card. You see who is waiting, who bought and who went cold, without asking anyone.",
 
   // ── Recursos ───────────────────────────────────────────────────────────
-  "O atendimento inteiro em um lugar só": "Your entire support operation in one place",
-  "Uma caixa de entrada para o time todo": "One shared inbox for the whole team",
-  "Todas as conversas em uma tela, com quem está atendendo o quê à vista de todos.":
-    "Every conversation on one screen, with who is handling what visible to everyone.",
-  "Agente de IA com a sua base de conhecimento": "An AI agent with your knowledge base",
-  "Ele responde pelo que você escreveu, não por achismo, e chama uma pessoa quando não sabe.":
-    "It answers from what you wrote, not from guesswork, and calls a human when it does not know.",
-  "Funil de vendas colado na conversa": "A sales pipeline attached to the conversation",
-  "Arraste o card, leia o histórico inteiro e pare de perguntar em que pé está cada cliente.":
-    "Drag the card, read the full history and stop asking where each customer stands.",
-  "Retorno automático no tempo certo": "Automatic follow-up at the right time",
-  "Quem parou de responder recebe uma mensagem de volta sem que ninguém precise lembrar disso.":
-    "Whoever went quiet gets a message back without anyone having to remember it.",
-  "Relatórios de atendimento": "Support reporting",
-  "Tempo de resposta, volume por pessoa do time e o que de fato virou venda.":
-    "Response time, volume per teammate and what actually turned into a sale.",
-  "LGPD desde o primeiro dia": "Data protection from day one",
-  "Dados isolados por empresa, registro de acesso e exclusão a pedido do titular.":
-    "Data isolated per company, access logging and deletion at the data subject's request.",
 
   // ── Planos ─────────────────────────────────────────────────────────────
 
@@ -158,15 +217,9 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "O cancelamento é um clique na própria tela de cobrança, sem falar com ninguém. O acesso continua até o fim do período já pago.":
     "Cancelling is one click on the billing screen, with no phone call. Access continues until the end of the period you already paid for.",
   "Onde ficam os dados dos meus clientes?": "Where is my customers' data kept?",
-  "Em base isolada por empresa, com registro de quem acessou o quê. Você pode exportar ou apagar os seus dados quando quiser.":
-    "In a database isolated per company, with a record of who accessed what. You can export or delete your data whenever you want.",
 
   // ── Fechamento e rodapé ────────────────────────────────────────────────
-  "A próxima pessoa que te chamar no WhatsApp merece resposta agora":
-    "The next person who messages you on WhatsApp deserves an answer now",
-  "Crie a conta, conecte o número e veja o primeiro atendimento acontecer sozinho ainda hoje.":
-    "Create the account, connect the number and watch the first conversation handle itself today.",
-  "Atendimento e vendas por WhatsApp": "WhatsApp support and sales",
+
   "Termos de uso": "Terms of use",
   "Política de Privacidade": "Privacy Policy",
 
@@ -175,16 +228,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   // Traduzida, não transposta: "Sou do centro" vira um bairro que quem lê em
   // inglês reconhece, e o prazo segue o mesmo. Uma vitrine que mostra endereço
   // brasileiro a um comprador indiano está mostrando o cliente de outra pessoa.
-  "Novo contato · 22h14": "New contact · 10:14 PM",
-  "IA atendendo": "AI replying",
-  "Oi! Vocês entregam hoje ainda? 😊": "Hi! Are you still delivering today? 😊",
-  "Oi, Mariana! Entregamos sim. Pedidos fechados até as 23h saem amanhã cedo. Me diz o seu bairro que eu confirmo o prazo.":
-    "Hi Mariana! We are. Orders placed by 11 PM go out first thing tomorrow. Tell me your neighbourhood and I'll confirm the time.",
-  "Sou do centro 🙏": "I'm downtown 🙏",
-  "No centro chega em até 2 horas. Quer que eu já reserve para você?":
-    "Downtown it arrives within 2 hours. Want me to reserve it for you?",
-  "Card criado no funil": "Card created on the pipeline",
-  "Respondido na hora": "Answered instantly",
 
   // ── Documentos legais e contato ────────────────────────────────────────
   //
@@ -256,6 +299,169 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Você continua na lista. Tente de novo em instantes — e se insistir em falhar, escreva para a gente.":
     "You are still on the list. Try again in a moment — and if it keeps failing, write to us.",
   "Tentar de novo": "Try again",
+
+  Português: "Portuguese",
+  // ── A demonstração e a nova vitrine ───────────────────────────────────
+  Demonstração: "Demo",
+  "Explore o produto": "Explore the product",
+  Conversas: "Conversations",
+  "Agentes de IA": "AI agents",
+  "Funil de vendas": "Sales pipeline",
+  Fila: "Queue",
+  Minhas: "Mine",
+  Todas: "All",
+  "Dados do contato": "Contact details",
+  "Histórico compartilhado": "Shared history",
+  "Cliente da loja": "Store customer",
+  "Sua equipe": "Your team",
+  "Oi! Vocês têm este modelo em estoque?": "Hi! Do you have this model in stock?",
+  "Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?":
+    "Hi, Mariana! We do. Can I help you choose a size?",
+  "Pode sim! Estou procurando o tamanho 38.": "Yes, please! I'm looking for size 38.",
+  "Escreva uma mensagem...": "Write a message...",
+  "Demonstração interativa com dados fictícios. Nenhuma mensagem é enviada.":
+    "Interactive demo with fictional data. No messages are sent.",
+  "Conversa atribuída à equipe": "Conversation assigned to the team",
+  "O conhecimento é da sua empresa.": "The knowledge comes from your business.",
+  "Organize os materiais que orientam o agente.": "Organize the materials that guide your agent.",
+  "Produtos e serviços": "Products and services",
+  "Prazos e entregas": "Delivery and turnaround times",
+  "Perguntas frequentes": "Frequently asked questions",
+  "Limites definidos por você": "Limits you define",
+  "Configure instruções, base de conhecimento e quando pedir ajuda ao time.":
+    "Set instructions, the knowledge base, and when to ask your team for help.",
+  "Uma pessoa assume com contexto": "A teammate takes over with context",
+  "O histórico acompanha a conversa quando ela passa da IA para a equipe.":
+    "The history stays with the conversation when it moves from AI to your team.",
+  "A conversa tem um próximo passo.": "Every conversation has a next step.",
+  "Novo contato": "New contact",
+  "Em atendimento": "In progress",
+  Proposta: "Proposal",
+  Concluído: "Completed",
+  "Próximo passo": "Next step",
+  "Confirmar o tamanho e acompanhar a decisão.": "Confirm the size and follow up on the decision.",
+  "Mover para": "Move to",
+  "Experimente mudar a etapa deste contato no exemplo acima.":
+    "Try moving this contact to another stage in the example above.",
+  "Veja como funciona": "See how it works",
+  "Um passeio pelo atendimento, pela IA e pelo funil. Vídeo com áudio e legendas em português.":
+    "A tour of support, AI and the pipeline. Video with Portuguese audio and captions.",
+  "Fechar vídeo": "Close video",
+  "Ler a explicação": "Read the explanation",
+  "O vídeo não carregou. Você pode ler a explicação abaixo.":
+    "The video didn't load. You can read the explanation below.",
+  "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.":
+    "Card required. Automatically renews after the trial. Cancel anytime.",
+  "Comércio e e-commerce": "Retail and e-commerce",
+  "A dúvida chega. A conversa continua.": "A question arrives. The conversation continues.",
+  "Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja.":
+    "Bring questions about products, orders and deliveries together with your store's context.",
+  "Empreendedora organizando pedidos de uma loja": "Business owner organizing store orders",
+  "Clínicas e saúde": "Clinics and healthcare",
+  "Mais atenção a quem precisa agendar.": "More care for those who need an appointment.",
+  "Organize o primeiro contato e encaminhe dúvidas para a equipe responsável.":
+    "Organize the first contact and direct questions to the responsible team.",
+  "Profissional de recepção em uma clínica": "Reception professional in a clinic",
+  Educação: "Education",
+  "Do interesse à próxima conversa.": "From interest to the next conversation.",
+  "Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil.":
+    "Centralize questions about courses and follow interested prospects through the pipeline.",
+  "Profissional de educação acompanhando informações no computador":
+    "Education professional reviewing information on a computer",
+  "Serviços e B2B": "Services and B2B",
+  "O contexto acompanha cada proposta.": "Context follows every proposal.",
+  "Qualifique os contatos e mantenha o próximo passo visível para o time.":
+    "Qualify contacts and keep the next step visible to your team.",
+  "Profissional de serviços conversando com um cliente":
+    "Services professional talking with a customer",
+  "Ir para o conteúdo": "Skip to content",
+  "Navegação principal": "Main navigation",
+  Integrações: "Integrations",
+  "Abrir navegação": "Open navigation",
+  "Seu atendimento cresce.": "Your support grows.",
+  "Seu cliente não espera.": "Your customer won't wait.",
+  "WhatsApp, agentes de IA e funil de vendas na mesma plataforma.":
+    "WhatsApp, AI agents and a sales pipeline in one platform.",
+  "Ver em ação": "See it in action",
+  "Conhecer os planos": "Explore pricing",
+  "Prévia ilustrativa com dados fictícios": "Illustrative preview with fictional data",
+  "O controle continua com você": "You stay in control",
+  "Veja o atendimento acontecer.": "See support in action.",
+  "Da primeira mensagem ao próximo passo da venda.":
+    "From the first message to the next sales step.",
+  "Um histórico para o time inteiro": "One history for the whole team",
+  "Todos acompanham o que já foi conversado.": "Everyone can follow what's already been discussed.",
+  "IA e pessoas, na mesma conversa": "AI and people in the same conversation",
+  "O time assume quando o atendimento pede.": "Your team takes over when support calls for it.",
+  "O próximo passo fica à vista": "The next step stays visible",
+  "Organize os contatos e acompanhe as oportunidades.":
+    "Organize contacts and follow opportunities.",
+  "No ritmo do seu negócio.": "At your business's pace.",
+  "Veja onde a plataforma entra na sua rotina.": "See how the platform fits into your routine.",
+  "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.":
+    "Use case examples. Configuration must respect your company's processes and responsibilities.",
+  "Conecte o que sua operação já usa.": "Connect what your operation already uses.",
+  "Lojas, APIs e webhooks para trazer mais contexto ao atendimento.":
+    "Stores, APIs and webhooks to bring more context to support.",
+  "Ferramentas e formas de conexão disponíveis": "Available tools and connection methods",
+  "Pausar animação": "Pause animation",
+  "Continuar animação": "Resume animation",
+  "As conexões dependem do plano, das credenciais e das permissões de cada ferramenta.":
+    "Connections depend on your plan, credentials and each tool's permissions.",
+  "Conversar sobre integrações": "Discuss integrations",
+  "Cena de atendimento com uma profissional usando headset":
+    "Support scene with a professional wearing a headset",
+  "Sem som": "No sound",
+  "Pausar vídeo de contexto": "Pause context video",
+  "Reproduzir vídeo de contexto": "Play context video",
+  "A imagem continua disponível enquanto o vídeo não carrega.":
+    "The image remains available while the video doesn't load.",
+  "Automatize a rotina.": "Automate the routine.",
+  "Mantenha o cuidado.": "Keep the care.",
+  "A IA ajuda no repetitivo. Sua equipe entra com atenção, contexto e autonomia quando o cliente precisa.":
+    "AI helps with repetitive work. Your team brings care, context and autonomy when the customer needs it.",
+  "Acesso por pessoa": "Individual access",
+  "Cada integrante entra com o próprio acesso e as permissões definidas pela empresa.":
+    "Each teammate signs in with their own access and company-defined permissions.",
+  "O contexto fica na conversa, mesmo quando muda quem atende.":
+    "The context stays in the conversation, even when someone else takes over.",
+  "Configure o conhecimento, as instruções e a passagem para o time.":
+    "Configure knowledge, instructions and the handoff to your team.",
+  "Conhecer a política de privacidade": "Read the privacy policy",
+  "Conheça antes de decidir.": "Get to know it before deciding.",
+  "Dê o play e entenda como as conversas, a IA e o funil se conectam no dia a dia.":
+    "Press play and see how conversations, AI and the pipeline connect in daily work.",
+  "Assistir à explicação": "Watch the explanation",
+  "Com áudio e legendas em português": "With Portuguese audio and captions",
+  "Respostas antes do primeiro passo.": "Answers before your first step.",
+  "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.":
+    "Data is separated by company, with access controls. The platform offers export tools and features for handling privacy requests.",
+  "O uso de IA tem alguma configuração adicional?": "Does AI require any additional setup?",
+  "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.":
+    "Yes. The agent needs a knowledge base, instructions and AI provider credentials configured in your operation. Provider usage may have its own costs.",
+  "A próxima conversa pode ser o começo de uma venda.": "The next conversation could start a sale.",
+  "Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.":
+    "Organize support. Give your team context. Follow the next step.",
+  "Informações e contato": "Information and contact",
+};
+
+/** As chaves do catálogo vêm de PLANOS, portanto não são literais no JSX da vitrine. */
+const INGLES_DOS_PLANOS: Readonly<Record<string, string>> = {
+  Essencial: "Essential",
+  Pro: "Pro",
+  Ilimitado: "Unlimited",
+  "1 número de WhatsApp": "1 WhatsApp number",
+  "Até 3 pessoas no time": "Up to 3 team members",
+  "Atendente de IA com a sua base de conhecimento": "AI agent with your knowledge base",
+  "Funil, contatos e histórico completos": "Full pipeline, contacts and history",
+  "Até 3 números de WhatsApp": "Up to 3 WhatsApp numbers",
+  "Até 10 pessoas no time": "Up to 10 team members",
+  "Follow-up automático e campanhas": "Automatic follow-ups and campaigns",
+  "Relatórios e metas de atendimento": "Support reports and goals",
+  "Números de WhatsApp sem limite": "Unlimited WhatsApp numbers",
+  "Time sem limite": "Unlimited team members",
+  "API e webhooks liberados": "API and webhooks included",
+  "Suporte prioritário": "Priority support",
 };
 
 /**
@@ -271,6 +477,6 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
  * função — degradação é a rede, não o plano.
  */
 export function textoDoSite(texto: string, idioma: IdiomaDoSite): string {
-  if (idioma === "en") return INGLES_DA_VITRINE[texto] ?? texto;
+  if (idioma === "en") return INGLES_DA_VITRINE[texto] ?? INGLES_DOS_PLANOS[texto] ?? texto;
   return traduzir(texto, idioma);
 }

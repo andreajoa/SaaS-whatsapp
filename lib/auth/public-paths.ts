@@ -8,6 +8,16 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/(fr|de|es|mx|en-us|en-gb)$/,
   // Vídeo comercial francês, arquivo público exato; demais vídeos seguem protegidos.
   /^\/videos\/atenza-fr\.mp4$/,
+  // Vitrine recuperada: somente páginas comerciais e arquivos publicados.
+  /^\/(?:en|us|precos|demonstracao|atendimento-whatsapp|chatbot-para-whatsapp|agentes-ia-whatsapp|crm-whatsapp|atendimento-whatsapp-sao-paulo)$/,
+  /^\/es\/(?:mexico|colombia|argentina|chile|peru|espana)$/,
+  /^\/(?:recursos|segmentos)\/[a-z0-9-]+$/,
+  /^\/guias\/como-escolher-atendimento-whatsapp$/,
+  /^\/(?:es\/guias|en\/guides)\/[a-z0-9-]+$/,
+  /^\/(?:ajuda\/chave-de-ia|es\/ayuda\/clave-de-ia|en\/help\/ai-key)$/,
+  /^\/de\/impressum$/,
+  /^\/llms\.txt$/,
+  /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt)|atenza-explica-(?:es-mx|es-co|es-ar|es-cl|es-pe|es-es|en-us|de-de)\.mp4|chave-(?:openai|anthropic|google|openrouter)(?:-es|-en)?\.mp4)$/,
   /^\/login(\/.*)?$/,
   /^\/signup$/,
   /^\/auth\/confirm$/,

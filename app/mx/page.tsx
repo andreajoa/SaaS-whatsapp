@@ -4,7 +4,7 @@ import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { redirect } from "next/navigation";
 export const metadata: Metadata = {
-  title: "CRM para WhatsApp Business en México" + " | Atenza",
+  title: { absolute: "CRM para WhatsApp Business en México" + " | Atenza" },
   description: "Coordina consultas, cotizaciones y seguimiento comercial con un CRM WhatsApp, agentes IA y atención humana.",
   alternates:{canonical:"/mx",languages:{ "pt-BR": "/", "fr-FR": "/fr", "de-DE": "/de", "es-ES": "/es", "es-MX": "/mx", "en-US": "/en-us", "en-GB": "/en-gb" }},
   openGraph:{type:"website",title:"CRM para WhatsApp Business en México",description:"Coordina consultas, cotizaciones y seguimiento comercial con un CRM WhatsApp, agentes IA y atención humana.",url:"/mx",locale:"es-MX",siteName:"Atenza"},

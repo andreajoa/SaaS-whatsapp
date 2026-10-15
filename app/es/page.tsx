@@ -4,7 +4,7 @@ import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { redirect } from "next/navigation";
 export const metadata: Metadata = {
-  title: "CRM WhatsApp con IA y atención multiagente" + " | Atenza",
+  title: { absolute: "CRM WhatsApp con IA y atención multiagente" + " | Atenza" },
   description: "Centraliza WhatsApp, tu equipo y agentes de IA. Mantén cada oportunidad organizada en un CRM compartido.",
   alternates:{canonical:"/es",languages:{ "pt-BR": "/", "fr-FR": "/fr", "de-DE": "/de", "es-ES": "/es", "es-MX": "/mx", "en-US": "/en-us", "en-GB": "/en-gb" }},
   openGraph:{type:"website",title:"CRM WhatsApp con IA y atención multiagente",description:"Centraliza WhatsApp, tu equipo y agentes de IA. Mantén cada oportunidad organizada en un CRM compartido.",url:"/es",locale:"es-ES",siteName:"Atenza"},

@@ -1,0 +1,234 @@
+.guia {
+  --g-ink: #173a2c;
+  --g-muted: #4a5d4f;
+  --g-line: #d6e3d1;
+  --g-soft: #f3f8f1;
+  --g-acento: #2f5a3f;
+  display: grid;
+  gap: 18px;
+  color: var(--g-ink);
+}
+.topo h2 {
+  margin: 0 0 8px;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.2;
+}
+.topo p {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--g-muted);
+}
+.recomendacao {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--g-soft);
+  border: 1px solid var(--g-line);
+  font-weight: 600;
+}
+.abas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.aba {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1px solid var(--g-line);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--g-ink);
+  cursor: pointer;
+}
+.aba strong {
+  font-size: 15px;
+}
+.aba span {
+  font-size: 12px;
+  color: var(--g-muted);
+}
+.aba[aria-selected="true"] {
+  border-color: var(--g-acento);
+  background: var(--g-acento);
+  color: #ffffff;
+}
+.aba[aria-selected="true"] span {
+  color: #e2eee0;
+}
+.painel {
+  padding: 22px;
+  border: 1px solid var(--g-line);
+  border-radius: 16px;
+  background: #ffffff;
+}
+.resumo {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+.fatos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--g-muted);
+}
+.fatos span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.passos li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.numero {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--g-acento);
+  color: #ffffff;
+  font-weight: 700;
+}
+.passos strong {
+  display: block;
+  font-size: 16px;
+}
+.passos p {
+  margin: 4px 0 6px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--g-muted);
+}
+.link.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--g-acento);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.atencao {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff6e5;
+  color: #6b4500;
+  font-size: 14px;
+}
+.atencao svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.assistente {
+  padding: 20px 22px;
+  border: 1px solid var(--g-line);
+  border-radius: 16px;
+  background: var(--g-soft);
+}
+.assistente h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+}
+.dica {
+  margin: 4px 0 12px;
+  font-size: 14px;
+  color: var(--g-muted);
+}
+.conversa {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.conversa li {
+  display: grid;
+  gap: 6px;
+}
+.conversa p {
+  margin: 0;
+  max-width: 86%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.conversa p[data-de="cliente"] {
+  justify-self: end;
+  background: var(--g-acento);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+.conversa p[data-de="agente"] {
+  justify-self: start;
+  background: #ffffff;
+  border: 1px solid var(--g-line);
+  border-bottom-left-radius: 4px;
+}
+.perguntas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.perguntas button {
+  padding: 8px 14px;
+  border: 1px solid var(--g-acento);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--g-ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+.perguntas button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+@media (max-width: 760px) {
+  .abas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .painel,
+  .assistente {
+    padding: 16px;
+  }
+}
+.video {
+  margin: 0 0 18px;
+}
+.video video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.12));
+  background: #f8faf7;
+}
+.video figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.75;
+}

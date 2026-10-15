@@ -8,11 +8,12 @@ export function idiomaDaUrlPublica(caminho: string): IdiomaDoSite {
   return "pt-BR";
 }
 
-export const IDIOMAS_PUBLICOS = { "pt-BR": "/", en: "/en", es: "/es", "x-default": "/" };
+export const IDIOMAS_PUBLICOS = { "pt-BR": "/", en: "/en", es: "/es", "fr-FR": "/fr", "x-default": "/" };
 export const SELETOR_DE_IDIOMA = [
   { href: "/", lang: "pt-BR", label: "Português" },
   { href: "/en", lang: "en", label: "English" },
   { href: "/es", lang: "es", label: "Español" },
+  { href: "/fr", lang: "fr", label: "Français" },
 ];
 export const LINKS_SEO = [
   { href: "/atendimento-whatsapp", label: "Atendimento WhatsApp" },

@@ -136,7 +136,8 @@ export async function POST(req: NextRequest): Promise<Response> {
   // demorar o que a API de e-mail demorar, e uma inscrição que já está GRAVADA
   // não pode falhar por causa do aviso que a anuncia. O `catch` existe porque
   // promessa solta que rejeita derruba o processo no Node.
-  if (resultado.tipo === "novo") {
+  // E-mails em francês e alemão aguardam o catálogo próprio; nunca enviar em português.
+  if (resultado.tipo === "novo" && dados.idioma !== "fr" && dados.idioma !== "de") {
     void dispararTransacional({
       email: dados.email,
       transacionalId: "boas-vindas",

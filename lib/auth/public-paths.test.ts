@@ -9,6 +9,11 @@ import { describe, it, expect } from "vitest";
 import { isPublicPath } from "@/lib/auth/public-paths";
 
 describe("isPublicPath", () => {
+  it("serve o vídeo comercial francês sem expor outros recursos", () => {
+    expect(isPublicPath("/videos/atenza-fr.mp4")).toBe(true);
+    expect(isPublicPath("/videos/private.mp4")).toBe(false);
+  });
+
   it("libera apenas as seis vitrines internacionais públicas", () => {
     for (const locale of ["fr","de","es","mx","en-us","en-gb"]) {
       expect(isPublicPath(`/${locale}`)).toBe(true);

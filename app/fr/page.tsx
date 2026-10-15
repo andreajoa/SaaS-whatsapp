@@ -6,7 +6,7 @@ import { instalacaoCobra } from "@/lib/billing/planos";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "CRM WhatsApp avec IA et multi-agents | Atenza France",
+  title: { absolute: "CRM WhatsApp avec IA et multi-agents | Atenza France" },
   description: "CRM WhatsApp pour entreprises : boîte de réception partagée, chatbot IA, suivi commercial, relances et transfert à un conseiller. Découvrez Atenza.",
   keywords: ["CRM WhatsApp", "logiciel WhatsApp Business", "service client WhatsApp", "chatbot WhatsApp IA", "WhatsApp multi-agents", "automatisation WhatsApp", "suivi des prospects", "boîte de réception partagée"],
   openGraph: {type: "website", locale: "fr_FR", title: "Atenza | CRM WhatsApp, IA et service client", description: "Centralisez les messages WhatsApp, les équipes et le suivi des prospects avec des agents IA sous contrôle humain.", url: "/fr", siteName: "Atenza"},

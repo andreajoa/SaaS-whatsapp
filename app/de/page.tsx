@@ -4,7 +4,7 @@ import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { redirect } from "next/navigation";
 export const metadata: Metadata = {
-  title: "WhatsApp CRM mit KI und Team-Posteingang" + " | Atenza",
+  title: { absolute: "WhatsApp CRM mit KI und Team-Posteingang" + " | Atenza" },
   description: "Verwalten Sie WhatsApp-Anfragen, KI-Agenten und Vertriebsnachverfolgung in einem übersichtlichen Arbeitsbereich.",
   alternates:{canonical:"/de",languages:{ "pt-BR": "/", "fr-FR": "/fr", "de-DE": "/de", "es-ES": "/es", "es-MX": "/mx", "en-US": "/en-us", "en-GB": "/en-gb" }},
   openGraph:{type:"website",title:"WhatsApp CRM mit KI und Team-Posteingang",description:"Verwalten Sie WhatsApp-Anfragen, KI-Agenten und Vertriebsnachverfolgung in einem übersichtlichen Arbeitsbereich.",url:"/de",locale:"de-DE",siteName:"Atenza"},

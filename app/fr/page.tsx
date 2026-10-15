@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { instalacaoCobra } from "@/lib/billing/planos";
@@ -85,7 +86,7 @@ export default function FrancePage() {
       <CapturaDeLead origem="rodape" textos={capture} idioma="fr" moeda="EUR"/>
     </section>
     <footer className="mx-auto max-w-6xl border-t border-[#D7E0D7] px-6 py-10 text-sm">
-      <a href="/legal/privacy" className="underline">Confidentialité</a>
+      <Link href="/legal/privacy" className="underline">Confidentialité</Link>
       <p className="mt-4">Atenza · WhatsApp au service de vos échanges clients, 24 h/24.</p>
     </footer>
     <ConviteDeLead idioma="fr" moeda="EUR" captura={capture}

@@ -1,3 +1,5 @@
+import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
+import { SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import Link from "next/link";
 
 import { LinksLegais } from "@/components/site/LinksLegais";
@@ -65,7 +67,11 @@ export default async function LegalLayout({ children }: { children: React.ReactN
       <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="text-sm font-semibold tracking-tight text-text">
-            {marca.name}
+            {simboloDaMarca(marca.name) === SIMBOLO_ATENZA ? (
+              <LogotipoDoProduto nome={marca.name} className="h-8 w-auto" />
+            ) : (
+              marca.name
+            )}
           </Link>
           {/*
             Volta para a RAIZ, e não para `/login` como antes. Quem lê a
@@ -92,7 +98,11 @@ export default async function LegalLayout({ children }: { children: React.ReactN
 
       <footer className="border-t border-border">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 text-xs text-text-subtle sm:px-6">
-          {marca.name}
+          {simboloDaMarca(marca.name) === SIMBOLO_ATENZA ? (
+            <LogotipoDoProduto nome={marca.name} className="h-8 w-auto" />
+          ) : (
+            marca.name
+          )}
         </div>
       </footer>
     </div>

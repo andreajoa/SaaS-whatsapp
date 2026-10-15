@@ -1,3 +1,5 @@
+import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
+import { SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -55,7 +57,11 @@ export default async function DescadastrarPage({
       <header className="border-b bg-background">
         <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-4 px-6 py-4">
           <Link href="/" className="text-xs tracking-wider text-muted-foreground uppercase">
-            {marca.name}
+            {simboloDaMarca(marca.name) === SIMBOLO_ATENZA ? (
+              <LogotipoDoProduto nome={marca.name} className="h-8 w-auto" />
+            ) : (
+              marca.name
+            )}
           </Link>
         </div>
       </header>

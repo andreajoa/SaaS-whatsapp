@@ -28,7 +28,7 @@ export function PaisesDisponiveis({ idioma }: { readonly idioma: IdiomaDoSite })
   const t = (texto: string) => textoDoSite(texto, idioma);
   const nomes = new Intl.DisplayNames([idioma], { type: "region" });
   const comPreco = idioma === "pt-BR";
-  const total = PAGINAS_DE_PAIS.length + 1;
+  const total = PAGINAS_DE_PAIS.length + 2; // Brasil e França têm páginas próprias.
 
   return (
     <section className={styles.mundo} aria-labelledby="paises-disponiveis">
@@ -77,6 +77,16 @@ export function PaisesDisponiveis({ idioma }: { readonly idioma: IdiomaDoSite })
             </li>
           );
         })}
+        <li>
+          <Link href="/fr" hrefLang="fr-FR">
+            <span className={styles.codigo}>FR</span>
+            <strong>{nomes.of("FR")}</strong>
+            <span className={styles.preco} lang="fr">
+              {new Intl.DisplayNames(["fr"], { type: "language" }).of("fr")}
+            </span>
+            <ArrowUpRight size={17} aria-hidden className={styles.seta} />
+          </Link>
+        </li>
       </ul>
     </section>
   );

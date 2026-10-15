@@ -49,6 +49,7 @@ import { sendEmail } from "@/lib/email/resend";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { montarEmail } from "@/lib/marketing/molde";
+import { emailLocalizado, idiomaNovo } from "@/lib/marketing/internacional";
 import { MENSAGENS, mensagemPorId } from "@/lib/marketing/sequencia";
 import { ehIdiomaDoSite, IDIOMA_DO_SITE_PADRAO } from "@/lib/mercado/paises";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -103,7 +104,7 @@ async function handle(req: NextRequest): Promise<Response> {
 
   const auth = req.headers.get("authorization") ?? "";
   const provided = auth.startsWith("Bearer ") ? auth.slice("Bearer ".length).trim() : "";
-  const aceitos = [env.INTERNAL_CRON_SECRET, env.INTERNAL_SECRET].filter(Boolean);
+  const aceitos = [env.INTERNAL_CRON_SECRET, env.INTERNAL_SECRET, process.env.CRON_SECRET].filter(Boolean);
   if (aceitos.length === 0 || !provided || !aceitos.includes(provided)) {
     return fail("forbidden", "Cron secret missing or invalid.", 403, { requestId });
   }
@@ -161,7 +162,9 @@ async function handle(req: NextRequest): Promise<Response> {
 
     const declarado = lead.idioma ?? "";
     const idioma = ehIdiomaDoSite(declarado) ? declarado : IDIOMA_DO_SITE_PADRAO;
-    const conteudo = passo.texto[idioma];
+    const novo = idiomaNovo(declarado);
+    const conteudo = novo ? null : passo.texto[idioma];
+    const conteudoNovo = novo ? emailLocalizado(declarado, lead.proximo_passo, lead.token_descadastro) : null;
 
     // ── 1. A linha ANTES do envio ─────────────────────────────────────────
     const { data: criado, error: erroInsert } = await admin
@@ -169,7 +172,7 @@ async function handle(req: NextRequest): Promise<Response> {
       .insert({
         lead_id: lead.id,
         mensagem: passo.id,
-        assunto: conteudo.assunto,
+        assunto: conteudoNovo?.subject ?? conteudo!.assunto,
         status: "agendado",
         agendado_para: new Date(agora).toISOString(),
       })
@@ -212,10 +215,10 @@ async function handle(req: NextRequest): Promise<Response> {
     }
 
     // ── 2. O envio ────────────────────────────────────────────────────────
-    const email = montarEmail(conteudo.corpo, idioma, lead.token_descadastro, marca.nome);
+    const email = conteudoNovo ?? montarEmail(conteudo!.corpo, idioma, lead.token_descadastro, marca.nome);
     const resultado = await sendEmail({
       to: lead.email,
-      subject: conteudo.assunto,
+      subject: conteudoNovo?.subject ?? conteudo!.assunto,
       html: email.html,
       text: email.text,
       headers: email.headers,

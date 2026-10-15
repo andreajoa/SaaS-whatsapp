@@ -283,7 +283,7 @@ function cabecalho(nomeDoProduto: string, base: string): string {
   return `<tr><td bgcolor="${TINTA.acento}" style="background-color:${TINTA.acento};border-radius:10px 10px 0 0;padding:18px 28px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            <td align="left" style="font-size:17px;font-weight:700;letter-spacing:-0.2px;color:${TINTA.acentoFg}">${esc(nomeDoProduto)}</td>
+            <td align="left" style="font-size:17px;font-weight:700;letter-spacing:-0.2px;color:${TINTA.acentoFg}">${esc(nomeDoProduto)}<span style="display:block;margin-top:4px;font-size:11px;font-weight:400;letter-spacing:0">${esc(nomeDoProduto.toLowerCase().includes("atenza") ? "WhatsApp que atende e vende 24h" : "")}</span></td>
             <td align="right" style="font-size:13px;line-height:1.4;color:${TINTA.acentoFg}">
               ${item("/#como-funciona", "Como funciona")}
               &nbsp;·&nbsp;
@@ -327,7 +327,7 @@ function pesDePagina(base: string, legal: string): string {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr><td height="1" bgcolor="${TINTA.borda}" style="background-color:${TINTA.borda};height:1px;line-height:1px;font-size:0">&nbsp;</td></tr>
         </table>
-        <div style="padding-top:12px">${legal}</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:12px">${legal}</td></tr></table>
       </td></tr>`;
 }
 

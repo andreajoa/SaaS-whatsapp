@@ -58,128 +58,155 @@ export interface ConteudoDaMensagem {
 
 export const MENSAGENS: readonly MensagemDaSequencia[] = [
   {
-    id: "o-que-e",
-    dia: 0,
-    texto: {
+    "id": "o-que-e",
+    "dia": 0,
+    "texto": {
       "pt-BR": {
-        assunto: "O que a gente faz, em um parágrafo",
-        corpo: {
-          titulo: "Você respondeu. Só que três horas depois.",
-          paragrafos: [
-            "Obrigado por deixar seu e-mail. Vou ser direto sobre o que fazemos, porque você não pediu uma newsletter — pediu para entender.",
-            "Atenza atende no WhatsApp da sua empresa com agentes de inteligência artificial que conversam de verdade: entendem o que a pessoa quer, respondem com o que a sua empresa sabe, e passam para uma pessoa do time quando a conversa sai do que eles dão conta.",
-            "Nos próximos dias vou mandar coisas que valem mesmo que você nunca contrate nada — o custo real de uma resposta atrasada, como se mede atendimento, por que a maioria dos robôs de WhatsApp irrita em vez de ajudar. Se em algum momento não fizer sentido, o link de sair está no rodapé de todo e-mail.",
+        "assunto": "O cliente escreveu. Sua empresa estava pronta para responder?",
+        "corpo": {
+          "titulo": "Uma conversa pode virar venda. Ou terminar no silêncio.",
+          "paragrafos": [
+            "Alguém pergunta o preço, o prazo ou a disponibilidade no WhatsApp. Se a resposta demora, a oportunidade pode esfriar antes de sua equipe perceber.",
+            "A Atenza reúne atendimento no WhatsApp, agentes de IA com as informações da sua empresa, atendimento humano e CRM em um só fluxo. O objetivo não é responder por responder: é dar continuidade à conversa com contexto.",
+            "Veja como isso funciona na prática e imagine o que mudaria na rotina da sua equipe."
           ],
-        },
+          "acao": {
+            "rotulo": "Ver a Atenza em ação",
+            "caminho": "/#como-funciona"
+          },
+          "posEscrito": "Atenza. WhatsApp que atende e vende 24h."
+        }
       },
-      en: {
-        assunto: "What we do, in one paragraph",
-        corpo: {
-          titulo: "You replied. Three hours later.",
-          paragrafos: [
-            "Thanks for leaving your email. I'll be direct about what we do, because you didn't ask for a newsletter — you asked to understand.",
-            "Atenza answers on your company's WhatsApp with AI agents that actually hold a conversation: they understand what the person wants, answer with what your company knows, and hand over to a human when the conversation goes past them.",
-            "Over the next few days I'll send things that are worth reading even if you never buy anything — the real cost of a late reply, how to measure support, why most WhatsApp bots annoy people instead of helping. If it stops making sense, the unsubscribe link is at the bottom of every email.",
+      "en": {
+        "assunto": "A new WhatsApp lead arrives. What happens next?",
+        "corpo": {
+          "titulo": "A lead is only valuable if the conversation moves forward.",
+          "paragrafos": [
+            "A customer asks about pricing or availability on WhatsApp. Your team is busy. By the time someone replies, the moment may have passed.",
+            "Atenza brings WhatsApp conversations, AI agents guided by your business information, human handoffs, and a sales pipeline into one workflow. Your team keeps the context instead of chasing it across tools.",
+            "Take a quick look at the workflow and decide whether it fits how your business sells."
           ],
-        },
+          "acao": {
+            "rotulo": "See how Atenza works",
+            "caminho": "/#como-funciona"
+          },
+          "posEscrito": "Atenza. WhatsApp that responds and helps you sell, 24/7."
+        }
       },
-      es: {
-        assunto: "Qué hacemos, en un párrafo",
-        corpo: {
-          titulo: "Respondió. Tres horas después.",
-          paragrafos: [
-            "Gracias por dejar su correo. Voy a ser directo sobre lo que hacemos, porque usted no pidió un boletín — pidió entender.",
-            "Atenza atiende en el WhatsApp de su empresa con agentes de inteligencia artificial que conversan de verdad: entienden lo que la persona quiere, responden con lo que su empresa sabe, y pasan a alguien del equipo cuando la conversación excede lo que ellos resuelven.",
-            "En los próximos días le enviaré cosas que valen aunque nunca contrate nada — el costo real de una respuesta tardía, cómo se mide la atención, por qué la mayoría de los robots de WhatsApp molestan en vez de ayudar. Si deja de tener sentido, el enlace para salir está al pie de cada correo.",
+      "es": {
+        "assunto": "Te escriben por WhatsApp. ¿Qué pasa después?",
+        "corpo": {
+          "titulo": "El mensaje llegó. La oportunidad todavía está abierta.",
+          "paragrafos": [
+            "Una persona pregunta por el precio o la disponibilidad. Si la conversación se queda esperando, puede buscar otra opción sin avisarte.",
+            "Atenza reúne tus conversaciones de WhatsApp, agentes de IA con información de tu negocio, atención humana y un embudo comercial en un mismo flujo. El equipo conserva el contexto y sabe cuál es el siguiente paso.",
+            "Mira cómo funciona y evalúa si encaja con la forma en que vende tu negocio."
           ],
-        },
-      },
-    },
+          "acao": {
+            "rotulo": "Conocer Atenza",
+            "caminho": "/#como-funciona"
+          },
+          "posEscrito": "Atenza. WhatsApp que atiende y ayuda a vender las 24 horas."
+        }
+      }
+    }
   },
-
   {
-    id: "o-silencio-custa",
-    dia: 2,
-    texto: {
+    "id": "o-silencio-custa",
+    "dia": 2,
+    "texto": {
       "pt-BR": {
-        assunto: "O que acontece nos 5 minutos depois da mensagem",
-        corpo: {
-          titulo: "A pessoa não esperou. Ela perguntou para outro.",
-          paragrafos: [
-            "Quem manda mensagem para uma empresa no WhatsApp raramente manda para uma só. Manda para três, e compra de quem responder primeiro com uma resposta que serve.",
-            'Isso muda o que significa "demorar". Não é o cliente ficar insatisfeito e reclamar — é ele nunca mais escrever, e você nunca saber que ele existiu. A venda perdida por silêncio não aparece em relatório nenhum: ela é uma conversa que não teve segunda mensagem.',
-            "O jeito mais barato de medir isso na sua empresa hoje: abra o WhatsApp, filtre as conversas dos últimos 30 dias em que a última mensagem é do CLIENTE. Cada uma é alguém que perguntou e não teve resposta.",
+        "assunto": "Quantas conversas ficaram sem resposta nesta semana?",
+        "corpo": {
+          "titulo": "A oportunidade perdida quase nunca reclama.",
+          "paragrafos": [
+            "Ela simplesmente deixa de responder. Por isso, contar apenas as vendas fechadas não mostra tudo: é preciso olhar também para quem procurou sua empresa e ficou sem retorno.",
+            "Faça um teste de cinco minutos: abra suas conversas recentes e procure perguntas sobre preço, agenda ou disponibilidade que ficaram sem uma resposta útil. Quantas ainda poderiam avançar?",
+            "Com a Atenza, a ideia é reduzir esse intervalo: a IA responde dentro dos limites definidos por você e encaminha ao time o que exige decisão humana."
           ],
-          posEscrito: "Amanhã não mando nada. No terceiro dia, falo de por que os robôs irritam.",
-        },
+          "acao": {
+            "rotulo": "Conhecer o fluxo de atendimento",
+            "caminho": "/#como-funciona"
+          },
+          "posEscrito": "Atenza. WhatsApp que atende e vende 24h."
+        }
       },
-      en: {
-        assunto: "What happens in the 5 minutes after the message",
-        corpo: {
-          titulo: "They didn't wait. They asked someone else.",
-          paragrafos: [
-            "People messaging a business on WhatsApp rarely message just one. They message three, and buy from whoever answers first with an answer that works.",
-            "That changes what \"slow\" means. It isn't an unhappy customer who complains — it's someone who never writes again, and you never know they existed. A sale lost to silence shows up in no report: it is a conversation with no second message.",
-            "The cheapest way to measure this in your business today: open WhatsApp and filter the last 30 days for conversations where the last message is from the CUSTOMER. Each one is someone who asked and got nothing.",
+      "en": {
+        "assunto": "How many WhatsApp inquiries went unanswered this week?",
+        "corpo": {
+          "titulo": "Lost opportunities rarely send a complaint.",
+          "paragrafos": [
+            "People often move on quietly. Looking only at closed deals misses the inquiries that never reached a proper follow-up.",
+            "Try a five-minute audit: scan recent WhatsApp conversations for pricing, scheduling, or availability questions without a useful answer. Which ones could still be moving?",
+            "Atenza helps your team respond within defined AI guardrails and hand off decisions that need a person, with the conversation history intact."
           ],
-          posEscrito: "Nothing tomorrow. On day three, why bots annoy people.",
-        },
+          "acao": {
+            "rotulo": "Explore the workflow",
+            "caminho": "/#como-funciona"
+          },
+          "posEscrito": "Atenza. WhatsApp that responds and helps you sell, 24/7."
+        }
       },
-      es: {
-        assunto: "Qué pasa en los 5 minutos después del mensaje",
-        corpo: {
-          titulo: "No esperó. Le preguntó a otro.",
-          paragrafos: [
-            "Quien escribe a una empresa por WhatsApp rara vez escribe a una sola. Escribe a tres, y compra a quien responda primero con una respuesta que sirva.",
-            'Eso cambia lo que significa "tardar". No es un cliente insatisfecho que reclama — es alguien que no vuelve a escribir, y usted nunca sabe que existió. La venta perdida por silencio no aparece en ningún informe: es una conversación sin segundo mensaje.',
-            "La forma más barata de medirlo hoy: abra WhatsApp y filtre los últimos 30 días por conversaciones donde el último mensaje es del CLIENTE. Cada una es alguien que preguntó y no recibió nada.",
+      "es": {
+        "assunto": "¿Cuántas consultas de WhatsApp quedaron sin respuesta?",
+        "corpo": {
+          "titulo": "Una oportunidad perdida rara vez se despide.",
+          "paragrafos": [
+            "Muchas personas siguen buscando y no vuelven a escribir. Por eso, medir solo las ventas cerradas deja fuera las consultas que nunca avanzaron.",
+            "Haz una revisión rápida: busca preguntas recientes sobre precios, citas o disponibilidad que no recibieron una respuesta útil. ¿Cuántas siguen pendientes?",
+            "Atenza ayuda a responder dentro de los límites que tú defines y a transferir al equipo las conversaciones que necesitan atención humana, sin perder el historial."
           ],
-          posEscrito: "Mañana no envío nada. Al tercer día, por qué los robots molestan.",
-        },
-      },
-    },
+          "acao": {
+            "rotulo": "Ver cómo funciona",
+            "caminho": "/#como-funciona"
+          },
+          "posEscrito": "Atenza. WhatsApp que atiende y ayuda a vender las 24 horas."
+        }
+      }
+    }
   },
-
   {
-    id: "por-que-robo-irrita",
-    dia: 4,
-    texto: {
+    "id": "por-que-robo-irrita",
+    "dia": 4,
+    "texto": {
       "pt-BR": {
-        assunto: "Digite 1 para atendimento",
-        corpo: {
-          titulo: "Por que quase todo robô de WhatsApp irrita",
-          paragrafos: [
-            "Porque quase todo robô de WhatsApp é uma árvore de menu. Digite 1, digite 2, voltar. Ele não entende a pergunta — ele classifica a pergunta em uma das sete gavetas que alguém desenhou no ano passado.",
-            'E a pergunta que a pessoa realmente tem quase nunca cabe numa gaveta. "Vocês entregam no sábado se eu pedir agora?" tem três perguntas dentro. A árvore responde uma e ignora as outras duas, ou joga tudo para o humano — que era justamente o que ela existia para evitar.',
-            'A diferença que importa não é a IA ser mais inteligente. É ela ler a frase inteira, responder as três coisas, e saber a hora de parar de tentar. Um agente que sabe dizer "isso eu não resolvo, vou chamar alguém" vale mais que um que tenta sempre.',
+        "assunto": "Seu cliente não quer digitar 1, 2 ou 3",
+        "corpo": {
+          "titulo": "Automatizar não deveria complicar a conversa.",
+          "paragrafos": [
+            "Imagine a mensagem: 'Vocês atendem sábado, quanto custa e como agendo?'. Um menu rígido pode obrigar o cliente a repetir a pergunta três vezes.",
+            "Um agente orientado pelas informações da empresa pode entender a solicitação completa, responder o que sabe e transferir o restante para uma pessoa. É essa combinação de autonomia com limite que importa.",
+            "Na Atenza, você define as informações e os limites da IA. Seu time assume quando necessário, sem precisar começar do zero."
           ],
-        },
+          "posEscrito": "Atenza. WhatsApp que atende e vende 24h."
+        }
       },
-      en: {
-        assunto: "Press 1 for support",
-        corpo: {
-          titulo: "Why nearly every WhatsApp bot annoys people",
-          paragrafos: [
-            "Because nearly every WhatsApp bot is a menu tree. Press 1, press 2, go back. It doesn't understand the question — it sorts the question into one of seven drawers somebody designed last year.",
-            'And the question people actually have rarely fits a drawer. "Do you deliver Saturday if I order now?" has three questions inside it. The tree answers one and ignores two, or dumps everything on a human — which is exactly what it existed to avoid.',
-            "The difference that matters isn't the AI being smarter. It's reading the whole sentence, answering all three things, and knowing when to stop trying. An agent that can say \"I can't solve that, let me get someone\" is worth more than one that always tries.",
+      "en": {
+        "assunto": "Your customers don't want to press 1, 2 or 3",
+        "corpo": {
+          "titulo": "Automation should remove friction, not create it.",
+          "paragrafos": [
+            "Consider this message: 'Are you open Saturday, what's the price, and how do I book?' A rigid menu can force a customer through several disconnected steps.",
+            "An AI agent informed by your business can address what it knows, recognise what it cannot, and hand the conversation to your team. The difference is control and continuity, not hype.",
+            "With Atenza, you define the information and boundaries. Your team steps in when judgment is needed, with the conversation context available."
           ],
-        },
+          "posEscrito": "Atenza. WhatsApp that responds and helps you sell, 24/7."
+        }
       },
-      es: {
-        assunto: "Marque 1 para atención",
-        corpo: {
-          titulo: "Por qué casi todo robot de WhatsApp molesta",
-          paragrafos: [
-            "Porque casi todo robot de WhatsApp es un árbol de menú. Marque 1, marque 2, volver. No entiende la pregunta — clasifica la pregunta en uno de los siete cajones que alguien diseñó el año pasado.",
-            'Y la pregunta que la persona realmente tiene casi nunca cabe en un cajón. "¿Entregan el sábado si pido ahora?" tiene tres preguntas dentro. El árbol responde una e ignora dos, o se lo pasa todo al humano — que era justo lo que venía a evitar.',
-            'La diferencia que importa no es que la IA sea más lista. Es que lee la frase entera, responde las tres cosas, y sabe cuándo dejar de intentar. Un agente que sabe decir "eso no lo resuelvo, llamo a alguien" vale más que uno que siempre lo intenta.',
+      "es": {
+        "assunto": "Tus clientes no quieren marcar 1, 2 o 3",
+        "corpo": {
+          "titulo": "Automatizar no debería complicar la conversación.",
+          "paragrafos": [
+            "Imagina este mensaje: '¿Abren el sábado, cuánto cuesta y cómo reservo?'. Un menú rígido obliga al cliente a separar una consulta sencilla en varios pasos.",
+            "Un agente de IA con la información de tu negocio puede responder lo que sabe y pasar el resto a tu equipo. La diferencia está en combinar agilidad con límites claros.",
+            "En Atenza tú defines la información y los límites de la IA. Si hace falta una persona, el equipo recibe la conversación con su contexto."
           ],
-        },
-      },
-    },
+          "posEscrito": "Atenza. WhatsApp que atiende y ayuda a vender las 24 horas."
+        }
+      }
+    }
   },
-
   {
     id: "o-funil-dentro-da-conversa",
     dia: 6,

@@ -41,6 +41,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: url("/"), changeFrequency: "weekly", priority: 1 },
+    { url: url("/fr"), changeFrequency: "weekly", priority: 0.9 },
+    { url: url("/es"), changeFrequency: "weekly", priority: 0.9 },
+    { url: url("/mx"), changeFrequency: "weekly", priority: 0.9 },
+    { url: url("/en-us"), changeFrequency: "weekly", priority: 0.9 },
+    { url: url("/en-gb"), changeFrequency: "weekly", priority: 0.9 },
+    { url: url("/de"), changeFrequency: "weekly", priority: 0.9 },
+
     // Quem procura "como falar com o suporte" antes de assinar procura esta.
     { url: url("/contato"), changeFrequency: "yearly", priority: 0.5 },
     { url: url("/legal"), changeFrequency: "yearly", priority: 0.4 },

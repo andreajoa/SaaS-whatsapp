@@ -75,5 +75,11 @@
     "app/api/v1/cron/data-retention/route.ts": {
       "maxDuration": 120
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/v1/cron/marketing-sequencia",
+      "schedule": "0 12 * * *"
+    }
+  ]
 }

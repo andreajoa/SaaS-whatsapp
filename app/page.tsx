@@ -118,6 +118,9 @@ export default async function HomePage() {
   if (user) redirect("/app");
 
   const visitante = await visitanteAtual();
+  const paginaLocal: Record<string, string> = {FR:"/fr",DE:"/de",ES:"/es",MX:"/mx",US:"/en-us",GB:"/en-gb"};
+  const destino = paginaLocal[visitante.pais ?? ""];
+  if (destino) redirect(destino);
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
 

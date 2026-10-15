@@ -1,5 +1,6 @@
 import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
 import { marcaEhADoProduto } from "@/lib/branding";
+import { SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { createClient } from "@/lib/supabase/server";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
@@ -53,7 +54,7 @@ export default async function PublicLayout({ children }: { children: React.React
     <IdiomaProvider locale={locale}>
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="w-full max-w-sm space-y-6">
-          {marca.logoUrl ? (
+          {marca.logoUrl && simboloDaMarca(marca.nome) !== SIMBOLO_ATENZA ? (
             <div className="flex justify-center">
               {/*
                 <img> em vez de next/image pelo mesmo motivo da barra lateral: a URL
@@ -79,7 +80,8 @@ export default async function PublicLayout({ children }: { children: React.React
                 className="h-10 w-auto max-w-[12rem] object-contain"
               />
             </div>
-          ) : marcaEhADoProduto({ name: marca.nome, logoUrl: null }) ? (
+          ) : marcaEhADoProduto({ name: marca.nome, logoUrl: null }) ||
+            simboloDaMarca(marca.nome) === SIMBOLO_ATENZA ? (
             <div className="flex justify-center">
               <LogotipoDoProduto nome={marca.nome} className="h-12 w-auto" />
             </div>

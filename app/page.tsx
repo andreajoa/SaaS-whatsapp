@@ -35,6 +35,7 @@ import {
 } from "@/components/site/VideosDaHome";
 import styles from "@/components/site/atenza-home.module.css";
 import { marcaEhADoProduto } from "@/lib/branding";
+import { SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import { marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
   DIAS_DE_TRIAL,
@@ -646,6 +647,8 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
 }
 
 function Marca({ marca }: { marca: MarcaDeSaida }) {
+  if (simboloDaMarca(marca.nome) === SIMBOLO_ATENZA)
+    return <LogotipoDoProduto nome={marca.nome} className="h-8 w-auto" />;
   if (marca.logoUrl)
     return <img src={marca.logoUrl} alt={marca.nome} className={styles.brandImage} />; // eslint-disable-line @next/next/no-img-element
   if (marcaEhADoProduto({ name: marca.nome, logoUrl: null }))

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
 import { instalacaoCobra } from "@/lib/billing/planos";
@@ -33,7 +34,7 @@ export default function FrancePage() {
   return <main lang="fr" className="min-h-screen bg-[#F7F5F0] text-[#263E33]">
     <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(schema).replace(/</g, "\\u003c")}} />
     <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8">
-      <a href="/fr" className="font-serif text-3xl font-semibold">Atenza <span className="font-sans text-xs tracking-widest uppercase">France</span></a>
+      <Link href="/fr" aria-label="Atenza France" className="inline-flex items-center gap-3"><LogotipoDoProduto nome="Atenza" decorativo className="h-8 w-auto" /><span className="font-sans text-xs tracking-widest uppercase">France</span></Link>
       <a href="#contact" className="text-sm underline underline-offset-4">En savoir plus</a>
     </header>
     <section className="mx-auto grid max-w-6xl gap-12 px-6 py-24 md:grid-cols-2">
@@ -86,6 +87,7 @@ export default function FrancePage() {
       <CapturaDeLead origem="rodape" textos={capture} idioma="fr" moeda="EUR"/>
     </section>
     <footer className="mx-auto max-w-6xl border-t border-[#D7E0D7] px-6 py-10 text-sm">
+      <Link href="/fr" aria-label="Atenza France" className="mb-6 inline-block"><LogotipoDoProduto nome="Atenza" decorativo className="h-8 w-auto" /></Link>
       <Link href="/legal/privacy" className="underline">Confidentialité</Link>
       <p className="mt-4">Atenza · WhatsApp au service de vos échanges clients, 24 h/24.</p>
     </footer>

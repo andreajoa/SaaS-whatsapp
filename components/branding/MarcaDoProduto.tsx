@@ -1,4 +1,4 @@
-import { LOGOTIPO, SIMBOLO, simboloDaMarca } from "@/lib/branding/desenho";
+import { LOGOTIPO, SIMBOLO, SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import { cn } from "@/lib/utils";
 
 /**
@@ -110,6 +110,20 @@ const OPACIDADE_DA_TINTA = { clara: 0.55, principal: 1, detalhe: 1 } as const;
 
 /** Símbolo + nome — para a barra aberta e a fachada de entrada. */
 export function LogotipoDoProduto({ nome, className, decorativo = false }: Props) {
+  // A marca nomeada usa o arquivo original; o desenho padrão abaixo continua
+  // reservado à instalação que ainda usa a marca padrão do produto.
+  if (simboloDaMarca(nome) === SIMBOLO_ATENZA) {
+    return (
+      <svg
+        viewBox="200 166 1774 392"
+        className={cn("shrink-0", className)}
+        data-logo="atenza-original"
+        {...acessibilidade(nome, decorativo)}
+      >
+        <image href="/media/atenza/atenza-logo.png" width="2172" height="724" />
+      </svg>
+    );
+  }
   return (
     <svg
       viewBox={LOGOTIPO.viewBox}

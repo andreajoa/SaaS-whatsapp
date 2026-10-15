@@ -66,6 +66,13 @@ const PASTAS_IGNORADAS = new Set(["api", "node_modules"]);
  * não é alcançável por quem usa o produto.
  */
 const FORA_DO_PRODUTO: Record<string, string> = {
+  // Conteúdo comercial redigido no idioma da URL; não é interface do CRM.
+  "components/site/PaginaDoPais.tsx": "página comercial escrita em espanhol/alemão por país",
+  "components/site/PaginaDeArtigo.tsx": "guias comerciais escritos em espanhol/inglês",
+  "app/de": "página comercial e Impressum escritos em alemão",
+  "app/fr": "página comercial escrita em francês, preservada na recuperação",
+  "app/precos": "página comercial brasileira em pt-BR, fora da interface autenticada",
+
   "app/design": "vitrine do design system: rota noindex, sem porta na navegação",
   "app/vitrine-agenda": "vitrine do kit visual da Agenda: dado de mentira, noindex",
   // O PAINEL DO FUNIL e a sua porta. Mesmo argumento das duas linhas acima, e

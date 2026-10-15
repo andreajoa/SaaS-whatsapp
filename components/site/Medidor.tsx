@@ -189,18 +189,30 @@ export function Medidor({
       }
     };
 
+    // O play do vídeo de apresentação. `play` não borbulha, então a escuta é
+    // na CAPTURA; só conta `<video data-video>` (o vídeo de fundo, mudo e em
+    // laço, não é "assistir"), e uma vez por vídeo — pausar e voltar não é um
+    // segundo play.
+    const tocados = new WeakSet<EventTarget>();
+    const aoTocar = (ev: Event) => {
+      const alvo = ev.target as HTMLElement | null;
+      if (!alvo || !alvo.hasAttribute?.("data-video") || tocados.has(alvo)) return;
+      tocados.add(alvo);
+      if (cliques.length < 40) cliques.push("video-play");
+    };
+
     document.addEventListener("click", aoClicar, true);
+    document.addEventListener("play", aoTocar, true);
     document.addEventListener("visibilitychange", aoTrocarVisibilidade);
     window.addEventListener("pagehide", entregar);
 
     return () => {
       document.removeEventListener("click", aoClicar, true);
+      document.removeEventListener("play", aoTocar, true);
       document.removeEventListener("visibilitychange", aoTrocarVisibilidade);
       window.removeEventListener("pagehide", entregar);
     };
   }, [visitaId]);
-
-
 
   return null;
 }

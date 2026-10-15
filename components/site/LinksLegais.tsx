@@ -37,13 +37,9 @@ export function LinksLegais({
   return (
     <nav
       aria-label={rotulo}
-      className="
-        -mx-4 mb-6 shrink-0 overflow-x-auto px-4 pb-3
-        sm:-mx-6 sm:px-6
-        lg:mx-0 lg:mb-0 lg:w-64 lg:overflow-visible lg:px-0 lg:pb-0
-      "
+      className="-mx-4 mb-6 shrink-0 overflow-x-auto px-4 pb-3 sm:-mx-6 sm:px-6 lg:mx-0 lg:mb-0 lg:w-64 lg:overflow-visible lg:px-0 lg:pb-0"
     >
-      <p className="mb-3 hidden text-xs font-medium tracking-wide text-text-subtle uppercase lg:block">
+      <p className="mb-3 hidden text-xs font-medium tracking-wide text-text-muted uppercase lg:block">
         {rotulo}
       </p>
       {/*

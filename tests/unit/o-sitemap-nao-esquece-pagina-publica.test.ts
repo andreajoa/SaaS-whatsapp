@@ -3,6 +3,10 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { ARTIGOS } from "@/lib/marketing/artigos";
+import { PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
+import { PAGES_SEO } from "@/lib/marketing/conteudo-seo";
+
 import { DOCUMENTOS_LEGAIS } from "@/lib/legal/documentos";
 
 /**
@@ -63,7 +67,10 @@ const FORA_DO_SITEMAP: Readonly<Record<string, string>> = {
  * dentro de um fluxo que, por definição, é de quem já tem conta.
  */
 const FAMILIAS_FORA: ReadonlyArray<{ prefixo: string; porque: string }> = [
-  { prefixo: "onboarding", porque: "fluxo de quem já criou conta; `robots.ts` barra a área logada" },
+  {
+    prefixo: "onboarding",
+    porque: "fluxo de quem já criou conta; `robots.ts` barra a área logada",
+  },
 ];
 
 /** Segmentos de rota que o App Router não publica (grupos, privados, API). */
@@ -110,8 +117,24 @@ describe("o sitemap cobre as páginas públicas que existem", () => {
     if (rota in FORA_DO_SITEMAP) return;
     if (FAMILIAS_FORA.some((f) => rota === f.prefixo || rota.startsWith(`${f.prefixo}/`))) return;
 
+    // Páginas editoriais entram no sitemap pela lista fechada PAGES_SEO (o
+    // sitemap a percorre); rota dinâmica [slug] conta se a lista tem filhos dela.
+    const editorial = PAGES_SEO.some(
+      (p) =>
+        p.slug === rota ||
+        (rota.endsWith("/[slug]") && p.slug.startsWith(rota.replace("[slug]", ""))),
+    );
+    // As páginas por país entram pela lista fechada PAGINAS_DE_PAIS, que o
+    // sitemap percorre do mesmo jeito.
+    const pais =
+      (SITEMAP.includes("PAGINAS_DE_PAIS") &&
+        ((rota === "es/[pais]" && PAGINAS_DE_PAIS.some((p) => !p.caminho)) ||
+          PAGINAS_DE_PAIS.some((p) => p.caminho === `/${rota}`))) ||
+      (SITEMAP.includes("ARTIGOS") &&
+        rota.endsWith("/[slug]") &&
+        ARTIGOS.some((a) => a.caminho.startsWith(`/${rota.replace("[slug]", "")}`)));
     expect(
-      SITEMAP.includes(`"/${rota}"`),
+      editorial || pais || SITEMAP.includes(`"/${rota}"`),
       `\`/${rota}\` tem página e não está em app/sitemap.ts. Se ela não deve ser ` +
         `indexada, acrescente-a a FORA_DO_SITEMAP com o motivo — a lista existe para ` +
         `separar "decidimos não indexar" de "esquecemos".`,

@@ -4252,9 +4252,10 @@ export const DICIONARIO: Traducoes = {
     es: "No se pudo copiar — selecciona el texto.",
   },
   "Conectar Claude Code ou Codex": { es: "Conectar Claude Code o Codex" },
-  "Liga o seu Claude Code ou Codex ao Atenza. Ele passa a ler e preencher o CRM e pode atender os seus clientes no WhatsApp enquanto estiver aberto no seu computador.": {
-    es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
-  },
+  "Liga o seu Claude Code ou Codex ao Atenza. Ele passa a ler e preencher o CRM e pode atender os seus clientes no WhatsApp enquanto estiver aberto no seu computador.":
+    {
+      es: "Conecta tu Claude Code o Codex a Atenza. Pasa a leer y completar el CRM y puede atender a tus clientes en WhatsApp mientras esté abierto en tu computadora.",
+    },
   "Gerar conexão": { es: "Generar conexión" },
   "Chave secreta do App (App Secret)": { es: "Clave secreta de la App (App Secret)" },
   "No painel da Meta: Configurações do app › Básico › Chave secreta do app": {
@@ -4266,9 +4267,10 @@ export const DICIONARIO: Traducoes = {
   "Modo teste ligado.": { es: "Modo de prueba activado." },
   "Modo teste desligado.": { es: "Modo de prueba desactivado." },
   "Testar pelo meu próprio número": { es: "Probar con mi propio número" },
-  "Com isto ligado, o que você escreve no chat com você mesmo no WhatsApp conta como mensagem de cliente, e a resposta aparece ali. Desligue depois do teste.": {
-    es: "Con esto activado, lo que escribes en el chat contigo mismo en WhatsApp cuenta como mensaje de cliente, y la respuesta aparece allí. Desactívalo después de la prueba.",
-  },
+  "Com isto ligado, o que você escreve no chat com você mesmo no WhatsApp conta como mensagem de cliente, e a resposta aparece ali. Desligue depois do teste.":
+    {
+      es: "Con esto activado, lo que escribes en el chat contigo mismo en WhatsApp cuenta como mensaje de cliente, y la respuesta aparece allí. Desactívalo después de la prueba.",
+    },
   Ligado: { es: "Activado" },
   Desligado: { es: "Desactivado" },
   "1. Claude Code — cole no terminal": { es: "1. Claude Code — pégalo en la terminal" },
@@ -4276,9 +4278,10 @@ export const DICIONARIO: Traducoes = {
   "2. Para ele atender os clientes — cole dentro do Claude Code": {
     es: "2. Para que atienda a los clientes — pégalo dentro de Claude Code",
   },
-  "Antes de deixar ele atender, pause o agente interno em Agentes de IA — senão o cliente recebe duas respostas. Ele só responde enquanto o Claude Code ou o Codex estiver aberto.": {
-    es: "Antes de dejarlo atender, pausa el agente interno en Agentes de IA — si no, el cliente recibe dos respuestas. Solo responde mientras Claude Code o Codex esté abierto.",
-  },
+  "Antes de deixar ele atender, pause o agente interno em Agentes de IA — senão o cliente recebe duas respostas. Ele só responde enquanto o Claude Code ou o Codex estiver aberto.":
+    {
+      es: "Antes de dejarlo atender, pausa el agente interno en Agentes de IA — si no, el cliente recibe dos respuestas. Solo responde mientras Claude Code o Codex esté abierto.",
+    },
   "Não foi possível copiar — selecione o token acima.": {
     es: "No se pudo copiar — selecciona el token de arriba.",
   },
@@ -6150,9 +6153,10 @@ export const DICIONARIO: Traducoes = {
   "Voltamos em alguns minutos.": { es: "Volvemos en unos minutos." },
   // A recusa por modelo padrão fala com o CLIENTE: o diagnóstico de
   // administrador (script/rotas de template) mora no audit, não na tela.
-  "Não conseguimos confirmar seu e-mail por este link. Clique em «Esqueci minha senha», use o mesmo e-mail e siga o link que vamos enviar — ele confirma sua conta. Se não chegar em alguns minutos, fale com o nosso suporte.": {
-    es: "No pudimos confirmar tu correo con este enlace. Haz clic en «Olvidé mi contraseña», usa el mismo correo y sigue el enlace que te enviaremos — confirma tu cuenta. Si no llega en unos minutos, habla con nuestro soporte.",
-  },
+  "Não conseguimos confirmar seu e-mail por este link. Clique em «Esqueci minha senha», use o mesmo e-mail e siga o link que vamos enviar — ele confirma sua conta. Se não chegar em alguns minutos, fale com o nosso suporte.":
+    {
+      es: "No pudimos confirmar tu correo con este enlace. Haz clic en «Olvidé mi contraseña», usa el mismo correo y sigue el enlace que te enviaremos — confirma tu cuenta. Si no llega en unos minutos, habla con nuestro soporte.",
+    },
   "Conta suspensa": { es: "Cuenta suspendida" },
   // Tela irmã de `/account-suspended`: quem TINHA acesso e não tem mais.
   "Acesso revogado": { es: "Acceso revocado" },
@@ -9730,14 +9734,22 @@ export const DICIONARIO: Traducoes = {
   },
   // ── A faixa de benefícios do topo da vitrine ───────────────────────────
   "Seu número de WhatsApp continua o mesmo": { es: "Tu número de WhatsApp sigue siendo el mismo" },
-  "A IA responde em segundos, 24 horas por dia": { es: "La IA responde en segundos, 24 horas al día" },
-  "Cancele em um clique, sem falar com ninguém": { es: "Cancela con un clic, sin hablar con nadie" },
-  "Conversas, funil e histórico em uma tela só": { es: "Conversaciones, embudo e historial en una sola pantalla" },
-  "Dados isolados por empresa, LGPD desde o primeiro dia": { es: "Datos aislados por empresa, protección de datos desde el primer día" },
+  "A IA responde em segundos, 24 horas por dia": {
+    es: "La IA responde en segundos, 24 horas al día",
+  },
+  "Cancele em um clique, sem falar com ninguém": {
+    es: "Cancela con un clic, sin hablar con nadie",
+  },
+  "Conversas, funil e histórico em uma tela só": {
+    es: "Conversaciones, embudo e historial en una sola pantalla",
+  },
+  "Dados isolados por empresa, LGPD desde o primeiro dia": {
+    es: "Datos aislados por empresa, protección de datos desde el primer día",
+  },
   // ── O olho do hero, com o nicho que alterna ─────────────────────────────
   "Atendimento por WhatsApp para": { es: "Atención por WhatsApp para" },
-  "clínicas": { es: "clínicas" },
-  "imobiliárias": { es: "inmobiliarias" },
+  clínicas: { es: "clínicas" },
+  imobiliárias: { es: "inmobiliarias" },
   "e-commerce": { es: "e-commerce" },
   "prestadores de serviço": { es: "prestadores de servicios" },
   "O problema": { es: "El problema" },
@@ -9745,36 +9757,59 @@ export const DICIONARIO: Traducoes = {
   "Sem a Atenza": { es: "Sin Atenza" },
   "Com a Atenza": { es: "Con Atenza" },
   "O que muda no dia seguinte": { es: "Lo que cambia al día siguiente" },
-  "A pessoa pergunta às 22h e é atendida no dia seguinte.": { es: "Alguien pregunta a las 22h y es atendido al día siguiente." },
-  "Responde em segundos, a qualquer hora, com o que você ensinou.": { es: "Responde en segundos, a cualquier hora, con lo que le enseñaste." },
-  "Cada pessoa do time guarda um pedaço da conversa no próprio celular.": { es: "Cada persona del equipo guarda un pedazo de la conversación en su propio celular." },
-  "Todas as conversas numa tela só, com o histórico inteiro à vista do time.": { es: "Todas las conversaciones en una sola pantalla, con el historial completo a la vista del equipo." },
-  "Quem disse “depois eu vejo” nunca mais é procurado.": { es: "Quien dijo “después lo veo” nunca más es contactado." },
-  "O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar.": { es: "El seguimiento sale solo, en el momento correcto, sin que nadie tenga que acordarse." },
-  "Ninguém sabe quantas conversas viraram venda, nem onde elas param.": { es: "Nadie sabe cuántas conversaciones se volvieron venta, ni dónde se detienen." },
-  "Cada conversa vira um card no funil, e o relatório mostra o que converteu.": { es: "Cada conversación se vuelve una tarjeta en el embudo, y el informe muestra qué convirtió." },
-  "Usar um sistema novo significa trocar o número que os clientes já conhecem.": { es: "Usar un sistema nuevo significa cambiar el número que tus clientes ya conocen." },
-  "O mesmo número de sempre, conectado por um QR code em um minuto.": { es: "El mismo número de siempre, conectado por un código QR en un minuto." },
+  "A pessoa pergunta às 22h e é atendida no dia seguinte.": {
+    es: "Alguien pregunta a las 22h y es atendido al día siguiente.",
+  },
+  "Responde em segundos, a qualquer hora, com o que você ensinou.": {
+    es: "Responde en segundos, a cualquier hora, con lo que le enseñaste.",
+  },
+  "Cada pessoa do time guarda um pedaço da conversa no próprio celular.": {
+    es: "Cada persona del equipo guarda un pedazo de la conversación en su propio celular.",
+  },
+  "Todas as conversas numa tela só, com o histórico inteiro à vista do time.": {
+    es: "Todas las conversaciones en una sola pantalla, con el historial completo a la vista del equipo.",
+  },
+  "Quem disse “depois eu vejo” nunca mais é procurado.": {
+    es: "Quien dijo “después lo veo” nunca más es contactado.",
+  },
+  "O retorno sai sozinho, no tempo certo, sem ninguém precisar lembrar.": {
+    es: "El seguimiento sale solo, en el momento correcto, sin que nadie tenga que acordarse.",
+  },
+  "Ninguém sabe quantas conversas viraram venda, nem onde elas param.": {
+    es: "Nadie sabe cuántas conversaciones se volvieron venta, ni dónde se detienen.",
+  },
+  "Cada conversa vira um card no funil, e o relatório mostra o que converteu.": {
+    es: "Cada conversación se vuelve una tarjeta en el embudo, y el informe muestra qué convirtió.",
+  },
+  "Usar um sistema novo significa trocar o número que os clientes já conhecem.": {
+    es: "Usar un sistema nuevo significa cambiar el número que tus clientes ya conocen.",
+  },
+  "O mesmo número de sempre, conectado por um QR code em um minuto.": {
+    es: "El mismo número de siempre, conectado por un código QR en un minuto.",
+  },
   "Comece seus": { es: "Comienza tus" },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
-  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.": {
-    es: "días con todo funcionando. Pedimos la tarjeta para empezar y la suscripción solo comienza después de ese período — cancela con un clic cuando quieras.",
-  },
+  "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.":
+    {
+      es: "días con todo funcionando. Pedimos la tarjeta para empezar y la suscripción solo comienza después de ese período — cancela con un clic cuando quieras.",
+    },
   "Escolha o plano e comece hoje. A cobrança só depois.": {
     es: "Elige el plan y empieza hoy. El cobro viene después.",
   },
   "dias sem cobrança": { es: "días sin cobro" },
-  "Escolha um plano e o seu atendente entra no ar agora. Pedimos o cartão para começar, e nada é cobrado nos primeiros": {
-    es: "Elige un plan y tu agente entra en funcionamiento ahora. Pedimos la tarjeta para empezar, y no se cobra nada durante los primeros",
-  },
+  "Escolha um plano e o seu atendente entra no ar agora. Pedimos o cartão para começar, e nada é cobrado nos primeiros":
+    {
+      es: "Elige un plan y tu agente entra en funcionamiento ahora. Pedimos la tarjeta para empezar, y no se cobra nada durante los primeros",
+    },
   "dias — a assinatura só começa depois disso, e você cancela em um clique quando quiser.": {
     es: "días — la suscripción solo empieza después de eso, y la cancelas con un clic cuando quieras.",
   },
   "Hoje é o último dia sem cobrança": { es: "Hoy es el último día sin cobro" },
   "Falta 1 dia sem cobrança": { es: "Falta 1 día sin cobro" },
-  "Tudo liberado. Quando o período terminar, a assinatura começa automaticamente no cartão cadastrado. Você pode cancelar antes disso, em um clique, sem falar com ninguém.": {
-    es: "Todo habilitado. Cuando termine el período, la suscripción comienza automáticamente en la tarjeta registrada. Puedes cancelar antes de eso, con un clic, sin hablar con nadie.",
-  },
+  "Tudo liberado. Quando o período terminar, a assinatura começa automaticamente no cartão cadastrado. Você pode cancelar antes disso, em um clique, sem falar com ninguém.":
+    {
+      es: "Todo habilitado. Cuando termine el período, la suscripción comienza automáticamente en la tarjeta registrada. Puedes cancelar antes de eso, con un clic, sin hablar con nadie.",
+    },
   "Seu período de avaliação termina hoje": { es: "Tu período de evaluación termina hoy" },
   "Falta 1 dia de avaliação": { es: "Falta 1 día de evaluación" },
   Faltam: { es: "Faltan" },
@@ -10106,6 +10141,358 @@ export const DICIONARIO: Traducoes = {
     {
       es: "Sigues en la lista. Inténtalo de nuevo en unos instantes — y si sigue fallando, escríbenos.",
     },
+
+  // Textos das páginas comerciais recuperadas.
+  "Onze e quarenta e sete da noite. Um cliente pergunta o preço. Quem responde? Com a Atenza, o seu WhatsApp atende e vende vinte e quatro horas por dia.":
+    {
+      es: "Once y cuarenta y siete de la noche. Un cliente pregunta el precio. ¿Quién responde? Con Atenza, tu WhatsApp atiende y vende las veinticuatro horas del día.",
+    },
+  "O agente de inteligência artificial responde na hora, com as informações do seu negócio: preço, estoque, horário, entrega. Quando a conversa pede uma pessoa, ela passa para a sua equipe, com todo o histórico. Ninguém pergunta tudo de novo.":
+    {
+      es: "El agente de inteligencia artificial responde al instante con la información de tu negocio: precio, stock, horario, entrega. Cuando la conversación necesita una persona, pasa a tu equipo con todo el historial. Nadie pregunta todo de nuevo.",
+    },
+  "Cada conversa vira uma oportunidade no funil. E o follow-up automático volta a falar com quem parou de responder. Precisa marcar horário? A Atenza agenda pela própria conversa, direto na sua agenda do Google.":
+    {
+      es: "Cada conversación se convierte en una oportunidad en el embudo, y el seguimiento automático vuelve a hablar con quien dejó de responder. ¿Necesitas agendar? Atenza agenda en la propia conversación, directo en tu Google Calendar.",
+    },
+  "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.":
+    {
+      es: "Varios agentes en el mismo número, la API oficial de WhatsApp y tus datos protegidos por la LGPD. Atenza: WhatsApp que atiende y vende 24h. Prueba siete días sin cobro.",
+    },
+  "Veja em menos de 1 minuto": { es: "Míralo en menos de 1 minuto" },
+  "O que é a": { es: "¿Qué es" },
+  "é uma plataforma brasileira de atendimento e vendas pelo WhatsApp que reúne, num único sistema, vários atendentes no mesmo número, agentes de inteligência artificial treinados com as informações do seu negócio, CRM com funil de vendas, follow-up automático, campanhas e agenda integrada ao Google.":
+    {
+      es: "es una plataforma brasileña de atención y ventas por WhatsApp que reúne, en un único sistema, varios agentes en el mismo número, agentes de inteligencia artificial entrenados con la información de tu negocio, CRM con embudo de ventas, seguimiento automático, campañas y agenda integrada con Google.",
+    },
+  "A conexão é pela API oficial do WhatsApp, da Meta, com integrações para Shopify, WooCommerce e Nuvemshop, além de API e webhooks para qualquer sistema. Atende empresas de todo o Brasil — lojas, clínicas, escolas, imobiliárias, escritórios e prestadores de serviço —, com planos mensais ou anuais e 7 dias sem cobrança para testar.":
+    {
+      es: "La conexión es por la API oficial de WhatsApp, de Meta, con integraciones para Shopify, WooCommerce y Nuvemshop, además de API y webhooks para cualquier sistema. Atiende empresas de todo Brasil — tiendas, clínicas, escuelas, inmobiliarias, oficinas y prestadores de servicios —, con planes mensuales o anuales y 7 días sin cobro para probar.",
+    },
+  "Empresa cadastrada no Reclame Aqui": { es: "Empresa registrada en Reclame Aqui" },
+  "Veja a nossa página e a nossa reputação.": {
+    es: "Mira nuestra página y nuestra reputación.",
+  },
+  "Empresa cadastrada no Reclame Aqui — abrir página": {
+    es: "Empresa registrada en Reclame Aqui — abrir página",
+  },
+  "Trocas e devoluções": { es: "Cambios y devoluciones" },
+  "Qual o prazo de entrega para Campinas?": { es: "¿Cuál es el plazo de entrega a Campinas?" },
+  "Vocês aceitam Pix?": { es: "¿Aceptan Pix?" },
+  "Quero trocar o tamanho do pedido.": { es: "Quiero cambiar la talla del pedido." },
+  "Paciente da clínica": { es: "Paciente de la clínica" },
+  "Boa tarde! Queria marcar uma limpeza. Tem horário esta semana?": {
+    es: "¡Buenas tardes! Quisiera agendar una limpieza. ¿Hay horario esta semana?",
+  },
+  "Boa tarde, Ricardo! Temos quinta às 15h ou sexta às 10h. Qual fica melhor?": {
+    es: "¡Buenas tardes, Ricardo! Tenemos el jueves a las 15h o el viernes a las 10h. ¿Cuál te queda mejor?",
+  },
+  "Quinta às 15h, por favor.": { es: "El jueves a las 15h, por favor." },
+  "Confirmar a consulta e enviar o lembrete na véspera.": {
+    es: "Confirmar la cita y enviar el recordatorio el día anterior.",
+  },
+  "Tratamentos e valores": { es: "Tratamientos y precios" },
+  "Convênios aceitos": { es: "Seguros aceptados" },
+  "Preparo e horários": { es: "Preparación y horarios" },
+  "Vocês atendem convênio?": { es: "¿Atienden con seguro?" },
+  "Preciso remarcar minha consulta.": { es: "Necesito reprogramar mi cita." },
+  "Qual o endereço da clínica?": { es: "¿Cuál es la dirección de la clínica?" },
+  "API, webhooks e MCP": { es: "API, webhooks y MCP" },
+  Advocacia: { es: "Abogacía" },
+  "Agenda, lembretes e recepção organizada.": {
+    es: "Agenda, recordatorios y recepción organizada.",
+  },
+  "Agendamento com Google Agenda e Meet.": { es: "Citas con Google Calendar y Meet." },
+  Agências: { es: "Agencias" },
+  "Assistir à demonstração": { es: "Ver la demostración" },
+  "Avisos e promoções para listas segmentadas.": {
+    es: "Avisos y promociones para listas segmentadas.",
+  },
+  "CRM e funil de vendas": { es: "CRM y embudo de ventas" },
+  "Cada negociação no seu lugar.": { es: "Cada negociación en su lugar." },
+  "Cardápio e reservas no pico.": { es: "Menú y reservas en la hora pico." },
+  "Chatbot para WhatsApp": { es: "Chatbot para WhatsApp" },
+  "Clínicas e consultórios": { es: "Clínicas y consultorios" },
+  "Como comparar plataformas de atendimento.": { es: "Cómo comparar plataformas de atención." },
+  "Conecte qualquer sistema.": { es: "Conecta cualquier sistema." },
+  "Contatos distribuídos entre corretores.": { es: "Contactos distribuidos entre corredores." },
+  "Conversas, agentes de IA e funil de vendas na prática.": {
+    es: "Conversaciones, agentes de IA y embudo de ventas en la práctica.",
+  },
+  "Crie a conta pelo site e conecte o WhatsApp da empresa.": {
+    es: "Crea tu cuenta en el sitio y conecta el WhatsApp de la empresa.",
+  },
+  "Direitos do titular dentro do sistema.": { es: "Derechos del titular dentro del sistema." },
+  "Do interessado à matrícula.": { es: "Del interesado a la matrícula." },
+  "Dúvidas antes de assinar.": { es: "Dudas antes de suscribirte." },
+  "E-commerce e lojas": { es: "E-commerce y tiendas" },
+  "Escolas e cursos": { es: "Escuelas y cursos" },
+  "Exemplos de uso na região.": { es: "Ejemplos de uso en la región." },
+  "Follow-up automático": { es: "Seguimiento automático" },
+  Funcionalidades: { es: "Funcionalidades" },
+  "Guia de escolha": { es: "Guía de elección" },
+  Imobiliárias: { es: "Inmobiliarias" },
+  Multiatendimento: { es: "Multiatención" },
+  "O produto funcionando, com legendas.": { es: "El producto funcionando, con subtítulos." },
+  "Orçamentos com retorno.": { es: "Presupuestos con respuesta." },
+  "Pedidos e catálogo dentro da conversa.": { es: "Pedidos y catálogo dentro de la conversación." },
+  "Prestadores de serviço": { es: "Prestadores de servicios" },
+  "Relatórios e SLA": { es: "Informes y SLA" },
+  "Respondem com as informações do seu negócio.": {
+    es: "Responden con la información de tu negocio.",
+  },
+  "Respostas automáticas 24 horas.": { es: "Respuestas automáticas 24 horas." },
+  "Respostas rápidas sobre planos e uso.": { es: "Respuestas rápidas sobre planes y uso." },
+  "Restaurantes e delivery": { es: "Restaurantes y delivery" },
+  Segmentos: { es: "Segmentos" },
+  "Shopify, WooCommerce, Nuvemshop, API e webhooks.": {
+    es: "Shopify, WooCommerce, Nuvemshop, API y webhooks.",
+  },
+  "São Paulo e Grande SP": { es: "São Paulo y región metropolitana" },
+  "Tempo de resposta e satisfação.": { es: "Tiempo de respuesta y satisfacción." },
+  "Teste 7 dias sem cobrança": { es: "Prueba 7 días sin cobro" },
+  "Triagem e histórico com sigilo.": { es: "Clasificación e historial con confidencialidad." },
+  "Uma conta por cliente, com a sua marca.": { es: "Una cuenta por cliente, con tu marca." },
+  "Ver integrações": { es: "Ver integraciones" },
+  "Volta a falar com quem parou.": { es: "Vuelve a hablar con quien se detuvo." },
+  "Vários atendentes no mesmo número.": { es: "Varios agentes en el mismo número." },
+  "Pagamento seguro": { es: "Pago seguro" },
+  "Processado pela Stripe. Não guardamos o número do seu cartão.": {
+    es: "Procesado por Stripe. No guardamos el número de tu tarjeta.",
+  },
+  "Dados protegidos": { es: "Datos protegidos" },
+  "Tratamento conforme a LGPD, com DPA e lista de subprocessadores publicados.": {
+    es: "Tratamiento conforme a la LGPD, con DPA y lista de subencargados publicados.",
+  },
+  "WhatsApp oficial": { es: "WhatsApp oficial" },
+  "Conexão pela API oficial do WhatsApp, da Meta.": {
+    es: "Conexión por la API oficial de WhatsApp, de Meta.",
+  },
+  "Cancele quando quiser, em um clique, sem falar com ninguém.": {
+    es: "Cancela cuando quieras, en un clic, sin hablar con nadie.",
+  },
+  Produto: { es: "Producto" },
+  "Planos e preços": { es: "Planes y precios" },
+  "Demonstração em vídeo": { es: "Demostración en video" },
+  Soluções: { es: "Soluciones" },
+  Ajuda: { es: "Ayuda" },
+  "Cancelamento e reembolso": { es: "Cancelación y reembolso" },
+  "Acordo de tratamento de dados (DPA)": { es: "Acuerdo de tratamiento de datos (DPA)" },
+  Subprocessadores: { es: "Subencargados" },
+  "Segurança e garantias": { es: "Seguridad y garantías" },
+  "WhatsApp que atende e vende 24h: vários atendentes no mesmo número, agentes de IA com as informações do seu negócio e CRM com histórico de cada cliente.":
+    {
+      es: "WhatsApp que atiende y vende 24h: varios agentes en el mismo número, agentes de IA con la información de tu negocio y CRM con el historial de cada cliente.",
+    },
+  "Atendimento e vendas por WhatsApp para empresas de todo o Brasil.": {
+    es: "Atención y ventas por WhatsApp para empresas de todo Brasil.",
+  },
+  "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.":
+    {
+      es: "Quiero recibir consejos, novedades y campañas de temporada por correo, como máximo un mensaje comercial al día. Puedo cancelar cuando quiera.",
+    },
+  Português: { es: "Portugués" },
+  "Explore o produto": { es: "Explora el producto" },
+  "Agentes de IA": { es: "Agentes de IA" },
+  "Dados do contato": { es: "Datos del contacto" },
+  "Histórico compartilhado": { es: "Historial compartido" },
+  "Cliente da loja": { es: "Cliente de la tienda" },
+  "Sua equipe": { es: "Tu equipo" },
+  "Oi! Vocês têm este modelo em estoque?": { es: "¡Hola! ¿Tienen este modelo en stock?" },
+  "Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?": {
+    es: "¡Hola, Mariana! Sí, lo tenemos. ¿Te ayudo a elegir la talla?",
+  },
+  "Pode sim! Estou procurando o tamanho 38.": { es: "¡Sí! Estoy buscando la talla 38." },
+  "Escreva uma mensagem...": { es: "Escribe un mensaje..." },
+  "Demonstração interativa com dados fictícios. Nenhuma mensagem é enviada.": {
+    es: "Demostración interactiva con datos ficticios. No se envían mensajes.",
+  },
+  "Conversa atribuída à equipe": { es: "Conversación asignada al equipo" },
+  "O conhecimento é da sua empresa.": { es: "El conocimiento es de tu empresa." },
+  "Organize os materiais que orientam o agente.": {
+    es: "Organiza los materiales que orientan al agente.",
+  },
+  "Produtos e serviços": { es: "Productos y servicios" },
+  "Prazos e entregas": { es: "Plazos y entregas" },
+  "Perguntas frequentes": { es: "Preguntas frecuentes" },
+  "Limites definidos por você": { es: "Límites definidos por ti" },
+  "Configure instruções, base de conhecimento e quando pedir ajuda ao time.": {
+    es: "Configura las instrucciones, la base de conocimiento y cuándo pedir ayuda al equipo.",
+  },
+  "Uma pessoa assume com contexto": { es: "Una persona asume con contexto" },
+  "O histórico acompanha a conversa quando ela passa da IA para a equipe.": {
+    es: "El historial acompaña la conversación cuando pasa de la IA al equipo.",
+  },
+  "A conversa tem um próximo passo.": { es: "La conversación tiene un siguiente paso." },
+  Proposta: { es: "Propuesta" },
+  "Confirmar o tamanho e acompanhar a decisão.": {
+    es: "Confirmar la talla y acompañar la decisión.",
+  },
+  "Mover para": { es: "Mover a" },
+  "Experimente mudar a etapa deste contato no exemplo acima.": {
+    es: "Prueba a cambiar la etapa de este contacto en el ejemplo de arriba.",
+  },
+  "Veja como funciona": { es: "Mira cómo funciona" },
+  "Um passeio pelo atendimento, pela IA e pelo funil. Vídeo com áudio e legendas em português.": {
+    es: "Un recorrido por la atención, la IA y el embudo. Vídeo con audio y subtítulos en portugués.",
+  },
+  "Fechar vídeo": { es: "Cerrar vídeo" },
+  "Ler a explicação": { es: "Leer la explicación" },
+  "O vídeo não carregou. Você pode ler a explicação abaixo.": {
+    es: "El vídeo no se cargó. Puedes leer la explicación abajo.",
+  },
+  "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.": {
+    es: "Tarjeta necesaria. Renovación automática después de la prueba. Cancela cuando quieras.",
+  },
+  "Comércio e e-commerce": { es: "Comercio y e-commerce" },
+  "A dúvida chega. A conversa continua.": { es: "Llega una duda. La conversación continúa." },
+  "Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja.": {
+    es: "Reúne las preguntas sobre productos, pedidos y entregas con el contexto de tu tienda.",
+  },
+  "Empreendedora organizando pedidos de uma loja": {
+    es: "Emprendedora organizando pedidos de una tienda",
+  },
+  "Clínicas e saúde": { es: "Clínicas y salud" },
+  "Mais atenção a quem precisa agendar.": { es: "Más atención para quien necesita una cita." },
+  "Organize o primeiro contato e encaminhe dúvidas para a equipe responsável.": {
+    es: "Organiza el primer contacto y dirige las dudas al equipo responsable.",
+  },
+  "Profissional de recepção em uma clínica": { es: "Profesional de recepción en una clínica" },
+  Educação: { es: "Educación" },
+  "Do interesse à próxima conversa.": { es: "Del interés a la próxima conversación." },
+  "Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil.": {
+    es: "Centraliza las dudas sobre cursos y sigue a los interesados en el embudo.",
+  },
+  "Profissional de educação acompanhando informações no computador": {
+    es: "Profesional de educación revisando información en un ordenador",
+  },
+  "Serviços e B2B": { es: "Servicios y B2B" },
+  "O contexto acompanha cada proposta.": { es: "El contexto acompaña cada propuesta." },
+  "Qualifique os contatos e mantenha o próximo passo visível para o time.": {
+    es: "Califica a los contactos y mantén el siguiente paso visible para el equipo.",
+  },
+  "Profissional de serviços conversando com um cliente": {
+    es: "Profesional de servicios conversando con un cliente",
+  },
+  "Ir para o conteúdo": { es: "Ir al contenido" },
+  "Seu atendimento cresce.": { es: "Tu atención crece." },
+  "Seu cliente não espera.": { es: "Tu cliente no espera." },
+  "WhatsApp, agentes de IA e funil de vendas na mesma plataforma.": {
+    es: "WhatsApp, agentes de IA y embudo de ventas en una misma plataforma.",
+  },
+  "Ver em ação": { es: "Ver en acción" },
+  "Conhecer os planos": { es: "Conocer los planes" },
+  "Prévia ilustrativa com dados fictícios": { es: "Vista previa ilustrativa con datos ficticios" },
+  "O controle continua com você": { es: "El control sigue en tus manos" },
+  "Veja o atendimento acontecer.": { es: "Mira la atención en acción." },
+  "Da primeira mensagem ao próximo passo da venda.": {
+    es: "Del primer mensaje al siguiente paso de la venta.",
+  },
+  "Um histórico para o time inteiro": { es: "Un historial para todo el equipo" },
+  "Todos acompanham o que já foi conversado.": {
+    es: "Todos pueden seguir lo que ya se ha conversado.",
+  },
+  "IA e pessoas, na mesma conversa": { es: "IA y personas en la misma conversación" },
+  "O time assume quando o atendimento pede.": {
+    es: "El equipo asume cuando la atención lo necesita.",
+  },
+  "O próximo passo fica à vista": { es: "El siguiente paso queda a la vista" },
+  "Organize os contatos e acompanhe as oportunidades.": {
+    es: "Organiza los contactos y sigue las oportunidades.",
+  },
+  "No ritmo do seu negócio.": { es: "Al ritmo de tu negocio." },
+  "Veja onde a plataforma entra na sua rotina.": {
+    es: "Mira dónde encaja la plataforma en tu rutina.",
+  },
+  "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.":
+    {
+      es: "Ejemplos de uso. La configuración debe respetar los procesos y las responsabilidades de tu empresa.",
+    },
+  "Conecte o que sua operação já usa.": { es: "Conecta lo que tu operación ya utiliza." },
+  "Lojas, APIs e webhooks para trazer mais contexto ao atendimento.": {
+    es: "Tiendas, APIs y webhooks para aportar más contexto a la atención.",
+  },
+  "Ferramentas e formas de conexão disponíveis": {
+    es: "Herramientas y formas de conexión disponibles",
+  },
+  "Pausar animação": { es: "Pausar animación" },
+  "Continuar animação": { es: "Continuar animación" },
+  "As conexões dependem do plano, das credenciais e das permissões de cada ferramenta.": {
+    es: "Las conexiones dependen del plan, las credenciales y los permisos de cada herramienta.",
+  },
+  "Conversar sobre integrações": { es: "Hablar sobre integraciones" },
+  "Cena de atendimento com uma profissional usando headset": {
+    es: "Escena de atención con una profesional usando auriculares",
+  },
+  "Sem som": { es: "Sin sonido" },
+  Nuvemshop: { es: "Nuvemshop" },
+  "Como conseguir a chave de IA": { es: "Cómo conseguir la clave de IA" },
+  "Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.": {
+    es: "Un recorrido por la atención, la IA y el embudo en menos de 1 minuto.",
+  },
+  "Disponível em": { es: "Disponible en" },
+  países: { es: "países" },
+  "A mesma plataforma que atende empresas no México, na Espanha e na Argentina.": {
+    es: "La misma plataforma que atiende a empresas en México, España y Argentina.",
+  },
+  "Cada país tem página, idioma e preço do próprio mercado. Compare: aqui no Brasil, o mesmo plano sai pelo menor preço.":
+    {
+      es: "Cada país tiene su página, su idioma y el precio de su mercado. Compara: en Brasil, el mismo plan tiene el precio más bajo.",
+    },
+  "Cada país tem página, idioma e preço do próprio mercado.": {
+    es: "Cada país tiene su página, su idioma y el precio de su mercado.",
+  },
+  "Menor preço": { es: "Precio más bajo" },
+  "Pausar vídeo de contexto": { es: "Pausar vídeo de contexto" },
+  "Reproduzir vídeo de contexto": { es: "Reproducir vídeo de contexto" },
+  "A imagem continua disponível enquanto o vídeo não carrega.": {
+    es: "La imagen sigue disponible mientras el vídeo no se carga.",
+  },
+  "Automatize a rotina.": { es: "Automatiza la rutina." },
+  "Mantenha o cuidado.": { es: "Mantén el cuidado." },
+  "A IA ajuda no repetitivo. Sua equipe entra com atenção, contexto e autonomia quando o cliente precisa.":
+    {
+      es: "La IA ayuda con lo repetitivo. Tu equipo aporta atención, contexto y autonomía cuando el cliente lo necesita.",
+    },
+  "Acesso por pessoa": { es: "Acceso por persona" },
+  "Cada integrante entra com o próprio acesso e as permissões definidas pela empresa.": {
+    es: "Cada integrante entra con su propio acceso y los permisos definidos por la empresa.",
+  },
+  "O contexto fica na conversa, mesmo quando muda quem atende.": {
+    es: "El contexto permanece en la conversación, incluso cuando cambia quien atiende.",
+  },
+  "Configure o conhecimento, as instruções e a passagem para o time.": {
+    es: "Configura el conocimiento, las instrucciones y el traspaso al equipo.",
+  },
+  "Conhecer a política de privacidade": { es: "Conocer la política de privacidad" },
+  "Conheça antes de decidir.": { es: "Conoce antes de decidir." },
+  "Dê o play e entenda como as conversas, a IA e o funil se conectam no dia a dia.": {
+    es: "Dale al play y descubre cómo las conversaciones, la IA y el embudo se conectan en el día a día.",
+  },
+  "Assistir à explicação": { es: "Ver la explicación" },
+  "Com áudio e legendas em português": { es: "Con audio y subtítulos en portugués" },
+  "Respostas antes do primeiro passo.": { es: "Respuestas antes del primer paso." },
+  "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.":
+    {
+      es: "Los datos están separados por empresa, con controles de acceso. La plataforma ofrece herramientas de exportación y para atender solicitudes de privacidad.",
+    },
+  "O uso de IA tem alguma configuração adicional?": {
+    es: "¿El uso de IA requiere configuración adicional?",
+  },
+  "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.":
+    {
+      es: "Sí. El agente necesita una base de conocimiento, instrucciones y credenciales del proveedor de IA configuradas en tu operación. El consumo del proveedor puede tener costes propios.",
+    },
+  "A próxima conversa pode ser o começo de uma venda.": {
+    es: "La próxima conversación puede ser el comienzo de una venta.",
+  },
+  "Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.": {
+    es: "Organiza la atención. Da contexto al equipo. Sigue el siguiente paso.",
+  },
+  "Informações e contato": { es: "Información y contacto" },
+  pedidos: { es: "pedidos" },
+  Campanhas: { es: "Campañas" },
+  "Próximo passo": { es: "Siguiente paso" },
 };
 
 /**

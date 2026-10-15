@@ -80,8 +80,7 @@ export function ehIdiomaDoSite(valor: string): valor is IdiomaDoSite {
 
 /** ISO-4217 em maiúsculas, como a doutrina de API exige. */
 export type Moeda =
-  | "BRL" | "USD" | "MXN" | "EUR" | "COP" | "CLP"
-  | "PEN" | "ARS" | "INR" | "IDR" | "MYR" | "ZAR";
+  "BRL" | "USD" | "MXN" | "EUR" | "COP" | "CLP" | "PEN" | "ARS" | "INR" | "IDR" | "MYR" | "ZAR";
 
 /**
  * Moedas sem centavos NO STRIPE: o `unit_amount` é a unidade inteira.
@@ -261,9 +260,7 @@ export const MERCADO_INTERNACIONAL: Mercado = {
 export const MERCADO_PADRAO: Mercado =
   MERCADOS.find((m) => m.pais === "BR") ?? MERCADO_INTERNACIONAL;
 
-const POR_PAIS: ReadonlyMap<string, Mercado> = new Map(
-  MERCADOS.map((m) => [m.pais, m]),
-);
+const POR_PAIS: ReadonlyMap<string, Mercado> = new Map(MERCADOS.map((m) => [m.pais, m]));
 
 /**
  * O mercado de um país, ou o internacional.
@@ -316,3 +313,22 @@ export function idiomaDoProduto(doSite: IdiomaDoSite): Idioma {
 
 /** O `IDIOMA_PADRAO` do produto, como idioma de site — para quem não negociou nada. */
 export const IDIOMA_DO_SITE_PADRAO: IdiomaDoSite = IDIOMA_PADRAO;
+
+export function moedasCobraveis(): ReadonlySet<Moeda> {
+  const extras = (process.env.STRIPE_MOEDAS ?? "")
+    .split(",")
+    .map((m) => m.trim().toUpperCase())
+    .filter((m) => m.length > 0) as Moeda[];
+  return new Set<Moeda>(["BRL", ...extras]);
+}
+
+export function precoParaQuemCompara(plano: PlanoId, mercado: Mercado, locale: string): string {
+  const bruto = precoNoMercado(plano, mercado);
+  const valor = MOEDAS_SEM_CENTAVOS.has(mercado.moeda) ? bruto : bruto / 100;
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: mercado.moeda,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(valor);
+}

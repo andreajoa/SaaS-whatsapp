@@ -15,7 +15,7 @@ describe("isPublicPath", () => {
   });
 
   it("libera apenas as seis vitrines internacionais públicas", () => {
-    for (const locale of ["fr","de","es","mx","en-us","en-gb"]) {
+    for (const locale of ["fr", "de", "es", "mx", "en-us", "en-gb"]) {
       expect(isPublicPath(`/${locale}`)).toBe(true);
       expect(isPublicPath(`/${locale}/private`)).toBe(false);
     }
@@ -73,5 +73,53 @@ describe("isPublicPath", () => {
     expect(isPublicPath("/legal/terms/interno")).toBe(false);
     expect(isPublicPath("/legal/qualquer-outra")).toBe(false);
     expect(isPublicPath("/legal/cookies/rascunho")).toBe(false);
+  });
+});
+
+describe("vitrines recuperadas e vídeos públicos", () => {
+  it.each([
+    "/",
+    "/en",
+    "/us",
+    "/en-us",
+    "/en-gb",
+    "/es",
+    "/mx",
+    "/de",
+    "/fr",
+    "/es/mexico",
+    "/es/colombia",
+    "/es/argentina",
+    "/es/chile",
+    "/es/peru",
+    "/es/espana",
+    "/precos",
+    "/demonstracao",
+    "/de/impressum",
+    "/recursos/agentes-ia",
+    "/ajuda/chave-de-ia",
+    "/es/ayuda/clave-de-ia",
+    "/en/help/ai-key",
+  ])("abre %s sem sessão", (path) => {
+    expect(isPublicPath(path)).toBe(true);
+  });
+  it.each([
+    "atenza-explica.mp4",
+    "atendimento-loop.mp4",
+    ...["es-mx", "es-co", "es-ar", "es-cl", "es-pe", "es-es", "en-us", "de-de"].map(
+      (locale) => `atenza-explica-${locale}.mp4`,
+    ),
+  ])("libera o vídeo %s", (file) => {
+    expect(isPublicPath(`/media/atenza/${file}`)).toBe(true);
+  });
+  it.each([
+    "/app",
+    "/api/v1/settings",
+    "/es/interno/segredo",
+    "/media/atenza/privado.mp4",
+    "/media/atenza/atenza-explica-es-fr.mp4",
+    "/videos/privado.mp4",
+  ])("mantém %s protegido", (path) => {
+    expect(isPublicPath(path)).toBe(false);
   });
 });

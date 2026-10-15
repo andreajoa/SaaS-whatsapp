@@ -118,9 +118,8 @@ export default async function HomePage() {
   if (user) redirect("/app");
 
   const visitante = await visitanteAtual();
-  const paginaLocal: Record<string, string> = {FR:"/fr",DE:"/de",ES:"/es",MX:"/mx",US:"/en-us",GB:"/en-gb"};
-  const destino = paginaLocal[visitante.pais ?? ""];
-  if (destino) redirect(destino);
+  // Somente a França tem uma vitrine visual nova; os demais mercados preservam a vitrine original.
+  if (visitante.pais === "FR") redirect("/fr");
   const { mercado } = visitante;
   const t = (texto: string) => textoDoSite(texto, visitante.idioma);
 

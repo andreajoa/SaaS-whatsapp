@@ -1,3 +1,5 @@
+import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
+import { SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -30,7 +32,11 @@ export default async function ContatoPage() {
       <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="text-sm font-semibold tracking-tight text-text">
-            {marca.name}
+            {simboloDaMarca(marca.name) === SIMBOLO_ATENZA ? (
+              <LogotipoDoProduto nome={marca.name} className="h-8 w-auto" />
+            ) : (
+              marca.name
+            )}
           </Link>
           <Link
             href="/login"
@@ -85,7 +91,12 @@ export default async function ContatoPage() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap gap-x-6 gap-y-2 px-4 py-6 text-sm sm:px-6">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-6 text-sm sm:px-6">
+          {simboloDaMarca(marca.name) === SIMBOLO_ATENZA && (
+            <Link href="/" aria-label={marca.name}>
+              <LogotipoDoProduto nome={marca.name} decorativo className="h-8 w-auto" />
+            </Link>
+          )}
           <Link href="/legal" className="link-sublinha text-text-muted hover:text-text">
             {t("Documentos")}
           </Link>

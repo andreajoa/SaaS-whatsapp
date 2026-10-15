@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
 import { MegaMenu } from "@/components/site/MegaMenu";
 import { ORDEM_DOS_PLANOS, precoDoPlano } from "@/lib/billing/planos";
+import { menuFrancais } from "@/lib/marketing/menu-fr";
 import { montarMenu } from "@/lib/marketing/menu";
 import type { IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
@@ -19,10 +20,11 @@ export function CabecalhoDoSite({
   idioma = "pt-BR",
 }: {
   readonly nome: string;
-  readonly idioma?: IdiomaDoSite;
+  readonly idioma?: IdiomaDoSite | "fr";
 }) {
   const comPlanos = ORDEM_DOS_PLANOS.some((p) => precoDoPlano(p) !== null);
-  const menu = montarMenu((texto) => textoDoSite(texto, idioma), comPlanos);
+  const menu =
+    idioma === "fr" ? menuFrancais() : montarMenu((texto) => textoDoSite(texto, idioma), comPlanos);
   return (
     <header className={styles.cabecalho}>
       <div className={styles.cabecalhoInterno}>

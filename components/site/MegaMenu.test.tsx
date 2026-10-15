@@ -43,3 +43,25 @@ it("todo destino do menu é uma página que existe", async () => {
   const quebrados = destinos.filter((h) => !paginas.has(h) && !fixas.has(h));
   expect(quebrados).toEqual([]);
 });
+
+it("le menu français ouvre les panneaux et garde les destinations en français", async () => {
+  const { menuFrancais } = await import("@/lib/marketing/menu-fr");
+  const francais = menuFrancais();
+  render(<MegaMenu menu={francais} />);
+  const button = screen.getByRole("button", { name: "Fonctionnalités" });
+  fireEvent.click(button);
+  expect(button.getAttribute("aria-expanded")).toBe("true");
+  expect(screen.getAllByRole("link", { name: /Agents IA/ })[0]!.getAttribute("href")).toBe(
+    "/fr#fonction-2",
+  );
+  const destinations = francais.grupos.flatMap((g) => [
+    ...g.itens.map((i) => i.href),
+    g.destaque.href,
+  ]);
+  expect(destinations.every((href) => href.startsWith("/fr#"))).toBe(true);
+  fireEvent.keyDown(document, { key: "Escape" });
+  fireEvent.click(screen.getByRole("button", { name: "Ouvrir la navigation" }));
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  fireEvent.click(screen.getByRole("dialog").querySelector('a[href="/fr#video"]')!);
+  expect(screen.queryByRole("dialog")).toBeNull();
+});

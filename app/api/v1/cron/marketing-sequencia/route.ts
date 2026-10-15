@@ -104,7 +104,7 @@ async function handle(req: NextRequest): Promise<Response> {
 
   const auth = req.headers.get("authorization") ?? "";
   const provided = auth.startsWith("Bearer ") ? auth.slice("Bearer ".length).trim() : "";
-  const aceitos = [env.INTERNAL_CRON_SECRET, env.INTERNAL_SECRET].filter(Boolean);
+  const aceitos = [env.INTERNAL_CRON_SECRET, env.INTERNAL_SECRET, process.env.CRON_SECRET].filter(Boolean);
   if (aceitos.length === 0 || !provided || !aceitos.includes(provided)) {
     return fail("forbidden", "Cron secret missing or invalid.", 403, { requestId });
   }

@@ -18,12 +18,19 @@ if [ -z "${INTERNAL_SECRET:-}" ]; then
   exit 1
 fi
 
-# Constante, não configuração: `app` é o nome do serviço na rede interna do
-# compose, e o scheduler não fala com mais nada. A primeira versão disto lia um
-# `SCHEDULER_APP_ORIGIN` que o compose nunca repassava e nenhum template
-# documentava — controle decorativo, que é pior que controle nenhum: quem o
-# encontrasse no código o definiria no `.env` e não veria efeito.
-APP_ORIGIN="http://app:3000"
+# No self-host clássico, `app` é o serviço Next.js da mesma rede Docker.
+# No runtime Oracle, o front/API continua na Vercel e o scheduler precisa chamar
+# essa origem pública. O override só vale quando é realmente repassado pelo
+# compose; sem ele preservamos o comportamento histórico.
+APP_ORIGIN="${SCHEDULER_APP_ORIGIN:-http://app:3000}"
+case "$APP_ORIGIN" in
+  http://*|https://*) ;;
+  *)
+    echo "scheduler: SCHEDULER_APP_ORIGIN precisa começar com http:// ou https://" >&2
+    exit 1
+    ;;
+esac
+APP_ORIGIN="${APP_ORIGIN%/}"
 
 # O crond executa cada linha por `/bin/sh -c`, então o segredo é REAVALIADO pelo
 # shell na hora de disparar. Interpolá-lo cru dentro de aspas duplas fazia com

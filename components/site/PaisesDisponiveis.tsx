@@ -82,7 +82,7 @@ export function PaisesDisponiveis({ idioma }: { readonly idioma: IdiomaDoSite })
             <span className={styles.codigo}>FR</span>
             <strong>{nomes.of("FR")}</strong>
             <span className={styles.preco} lang="fr">
-              Français
+              {new Intl.DisplayNames(["fr"], { type: "language" }).of("fr")}
             </span>
             <ArrowUpRight size={17} aria-hidden className={styles.seta} />
           </Link>

@@ -7,7 +7,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   // Vitrines internacionais: públicas por nome exato, jamais por prefixo.
   /^\/(fr|de|es|mx|en-us|en-gb)$/,
   // Vídeo comercial francês, arquivo público exato; demais vídeos seguem protegidos.
-  /^\/videos\/atenza-fr\.mp4$/,
+  /^\/videos\/atenza-fr(?:-v2)?\.mp4$/,
   // Vitrine recuperada: somente páginas comerciais e arquivos publicados.
   /^\/(?:en|us|precos|demonstracao|atendimento-whatsapp|chatbot-para-whatsapp|agentes-ia-whatsapp|crm-whatsapp|atendimento-whatsapp-sao-paulo)$/,
   /^\/es\/(?:mexico|colombia|argentina|chile|peru|espana)$/,

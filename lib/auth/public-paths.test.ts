@@ -11,6 +11,8 @@ import { isPublicPath } from "@/lib/auth/public-paths";
 describe("isPublicPath", () => {
   it("serve o vídeo comercial francês sem expor outros recursos", () => {
     expect(isPublicPath("/videos/atenza-fr.mp4")).toBe(true);
+    expect(isPublicPath("/videos/atenza-fr-v2.mp4")).toBe(true);
+    expect(isPublicPath("/videos/atenza-fr-private.mp4")).toBe(false);
     expect(isPublicPath("/videos/private.mp4")).toBe(false);
   });
 

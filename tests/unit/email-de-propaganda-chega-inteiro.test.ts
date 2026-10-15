@@ -232,7 +232,7 @@ describe("o conteúdo das vinte", () => {
     //
     // A leitura é do ARQUIVO da página, e não de uma lista de âncoras mantida
     // à mão: uma lista à mão é só o mesmo erro escrito num segundo lugar.
-    const pagina = readFileSync(resolve(process.cwd(), "app/page.tsx"), "utf8");
+    const paginaHome = readFileSync(resolve(process.cwd(), "app/page.tsx"), "utf8");
 
     for (const m of [...MENSAGENS, ...TRANSACIONAIS]) {
       for (const idioma of IDIOMAS_DO_SITE) {
@@ -241,6 +241,10 @@ describe("o conteúdo das vinte", () => {
         const corte = caminho.indexOf("#");
         if (corte === -1) continue;
 
+        const rota = caminho.slice(0, corte).replace(/^\/+|\/+$/g, "");
+        const pagina = rota
+          ? readFileSync(resolve(process.cwd(), `app/${rota}/page.tsx`), "utf8")
+          : paginaHome;
         const ancora = caminho.slice(corte + 1);
         expect(ancora, `${m.id}/${idioma}: âncora vazia`).not.toBe("");
 
@@ -252,7 +256,7 @@ describe("o conteúdo das vinte", () => {
           new RegExp(`id=\\{[A-Z_]+\\}`).test(pagina) && ehAncoraConhecida(ancora);
         expect(
           literal || porConstante,
-          `${m.id}/${idioma}: "#${ancora}" não existe em app/page.tsx`,
+          `${m.id}/${idioma}: "#${ancora}" não existe na página de ${caminho}`,
         ).toBe(true);
       }
     }

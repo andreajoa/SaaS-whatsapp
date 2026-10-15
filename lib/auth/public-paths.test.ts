@@ -9,6 +9,13 @@ import { describe, it, expect } from "vitest";
 import { isPublicPath } from "@/lib/auth/public-paths";
 
 describe("isPublicPath", () => {
+  it("libera apenas as seis vitrines internacionais públicas", () => {
+    for (const locale of ["fr","de","es","mx","en-us","en-gb"]) {
+      expect(isPublicPath(`/${locale}`)).toBe(true);
+      expect(isPublicPath(`/${locale}/private`)).toBe(false);
+    }
+  });
+
   it("libera o heartbeat do agente do host (bearer, sem cookie)", () => {
     expect(isPublicPath("/api/v1/system/agent")).toBe(true);
   });

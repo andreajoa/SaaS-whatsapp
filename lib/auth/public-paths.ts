@@ -4,6 +4,8 @@
  */
 export const PUBLIC_PATHS: RegExp[] = [
   /^\/$/,
+  // Vitrines internacionais: públicas por nome exato, jamais por prefixo.
+  /^\/(fr|de|es|mx|en-us|en-gb)$/,
   /^\/login(\/.*)?$/,
   /^\/signup$/,
   /^\/auth\/confirm$/,

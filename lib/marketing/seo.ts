@@ -135,6 +135,8 @@ const VERIFICACAO_GOOGLE_ATENZA = "CrYhy8LdJsnENi_wtvU3A8ECgveVLBX03mIeApnm3Yc";
 
 /** Perfis oficiais da Atenza; como a meta do Google, só valem no domínio oficial. */
 const INSTAGRAM_ATENZA = "https://www.instagram.com/atenzaon/";
+/** Página do Facebook (antiga Vastara, renomeada e com o @atenzaon em 19/10/2026). */
+const FACEBOOK_ATENZA = "https://www.facebook.com/atenzaon";
 
 function ehDominioOficial(base: string): boolean {
   return new URL(base).hostname.replace(/^www\./, "") === "atenza.online";
@@ -198,7 +200,7 @@ export function identidadePublica(nome: string, base: string, logoUrl: string | 
       areaServed: AREA_ATENDIDA,
       knowsLanguage: ["pt-BR", "en", "es"],
       // sameAs liga a marca ao perfil social no Knowledge Graph e nas respostas de IA.
-      ...(instagramOficial(base) ? { sameAs: [instagramOficial(base)] } : {}),
+      ...(ehDominioOficial(base) ? { sameAs: [INSTAGRAM_ATENZA, FACEBOOK_ATENZA] } : {}),
     },
     {
       "@type": "WebSite",

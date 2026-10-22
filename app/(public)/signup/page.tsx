@@ -6,8 +6,12 @@ import { verifyInviteToken } from "@/lib/auth/invite-token";
 import { createClient } from "@/lib/supabase/server";
 import { normalizarIdioma } from "@/lib/i18n/idiomas";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { idiomaPublicoDoAcesso } from "@/lib/mercado/idioma-publico-server";
+import { traduzirAcessoEmIngles } from "@/lib/mercado/idioma-publico-en";
 
-export const metadata = { title: "Criar conta" };
+export async function generateMetadata() {
+  return { title: await idiomaPublicoDoAcesso() ? "Create account" : "Criar conta" };
+}
 
 /**
  * Aceita `?invite=<token>`: é o caminho de quem foi convidado e ainda não tem
@@ -35,7 +39,8 @@ export default async function SignupPage({
   const idioma = normalizarIdioma(
     (user?.user_metadata?.locale as string | undefined) ?? null,
   );
-  const t = (texto: string) => traduzir(texto, idioma);
+  const ingles = Boolean(await idiomaPublicoDoAcesso());
+  const t = (texto: string) => ingles ? traduzirAcessoEmIngles(texto) : traduzir(texto, idioma);
 
   return (
     <div className="space-y-6">
@@ -59,7 +64,7 @@ export default async function SignupPage({
         </p>
       )}
 
-      <SignupForm convite={convite} />
+      <SignupForm convite={convite} ingles={ingles} />
 
       <p className="text-center text-sm text-muted-foreground">
         {t("Já tem conta?")}{" "}

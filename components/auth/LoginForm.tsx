@@ -6,14 +6,16 @@ import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useT } from "@/hooks/i18n/useT";
+import { traduzirAcessoEmIngles } from "@/lib/mercado/idioma-publico-en";
 import { loginSchema, type LoginInput } from "@/lib/auth/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInWithPassword } from "@/app/actions/auth/signInWithPassword";
 
-export function LoginForm({ next }: { next?: string }) {
-  const t = useT();
+export function LoginForm({ next, ingles = false }: { next?: string; ingles?: boolean }) {
+  const traduzirExistente = useT();
+  const t = (texto: string) => ingles ? traduzirAcessoEmIngles(texto) : traduzirExistente(texto);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);

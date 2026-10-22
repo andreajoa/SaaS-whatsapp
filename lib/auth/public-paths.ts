@@ -6,6 +6,7 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/$/,
   // Vitrines internacionais: públicas por nome exato, jamais por prefixo.
   /^\/(fr|de|es|mx|en-us|en-gb)$/,
+  /^\/en-(?:gb|us)\/pricing$/,
   // Vídeo comercial francês, arquivo público exato; demais vídeos seguem protegidos.
   /^\/videos\/atenza-fr(?:-v2)?\.mp4$/,
   // Vitrine recuperada: somente páginas comerciais e arquivos publicados.

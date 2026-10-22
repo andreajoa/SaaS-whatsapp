@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react";
 
 import { useT } from "@/hooks/i18n/useT";
+import { traduzirAcessoEmIngles } from "@/lib/mercado/idioma-publico-en";
 import {
   signupSchema,
   signupComConviteSchema,
@@ -29,8 +30,9 @@ export interface ConviteDoSignup {
   email: string;
 }
 
-export function SignupForm({ convite }: { convite?: ConviteDoSignup }) {
-  const t = useT();
+export function SignupForm({ convite, ingles = false }: { convite?: ConviteDoSignup; ingles?: boolean }) {
+  const traduzirExistente = useT();
+  const t = (texto: string) => ingles ? traduzirAcessoEmIngles(texto) : traduzirExistente(texto);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);

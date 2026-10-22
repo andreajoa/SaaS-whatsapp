@@ -82,6 +82,15 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
 
   const [origem, marca] = await Promise.all([visitanteAtual(), marcaDaSaida(null)]);
   const escolhido = (await params)?.idioma;
+  if (!escolhido) {
+    if (origem.pais === "GB") redirect("/en-gb");
+    if (origem.pais === "US") redirect("/en-us");
+    if (!origem.pais && origem.idioma === "en") {
+      const h = await import("next/headers").then((mod) => mod.headers());
+      redirect(h.get("accept-language")?.toLowerCase().startsWith("en-gb") ? "/en-gb" : "/en-us");
+    }
+  }
+
   const idioma: IdiomaDoSite = escolhido === "en" || escolhido === "es" ? escolhido : "pt-BR";
   const visitante = { ...origem, idioma };
   const { mercado } = visitante;

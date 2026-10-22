@@ -11,7 +11,9 @@ import {
 const COOKIE_NAME = "sb-deskcomm-auth";
 
 export async function proxy(request: NextRequest) {
-  const response = NextResponse.next({ request: { headers: request.headers } });
+  const forwardedHeaders = new Headers(request.headers);
+  forwardedHeaders.set("x-pathname", request.nextUrl.pathname);
+  const response = NextResponse.next({ request: { headers: forwardedHeaders } });
 
   // Inject X-Request-Id for downstream correlation (audit log, error wrappers).
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
@@ -20,7 +22,7 @@ export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   // Expose pathname to Server Components via header (used by onboarding layout).
   response.headers.set("x-pathname", pathname);
-  request.headers.set("x-pathname", pathname);
+  // x-pathname is passed via forwardedHeaders before NextResponse is constructed.
 
   // EPIC-11: in dev we route by path (`/admin/*`); in prod the
   // `admin.deskcomm.com` sub-domain is mapped via Vercel rewrites to the same
@@ -29,6 +31,21 @@ export async function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const isAdminSurface = host.startsWith("admin.") || pathname.startsWith("/admin");
 
+  // Preserve the language selected on an English acquisition page across signup/login.
+  if (request.method === "GET" && /^\/en-(gb|us)(?:\/|$)/.test(pathname)) {
+    const locale = pathname.startsWith("/en-gb") ? "en-gb" : "en-us";
+    response.cookies.set("atenza_market", locale, {
+      path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax", httpOnly: true,
+      secure: request.nextUrl.protocol === "https:",
+    });
+  }
+  if (pathname === "/precos" && request.method === "GET") {
+    const locale = request.cookies.get("atenza_market")?.value;
+    const country = request.headers.get("x-vercel-ip-country") ?? request.headers.get("cf-ipcountry");
+    const market = locale === "en-gb" || locale === "en-us" ? locale
+      : country === "GB" ? "en-gb" : country === "US" ? "en-us" : null;
+    if (market) return NextResponse.redirect(new URL(`/${market}/pricing`, request.url), 307);
+  }
   if (isPublicPath(pathname)) {
     return response;
   }

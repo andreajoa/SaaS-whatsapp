@@ -5,14 +5,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition, useState } from "react";
 
 import { useT } from "@/hooks/i18n/useT";
+import { traduzirAcessoEmIngles } from "@/lib/mercado/idioma-publico-en";
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/auth/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requestPasswordReset } from "@/app/actions/auth/requestPasswordReset";
 
-export function ForgotPasswordForm() {
-  const t = useT();
+export function ForgotPasswordForm({ ingles = false }: { ingles?: boolean }) {
+  const traduzirExistente = useT();
+  const t = (texto: string) => ingles ? traduzirAcessoEmIngles(texto) : traduzirExistente(texto);
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);

@@ -5,8 +5,12 @@ import { branding } from "@/lib/branding";
 import { createClient } from "@/lib/supabase/server";
 import { normalizarIdioma } from "@/lib/i18n/idiomas";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { idiomaPublicoDoAcesso } from "@/lib/mercado/idioma-publico-server";
+import { traduzirAcessoEmIngles } from "@/lib/mercado/idioma-publico-en";
 
-export const metadata = { title: "Entrar" };
+export async function generateMetadata() {
+  return { title: await idiomaPublicoDoAcesso() ? "Sign in" : "Entrar" };
+}
 
 export default async function LoginPage({
   searchParams,
@@ -25,7 +29,8 @@ export default async function LoginPage({
   const idioma = normalizarIdioma(
     (user?.user_metadata?.locale as string | undefined) ?? null,
   );
-  const t = (texto: string) => traduzir(texto, idioma);
+  const ingles = Boolean(await idiomaPublicoDoAcesso());
+  const t = (texto: string) => ingles ? traduzirAcessoEmIngles(texto) : traduzir(texto, idioma);
 
   return (
     <div className="space-y-6">
@@ -91,7 +96,7 @@ export default async function LoginPage({
           )}
         </div>
       )}
-      <LoginForm next={next} />
+      <LoginForm next={next} ingles={ingles} />
       <div className="space-y-2 text-center text-sm">
         <p>
           <Link

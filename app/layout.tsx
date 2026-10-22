@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, IBM_Plex_Mono } from "next/font/google";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { Toaster } from "sonner";
 import { coresDaBarraDoNavegador } from "@/lib/branding/barra-do-navegador";
 import { MarcaDaInstalacaoProvider } from "@/lib/branding/contexto";
@@ -275,12 +275,22 @@ async function MarcaDosClientComponents({ children }: { children: React.ReactNod
   );
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const [h, c] = await Promise.all([headers(), cookies()]);
+  const path = h.get("x-pathname") ?? "";
+  const stored = c.get("atenza_market")?.value;
+  const isEnglishPage = path === "/en-gb" || path.startsWith("/en-gb/") || path === "/en-us" || path.startsWith("/en-us/");
+  const isAuthPage = path === "/signup" || path.startsWith("/login") || path === "/precos";
+  const locale = path.startsWith("/en-gb") || (isAuthPage && stored === "en-gb") ? "en-GB"
+    : path.startsWith("/en-us") || (isAuthPage && stored === "en-us") ? "en-US"
+    : isAuthPage && !stored && h.get("x-vercel-ip-country") === "GB" ? "en-GB"
+    : isAuthPage && !stored && h.get("x-vercel-ip-country") === "US" ? "en-US"
+    : "pt-BR";
   return (
     <html
-      lang="pt-BR"
+      lang={isEnglishPage || isAuthPage ? locale : "pt-BR"}
       data-theme="light"
       suppressHydrationWarning
       className={`${atkinson.variable} ${plexMono.variable}`}

@@ -160,27 +160,28 @@ describe("crons no deploy hospedado (Vercel)", () => {
     expect(subDiarias(cadenciasDoScheduler()).length).toBeGreaterThan(0);
   });
 
-  it("se vercel.json declara crons, eles batem com o scheduler rota a rota", () => {
+  // A Vercel Hobby só aceita cadência diária. Este único cron é um fallback
+  // intencional para a sequência comercial; o scheduler externo cobre as
+  // outras rotas em suas cadências completas. Verificamos a lista EXATA para
+  // impedir que novos crons silenciosos sejam publicados neste plano.
+  const CRON_DIARIO_HOBBY = { "marketing-sequencia": "0 12 * * *" } as const;
+
+  it("no Hobby, apenas os crons diários explicitamente aprovados estão declarados", () => {
     const vercel = cadenciasDaVercel();
-    if (Object.keys(vercel).length === 0) return; // modo (a) — agendador externo
-    const naVps = Object.keys(cadenciasDoScheduler()).sort();
-    const naVercel = Object.keys(vercel).sort();
-    expect(
-      naVercel,
-      `O 'crons' do vercel.json divergiu de docker/scheduler/entrypoint.sh. ` +
-        `Só na VPS: [${naVps.filter((r) => !naVercel.includes(r)).join(", ")}]. ` +
-        `Só na Vercel: [${naVercel.filter((r) => !naVps.includes(r)).join(", ")}].`,
-    ).toEqual(naVps);
+    expect(vercel).toEqual(CRON_DIARIO_HOBBY);
+    const semRota = Object.keys(vercel).filter((nome) => !rotasNoCodigo().includes(nome));
+    expect(semRota, "Toda entrada Vercel Cron deve ter rota HTTP real").toEqual([]);
   });
 
-  it("se vercel.json declara crons, a cadência é a mesma dos dois lados", () => {
-    const vercel = cadenciasDaVercel();
-    if (Object.keys(vercel).length === 0) return; // modo (a)
-    const vps = cadenciasDoScheduler();
-    const divergentes = Object.keys(vps)
-      .filter((r) => vercel[r] && vercel[r] !== vps[r])
-      .map((r) => `${r}: VPS "${vps[r]}" ≠ Vercel "${vercel[r]}"`);
-    expect(divergentes, `Cadência divergente:\n  ${divergentes.join("\n  ")}`).toEqual([]);
+  it("o scheduler externo continua cobrindo todas as rotas em suas cadências", () => {
+    const agendados = cadenciasDoScheduler();
+    const daVercel = cadenciasDaVercel();
+    expect(Object.keys(daVercel).filter((nome) => !agendados[nome])).toEqual([]);
+    // Diferença deliberada: 37 * * * * no scheduler, 0 12 * * * no Hobby.
+    for (const [nome, horario] of Object.entries(CRON_DIARIO_HOBBY)) {
+      expect(daVercel[nome]).toBe(horario);
+      expect(agendados[nome]).toBeDefined();
+    }
   });
 
   it("vercel.json não declara cron sub-diário (reprovaria o deploy no Hobby)", () => {

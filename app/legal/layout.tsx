@@ -1,6 +1,7 @@
 import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
 import { SIMBOLO_ATENZA, simboloDaMarca } from "@/lib/branding/desenho";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { LinksLegais } from "@/components/site/LinksLegais";
 import { branding } from "@/lib/branding";
@@ -40,6 +41,9 @@ import { visitanteAtual } from "@/lib/mercado/visitante";
  * específica, e esconder os outros sete atrás de um clique é exatamente o que
  * faz a pessoa desistir e escrever para o suporte.
  */
+/** The public sitemap advertises these transparency documents; override the global private-app noindex. */
+export const metadata: Metadata = { robots: { index: true, follow: true } };
+
 export default async function LegalLayout({ children }: { children: React.ReactNode }) {
   const marca = branding();
   const { idioma } = await visitanteAtual();

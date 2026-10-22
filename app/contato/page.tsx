@@ -11,7 +11,11 @@ import { visitanteAtual } from "@/lib/mercado/visitante";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Contato" };
+export const metadata: Metadata = {
+  title: "Contato",
+  robots: { index: true, follow: true },
+  alternates: { canonical: "/contato" },
+};
 
 /**
  * A porta de entrada de quem ainda não é cliente.

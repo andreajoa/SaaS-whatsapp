@@ -127,6 +127,10 @@ export const ALVO_DE_FUNIL: Record<string, AlvoDeFunil> = {
   crm_create_webhook_source: "sem_funil",
   crm_set_webhook_source_active: "sem_funil",
   crm_set_automation_rule_active: "sem_funil",
+  // Global IA attendants and per-number routing do not target a sales pipeline.
+  // Both are critical and human-only in TOOL_CATALOG, gated by role/permissions.
+  crm_upsert_agent: "sem_funil",
+  crm_upsert_router: "sem_funil",
 };
 
 /**

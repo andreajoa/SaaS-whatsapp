@@ -84,6 +84,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { url: url("/demonstracao"), lastModified: "2026-10-10" },
     { url: url("/precos"), lastModified: "2026-10-11", priority: 0.9 },
+    // English acquisition pricing pages must be discoverable in both markets.
+    { url: url("/en-gb/pricing"), priority: 0.9 },
+    { url: url("/en-us/pricing"), priority: 0.9 },
     // Quem procura "como falar com o suporte" antes de assinar procura esta.
     { url: url("/contato"), changeFrequency: "yearly", priority: 0.5 },
     { url: url("/legal"), changeFrequency: "yearly", priority: 0.4 },

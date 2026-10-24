@@ -187,6 +187,10 @@ const schema = z.object({
   OPENROUTER_APP_TITLE: z.string().optional().default(""),
   ANTHROPIC_API_KEY: z.string().optional().default(""),
   OPENAI_API_KEY: z.string().optional().default(""),
+  // Chave de plataforma do Google (Gemini). Com `AI_PROVIDER=google` e um
+  // `AI_DEFAULT_MODEL` gemini, a conta nova responde sem cadastrar chave nenhuma —
+  // é o que segura o teste sem cartão no plano gratuito do Google AI Studio.
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional().default(""),
   // O provedor e o modelo com que a organização NASCE no cadastro do site.
   // Os dois juntos, ou nenhum — ver `lib/ai/llm-de-nascimento.ts`.
   AI_PROVIDER: z.string().optional().default(""),

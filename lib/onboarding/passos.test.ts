@@ -35,7 +35,6 @@ describe("passos visíveis", () => {
   it("a ordem é a mesma nos dois casos, menos o passo que não existe", () => {
     expect(passosVisiveis(SEM_LOJA).map((p) => p.segmento)).toEqual([
       "welcome",
-      "connect-whatsapp",
       "setup-ai",
       // O quadro de clientes vem DEPOIS de treinar: a sugestão sai da chave que
       // a pessoa acabou de confirmar funcionando, e é o mesmo modelo que vai
@@ -45,6 +44,10 @@ describe("passos visíveis", () => {
       // time: é a prova de que ele funciona, e ela precisa acontecer enquanto a
       // pessoa ainda está no wizard.
       "testar",
+      // Conselho de 24/10/2026: o WhatsApp vem DEPOIS de ver a IA atender — era o
+      // 2º passo e, na operação hospedada, pede credenciais da Meta antes de a
+      // pessoa ver qualquer resultado.
+      "connect-whatsapp",
       "invite-team",
     ]);
   });
@@ -60,9 +63,12 @@ describe("próximo passo", () => {
     // instalação não oferece deixaria a pessoa presa sem entender por quê.
     const s: OnboardingState = {
       welcome: { accepted_at: "x", timezone: "America/Sao_Paulo", display_name: "N" },
+      ai: { agent_id: "a", prompt_template: "p" },
+      funil: { pipeline_id: "f", origem: "ia", etapas: 6 },
+      teste: { respondeu: true },
       whatsapp: { status: "WORKING" },
     };
-    expect(proximoPasso(s, SEM_LOJA)?.segmento).toBe("setup-ai");
+    expect(proximoPasso(s, SEM_LOJA)?.segmento).toBe("invite-team");
     expect(proximoPasso(s, COM_LOJA)?.segmento).toBe("connect-nuvemshop");
   });
 

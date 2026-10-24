@@ -89,6 +89,7 @@ export const AUDIT_ACTIONS = [
   "onboarding.whatsapp_skipped",
   "onboarding.nuvemshop_skipped",
   "onboarding.ai_configured",
+  "onboarding.ai_published_after_channel",
   "onboarding.team_invited",
   "onboarding.completed",
   "tenant.onboarded",

@@ -9788,6 +9788,25 @@ export const DICIONARIO: Traducoes = {
     es: "El mismo número de siempre, conectado por un código QR en un minuto.",
   },
   "Comece seus": { es: "Comienza tus" },
+  "Seu teste de": { es: "Tu prueba de" },
+  "dias, sem cartão, começa quando a sua IA responder o primeiro cliente": {
+    es: "días, sin tarjeta, comienza cuando tu IA responda al primer cliente",
+  },
+  "Configure, teste e conecte o WhatsApp sem pressa: o relógio só começa a contar quando a IA atender uma conversa de verdade. Se quiser garantir o plano agora, escolha abaixo.":
+    {
+      es: "Configura, prueba y conecta WhatsApp sin prisa: el reloj solo empieza a contar cuando la IA atiende una conversación real. Si quieres asegurar el plan ahora, elígelo abajo.",
+    },
+  "Hoje é o último dia do seu teste sem cartão": { es: "Hoy es el último día de tu prueba sin tarjeta" },
+  "Falta 1 dia do seu teste sem cartão": { es: "Falta 1 día de tu prueba sin tarjeta" },
+  "dias do seu teste sem cartão": { es: "días de tu prueba sin tarjeta" },
+  "Tudo liberado e nada foi cobrado. Para a IA continuar atendendo depois do teste, escolha um plano: o cartão só é cobrado quando o teste terminar.":
+    {
+      es: "Todo habilitado y no se cobró nada. Para que la IA siga atendiendo después de la prueba, elige un plan: la tarjeta solo se cobra cuando termine la prueba.",
+    },
+  "Seu teste sem cartão terminou": { es: "Tu prueba sin tarjeta terminó" },
+  "Escolha um plano para a IA voltar a atender pelo WhatsApp. A cobrança começa hoje.": {
+    es: "Elige un plan para que la IA vuelva a atender por WhatsApp. El cobro empieza hoy.",
+  },
   "Nada é cobrado nos primeiros dias": { es: "No se cobra nada en los primeros días" },
   "dias com tudo funcionando. Pedimos o cartão para começar e a assinatura só começa depois desse período — cancele em um clique quando quiser.":
     {

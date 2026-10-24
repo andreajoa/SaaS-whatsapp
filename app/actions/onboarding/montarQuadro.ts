@@ -15,7 +15,7 @@ import { audit } from "@/lib/audit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildModel, chaveDePlataforma } from "@/lib/ai/runtime/agent";
 import { loadCredential } from "@/lib/ai/credentials";
-import { cerebroDoRascunho } from "@/lib/onboarding/cerebro-do-rascunho";
+import { cerebroDoRascunho, SEM_RACIOCINIO } from "@/lib/onboarding/cerebro-do-rascunho";
 import { slugDeNome } from "@/lib/leads/stage-editing";
 import {
   etapasParaGravar,
@@ -162,6 +162,7 @@ export async function dadosDoPasso(orgId: string, negocio: string): Promise<Dado
       // discursar bate no teto em vez de queimar o crédito de quem acabou de
       // colar a chave.
       maxOutputTokens: 900,
+      providerOptions: SEM_RACIOCINIO,
     });
     return r.text;
   });

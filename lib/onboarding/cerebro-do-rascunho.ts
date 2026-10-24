@@ -16,6 +16,15 @@ import { chaveDePlataforma } from "@/lib/ai/runtime/agent";
 import { loadCredential } from "@/lib/ai/credentials";
 import { escolherModeloDoProvedor, type ModeloDoCatalogo } from "@/lib/ai/agents/escolher-modelo";
 
+/**
+ * As chamadas do onboarding têm teto baixo de saída, e o Gemini 3.x conta o
+ * raciocínio dentro dele: medido em 24/10, 573 dos 600 tokens foram pensamento e
+ * a resposta saiu cortada na terceira palavra (`finishReason: MAX_TOKENS`) — no
+ * quadro, o JSON nem fechava. Resposta de WhatsApp e sete linhas de JSON não
+ * precisam de raciocínio. A chave é por provedor: os outros ignoram.
+ */
+export const SEM_RACIOCINIO = { google: { thinkingConfig: { thinkingBudget: 0 } } };
+
 export type CerebroDoRascunho =
   | { provider: string; model: string; apiKey: string }
   | { erro: string };

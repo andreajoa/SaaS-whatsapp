@@ -17,10 +17,22 @@ import { generateText } from "ai";
 
 import { buildModel } from "@/lib/ai/runtime/agent";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cerebroDoRascunho } from "@/lib/onboarding/cerebro-do-rascunho";
+import { cerebroDoRascunho, SEM_RACIOCINIO } from "@/lib/onboarding/cerebro-do-rascunho";
 import { requireOnboardingCtx } from "./_shared";
 
 export type DesfechoDoRascunho = { ok: true; texto: string } | { ok: false; erro: string };
+
+/**
+ * O turno real confere estoque, agenda e preço pelas ferramentas e tem as
+ * conferências de promessa antes de a mensagem sair; a prévia não tem nenhuma
+ * das duas. Medido em 24/10: sem este aviso, a prévia respondeu "temos sim" e
+ * "entregamos hoje" a uma loja que ela nunca consultou — o dono veria o
+ * funcionário prometendo o que o de verdade nunca prometeria.
+ */
+const SEM_FERRAMENTAS =
+  "Isto é uma prévia: você ainda não consegue consultar estoque, agenda, preços nem prazos. " +
+  "Não afirme que algo existe, quanto custa ou quando chega — acolha a pessoa, entenda o que ela quer " +
+  "e diga que vai confirmar.";
 
 /** O mesmo teto do campo da tela: mensagem de cliente, não um documento. */
 const LIMITE_DA_MENSAGEM = 4000;
@@ -45,11 +57,12 @@ export async function ensaiarRascunho(mensagem: string): Promise<DesfechoDoRascu
   try {
     const r = await generateText({
       model: buildModel(cerebro.provider, cerebro.apiKey, cerebro.model),
-      system: (agente.system_prompt as string | null) ?? "",
+      system: `${(agente.system_prompt as string | null) ?? ""}\n\n${SEM_FERRAMENTAS}`,
       prompt: texto,
       // Uma resposta de WhatsApp. O teto protege a chave da instalação de quem
       // resolver pedir um texto longo no ensaio.
       maxOutputTokens: 600,
+      providerOptions: SEM_RACIOCINIO,
     });
     const resposta = r.text.trim();
     return resposta

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { marcarTesteFeito, pularTeste } from "@/app/actions/onboarding/marcarTeste";
+import { ensaiarRascunho } from "@/app/actions/onboarding/ensaiarRascunho";
 
 interface Props {
   nome: string | null;
@@ -38,10 +39,17 @@ export function TestarClient({ nome, agenteId, versaoId }: Props) {
   const rascunho = Boolean(agenteId) && !versaoId;
 
   async function ensaiar() {
-    if (!agenteId || !versaoId) return;
+    if (!agenteId) return;
     setCarregando(true);
     setDesfecho(null);
     try {
+      // Sem número ainda não há versão para o runtime real: o rascunho responde
+      // pela prévia, com a mesma instrução e o mesmo cérebro.
+      if (!versaoId) {
+        const r = await ensaiarRascunho(mensagem);
+        setDesfecho(r.ok ? { tipo: "resposta", texto: r.texto } : { tipo: "erro", mensagem: r.erro });
+        return;
+      }
       const res = await fetch(`/api/v1/ai/agents/${agenteId}/versions/${versaoId}/test`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -100,19 +108,14 @@ export function TestarClient({ nome, agenteId, versaoId }: Props) {
       )}
 
       {rascunho && (
-        <div className="rounded-lg border bg-background p-6" role="status">
-          <p className="text-sm font-medium">
-            {funcionario} {t("está como")} <strong>{t("rascunho")}</strong> — {t("ainda não foi para o ar.")}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t(
-              "Rascunho não responde mensagem, então não há o que ensaiar. O passo anterior explicou o que falta; você pode resolver depois em IA › Agentes.",
-            )}
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground" role="status">
+          {t(
+            "Prévia: ele responde com o que você ensinou. Cadastrar o cliente e mover o cartão começam quando o WhatsApp estiver conectado, no próximo passo.",
+          )}
+        </p>
       )}
 
-      {!semAgente && !rascunho && (
+      {!semAgente && (
         <div className="space-y-4 rounded-lg border bg-background p-6">
           <div className="space-y-2">
             <Label htmlFor="mensagem">{t("Escreva como se fosse um cliente")}</Label>

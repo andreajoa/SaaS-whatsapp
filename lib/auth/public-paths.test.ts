@@ -9,6 +9,11 @@ import { describe, it, expect } from "vitest";
 import { isPublicPath } from "@/lib/auth/public-paths";
 
 describe("isPublicPath", () => {
+  it("libera só a chave do IndexNow, não qualquer .txt", () => {
+    expect(isPublicPath("/a74287edcb6775cfbfdf01846f276e6d.txt")).toBe(true);
+    expect(isPublicPath("/outro-arquivo.txt")).toBe(false);
+  });
+
   it("serve o vídeo comercial francês sem expor outros recursos", () => {
     expect(isPublicPath("/videos/atenza-fr.mp4")).toBe(true);
     expect(isPublicPath("/videos/atenza-fr-v2.mp4")).toBe(true);

@@ -18,6 +18,8 @@ export const PUBLIC_PATHS: RegExp[] = [
   /^\/(?:ajuda\/chave-de-ia|es\/ayuda\/clave-de-ia|en\/help\/ai-key)$/,
   /^\/de\/impressum$/,
   /^\/llms\.txt$/,
+  // Chave do IndexNow (Bing): o protocolo exige o arquivo público na raiz.
+  /^\/a74287edcb6775cfbfdf01846f276e6d\.txt$/,
   /^\/media\/atenza\/(?:atendimento-loop\.mp4|atenza-explica\.(?:mp4|vtt)|atenza-explica-(?:es-mx|es-co|es-ar|es-cl|es-pe|es-es|en-us|de-de)\.mp4|chave-(?:openai|anthropic|google|openrouter)(?:-es|-en)?\.mp4)$/,
   /^\/login(\/.*)?$/,
   /^\/signup$/,

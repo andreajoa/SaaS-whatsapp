@@ -9,7 +9,8 @@ import { redirect } from "next/navigation";
 
 import { audit } from "@/lib/audit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireOnboardingCtx, OnboardingError } from "./_shared";
+import { publishFirstVersion } from "@/lib/ai/agents/first-publication";
+import { loadOnboardingState, requireOnboardingCtx, OnboardingError } from "./_shared";
 
 export type FinishOnboardingResult =
   | { ok: true; alreadyOnboarded: boolean }
@@ -60,5 +61,44 @@ export async function finishOnboarding(): Promise<FinishOnboardingResult> {
     });
   }
 
+  // Desde 24/10/2026 o WhatsApp vem DEPOIS de treinar (lib/onboarding/passos.ts):
+  // o agente nasce em "Treinar" sem canal e fica rascunho (`no_channel`). Se o
+  // número foi conectado no caminho, é aqui que ele vai ao ar — sem isso a IA
+  // nunca responderia, e o teste sem cartão (que começa na 1ª resposta dela)
+  // nunca começaria. `publishFirstVersion` nunca lança e não republica.
+  await publicarAgenteQueEsperavaCanal(admin, ctx.orgId, ctx.userId);
+
   redirect("/app/inbox");
+}
+
+async function publicarAgenteQueEsperavaCanal(
+  admin: ReturnType<typeof createAdminClient>,
+  orgId: string,
+  userId: string,
+): Promise<void> {
+  try {
+    const { state } = await loadOnboardingState(orgId);
+    const agentId = state.ai?.agent_id;
+    if (!agentId) return;
+    const { data: agent } = await admin
+      .from("ai_agents")
+      .select("id, system_prompt, published_version_id, archived_at")
+      .eq("organization_id", orgId)
+      .eq("id", agentId)
+      .maybeSingle();
+    if (!agent || agent.published_version_id || agent.archived_at) return;
+    const publicacao = await publishFirstVersion(admin, orgId, agent, agent.system_prompt ?? "", userId);
+    if (publicacao.published) {
+      await audit({
+        action: "onboarding.ai_published_after_channel",
+        actorUserId: userId,
+        organizationId: orgId,
+        resourceType: "ai_agent",
+        resourceId: agent.id,
+      });
+    }
+  } catch {
+    // O onboarding termina mesmo assim: o agente segue rascunho e a lista de
+    // agentes já mostra "Rascunho" com o botão de publicar.
+  }
 }

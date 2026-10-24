@@ -10,6 +10,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  DIAS_DE_TRIAL,
   ehPlanoConhecido,
   instalacaoCobra,
   type PlanoId,
@@ -29,8 +30,15 @@ const DIA_MS = 86_400_000;
 export type AcessoDeCobranca =
   /** Esta instalação não cobra (self-host, sem STRIPE_SECRET_KEY). */
   | "nao_cobra"
-  /** Cartão ainda não entrou — o trial do Stripe nem começou. */
+  /**
+   * Sem cartão e sem teste: a IA ainda não respondeu nenhuma conversa e a conta já passou de
+   * `DIAS_PARA_COMECAR_O_TESTE`, ou o teste sem cartão já terminou. Vai para a tela de cobrança.
+   */
   | "sem_cartao"
+  /** Conta nova, a IA ainda não respondeu ninguém: tudo liberado, o relógio do teste não começou. */
+  | "teste_nao_iniciado"
+  /** Teste sem cartão: `DIAS_DE_TRIAL` dias contados da 1ª resposta da IA a um cliente real. */
+  | "teste_sem_cartao"
   /** Dentro dos dias sem cobrança do Stripe (status `trialing`). */
   | "trial"
   | "em_dia"
@@ -96,14 +104,42 @@ function diasAte(quando: Date | null, agora: Date): number | null {
  * Recebe o client como parâmetro (admin, já escopado pelo chamador) em vez de
  * criá-lo: o layout já tem um de pé, e a org vem de fonte confiável lá.
  */
+/**
+ * Quem nunca pôs a IA para responder ninguém não ganha teste eterno: depois disto a conta pede cartão
+ * mesmo sem o relógio do teste ter começado.
+ */
+export const DIAS_PARA_COMECAR_O_TESTE = 14;
+
+/**
+ * Quando a IA respondeu a primeira conversa real desta organização (`messages` outbound com
+ * `sent_via = 'ai'`). `null` = ainda não respondeu. Falha de consulta conta como "ainda não", o mesmo
+ * sentido de falha aberta do resto deste arquivo.
+ */
+export async function inicioDoTeste(admin: SupabaseClient, organizationId: string): Promise<Date | null> {
+  try {
+    const { data } = await admin
+      .from("messages")
+      .select("sent_at")
+      .eq("organization_id", organizationId)
+      .eq("direction", "outbound")
+      .eq("sent_via", "ai")
+      .order("sent_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    const quando = (data as { sent_at?: string } | null)?.sent_at;
+    return quando ? new Date(quando) : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function estadoDaCobranca(
   admin: SupabaseClient,
   organizationId: string,
   /**
-   * Quando a organização nasceu. NÃO decide mais acesso — o trial é o do
-   * Stripe desde 2026-09-24 (ver o cabeçalho de `DIAS_DE_TRIAL`). Continua na
-   * assinatura porque os quatro chamadores já o passam e porque a tela de
-   * cobrança mostra desde quando a conta existe.
+   * Quando a organização nasceu. Só decide uma coisa: quem nunca pôs a IA
+   * para responder recebe a tela de cobrança depois de
+   * `DIAS_PARA_COMECAR_O_TESTE` dias (não existe teste eterno).
    */
   _orgCriadaEm: string | Date | null,
   agora: Date = new Date(),
@@ -153,7 +189,26 @@ export async function estadoDaCobranca(
   // `orgCriadaEm` deixou de decidir acesso. O parâmetro fica porque as telas
   // ainda mostram desde quando a conta existe.
   if (!linha) {
-    return { ...vazio, acesso: "sem_cartao" };
+    // ─── Teste sem cartão (conselho de 24/10/2026) ──────────────────────────
+    //
+    // A Atenza nunca teve um pagante: o cliente esbarrava em credenciais da
+    // Meta, chave de IA e cartão antes de ver a IA funcionar. O teste volta a
+    // ser sem cartão, mas sem os dois defeitos do modelo antigo (cabeçalho de
+    // `DIAS_DE_TRIAL`): o relógio só começa quando a IA responde a primeira
+    // conversa real (o onboarding não come dias do teste), e a tela de
+    // cobrança aparece sozinha no fim, com o plano escolhido a um clique.
+    const inicio = await inicioDoTeste(admin, organizationId);
+    if (!inicio) {
+      const criada = _orgCriadaEm ? new Date(_orgCriadaEm) : null;
+      const prazo = criada ? criada.getTime() + DIAS_PARA_COMECAR_O_TESTE * DIA_MS : null;
+      if (prazo !== null && prazo <= agora.getTime()) return { ...vazio, acesso: "sem_cartao" };
+      return { ...vazio, acesso: "teste_nao_iniciado" };
+    }
+    const fim = new Date(inicio.getTime() + DIAS_DE_TRIAL * DIA_MS);
+    if (fim.getTime() > agora.getTime()) {
+      return { ...vazio, acesso: "teste_sem_cartao", diasRestantes: diasAte(fim, agora), expiraEm: fim };
+    }
+    return { ...vazio, acesso: "sem_cartao", expiraEm: fim };
   }
 
   const fimDoCiclo = linha.current_period_end ? new Date(linha.current_period_end) : null;

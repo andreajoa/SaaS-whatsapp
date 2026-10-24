@@ -110,4 +110,16 @@ describe("llmEdgeConfigFromEnv — o que sai do .env chega ao turno", () => {
     );
     expect(out.apiKey).toBe("sk-proj-do-env");
   });
+
+  it("Gemini: a chave do Google no .env responde a org em google sem BYOK (teste grátis)", async () => {
+    const cfg = llmEdgeConfigFromEnv({ GOOGLE_GENERATIVE_AI_API_KEY: "AIza-do-env" });
+    expect(cfg.googleApiKey).toBe("AIza-do-env");
+    const out = await resolveOrgLlmConfig(
+      poolFake({ provider: "google", default_model: "gemini-3.5-flash" }, SEM_BYOK),
+      cfg,
+      "org1",
+    );
+    expect(out.provider).toBe("google");
+    expect(out.apiKey).toBe("AIza-do-env");
+  });
 });

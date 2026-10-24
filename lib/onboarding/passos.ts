@@ -57,22 +57,6 @@ export const PASSOS: readonly PassoDoOnboarding[] = [
     pulado: () => false,
   },
   {
-    segmento: "connect-whatsapp",
-    // O telefone é a primeira peça concreta do funcionário, e é o passo que
-    // pede o celular na mão — o instalador já avisa para deixá-lo aberto.
-    rotulo: "O telefone dele",
-    existe: () => true,
-    cumprido: (s) => marcado(s.whatsapp),
-    pulado: (s) => foiPulado(s.whatsapp),
-  },
-  {
-    segmento: "connect-nuvemshop",
-    rotulo: "Sua loja",
-    existe: (ctx) => ctx.lojaLigada,
-    cumprido: (s) => marcado(s.nuvemshop),
-    pulado: (s) => foiPulado(s.nuvemshop),
-  },
-  {
     segmento: "setup-ai",
     rotulo: "Treinar",
     existe: () => true,
@@ -99,6 +83,24 @@ export const PASSOS: readonly PassoDoOnboarding[] = [
     existe: () => true,
     cumprido: (s) => marcado(s.teste),
     pulado: (s) => foiPulado(s.teste),
+  },
+  {
+    segmento: "connect-whatsapp",
+    // Conselho de 24/10/2026: o WhatsApp vem DEPOIS de ver a IA atender. Era o
+    // 2º passo, e na operação hospedada ele pede credenciais da Meta — a
+    // parede em que todo cadastro parava antes de o dono ver o funcionário
+    // funcionando. Agora a pessoa treina, ensaia e só então liga o telefone.
+    rotulo: "O telefone dele",
+    existe: () => true,
+    cumprido: (s) => marcado(s.whatsapp),
+    pulado: (s) => foiPulado(s.whatsapp),
+  },
+  {
+    segmento: "connect-nuvemshop",
+    rotulo: "Sua loja",
+    existe: (ctx) => ctx.lojaLigada,
+    cumprido: (s) => marcado(s.nuvemshop),
+    pulado: (s) => foiPulado(s.nuvemshop),
   },
   {
     segmento: "invite-team",

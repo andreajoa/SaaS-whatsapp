@@ -100,7 +100,7 @@ const PASSOS = [
 const FAQ = [
   {
     question: "Preciso de cartão para testar?",
-    answer: `Sim. O cartão é cadastrado no checkout da Stripe, mas nada é cobrado nos primeiros ${DIAS_DE_TRIAL} dias. Se cancelar antes, não paga nada.`,
+    answer: `Não. Você cria a conta, treina a IA e conecta o WhatsApp sem cartão. Os ${DIAS_DE_TRIAL} dias de teste só começam a contar quando a sua IA responde o primeiro cliente de verdade. No fim do teste, para continuar, você escolhe um plano e cadastra o cartão no checkout da Stripe.`,
   },
   {
     question: "O custo da inteligência artificial está incluído?",

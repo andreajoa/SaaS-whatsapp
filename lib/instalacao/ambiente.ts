@@ -52,10 +52,7 @@ const VARIAVEL_DA_CHAVE: Record<string, string> = {
   anthropic: "ANTHROPIC_API_KEY",
   openai: "OPENAI_API_KEY",
   openrouter: "OPENROUTER_API_KEY",
-  // O Google não tem chave de plataforma: `resolveOrgLlmConfig` não tem ramo de
-  // fallback para ele, e nenhuma variável existe em `lib/env.ts` nem no
-  // `.env.example`. Declarar aqui um nome inventado faria o leitor prometer um
-  // caminho que o runtime recusa.
+  google: "GOOGLE_GENERATIVE_AI_API_KEY",
 };
 
 function preenchida(source: FonteDeAmbiente, nome: string | undefined): boolean {

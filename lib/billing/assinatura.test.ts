@@ -65,61 +65,87 @@ describe("estadoDaCobranca — o interruptor do self-host", () => {
   });
 });
 
-describe("estadoDaCobranca — sem linha no banco: falta o cartão", () => {
+/**
+ * Banco de mentira que responde POR TABELA: `org_subscriptions` devolve a linha
+ * da assinatura e `messages` devolve a 1ª resposta da IA (ou nada).
+ */
+function bancoPorTabela(assinatura: Linha, primeiraRespostaDaIA: string | null) {
+  const cadeia = (resposta: Linha) => {
+    const no = {
+      select: () => no,
+      eq: () => no,
+      order: () => no,
+      limit: () => no,
+      async maybeSingle() {
+        return { data: resposta, error: null };
+      },
+    };
+    return no;
+  };
+  return {
+    from(tabela: string) {
+      return tabela === "messages"
+        ? cadeia(primeiraRespostaDaIA ? { sent_at: primeiraRespostaDaIA } : null)
+        : cadeia(assinatura);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
+}
+
+describe("estadoDaCobranca — sem assinatura: o teste sem cartão (24/10/2026)", () => {
   /**
-   * Este bloco media o TRIAL DERIVADO: 14 dias contados de
-   * `organizations.created_at`, sem cartão, com a ausência de linha
-   * significando "está avaliando". Desde 2026-09-24 o trial é o do Stripe e só
-   * existe depois do cartão — a ausência de linha passou a significar uma
-   * coisa só, e é outra.
-   *
-   * O que os casos abaixo protegem é a DISTINÇÃO: `sem_cartao` não pode voltar
-   * a ser `trial` (liberaria o produto de graça para sempre) nem virar
-   * `vencido` (acusaria de atraso quem nunca assinou, e a tela diria a frase
-   * errada no primeiro minuto do cliente novo).
+   * O teste voltou a ser sem cartão, mas o relógio só começa na 1ª resposta da
+   * IA a uma conversa real (o onboarding não come dias), e quem nunca põe a IA
+   * para responder recebe a tela de cobrança depois de 14 dias — não existe
+   * teste eterno. `vencido` continua reservado para quem já assinou.
    */
-  it("⭐ organização recém-criada NÃO tem acesso — falta o cartão", async () => {
-    const estado = await estadoDaCobranca(
-      bancoQueDevolve(null),
-      ORG,
-      "2026-02-25T12:00:00Z",
-      AGORA,
-    );
-    expect(estado.acesso).toBe("sem_cartao");
+  it("⭐ conta nova, IA ainda não respondeu: tudo liberado e o relógio parado", async () => {
+    const estado = await estadoDaCobranca(bancoPorTabela(null, null), ORG, "2026-02-25T12:00:00Z", AGORA);
+    expect(estado.acesso).toBe("teste_nao_iniciado");
     expect(estado.jaAssinou).toBe(false);
+    expect(estado.expiraEm).toBeNull();
   });
 
-  it("a data de criação deixou de decidir: antiga ou recente, é o mesmo estado", async () => {
-    // Enquanto o trial era derivado, estas duas datas davam respostas opostas.
-    // Se alguém reintroduzir a conta por `created_at`, este caso reprova.
-    const recente = await estadoDaCobranca(
-      bancoQueDevolve(null),
+  it("⭐ a IA respondeu há 2 dias: teste sem cartão com 5 dias restantes", async () => {
+    const estado = await estadoDaCobranca(
+      bancoPorTabela(null, "2026-02-27T12:00:00Z"),
       ORG,
-      "2026-02-25T12:00:00Z",
+      "2026-02-20T12:00:00Z",
       AGORA,
     );
-    const antiga = await estadoDaCobranca(
-      bancoQueDevolve(null),
-      ORG,
-      "2020-01-01T00:00:00Z",
-      AGORA,
-    );
-    expect(recente.acesso).toBe("sem_cartao");
-    expect(antiga.acesso).toBe("sem_cartao");
+    expect(estado.acesso).toBe("teste_sem_cartao");
+    expect(estado.diasRestantes).toBe(5);
+    expect(estado.expiraEm?.toISOString()).toBe("2026-03-06T12:00:00.000Z");
   });
 
-  it("sem saber quando a organização nasceu, o estado é o mesmo", async () => {
-    const estado = await estadoDaCobranca(bancoQueDevolve(null), ORG, null, AGORA);
+  it("⭐ teste acabou sem cartão: vai para a cobrança, com a data do fim", async () => {
+    const estado = await estadoDaCobranca(
+      bancoPorTabela(null, "2026-02-20T12:00:00Z"),
+      ORG,
+      "2026-02-10T12:00:00Z",
+      AGORA,
+    );
     expect(estado.acesso).toBe("sem_cartao");
+    expect(estado.expiraEm?.toISOString()).toBe("2026-02-27T12:00:00.000Z");
   });
 
-  it("⭐ quem nunca assinou não é tratado como inadimplente nem como avaliando", async () => {
-    // `vencido` fala de assinatura parada. Mostrá-lo a quem nunca assinou é
-    // acusar a pessoa de um atraso que ela não teve, no primeiro minuto dela.
-    // `trial` seria pior: liberaria o produto sem cartão nenhum.
-    const estado = await estadoDaCobranca(bancoQueDevolve(null), ORG, null, AGORA);
-    expect(estado.acesso).not.toBe("vencido");
-    expect(estado.acesso).not.toBe("trial");
+  it("⭐ sem resposta da IA por mais de 14 dias: pede cartão (sem teste eterno)", async () => {
+    const estado = await estadoDaCobranca(bancoPorTabela(null, null), ORG, "2026-02-01T12:00:00Z", AGORA);
+    expect(estado.acesso).toBe("sem_cartao");
+    expect(estado.expiraEm).toBeNull();
+  });
+
+  it("sem saber quando a organização nasceu e sem resposta da IA: liberado", async () => {
+    const estado = await estadoDaCobranca(bancoPorTabela(null, null), ORG, null, AGORA);
+    expect(estado.acesso).toBe("teste_nao_iniciado");
+  });
+
+  it("⭐ quem nunca assinou nunca é tratado como inadimplente", async () => {
+    for (const ia of [null, "2026-02-27T12:00:00Z", "2026-02-01T12:00:00Z"]) {
+      const estado = await estadoDaCobranca(bancoPorTabela(null, ia), ORG, "2026-01-01T12:00:00Z", AGORA);
+      expect(estado.acesso).not.toBe("vencido");
+      expect(estado.acesso).not.toBe("trial");
+    }
   });
 });
 

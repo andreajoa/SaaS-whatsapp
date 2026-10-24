@@ -120,7 +120,53 @@ export default async function BillingPage({
         sétimo dia. Guardar isso só para os documentos legais seria a letra
         miúda que este produto existe para não ter.
       */}
-      {estado.acesso === "sem_cartao" ? (
+      {/*
+        Teste sem cartão (24/10/2026): enquanto a IA não respondeu ninguém, o
+        relógio não anda; depois da 1ª resposta, conta os dias. As duas frases
+        dizem a verdade inteira: não há cartão agora, e no fim pedimos um.
+      */}
+      {estado.acesso === "teste_nao_iniciado" ? (
+        <Card className="border-accent/40 bg-accent/5 p-5">
+          <h2 className="text-sm font-semibold">
+            {`${traduzir("Seu teste de", idioma)} ${DIAS_DE_TRIAL} ${traduzir("dias, sem cartão, começa quando a sua IA responder o primeiro cliente", idioma)}`}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {traduzir(
+              "Configure, teste e conecte o WhatsApp sem pressa: o relógio só começa a contar quando a IA atender uma conversa de verdade. Se quiser garantir o plano agora, escolha abaixo.",
+              idioma,
+            )}
+          </p>
+        </Card>
+      ) : null}
+
+      {estado.acesso === "teste_sem_cartao" ? (
+        <Card className="border-accent/40 bg-accent/5 p-5">
+          <h2 className="text-sm font-semibold">
+            {estado.diasRestantes === 0
+              ? traduzir("Hoje é o último dia do seu teste sem cartão", idioma)
+              : estado.diasRestantes === 1
+                ? traduzir("Falta 1 dia do seu teste sem cartão", idioma)
+                : `${traduzir("Faltam", idioma)} ${estado.diasRestantes} ${traduzir("dias do seu teste sem cartão", idioma)}`}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {traduzir(
+              "Tudo liberado e nada foi cobrado. Para a IA continuar atendendo depois do teste, escolha um plano: o cartão só é cobrado quando o teste terminar.",
+              idioma,
+            )}
+          </p>
+        </Card>
+      ) : null}
+
+      {estado.acesso === "sem_cartao" && estado.expiraEm ? (
+        <Card className="border-destructive/40 bg-destructive/5 p-5">
+          <h2 className="text-sm font-semibold">{traduzir("Seu teste sem cartão terminou", idioma)}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {traduzir("Escolha um plano para a IA voltar a atender pelo WhatsApp. A cobrança começa hoje.", idioma)}
+          </p>
+        </Card>
+      ) : null}
+
+      {estado.acesso === "sem_cartao" && !estado.expiraEm ? (
         <Card className="border-accent/40 bg-accent/5 p-5">
           <h2 className="text-sm font-semibold">
             {`${traduzir("Comece seus", idioma)} ${DIAS_DE_TRIAL} ${traduzir("dias sem cobrança", idioma)}`}

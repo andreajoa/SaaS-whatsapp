@@ -15,6 +15,7 @@ import { audit } from "@/lib/audit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildModel, chaveDePlataforma } from "@/lib/ai/runtime/agent";
 import { loadCredential } from "@/lib/ai/credentials";
+import { cerebroDoRascunho } from "@/lib/onboarding/cerebro-do-rascunho";
 import { slugDeNome } from "@/lib/leads/stage-editing";
 import {
   etapasParaGravar,
@@ -52,9 +53,10 @@ async function cerebroDoFuncionario(
 
   const versionId = agente?.published_version_id as string | null | undefined;
   if (!versionId) {
-    // Quem pulou o passo de treinar, ou ficou com o agente em rascunho por não
-    // ter número, chega aqui sem cérebro. Não é erro: é o quadro pronto.
-    return { erro: "seu funcionário ainda não está no ar" };
+    // Sem número ainda não há versão — e com o WhatsApp no fim do onboarding,
+    // é o caso de toda conta nova. A sugestão usa o mesmo cérebro que a versão
+    // vai usar quando o canal chegar.
+    return cerebroDoRascunho(admin, orgId);
   }
 
   const { data: versao } = await admin

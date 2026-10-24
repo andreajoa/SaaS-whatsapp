@@ -5543,6 +5543,10 @@ export const DICIONARIO: Traducoes = {
     {
       es: "Un borrador no responde mensajes, así que no hay qué ensayar. El paso anterior explicó lo que falta; puedes resolverlo después en IA › Agentes.",
     },
+  "Prévia: ele responde com o que você ensinou. Cadastrar o cliente e mover o cartão começam quando o WhatsApp estiver conectado, no próximo passo.":
+    {
+      es: "Vista previa: responde con lo que le enseñaste. Registrar al cliente y mover la tarjeta empiezan cuando WhatsApp esté conectado, en el próximo paso.",
+    },
   "Escreva como se fosse um cliente": { es: "Escribe como si fueras un cliente" },
   "Ele está pensando...": { es: "Está pensando..." },
   "Mandar mensagem": { es: "Enviar mensaje" },

@@ -65,84 +65,23 @@ describe("estadoDaCobranca — o interruptor do self-host", () => {
   });
 });
 
-/**
- * Banco de mentira que responde POR TABELA: `org_subscriptions` devolve a linha
- * da assinatura e `messages` devolve a 1ª resposta da IA (ou nada).
- */
-function bancoPorTabela(assinatura: Linha, primeiraRespostaDaIA: string | null) {
-  const cadeia = (resposta: Linha) => {
-    const no = {
-      select: () => no,
-      eq: () => no,
-      order: () => no,
-      limit: () => no,
-      async maybeSingle() {
-        return { data: resposta, error: null };
-      },
-    };
-    return no;
-  };
-  return {
-    from(tabela: string) {
-      return tabela === "messages"
-        ? cadeia(primeiraRespostaDaIA ? { sent_at: primeiraRespostaDaIA } : null)
-        : cadeia(assinatura);
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
-}
-
-describe("estadoDaCobranca — sem assinatura: o teste sem cartão (24/10/2026)", () => {
+describe("estadoDaCobranca — sem assinatura: cartão antes de usar (27/10/2026)", () => {
   /**
-   * O teste voltou a ser sem cartão, mas o relógio só começa na 1ª resposta da
-   * IA a uma conversa real (o onboarding não come dias), e quem nunca põe a IA
-   * para responder recebe a tela de cobrança depois de 14 dias — não existe
-   * teste eterno. `vencido` continua reservado para quem já assinou.
+   * Sem linha em `org_subscriptions` o cartão ainda não entrou, e isso é
+   * `sem_cartao` — nunca `vencido` (acusaria de atraso quem nunca assinou) e
+   * nunca `trial` (o trial é o do Stripe, e só existe depois do cartão).
    */
-  it("⭐ conta nova, IA ainda não respondeu: tudo liberado e o relógio parado", async () => {
-    const estado = await estadoDaCobranca(bancoPorTabela(null, null), ORG, "2026-02-25T12:00:00Z", AGORA);
-    expect(estado.acesso).toBe("teste_nao_iniciado");
+  it("⭐ conta nova sem cartão: pede o cartão", async () => {
+    const estado = await estadoDaCobranca(bancoQueDevolve(null), ORG, "2026-02-28T12:00:00Z", AGORA);
+    expect(estado.acesso).toBe("sem_cartao");
     expect(estado.jaAssinou).toBe(false);
     expect(estado.expiraEm).toBeNull();
   });
 
-  it("⭐ a IA respondeu há 2 dias: teste sem cartão com 5 dias restantes", async () => {
-    const estado = await estadoDaCobranca(
-      bancoPorTabela(null, "2026-02-27T12:00:00Z"),
-      ORG,
-      "2026-02-20T12:00:00Z",
-      AGORA,
-    );
-    expect(estado.acesso).toBe("teste_sem_cartao");
-    expect(estado.diasRestantes).toBe(5);
-    expect(estado.expiraEm?.toISOString()).toBe("2026-03-06T12:00:00.000Z");
-  });
-
-  it("⭐ teste acabou sem cartão: vai para a cobrança, com a data do fim", async () => {
-    const estado = await estadoDaCobranca(
-      bancoPorTabela(null, "2026-02-20T12:00:00Z"),
-      ORG,
-      "2026-02-10T12:00:00Z",
-      AGORA,
-    );
-    expect(estado.acesso).toBe("sem_cartao");
-    expect(estado.expiraEm?.toISOString()).toBe("2026-02-27T12:00:00.000Z");
-  });
-
-  it("⭐ sem resposta da IA por mais de 14 dias: pede cartão (sem teste eterno)", async () => {
-    const estado = await estadoDaCobranca(bancoPorTabela(null, null), ORG, "2026-02-01T12:00:00Z", AGORA);
-    expect(estado.acesso).toBe("sem_cartao");
-    expect(estado.expiraEm).toBeNull();
-  });
-
-  it("sem saber quando a organização nasceu e sem resposta da IA: liberado", async () => {
-    const estado = await estadoDaCobranca(bancoPorTabela(null, null), ORG, null, AGORA);
-    expect(estado.acesso).toBe("teste_nao_iniciado");
-  });
-
-  it("⭐ quem nunca assinou nunca é tratado como inadimplente", async () => {
-    for (const ia of [null, "2026-02-27T12:00:00Z", "2026-02-01T12:00:00Z"]) {
-      const estado = await estadoDaCobranca(bancoPorTabela(null, ia), ORG, "2026-01-01T12:00:00Z", AGORA);
+  it("⭐ a idade da conta não muda nada: nova ou antiga, sem cartão é sem cartão", async () => {
+    for (const criada of ["2026-02-28T12:00:00Z", "2020-01-01T00:00:00Z", null]) {
+      const estado = await estadoDaCobranca(bancoQueDevolve(null), ORG, criada, AGORA);
+      expect(estado.acesso).toBe("sem_cartao");
       expect(estado.acesso).not.toBe("vencido");
       expect(estado.acesso).not.toBe("trial");
     }

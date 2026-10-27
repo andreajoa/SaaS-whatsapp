@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { instalacaoCobra } from "@/lib/billing/planos";
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { loadOnboardingState } from "@/app/actions/onboarding/_shared";
 import { proximoPasso } from "@/lib/onboarding/passos";
@@ -23,6 +24,6 @@ export default async function OnboardingIndex() {
   const { state, onboardedAt } = await loadOnboardingState(activeOrg.orgId);
   if (onboardedAt) redirect("/app/inbox");
 
-  const passo = proximoPasso(state, { lojaLigada: env.NUVEMSHOP_ENABLED });
+  const passo = proximoPasso(state, { lojaLigada: env.NUVEMSHOP_ENABLED, cobra: instalacaoCobra() });
   redirect(passo ? `/onboarding/${passo.segmento}` : "/onboarding/done");
 }

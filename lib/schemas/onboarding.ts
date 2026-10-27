@@ -120,6 +120,16 @@ export const onboardingStateSchema = z.object({
       skipped: z.boolean().optional(),
     })
     .optional(),
+  /**
+   * O cartão entrou (passo "Plano"). Não tem `skipped`: sem cartão não se
+   * conecta número — ver `precisaDeCartao` em `lib/billing/assinatura.ts`.
+   */
+  plano: z
+    .object({
+      acesso: z.string(),
+      em: z.string(),
+    })
+    .optional(),
 });
 export type OnboardingState = z.infer<typeof onboardingStateSchema>;
 

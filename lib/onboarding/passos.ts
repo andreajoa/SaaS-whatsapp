@@ -37,6 +37,12 @@ export interface PassoDoOnboarding {
 export interface ContextoDoPasso {
   /** A integração de loja está ligada nesta instalação? */
   lojaLigada: boolean;
+  /**
+   * Esta instalação cobra assinatura (`instalacaoCobra()`)? Sem cobrança — o
+   * self-host — o passo "Plano" não existe. Opcional para os chamadores que
+   * não decidem nada sobre cobrança (resumo, testes antigos): ausente = não cobra.
+   */
+  cobra?: boolean;
 }
 
 /** Um passo marcado no estado — com ou sem `skipped`. */
@@ -83,6 +89,17 @@ export const PASSOS: readonly PassoDoOnboarding[] = [
     existe: () => true,
     cumprido: (s) => marcado(s.teste),
     pulado: (s) => foiPulado(s.teste),
+  },
+  {
+    segmento: "plano",
+    // Decisão do dono, 27/10/2026: cartão antes de usar. Vem DEPOIS de ver a IA
+    // atender (a pessoa já sabe o que está comprando) e ANTES do telefone: sem
+    // cartão não se conecta número, porque o runtime do agente não consulta
+    // cobrança e a IA atenderia de graça. O Stripe dá os 7 dias sem cobrança.
+    rotulo: "Plano",
+    existe: (ctx) => Boolean(ctx.cobra),
+    cumprido: (s) => marcado(s.plano),
+    pulado: () => false,
   },
   {
     segmento: "connect-whatsapp",

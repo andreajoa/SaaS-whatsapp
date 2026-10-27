@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { instalacaoCobra } from "@/lib/billing/planos";
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { loadOnboardingState } from "@/app/actions/onboarding/_shared";
 import { Stepper } from "./_components/Stepper";
@@ -26,7 +27,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
 
   // Os passos que ESTA instalação oferece, com o que já foi resolvido. O
   // indicador não decide mais nada sozinho — ele desenha o que recebe.
-  const passos = passosVisiveis({ lojaLigada: env.NUVEMSHOP_ENABLED }).map((p) => ({
+  const passos = passosVisiveis({ lojaLigada: env.NUVEMSHOP_ENABLED, cobra: instalacaoCobra() }).map((p) => ({
     segmento: p.segmento,
     rotulo: p.rotulo,
     cumprido: p.cumprido(state),

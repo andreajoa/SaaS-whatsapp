@@ -33,6 +33,7 @@ import {
 import { env } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { encryptWebhookSecret } from "@/lib/webhooks/secrets";
+import { FRASE_CARTAO_ANTES_DO_WHATSAPP, precisaDeCartao } from "@/lib/billing/assinatura";
 import { traduzir } from "@/lib/i18n/dicionario";
 
 export const dynamic = "force-dynamic";
@@ -108,6 +109,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!authz.ok) return authz.response;
   const t = (texto: string) => traduzir(texto, authz.user.idioma);
   const orgId = authz.org.orgId;
+
+  // Cartão antes do telefone (27/10/2026): o runtime do agente não consulta
+  // cobrança, então número conectado sem cartão teria a IA atendendo de graça.
+  if (await precisaDeCartao(createAdminClient(), orgId)) {
+    return fail("teto_do_plano", t(FRASE_CARTAO_ANTES_DO_WHATSAPP), 402, { requestId });
+  }
 
   const parsed = conectarSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

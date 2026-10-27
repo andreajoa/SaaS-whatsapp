@@ -22,6 +22,7 @@ import { PROVIDERS_DE_MENSAGEM } from "@/lib/channels/capabilities";
 import { createChannelSchema } from "@/lib/schemas/channels";
 import { createClient } from "@/lib/supabase/server";
 import { getWahaClient } from "@/lib/waha/client";
+import { FRASE_CARTAO_ANTES_DO_WHATSAPP, precisaDeCartao } from "@/lib/billing/assinatura";
 import { traduzir } from "@/lib/i18n/dicionario";
 
 export const dynamic = "force-dynamic";
@@ -113,6 +114,11 @@ export async function POST(req: NextRequest): Promise<Response> {
   // sessão lá e só então recusar deixaria uma sessão órfã do outro lado e um
   // código de país queimado. Numa instalação que não cobra, isto é um `return`
   // imediato e nem chega a consultar o banco (lib/billing/tetos.ts).
+  // Cartão antes do telefone (27/10/2026): o runtime do agente não consulta
+  // cobrança, então número conectado sem cartão teria a IA atendendo de graça.
+  if (await precisaDeCartao(createAdminClient(), activeOrg.orgId)) {
+    return fail("teto_do_plano", t(FRASE_CARTAO_ANTES_DO_WHATSAPP), 402, { requestId });
+  }
   const cabe = await cabeMaisUm(createAdminClient(), activeOrg.orgId, "canais");
   if (!cabe.permitido) {
     return fail("teto_do_plano", t(frasePrimeiraPessoa("canais", cabe)), 402, { requestId });

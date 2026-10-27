@@ -4,6 +4,8 @@ import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { ROLE_RANK } from "@/lib/auth/types";
 import { ConexoesShell } from "@/components/connections/ConexoesShell";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { conexaoPorQrDisponivel } from "@/lib/channels/conexao-por-qr";
+import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +35,11 @@ export default async function ConnectionsPage() {
           )}
         </p>
       </header>
-      <ConexoesShell wahaConfigured={wahaConfigured} wacallsConfigured={wacallsConfigured} />
+      <ConexoesShell
+        wahaConfigured={wahaConfigured}
+        wacallsConfigured={wacallsConfigured}
+        qrDaPlataforma={conexaoPorQrDisponivel(env.INTERNAL_SECRET)}
+      />
     </div>
   );
 }

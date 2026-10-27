@@ -87,6 +87,7 @@ export const AGENDA: readonly TarefaAgendada[] = [
   { rota: "kb-conversations-batch", cadencia: "30 3 * * *", timeoutS: 120 },
   { rota: "sync-model-catalog", cadencia: "15 4 * * *", timeoutS: 60 },
   { rota: "data-retention", cadencia: "40 4 * * *", timeoutS: 120 },
+  { rota: "liberar-numeros-sem-acesso", cadencia: "50 4 * * *", timeoutS: 120 },
 ] as const;
 
 /** As que o tick despacha por HTTP — todas menos as quatro em processo. */

@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { CanalOficialClient } from "./CanalOficialClient";
 import { CanalParceiroClient } from "./CanalParceiroClient";
+import { ConectarPorQrClient } from "./ConectarPorQrClient";
 import { CanalVozClient } from "./CanalVozClient";
 import { ConnectionsClient } from "./ConnectionsClient";
 import { TemplatesClient } from "./TemplatesClient";
@@ -37,9 +38,12 @@ import { useT } from "@/hooks/i18n/useT";
 export function ConexoesShell({
   wahaConfigured,
   wacallsConfigured,
+  qrDaPlataforma = false,
 }: {
   wahaConfigured: boolean;
   wacallsConfigured: boolean;
+  /** Conexão por QR pela conta da instalação — ver `ConectarPorQrClient`. */
+  qrDaPlataforma?: boolean;
 }) {
   const t = useT();
   const router = useRouter();
@@ -88,7 +92,10 @@ export function ConexoesShell({
         <TabsTrigger value="voz">{t("Chamada de voz")}</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="numeros" className="mt-0">
+      <TabsContent value="numeros" className="mt-0 flex flex-col gap-4">
+        {/* O caminho do cliente vem PRIMEIRO: é o que funciona sem servidor de
+            WhatsApp próprio. A lista abaixo segue para quem tem um. */}
+        {qrDaPlataforma && <ConectarPorQrClient origem="conexoes" />}
         <ConnectionsClient wahaConfigured={wahaConfigured} />
       </TabsContent>
 

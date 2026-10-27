@@ -54,6 +54,12 @@ export const PUBLIC_PATHS: RegExp[] = [
   // qualquer sub-path futuro nascer público de carona.
   /^\/api\/v1\/agenda\/google\/callback$/,
   /^\/api\/v1\/integrations\/nuvemshop\/callback$/,
+  // A volta da conexão do WhatsApp por QR — mesma natureza das duas acima: o
+  // navegador chega de outro site, sem o cookie strict. A identidade vem do
+  // estado assinado e da confirmação do provedor, dentro da rota
+  // (`app/api/v1/channels/partner/qr/retorno/route.ts`). Ancorada com `$`: o
+  // POST irmão (`/qr`), que abre a janela, continua exigindo sessão.
+  /^\/api\/v1\/channels\/partner\/qr\/retorno$/,
   /^\/api\/internal\//,
   /^\/api\/mcp(\/.*)?$/,
   // GET /api/v1/contacts aceita SESSÃO ou Bearer `dsk_...` (api_tokens) — a

@@ -30,15 +30,10 @@
 import { randomUUID } from "node:crypto";
 import type { NextRequest } from "next/server";
 
-import { fail, ok } from "@/lib/api/wrappers";
+import { fail } from "@/lib/api/wrappers";
 import { ARCHIVED_AT, queryTolerantToMissingArchived } from "@/lib/channels/archived";
-import {
-  abrirArquivoDoWebhook,
-  fecharArquivoDoWebhook,
-} from "@/lib/channels/arquivo-de-webhook";
-import { acceptsInboundWebhook, handleInboundWebhook } from "@/lib/channels/inbound";
+import { processarEntradaDaSessao } from "@/lib/channels/entrada-da-sessao";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { decryptWebhookSecret } from "@/lib/webhooks/secrets";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -86,74 +81,5 @@ export async function POST(
 
   if (!sessao) return fail("not_found", "unknown webhook token", 404, { requestId });
 
-  // Canal arquivado não ingere: o usuário mandou excluí-lo, e aceitar evento em
-  // voo ressuscitaria a conversa no inbox com o operador sem poder responder.
-  if (sessao.archived_at) {
-    return ok({ status: "ignored", reason: "canal_arquivado" }, { requestId });
-  }
-
-  if (!acceptsInboundWebhook(sessao.provider)) {
-    return fail("invalid_request", "provider_mismatch", 400, { requestId });
-  }
-
-  const cifrado = sessao.webhook_secret_encrypted;
-  const secret = cifrado ? await decryptWebhookSecret(admin, cifrado as string) : null;
-
-  // ─── O corpo cru vai para o arquivo ANTES de qualquer processamento ────────
-  //
-  // Se o processo morrer no meio — exceção, OOM, deploy no instante errado — o
-  // payload continua gravado, que é justamente quando alguém vai querer lê-lo.
-  // Este caminho não gravava NADA, enquanto a rota do outro canal grava desde
-  // sempre: era o único canal sem instrumento para investigar o que chegou.
-  const arquivo = await abrirArquivoDoWebhook(admin, {
-    organizationId: sessao.organization_id,
-    channelSessionId: sessao.id,
-    provider: sessao.provider,
-    rawBody,
-    headers: req.headers,
-  });
-
-  try {
-    const r = await handleInboundWebhook(admin, {
-      session: sessao,
-      rawBody,
-      headers: req.headers,
-      secret,
-    });
-
-    if (r.ok) {
-      await fecharArquivoDoWebhook(admin, arquivo, {
-        status: "processed",
-        validSignature: true,
-        // O desfecho do seam vai junto: é ele que distingue "ingerido" de
-        // "ignorado por falta de identidade" quando alguém for contar depois.
-        erro: typeof r.body.reason === "string" ? r.body.reason : null,
-      });
-      return ok(r.body, { requestId });
-    }
-
-    const status = r.code === "unauthorized" ? 401 : 400;
-    await fecharArquivoDoWebhook(admin, arquivo, {
-      status: "error",
-      // `false` SÓ quando a recusa foi por assinatura. Um payload bem assinado
-      // que o parser recusou não é problema de segredo, e marcá-lo como se
-      // fosse mandaria quem investiga procurar no lugar errado.
-      validSignature: r.code === "unauthorized" ? false : null,
-      erro: r.message,
-    });
-    return fail(
-      r.code === "unauthorized" ? "unauthorized" : "invalid_request",
-      r.message,
-      status,
-      { requestId },
-    );
-  } catch (err) {
-    const detalhe = err instanceof Error ? err.message : "ingest_failed";
-    await fecharArquivoDoWebhook(admin, arquivo, {
-      status: "error",
-      validSignature: null,
-      erro: detalhe,
-    });
-    return fail("internal_error", detalhe, 500, { requestId });
-  }
+  return processarEntradaDaSessao(admin, sessao, { rawBody, headers: req.headers, requestId });
 }

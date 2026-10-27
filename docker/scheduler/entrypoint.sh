@@ -96,6 +96,10 @@ CRONS="
 30 3 * * *|120|api/v1/cron/kb-conversations-batch
 15 4 * * *|60|api/v1/cron/sync-model-catalog
 40 4 * * *|120|api/v1/cron/data-retention
+# NUMEROS PAGOS SEM USO. Uma vez por dia: tira da conta da instalacao no
+# provedor o numero conectado por QR de quem esta sem acesso ha 14+ dias.
+# Numa VPS sem ZERNIO_API_KEY a rodada termina sem consultar nada.
+50 4 * * *|120|api/v1/cron/liberar-numeros-sem-acesso
 "
 
 # CRONTAB_PATH é ponto de injeção do teste (tests/shell/scheduler-entrypoint.test.sh).

@@ -74,6 +74,9 @@
     },
     "app/api/v1/cron/data-retention/route.ts": {
       "maxDuration": 120
+    },
+    "app/api/v1/cron/liberar-numeros-sem-acesso/route.ts": {
+      "maxDuration": 120
     }
   },
   "crons": [

@@ -64,8 +64,8 @@ export async function finishOnboarding(): Promise<FinishOnboardingResult> {
   // Desde 24/10/2026 o WhatsApp vem DEPOIS de treinar (lib/onboarding/passos.ts):
   // o agente nasce em "Treinar" sem canal e fica rascunho (`no_channel`). Se o
   // número foi conectado no caminho, é aqui que ele vai ao ar — sem isso a IA
-  // nunca responderia, e o teste sem cartão (que começa na 1ª resposta dela)
-  // nunca começaria. `publishFirstVersion` nunca lança e não republica.
+  // nunca responderia no número que o cliente acabou de conectar (com cartão,
+  // desde 27/10). `publishFirstVersion` nunca lança e não republica.
   await publicarAgenteQueEsperavaCanal(admin, ctx.orgId, ctx.userId);
 
   redirect("/app/inbox");

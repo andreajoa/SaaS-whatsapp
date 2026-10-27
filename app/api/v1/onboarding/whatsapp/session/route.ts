@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { FRASE_CARTAO_ANTES_DO_WHATSAPP, precisaDeCartao } from "@/lib/billing/assinatura";
+import { traduzir } from "@/lib/i18n/dicionario";
 import { ok, fail } from "@/lib/api/wrappers";
 import { loadAuthUser, mfaEmDivida, resolveActiveOrg } from "@/lib/auth/server";
 import { requireRole } from "@/lib/auth/require-role";
@@ -33,6 +35,11 @@ export async function POST(req: Request): Promise<Response> {
   const auth = await requireRole("admin", { requestId, resource: "channel_sessions", allowPlatformAdmin: true });
   if (!auth.ok) return auth.response;
   if (await mfaEmDivida()) return fail("mfa_required", "Confirme a verificação em duas etapas.", 403, { requestId });
+  // Cartão antes do telefone (27/10/2026): o runtime do agente não consulta
+  // cobrança, então número conectado sem cartão teria a IA atendendo de graça.
+  if (await precisaDeCartao(createAdminClient(), auth.org.orgId)) {
+    return fail("teto_do_plano", traduzir(FRASE_CARTAO_ANTES_DO_WHATSAPP, auth.user.idioma), 402, { requestId });
+  }
   const waha = getWahaClient(); if (!waha) return fail("waha_not_configured", "O serviço de conexão está indisponível. Tente novamente.", 503, { requestId });
   try {
     const result = await connectWahaChannel(await createClient(), createAdminClient(), waha, {

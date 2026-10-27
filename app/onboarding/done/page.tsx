@@ -1,4 +1,5 @@
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
+import { instalacaoCobra } from "@/lib/billing/planos";
 import { redirect } from "next/navigation";
 import { loadOnboardingState } from "@/app/actions/onboarding/_shared";
 import { resumoDoOnboarding } from "@/lib/onboarding/passos";
@@ -19,7 +20,7 @@ export default async function DonePage() {
   // Antes era uma terceira lista, fixa, e por isso ela listava "Loja Nuvemshop
   // (pulado)" em instalações que nunca ofereceram esse passo — o wizard
   // acusando a pessoa de não fazer o que ninguém lhe pediu.
-  const itens = resumoDoOnboarding(state, { lojaLigada: env.NUVEMSHOP_ENABLED });
+  const itens = resumoDoOnboarding(state, { lojaLigada: env.NUVEMSHOP_ENABLED, cobra: instalacaoCobra() });
 
   return <DoneClient itens={itens} pecas={oQueMaisExiste()} />;
 }

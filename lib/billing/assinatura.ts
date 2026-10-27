@@ -10,7 +10,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
-  DIAS_DE_TRIAL,
   ehPlanoConhecido,
   instalacaoCobra,
   type PlanoId,
@@ -30,15 +29,8 @@ const DIA_MS = 86_400_000;
 export type AcessoDeCobranca =
   /** Esta instalação não cobra (self-host, sem STRIPE_SECRET_KEY). */
   | "nao_cobra"
-  /**
-   * Sem cartão e sem teste: a IA ainda não respondeu nenhuma conversa e a conta já passou de
-   * `DIAS_PARA_COMECAR_O_TESTE`, ou o teste sem cartão já terminou. Vai para a tela de cobrança.
-   */
+  /** O cartão ainda não entrou — o trial do Stripe nem começou. */
   | "sem_cartao"
-  /** Conta nova, a IA ainda não respondeu ninguém: tudo liberado, o relógio do teste não começou. */
-  | "teste_nao_iniciado"
-  /** Teste sem cartão: `DIAS_DE_TRIAL` dias contados da 1ª resposta da IA a um cliente real. */
-  | "teste_sem_cartao"
   /** Dentro dos dias sem cobrança do Stripe (status `trialing`). */
   | "trial"
   | "em_dia"
@@ -104,42 +96,14 @@ function diasAte(quando: Date | null, agora: Date): number | null {
  * Recebe o client como parâmetro (admin, já escopado pelo chamador) em vez de
  * criá-lo: o layout já tem um de pé, e a org vem de fonte confiável lá.
  */
-/**
- * Quem nunca pôs a IA para responder ninguém não ganha teste eterno: depois disto a conta pede cartão
- * mesmo sem o relógio do teste ter começado.
- */
-export const DIAS_PARA_COMECAR_O_TESTE = 14;
-
-/**
- * Quando a IA respondeu a primeira conversa real desta organização (`messages` outbound com
- * `sent_via = 'ai'`). `null` = ainda não respondeu. Falha de consulta conta como "ainda não", o mesmo
- * sentido de falha aberta do resto deste arquivo.
- */
-export async function inicioDoTeste(admin: SupabaseClient, organizationId: string): Promise<Date | null> {
-  try {
-    const { data } = await admin
-      .from("messages")
-      .select("sent_at")
-      .eq("organization_id", organizationId)
-      .eq("direction", "outbound")
-      .eq("sent_via", "ai")
-      .order("sent_at", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    const quando = (data as { sent_at?: string } | null)?.sent_at;
-    return quando ? new Date(quando) : null;
-  } catch {
-    return null;
-  }
-}
-
 export async function estadoDaCobranca(
   admin: SupabaseClient,
   organizationId: string,
   /**
-   * Quando a organização nasceu. Só decide uma coisa: quem nunca pôs a IA
-   * para responder recebe a tela de cobrança depois de
-   * `DIAS_PARA_COMECAR_O_TESTE` dias (não existe teste eterno).
+   * Quando a organização nasceu. NÃO decide acesso — o trial é o do Stripe
+   * (ver o cabeçalho de `DIAS_DE_TRIAL`). Continua na assinatura porque os
+   * chamadores já o passam e a tela de cobrança mostra desde quando a conta
+   * existe.
    */
   _orgCriadaEm: string | Date | null,
   agora: Date = new Date(),
@@ -189,26 +153,17 @@ export async function estadoDaCobranca(
   // `orgCriadaEm` deixou de decidir acesso. O parâmetro fica porque as telas
   // ainda mostram desde quando a conta existe.
   if (!linha) {
-    // ─── Teste sem cartão (conselho de 24/10/2026) ──────────────────────────
+    // ─── Cartão antes de usar (decisão do dono, 27/10/2026) ────────────────
     //
-    // A Atenza nunca teve um pagante: o cliente esbarrava em credenciais da
-    // Meta, chave de IA e cartão antes de ver a IA funcionar. O teste volta a
-    // ser sem cartão, mas sem os dois defeitos do modelo antigo (cabeçalho de
-    // `DIAS_DE_TRIAL`): o relógio só começa quando a IA responde a primeira
-    // conversa real (o onboarding não come dias do teste), e a tela de
-    // cobrança aparece sozinha no fim, com o plano escolhido a um clique.
-    const inicio = await inicioDoTeste(admin, organizationId);
-    if (!inicio) {
-      const criada = _orgCriadaEm ? new Date(_orgCriadaEm) : null;
-      const prazo = criada ? criada.getTime() + DIAS_PARA_COMECAR_O_TESTE * DIA_MS : null;
-      if (prazo !== null && prazo <= agora.getTime()) return { ...vazio, acesso: "sem_cartao" };
-      return { ...vazio, acesso: "teste_nao_iniciado" };
-    }
-    const fim = new Date(inicio.getTime() + DIAS_DE_TRIAL * DIA_MS);
-    if (fim.getTime() > agora.getTime()) {
-      return { ...vazio, acesso: "teste_sem_cartao", diasRestantes: diasAte(fim, agora), expiraEm: fim };
-    }
-    return { ...vazio, acesso: "sem_cartao", expiraEm: fim };
+    // De 24/10 a 27/10 o teste foi SEM cartão, contado da 1ª resposta da IA.
+    // Voltou a ser o do Stripe: o cartão entra no onboarding (passo "Plano",
+    // antes do WhatsApp), o Stripe dá `DIAS_DE_TRIAL` dias sem cobrança e cobra
+    // sozinho no fim. Sem linha aqui = o cartão ainda não entrou.
+    //
+    // O gate do layout manda `sem_cartao` para a tela de cobrança, e as rotas
+    // que conectam número recusam (`precisaDeCartao`): sem isso a IA atenderia
+    // no WhatsApp de graça, porque o runtime do agente não consulta cobrança.
+    return { ...vazio, acesso: "sem_cartao" };
   }
 
   const fimDoCiclo = linha.current_period_end ? new Date(linha.current_period_end) : null;
@@ -277,3 +232,28 @@ export async function gravarAssinatura(
   );
   return { error: error?.message ?? null };
 }
+
+/**
+ * Esta organização precisa cadastrar o cartão antes de conectar um número?
+ *
+ * Existe porque a trava de cobrança do layout só tranca TELAS: o runtime do
+ * agente não consulta cobrança, então um número conectado sem cartão teria a
+ * IA atendendo de graça, na chave e na conta de canal da instalação. As rotas
+ * que conectam número perguntam isto antes de qualquer coisa.
+ *
+ * Falha aberta como o resto do arquivo (`estadoDaCobranca` devolve `em_dia`
+ * quando não consegue ler): o pior caso é um número conectado a mais, não um
+ * cliente pagante impedido de conectar.
+ */
+export async function precisaDeCartao(
+  admin: SupabaseClient,
+  organizationId: string,
+): Promise<boolean> {
+  if (!instalacaoCobra()) return false;
+  const estado = await estadoDaCobranca(admin, organizationId, null);
+  return estado.acesso === "sem_cartao" || estado.acesso === "vencido";
+}
+
+/** A frase das rotas que recusam conectar sem cartão. */
+export const FRASE_CARTAO_ANTES_DO_WHATSAPP =
+  "Para conectar o WhatsApp, cadastre o cartão no passo Plano. São 7 dias grátis e a cobrança só começa no 7º dia.";

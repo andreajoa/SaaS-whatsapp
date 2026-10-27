@@ -127,18 +127,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // `jaAssinou` é o que separa o primeiro teste de uma volta: quem cancelou e
   // está voltando não ganha outros sete dias. O trial é boas-vindas, não um
   // desconto recorrente para quem aprendeu a cancelar antes da cobrança.
-  //
-  // Desde 24/10/2026 o teste começa SEM cartão, na 1ª resposta da IA (ver
-  // `estadoDaCobranca`). Quem põe o cartão no meio do teste fica só com os
-  // dias que faltam; quem chega depois do fim já usou o teste e é cobrado na
-  // hora; quem assina antes de a IA responder ganha os sete dias inteiros.
-  const trialDias = estado.jaAssinou
-    ? null
-    : estado.acesso === "teste_sem_cartao"
-      ? Math.max(1, estado.diasRestantes ?? 0)
-      : estado.acesso === "sem_cartao" && estado.expiraEm
-        ? null
-        : DIAS_DE_TRIAL;
+  const trialDias = estado.jaAssinou ? null : DIAS_DE_TRIAL;
 
   const base = baseUrl(req);
 

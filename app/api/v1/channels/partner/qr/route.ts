@@ -25,6 +25,7 @@ import {
 } from "@/lib/channels/conexao-por-qr";
 import { findPartnerSession } from "@/lib/channels/connect";
 import { env } from "@/lib/env";
+import { FRASE_CARTAO_ANTES_DO_WHATSAPP, precisaDeCartao } from "@/lib/billing/assinatura";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -95,6 +96,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   const admin = createAdminClient();
+
+  // Cartão antes do telefone (27/10/2026): o runtime do agente não consulta
+  // cobrança, então número conectado sem cartão teria a IA atendendo de graça.
+  if (await precisaDeCartao(admin, orgId)) {
+    return fail("teto_do_plano", t(FRASE_CARTAO_ANTES_DO_WHATSAPP), 402, { requestId });
+  }
 
   // O teto só pesa quando a conexão ACRESCENTA um canal: trocar o número que a
   // organização já tem não aumenta a conta (lib/billing/tetos.ts).

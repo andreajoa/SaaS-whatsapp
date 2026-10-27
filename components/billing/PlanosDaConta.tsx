@@ -69,6 +69,12 @@ interface Props {
    * `redirect_on_completion` em lib/billing/stripe.ts.
    */
   sessaoDeRetorno: string | null;
+  /**
+   * Para onde o "Continuar" leva depois do pagamento. A tela de Cobrança volta
+   * para ela mesma; o passo "Plano" do onboarding volta para o passo, que vê a
+   * assinatura e segue para o telefone.
+   */
+  destinoAoConcluir?: string;
 }
 
 type Passo =
@@ -86,6 +92,7 @@ export function PlanosDaConta({
   mercado,
   temAssinatura,
   sessaoDeRetorno,
+  destinoAoConcluir = "/app/settings/billing",
 }: Props) {
   const t = useT();
   const [passo, setPasso] = useState<Passo>(
@@ -291,7 +298,7 @@ export function PlanosDaConta({
         </div>
         {/* Recarrega do SERVIDOR: o gate de acesso é calculado no layout, e só
             um novo render dele solta a trava para o resto do sistema. */}
-        <Button onClick={() => window.location.assign("/app/settings/billing")}>
+        <Button onClick={() => window.location.assign(destinoAoConcluir)}>
           {t("Continuar")}
         </Button>
       </Card>

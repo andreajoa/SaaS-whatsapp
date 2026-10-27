@@ -53,7 +53,7 @@ export interface DocumentoLegal {
   readonly secoes: readonly SecaoLegal[];
 }
 
-const ATUALIZADO = "2026-09-21";
+const ATUALIZADO = "2026-10-27";
 
 const COOKIES: DocumentoLegal = {
   slug: "cookies",
@@ -156,9 +156,9 @@ const REEMBOLSO: DocumentoLegal = {
       titulo: { pt: "O teste vem antes", es: "La prueba viene antes", en: "The trial comes first" },
       paragrafos: [
         {
-          pt: "A assinatura começa por um período de teste sem cobrança e sem cartão. É de propósito: a pergunta “isto serve para a minha empresa?” tem de ser respondida antes de existir dinheiro em jogo, e não depois, por meio de um pedido de reembolso.",
-          es: "La suscripción empieza con un período de prueba sin cobro y sin tarjeta. Es a propósito: la pregunta “¿esto sirve para mi empresa?” debe responderse antes de que haya dinero en juego, y no después, mediante una solicitud de reembolso.",
-          en: "The subscription starts with a trial period, free and with no card. That is deliberate: the question “is this right for my company?” should be answered before any money is at stake, not afterwards through a refund request.",
+          pt: "A assinatura começa por 7 dias de teste sem cobrança: o cartão é cadastrado no início e só é cobrado no 7º dia, se você não cancelar antes. É de propósito: a pergunta “isto serve para a minha empresa?” tem de ser respondida antes de existir dinheiro em jogo, e não depois, por meio de um pedido de reembolso.",
+          es: "La suscripción empieza con 7 días de prueba sin cobro: la tarjeta se registra al inicio y solo se cobra el 7.º día, si no cancelas antes. Es a propósito: la pregunta “¿esto sirve para mi empresa?” debe responderse antes de que haya dinero en juego, y no después, mediante una solicitud de reembolso.",
+          en: "The subscription starts with a 7-day free trial: the card is added at the start and only charged on day 7, unless you cancel first. That is deliberate: the question “is this right for my company?” should be answered before any money is at stake, not afterwards through a refund request.",
         },
       ],
     },

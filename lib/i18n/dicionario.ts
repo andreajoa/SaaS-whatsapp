@@ -10566,6 +10566,19 @@ export const DICIONARIO: Traducoes = {
     es: "La conexión por QR no está disponible en esta instalación.",
   },
   "Origem inválida.": { es: "Origen inválido." },
+
+  // Passo "Plano" do onboarding e a trava de cartão antes do WhatsApp.
+  "Escolha seu plano:": { es: "Elige tu plan:" },
+  "O cartão é cadastrado agora e nada é cobrado nos primeiros": {
+    es: "La tarjeta se registra ahora y no se cobra nada en los primeros",
+  },
+  "dias. A cobrança começa sozinha depois disso, e você cancela em um clique quando quiser.": {
+    es: "días. El cobro empieza solo después de eso, y cancelas con un clic cuando quieras.",
+  },
+  "Para conectar o WhatsApp, cadastre o cartão no passo Plano. São 7 dias grátis e a cobrança só começa no 7º dia.":
+    {
+      es: "Para conectar WhatsApp, registra la tarjeta en el paso Plan. Son 7 días gratis y el cobro solo empieza el 7.º día.",
+    },
 };
 
 /**

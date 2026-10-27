@@ -10516,6 +10516,56 @@ export const DICIONARIO: Traducoes = {
   pedidos: { es: "pedidos" },
   Campanhas: { es: "Campañas" },
   "Próximo passo": { es: "Siguiente paso" },
+
+  // Conexão do WhatsApp por QR pela conta da instalação
+  // (components/connections/ConectarPorQrClient.tsx e o passo do onboarding).
+  "Conectar meu WhatsApp": { es: "Conectar mi WhatsApp" },
+  "Você lê um código com o celular e pronto: o número continua funcionando no seu app e passa a ser atendido por aqui também.":
+    {
+      es: "Lees un código con el celular y listo: el número sigue funcionando en tu app y pasa a ser atendido desde aquí también.",
+    },
+  "Número conectado:": { es: "Número conectado:" },
+  "Trocar o número conectado": { es: "Cambiar el número conectado" },
+  "Tenha o celular com o app WhatsApp Business por perto (o WhatsApp comum não serve).": {
+    es: "Ten cerca el celular con la app WhatsApp Business (el WhatsApp común no sirve).",
+  },
+  "Clique no botão abaixo. Abre uma janela oficial da Meta.": {
+    es: "Haz clic en el botón de abajo. Se abre una ventana oficial de Meta.",
+  },
+  "No app, toque no ícone da câmera e leia o código que aparece na tela.": {
+    es: "En la app, toca el ícono de la cámara y lee el código que aparece en la pantalla.",
+  },
+  "Confirme e espere voltar para cá.": { es: "Confirma y espera a volver aquí." },
+  "Não consegui abrir a conexão agora. Tente de novo em alguns minutos.": {
+    es: "No pude abrir la conexión ahora. Inténtalo de nuevo en unos minutos.",
+  },
+  "A conexão foi cancelada antes de terminar. Quando quiser, é só tentar de novo.": {
+    es: "La conexión se canceló antes de terminar. Cuando quieras, solo inténtalo de nuevo.",
+  },
+  "Este número já está conectado em outra conta. Desconecte de lá (no app: Configurações › Conta › Plataforma comercial) e tente de novo.":
+    {
+      es: "Este número ya está conectado en otra cuenta. Desconéctalo de allí (en la app: Ajustes › Cuenta › Plataforma comercial) e inténtalo de nuevo.",
+    },
+  "A janela de conexão expirou. Clique de novo para abrir outra.": {
+    es: "La ventana de conexión expiró. Haz clic de nuevo para abrir otra.",
+  },
+  "A conexão por QR está temporariamente indisponível. Tente de novo em alguns minutos.": {
+    es: "La conexión por QR no está disponible por ahora. Inténtalo de nuevo en unos minutos.",
+  },
+  "Não consegui confirmar a volta da conexão. Clique de novo para recomeçar.": {
+    es: "No pude confirmar el regreso de la conexión. Haz clic de nuevo para empezar otra vez.",
+  },
+  "Não deu para concluir a conexão. Confira se o número está no app WhatsApp Business e tente de novo.": {
+    es: "No se pudo completar la conexión. Verifica que el número esté en la app WhatsApp Business e inténtalo de nuevo.",
+  },
+  "É assim para quase todo mundo. Você abre o app WhatsApp Business no celular e lê um código numa janela oficial da Meta. O número continua funcionando no celular.":
+    {
+      es: "Así es para casi todo el mundo. Abres la app WhatsApp Business en el celular y lees un código en una ventana oficial de Meta. El número sigue funcionando en el celular.",
+    },
+  "A conexão por QR não está disponível nesta instalação.": {
+    es: "La conexión por QR no está disponible en esta instalación.",
+  },
+  "Origem inválida.": { es: "Origen inválido." },
 };
 
 /**

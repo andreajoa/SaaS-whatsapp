@@ -153,7 +153,22 @@ describe("o arquivo do corpo cru", () => {
 });
 
 describe("a rota chama o arquivo nos dois lados", () => {
-  const ROTA = readFileSync("app/api/v1/webhooks/channel/[token]/route.ts", "utf8");
+  // O miolo saiu da rota de token para `lib/channels/entrada-da-sessao.ts` quando
+  // a entrada da instalação (conexão por QR) nasceu: duas rotas, um trabalho.
+  // O que se vigia é o miolo — e que as DUAS rotas passam por ele, senão uma
+  // delas poderia voltar a processar sem arquivar.
+  const ROTA = readFileSync("lib/channels/entrada-da-sessao.ts", "utf8");
+
+  it("as duas entradas delegam ao mesmo miolo", () => {
+    for (const rota of [
+      "app/api/v1/webhooks/channel/[token]/route.ts",
+      "app/api/v1/webhooks/channel/plataforma/route.ts",
+    ]) {
+      const fonte = readFileSync(rota, "utf8");
+      expect(fonte, `${rota} não passa pelo miolo`).toContain("processarEntradaDaSessao(");
+      expect(fonte, `${rota} processa por conta própria`).not.toContain("handleInboundWebhook(");
+    }
+  });
 
   it("abre ANTES de processar", () => {
     // Se o processo morrer no meio, o corpo cru precisa já estar gravado — que é

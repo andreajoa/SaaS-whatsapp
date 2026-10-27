@@ -520,6 +520,17 @@ export const AUDIT_ACTIONS = [
   // consultas voltam vazias de hora em hora, e auditar isso encheria a tabela
   // com a prova de que nada aconteceu.
   "marketing.abandono_run",
+  // Conexão do WhatsApp por QR pela conta da instalação
+  // (`lib/channels/conexao-por-qr.ts`): o clique que abriu a janela, a volta que
+  // gravou o número, e a falha de qualquer uma das duas — com a etapa no
+  // metadata, para quem investiga saber se o cliente nem chegou ao QR ou se
+  // escaneou e a gravação falhou.
+  "channel.qr_connect_started",
+  "channel.qr_connected",
+  "channel.qr_connect_failed",
+  // O número saiu da conta da instalação porque a organização está sem acesso
+  // há mais de 14 dias (`app/api/v1/cron/liberar-numeros-sem-acesso`).
+  "channel.qr_number_released",
 ] as const;
 
 /** Um código de auditoria. Derivado de `AUDIT_ACTIONS` — não redigite a lista. */

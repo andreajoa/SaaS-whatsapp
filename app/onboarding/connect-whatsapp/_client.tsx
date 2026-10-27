@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { skipWhatsapp, markWhatsappConfigured } from "@/app/actions/onboarding/skipWhatsapp";
 import { CanalOficialClient } from "@/components/connections/CanalOficialClient";
 import { CanalParceiroClient } from "@/components/connections/CanalParceiroClient";
+import { ConectarPorQrClient } from "@/components/connections/ConectarPorQrClient";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   wahaConfigured: boolean;
@@ -20,6 +22,13 @@ interface Props {
    * isso é ANTES de a pessoa buscar três credenciais no painel, não depois.
    */
   oficialPodeReceber: boolean;
+  /**
+   * A instalação conecta por QR pela conta DELA no provedor oficial
+   * (coexistência): é o caminho do cliente que não tem servidor de WhatsApp
+   * próprio. Quando `true`, "Leio um código com o celular" usa este caminho e
+   * o servidor de QR desta instalação nem é acordado.
+   */
+  qrDaPlataforma?: boolean;
 }
 
 /**
@@ -219,10 +228,16 @@ export function ConnectWhatsappClient({
   wahaConfigured,
   sessionName,
   oficialPodeReceber,
+  qrDaPlataforma = false,
 }: Props) {
   const t = useT();
+  const params = useSearchParams();
   const [pending, startTransition] = useTransition();
-  const [forma, setForma] = useState<Forma | null>(null);
+  // Voltando da janela de conexão com erro: reabre direto no caminho do QR,
+  // onde o motivo é explicado — e não na pergunta inicial, que o esconderia.
+  const [forma, setForma] = useState<Forma | null>(
+    qrDaPlataforma && params.get("qr") === "erro" ? "qr" : null,
+  );
   const createKey = useRef<string | null>(null);
   const restartKey = useRef<string | null>(null);
   const [info, setInfo] = useState<SessionInfo>({ status: "INIT", session: sessionName });
@@ -241,7 +256,7 @@ export function ConnectWhatsappClient({
   // antes de clicar em coisa alguma, e descobria depois, em outra tela.
   useEffect(() => {
     if (forma !== "qr") return;
-    if (!wahaConfigured) return;
+    if (!wahaConfigured || qrDaPlataforma) return;
     let cancelled = false;
     (async () => {
       setBusy(true);
@@ -272,7 +287,7 @@ export function ConnectWhatsappClient({
     return () => {
       cancelled = true;
     };
-  }, [forma, wahaConfigured, sessionName, t]);
+  }, [forma, wahaConfigured, qrDaPlataforma, sessionName, t]);
 
   // 2) Poll status every 3 seconds until WORKING/FAILED.
   //
@@ -281,7 +296,7 @@ export function ConnectWhatsappClient({
   // trocaria de estado sozinha por trás do formulário que a pessoa preenche.
   useEffect(() => {
     if (forma !== "qr") return;
-    if (!wahaConfigured) return;
+    if (!wahaConfigured || qrDaPlataforma) return;
     if (status === "WORKING" || status === "FAILED") return;
     const id = setInterval(async () => {
       try {
@@ -310,7 +325,7 @@ export function ConnectWhatsappClient({
       }
     }, 3000);
     return () => clearInterval(id);
-  }, [forma, wahaConfigured, status, sessionName, t]);
+  }, [forma, wahaConfigured, qrDaPlataforma, status, sessionName, t]);
 
   // 3) When status → WORKING, auto-advance.
   useEffect(() => {
@@ -361,9 +376,15 @@ export function ConnectWhatsappClient({
               valor="qr"
               atual={forma}
               titulo={t("Leio um código com o celular")}
-              corpo={t(
-                "É assim para quase todo mundo. Você abre o WhatsApp no celular que vai atender e aponta para um código que aparece aqui.",
-              )}
+              corpo={
+                qrDaPlataforma
+                  ? t(
+                      "É assim para quase todo mundo. Você abre o app WhatsApp Business no celular e lê um código numa janela oficial da Meta. O número continua funcionando no celular.",
+                    )
+                  : t(
+                      "É assim para quase todo mundo. Você abre o WhatsApp no celular que vai atender e aponta para um código que aparece aqui.",
+                    )
+              }
               onEscolher={setForma}
             />
             <Escolha
@@ -410,6 +431,16 @@ export function ConnectWhatsappClient({
             contra o outro lado ANTES de gravar — e duas cópias divergem. */}
         {forma === "oficial" ? <CanalOficialClient /> : <CanalParceiroClient />}
 
+        <Saidas status={status} sessionName={info.session ?? ""} />
+      </div>
+    );
+  }
+
+  if (qrDaPlataforma) {
+    return (
+      <div className="space-y-4 rounded-lg border bg-background p-6">
+        <VoltarParaEscolha onVoltar={() => setForma(null)} />
+        <ConectarPorQrClient origem="onboarding" />
         <Saidas status={status} sessionName={info.session ?? ""} />
       </div>
     );

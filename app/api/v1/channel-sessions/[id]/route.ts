@@ -27,6 +27,7 @@ import { ok, fail } from "@/lib/api/wrappers";
 import { loadAuthUser, mfaEmDivida, resolveActiveOrg } from "@/lib/auth/server";
 import { requireRole } from "@/lib/auth/require-role";
 import { CHANNEL_PROVIDER_WAHA } from "@/lib/channels/capabilities";
+import { desconectarDaPlataforma } from "@/lib/channels/conexao-por-qr";
 import { numeroObservadoDaSessao } from "@/lib/channels/numero-observado";
 import { isChannelStatus } from "@/lib/schemas/channels";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -359,6 +360,10 @@ export async function DELETE(
     // sentido no ramo que PRESERVA a linha — no hard delete ela some inteira.
     patch.meta_token_encrypted = null;
     patch.webhook_path_token = randomUUID().replace(/-/g, "");
+    // Número conectado por QR pela conta da instalação: sai de lá também, senão
+    // seguiria cobrado sem ninguém usá-lo. Não lança e não bloqueia a exclusão
+    // — com o provedor fora do ar, o canal sai do CRM do mesmo jeito.
+    await desconectarDaPlataforma(createAdminClient(), activeOrg.orgId, id);
   }
 
   if (arquivar) {

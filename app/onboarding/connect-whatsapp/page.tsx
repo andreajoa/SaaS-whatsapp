@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getWahaClient } from "@/lib/waha/client";
 import { ConnectWhatsappClient } from "./_client";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { conexaoPorQrDisponivel } from "@/lib/channels/conexao-por-qr";
+import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,9 @@ export default async function ConnectWhatsappPage() {
   // caminhos — e o formulário sempre oferece o segundo. Fica `true` em vez de
   // sumir com a prop para o aviso continuar disponível se um caminho cair.
   const oficialPodeReceber = true;
+  // Conexão por QR pela conta da instalação (coexistência): quando ligada, é
+  // o caminho do QR para o cliente — sem servidor de WhatsApp próprio.
+  const qrDaPlataforma = conexaoPorQrDisponivel(env.INTERNAL_SECRET);
   // We don't try to start the session at SSR — client kicks off the call
   // (and shows graceful banner if WAHA is not reachable).
 
@@ -44,6 +49,7 @@ export default async function ConnectWhatsappPage() {
         wahaConfigured={wahaConfigured}
         sessionName={`org_${activeOrg.orgId.slice(0, 8)}`}
         oficialPodeReceber={oficialPodeReceber}
+        qrDaPlataforma={qrDaPlataforma}
       />
     </div>
   );

@@ -614,7 +614,8 @@ jobs:
 
       - uses: supabase/setup-cli@v3
         with:
-          version: latest
+          # Compatível com [local_smtp]; evitar mudança de major sem revisão.
+          version: 3.0.0
 
       # Sobe Postgres + Auth (GoTrue) + PostgREST + Storage. Auth de verdade é
       # requisito: os specs de login exercitam o GoTrue, não um mock.
@@ -871,7 +872,9 @@ jobs:
           # (`✓ 12 [chromium] › tests/e2e/x.spec.ts:9:5 › título (3.4s)`), e a
           # soma por arquivo sai de um `gh run view <id> --log`. Custo medido:
           # ~240 linhas a mais de log, zero segundo de execução.
-          pnpm exec playwright test --workers=1 $LISTA --reporter=list
+          # Encerrar após cinco falhas preserva traces antes do timeout do job.
+          # Qualquer falha continua reprovando o gate; nenhum teste é omitido numa execução verde.
+          pnpm exec playwright test --workers=1 $LISTA --reporter=list --max-failures=5
         env:
           # Só o que NÃO vem do `.env.e2e`: isto é ajuste de CI, não config do
           # produto. CI = 1 IP para todos os specs, e o teto de produção

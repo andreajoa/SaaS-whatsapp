@@ -52,6 +52,10 @@ const DIR = join(process.cwd(), ".github/workflows");
  * acrescente, e acrescentar sem razão é visível em code review.
  */
 const ESCRITA_JUSTIFICADA: Record<string, string> = {
+  "nexacloud.yml::id-token: write":
+    "autentica o deploy por OIDC no projeto deste repositório, sem chave permanente no workflow",
+  "nexacloud.yml::pull-requests: write":
+    "publica no PR o endereço do preview ou a indisponibilidade de preview de app servidor",
   "publish-image.yml::packages: write":
     "publica a imagem do app no GHCR — é o artefato que o self-hoster instala",
   "acolhida.yml::pull-requests: write":

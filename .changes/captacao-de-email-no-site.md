@@ -11,9 +11,7 @@ página de vendas nem é renderizada (a raiz redireciona para `/app`), e
 instala este projeto para atender no próprio WhatsApp não ganha um formulário
 de mala direta no rodapé.
 
-O que entrou são duas portas para a mesma pergunta — um bloco no rodapé e um
-convite que aparece uma vez — e uma função, `registrarLead`, que é a única a
-escrever em `site_leads`.
+Rodapé e convite usam `registrarLead`, único escritor de `site_leads`.
 
 **Digitar o e-mail duas vezes não reescreve a história de ninguém.**
 O formulário só enriquece: dado novo preenche lacuna e nunca escreve por cima.

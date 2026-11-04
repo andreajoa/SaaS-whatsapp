@@ -64,6 +64,11 @@ const DIR = join(process.cwd(), ".github/workflows");
  * que desliga um job de entrega fica visível em code review.
  */
 const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string }> = {
+  "nexacloud.yml::deploy": {
+    condicao: null,
+    efeito:
+      "Publica a instalação deste fork na NexaCloud; PR de app servidor informa que preview não está disponível.",
+  },
   // --- a cadeia que leva o conserto até a VPS ---------------------------------
   "release.yml::abrir-pr-de-release": {
     condicao: "github.event_name == 'workflow_dispatch'",
@@ -191,7 +196,9 @@ interface JobLido {
 function lerJobs(): JobLido[] {
   const achados: JobLido[] = [];
 
-  for (const arquivo of readdirSync(DIR).filter((f) => /\.ya?ml$/.test(f)).sort()) {
+  for (const arquivo of readdirSync(DIR)
+    .filter((f) => /\.ya?ml$/.test(f))
+    .sort()) {
     const brutas = readFileSync(join(DIR, arquivo), "utf8").split("\n");
     // Comentário não conta em NENHUMA direção: um `#` falando de `if:` não pode
     // satisfazer o mapa, e um `#` na coluna 0 no meio de `jobs:` não pode
@@ -248,7 +255,10 @@ describe("nenhum job pode ser desligado por uma condição — `skipped` conta c
     // nada — o modo de falha mais comum desta classe de teste.
     expect(jobs.length, "jobs lidos em .github/workflows").toBeGreaterThanOrEqual(10);
     expect(
-      jobs.filter((j) => j.condicao !== null).map(chave).sort(),
+      jobs
+        .filter((j) => j.condicao !== null)
+        .map(chave)
+        .sort(),
       "o recorte de `if:` está cego — nenhuma condição foi lida, e o mapa passaria por vacuidade",
     ).not.toEqual([]);
     // E o inverso: se TUDO virasse condição, a comparação também seria inútil.

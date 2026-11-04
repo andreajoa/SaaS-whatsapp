@@ -614,7 +614,8 @@ jobs:
 
       - uses: supabase/setup-cli@v3
         with:
-          version: latest
+          # Compatível com [local_smtp]; evitar mudança de major sem revisão.
+          version: 3.0.0
 
       # Sobe Postgres + Auth (GoTrue) + PostgREST + Storage. Auth de verdade é
       # requisito: os specs de login exercitam o GoTrue, não um mock.

@@ -1,6 +1,6 @@
 ---
 impacto: capacidade_nova
 secao: adicionado
-titulo: Logo público de alta resolução para e-mails
+titulo: Logos
 ---
-A instalação oferece `/logo-512.png` com a marca configurada em tempo de execução, sem fixar a identidade de quem construiu a imagem. O `/apple-icon` também passa a carregar sem login, corrigindo imagens quebradas nos e-mails. Crédito: @andreajoa.
+`/logo-512.png` e `/apple-icon` carregam sem login, com a marca da instalação.

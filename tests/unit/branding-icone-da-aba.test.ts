@@ -93,3 +93,18 @@ describe("o ícone carrega para quem NÃO entrou", () => {
     expect(layout).toMatch(/icons:\s*\{\s*icon:\s*"\/icon"\s*\}/);
   });
 });
+
+describe("logos públicos de e-mail", () => {
+  it("permite apenas as URLs exatas dos logos sem sessão", () => {
+    expect(isPublicPath("/apple-icon")).toBe(true);
+    expect(isPublicPath("/logo-512.png")).toBe(true);
+    for (const caminho of [
+      "/apple-icon/private",
+      "/apple-icon-secreto",
+      "/logo-512.png/private",
+      "/admin/logo-512.png",
+    ]) {
+      expect(isPublicPath(caminho)).toBe(false);
+    }
+  });
+});

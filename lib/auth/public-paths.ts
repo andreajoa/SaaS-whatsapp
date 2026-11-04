@@ -81,6 +81,9 @@ export const PUBLIC_PATHS: RegExp[] = [
   // antes desta linha: `GET /icon` → 307 para `/login?next=%2Ficon`, enquanto
   // `/icon.png` (inexistente) devolvia 404 — a diferença é só a extensão.
   /^\/icon$/,
+  // Logos públicos: só a marca da instalação, sem dados ou ações de conta.
+  /^\/apple-icon$/,
+  /^\/logo-512\.png$/,
   /^\/manifest\.webmanifest$/,
   /^\/team\/accept-invite\/.+$/,
   /^\/account-suspended$/,

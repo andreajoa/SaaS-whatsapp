@@ -68,7 +68,7 @@ jobs:
             if [ "$state" = "error" ]; then echo "$st" | jq -r .log | tail -n 80; echo "::error::$(echo "$st" | jq -r .error)"; exit 1; fi
           done
           echo "::error::The app did not start within 5 minutes"; exit 1
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: env.NC_SERVER != 'true'
         with: { node-version: "${{ env.NC_NODE }}" }
       - name: Install

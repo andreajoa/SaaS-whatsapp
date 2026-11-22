@@ -443,6 +443,25 @@ export const INGLES_DA_VITRINE: Readonly<Record<string, string>> = {
   "Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.":
     "Organize support. Give your team context. Follow the next step.",
   "Informações e contato": "Information and contact",
+  Agora: "Now",
+  "IA no WhatsApp 24h": "24/7 WhatsApp AI",
+  "Resposta imediata": "Instant reply",
+  "Principais recursos no WhatsApp": "Core WhatsApp features",
+  "Para quem é a plataforma": "Who it's built for",
+  "WhatsApp, IA e CRM para negócios reais": "WhatsApp, AI and CRM for real businesses",
+  "Seu WhatsApp": "Your WhatsApp",
+  "atende na hora.": "replies right away.",
+  "fecha com contexto.": "closes with context.",
+  "O CONTEXTO": "THE CONTEXT",
+  "O PROBLEMA": "THE PROBLEM",
+  "Sem resposta rápida, o interessado esfria e procura outro lugar.":
+    "Without a fast reply, the prospect loses interest and goes elsewhere.",
+  "COM A PLATAFORMA": "WITH THE PLATFORM",
+  "Um celular na mão de uma pessoa só trava o time inteiro.":
+    "One phone in one person's hand bottlenecks the entire team.",
+  "Conversas soltas viram propostas esquecidas no fim da semana.":
+    "Unorganized chats turn into forgotten quotes by the end of the week.",
+  Recomendado: "Recommended",
 };
 
 /** As chaves do catálogo vêm de PLANOS, portanto não são literais no JSX da vitrine. */

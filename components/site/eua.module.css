@@ -1,11 +1,14 @@
 .pagina {
-  --u-ink: #0f1d17;
-  --u-muted: #4b5a52;
-  --u-line: #e3e8e4;
-  --u-acento: #1f5c3a;
-  --u-acento-2: #2f7a4f;
-  --u-fundo: #ffffff;
-  background: var(--u-fundo);
+  --u-ink: #0e241d;
+  --u-muted: #4b6158;
+  --u-line: #d4e0d5;
+  --u-acento: #123f34;
+  --u-acento-2: #1f6b52;
+  --u-fundo: #fafbf8;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 53px, rgba(18, 63, 52, 0.026) 53px 107px),
+    radial-gradient(ellipse 37% 62% at 0% 24%, #d6efe0 0, transparent 100%),
+    var(--u-fundo);
   color: var(--u-ink);
   font-family: var(--font-atkinson), system-ui, sans-serif;
 }
@@ -25,13 +28,15 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 18px;
-  padding: 6px 14px;
+  margin: 0 0 22px;
+  padding: 10px 18px;
+  border: 2px solid var(--u-ink);
   border-radius: 999px;
-  background: #eaf4ee;
-  color: var(--u-acento);
+  background: #ffffff;
+  box-shadow: 5px 5px 0 #64d893;
+  color: var(--u-ink);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
 }
 .pill span {
   color: #2fb36a;
@@ -40,9 +45,9 @@
 .heroTexto h1 {
   margin: 0;
   font-size: clamp(40px, 5.4vw, 68px);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
-  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+  font-weight: 900;
 }
 .sub {
   margin: 20px 0 0;
@@ -67,22 +72,31 @@
   min-height: 54px;
   padding: 14px 26px;
   border-radius: 12px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 .primario.primario {
   background: var(--u-acento);
   color: #ffffff;
-  box-shadow: 0 12px 26px -14px rgba(31, 92, 58, 0.8);
+  border: 2px solid var(--u-ink);
+  box-shadow: 4px 4px 0 var(--u-ink);
 }
 .primario.primario:hover {
   background: var(--u-acento-2);
+  transform: translate(-1px, -2px);
+  box-shadow: 6px 6px 0 var(--u-ink);
 }
 .secundario.secundario {
-  border: 1.5px solid var(--u-line);
+  border: 2px solid var(--u-ink);
   color: var(--u-ink);
   background: #ffffff;
+  box-shadow: 4px 4px 0 rgba(14, 36, 29, 0.15);
+}
+.secundario.secundario:hover {
+  transform: translate(-1px, -2px);
+  box-shadow: 5px 5px 0 var(--u-ink);
 }
 .micro {
   list-style: none;
@@ -106,8 +120,8 @@
   margin: 0;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 40px 80px -40px rgba(15, 29, 23, 0.45);
-  border: 1px solid var(--u-line);
+  box-shadow: 10px 10px 0 #64d893;
+  border: 3px solid var(--u-ink);
 }
 .heroVisual img {
   display: block;

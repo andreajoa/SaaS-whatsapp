@@ -38,8 +38,8 @@ export default async function OnboardingLayout({ children }: { children: React.R
 
   return (
     <IdiomaProvider locale={user.idioma}>
-      <div className="flex min-h-screen flex-col bg-muted/40">
-        <header className="border-b bg-background">
+      <div className="atenza-app-canvas flex min-h-screen flex-col bg-muted/40">
+        <header className="border-b-2 border-neutral-900/90 bg-surface shadow-[0_3px_0_rgba(14,36,29,0.08)] dark:border-border-strong">
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               {/* O nome está escrito logo abaixo — o símbolo é reforço, não legenda. */}

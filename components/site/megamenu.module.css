@@ -54,16 +54,16 @@
   }
 }
 .painelInterno {
-  width: min(1180px, 100%);
-  margin: 8px auto 0;
+  width: min(1140px, 100%);
+  margin: 12px auto 0;
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 24px;
   padding: 24px;
   background: #ffffff;
-  border: 1px solid #dbe5d6;
+  border: 2px solid #0e241d;
   border-radius: 18px;
-  box-shadow: 0 24px 60px -24px rgba(23, 58, 44, 0.35);
+  box-shadow: 0 24px 60px -18px rgba(14, 36, 29, 0.28), 7px 7px 0 #0e241d;
 }
 
 .lista {
@@ -340,23 +340,30 @@
   }
 }
 
-/* ── Cabeçalho das páginas de conteúdo ─────────────────────────────────── */
+/* ── Cabeçalho das páginas de conteúdo (FlowNexa floating pill in Atenza palette) ── */
 .cabecalho {
   position: sticky;
-  top: 0;
-  z-index: 50;
-  background: rgba(247, 250, 246, 0.94);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid #dae2dc;
+  top: 12px;
+  z-index: 120;
+  padding: 0 18px;
+  pointer-events: none;
 }
 .cabecalhoInterno {
-  width: min(1280px, calc(100% - 32px));
+  pointer-events: auto;
+  position: relative;
+  width: min(1140px, 100%);
   margin-inline: auto;
-  min-height: 72px;
+  min-height: 68px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  border: 2px solid #0e241d;
+  border-radius: 17px;
+  box-shadow: 0 12px 32px rgba(14, 36, 29, 0.12), 4px 4px 0 #0e241d;
 }
 .logoLink {
   display: inline-flex;
@@ -368,22 +375,31 @@
   gap: 14px;
 }
 .entrar.entrar {
-  color: #173a2c;
-  font-size: 15px;
+  color: #0e241d;
+  font-size: 14px;
+  font-weight: 700;
   text-decoration: none;
 }
 .criar.criar {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 11px 16px;
+  padding: 10px 16px;
+  border: 2px solid #0e241d;
   border-radius: 11px;
-  background: #173a2c;
+  background: #123f34;
   color: #ffffff;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
+  box-shadow: 3px 3px 0 #0e241d;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.criar.criar:hover {
+  background: #1f6b52;
+  transform: translate(-1px, -2px);
+  box-shadow: 5px 5px 0 #0e241d;
 }
 @media (max-width: 900px) {
   .entrar.entrar {

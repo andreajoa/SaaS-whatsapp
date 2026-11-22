@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  PRECOS_LIVE_ATENZA_BRL,
+  PRECOS_LIVE_ATENZA_POR_MOEDA,
   mercadoCobradoParaPlanos,
   planoDoPreco,
   precoDoPlano,
@@ -19,6 +21,7 @@ const CHAVES = [
   "STRIPE_PRICE_PRO_GBP",
   "STRIPE_PRICE_ILIMITADO_GBP",
   "STRIPE_PRICE_PRO_EUR",
+  "STRIPE_PRICES_POR_MOEDA",
   "STRIPE_MOEDAS",
 ] as const;
 
@@ -105,5 +108,31 @@ describe("preços multi-moeda do Stripe", () => {
     process.env.STRIPE_PRICE_PRO_USD = "price_us_pro";
     process.env.STRIPE_PRICE_ILIMITADO_USD = "price_us_ili";
     expect(mercadoCobradoParaPlanos(us)).toEqual(us);
+  });
+
+  it("resolve automaticamente todas as 12 moedas quando configurado com o catálogo live oficial da Atenza", () => {
+    process.env.STRIPE_PRICE_ESSENCIAL = PRECOS_LIVE_ATENZA_BRL.essencial;
+    process.env.STRIPE_PRICE_PRO = PRECOS_LIVE_ATENZA_BRL.pro;
+    process.env.STRIPE_PRICE_ILIMITADO = PRECOS_LIVE_ATENZA_BRL.ilimitado;
+
+    expect(precoResolvidoDoPlano("essencial", "USD")).toEqual({
+      priceId: PRECOS_LIVE_ATENZA_POR_MOEDA.USD!.essencial,
+      moedaCobrada: "USD",
+    });
+    expect(precoResolvidoDoPlano("pro", "GBP")).toEqual({
+      priceId: PRECOS_LIVE_ATENZA_POR_MOEDA.GBP!.pro,
+      moedaCobrada: "GBP",
+    });
+    expect(precoResolvidoDoPlano("ilimitado", "EUR")).toEqual({
+      priceId: PRECOS_LIVE_ATENZA_POR_MOEDA.EUR!.ilimitado,
+      moedaCobrada: "EUR",
+    });
+    expect(planoDoPreco(PRECOS_LIVE_ATENZA_POR_MOEDA.MXN!.pro)).toBe("pro");
+    expect(moedasCobraveis().has("USD")).toBe(true);
+    expect(moedasCobraveis().has("GBP")).toBe(true);
+    expect(moedasCobraveis().has("EUR")).toBe(true);
+    expect(moedasCobraveis().has("MXN")).toBe(true);
+    expect(mercadoCobradoParaPlanos(mercadoDoPais("US"))).toEqual(mercadoDoPais("US"));
+    expect(mercadoCobradoParaPlanos(mercadoDoPais("GB"))).toEqual(mercadoDoPais("GB"));
   });
 });

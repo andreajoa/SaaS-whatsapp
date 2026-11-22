@@ -163,16 +163,112 @@ export interface PrecoResolvido {
 }
 
 /**
+ * Catálogo oficial de `price_...` live da conta Stripe da Atenza por moeda,
+ * pareado com os produtos `prod_VIREXEWiksyLQA` (Essencial),
+ * `prod_VIREzGfcd9f5SP` (Pro) e `prod_VIREiSir4VQ6FV` (Ilimitado).
+ *
+ * Só entra em vigor quando a instalação está usando os `STRIPE_PRICE_*` live
+ * oficiais da Atenza — qualquer self-host ou operador com conta Stripe própria
+ * usa seus próprios `STRIPE_PRICE_*` / `STRIPE_PRICES_POR_MOEDA`.
+ */
+export const PRECOS_LIVE_ATENZA_BRL: Readonly<Record<PlanoId, string>> = {
+  essencial: "price_1UHqM8G3HxcyUpFWDj4Wv7pW",
+  pro: "price_1UHqM9G3HxcyUpFWgj7aIi7x",
+  ilimitado: "price_1UHqMBG3HxcyUpFWH3Aa7k1a",
+};
+
+export const PRECOS_LIVE_ATENZA_POR_MOEDA: Readonly<
+  Partial<Record<Exclude<Moeda, "BRL">, Readonly<Record<PlanoId, string>>>>
+> = {
+  USD: {
+    essencial: "price_1UefeJG3HxcyUpFWIEP5SVP6",
+    pro: "price_1UefeLG3HxcyUpFWiUtqycxN",
+    ilimitado: "price_1UefePG3HxcyUpFWEhGzwLC2",
+  },
+  GBP: {
+    essencial: "price_1Ueff0G3HxcyUpFWlMKc89wG",
+    pro: "price_1Ueff6G3HxcyUpFWsAqHXjiI",
+    ilimitado: "price_1Ueff7G3HxcyUpFWPAjEPazh",
+  },
+  EUR: {
+    essencial: "price_1Ueff7G3HxcyUpFWpvurfBkp",
+    pro: "price_1Ueff8G3HxcyUpFWcULABxPu",
+    ilimitado: "price_1Ueff9G3HxcyUpFWnLOTQqPg",
+  },
+  MXN: {
+    essencial: "price_1Ueff9G3HxcyUpFWi07g1Nin",
+    pro: "price_1UeffAG3HxcyUpFWq02OgxEL",
+    ilimitado: "price_1UeffBG3HxcyUpFWiF3TieX2",
+  },
+  COP: {
+    essencial: "price_1UeffBG3HxcyUpFWb9Xh3NUo",
+    pro: "price_1UeffCG3HxcyUpFWab3kKBeL",
+    ilimitado: "price_1UeffCG3HxcyUpFWgXc3Ukbf",
+  },
+  CLP: {
+    essencial: "price_1UeffDG3HxcyUpFWCTSL09Gv",
+    pro: "price_1UeffEG3HxcyUpFWCMmzSrle",
+    ilimitado: "price_1UeffEG3HxcyUpFWbMNDA5B9",
+  },
+  PEN: {
+    essencial: "price_1UeffFG3HxcyUpFWi7piB598",
+    pro: "price_1UeffFG3HxcyUpFWShcmu8vI",
+    ilimitado: "price_1UeffGG3HxcyUpFWo4CLpZXN",
+  },
+  INR: {
+    essencial: "price_1UeffHG3HxcyUpFWjPGRqS0c",
+    pro: "price_1UeffHG3HxcyUpFWXoRU0LlC",
+    ilimitado: "price_1UeffIG3HxcyUpFWqmbjNTBU",
+  },
+  IDR: {
+    essencial: "price_1UeffJG3HxcyUpFWag0kAgoD",
+    pro: "price_1UeffJG3HxcyUpFW3CF2y7x9",
+    ilimitado: "price_1UeffKG3HxcyUpFWdoy8zt7g",
+  },
+  MYR: {
+    essencial: "price_1UeffKG3HxcyUpFWAdA3Qvyo",
+    pro: "price_1UeffLG3HxcyUpFWXb4cnhOZ",
+    ilimitado: "price_1UeffLG3HxcyUpFWYgRT9yOZ",
+  },
+  ZAR: {
+    essencial: "price_1UeffMG3HxcyUpFWn4UZWxoB",
+    pro: "price_1UeffNG3HxcyUpFWzMwlEDZD",
+    ilimitado: "price_1UeffNG3HxcyUpFWwPqcFux0",
+  },
+};
+
+function lerMapaDePrecosJson(): Record<string, Partial<Record<PlanoId, string>>> | null {
+  const bruto = (process.env.STRIPE_PRICES_POR_MOEDA ?? "").trim();
+  if (!bruto) return null;
+  try {
+    const parsed = JSON.parse(bruto) as unknown;
+    return typeof parsed === "object" && parsed !== null
+      ? (parsed as Record<string, Partial<Record<PlanoId, string>>>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+export function usaCatalogoLiveAtenza(plano?: PlanoId): boolean {
+  if (plano) {
+    const sufixo = plano.toUpperCase();
+    return (process.env[`STRIPE_PRICE_${sufixo}`] ?? "").trim() === PRECOS_LIVE_ATENZA_BRL[plano];
+  }
+  return ORDEM_DOS_PLANOS.some(
+    (p) => (process.env[`STRIPE_PRICE_${p.toUpperCase()}`] ?? "").trim() === PRECOS_LIVE_ATENZA_BRL[p],
+  );
+}
+
+/**
  * O `price` do Stripe correspondente a um plano e moeda (opcional), ou `null`
  * quando o operador não configurou aquele plano nesta instalação.
  *
- * Multi-moeda: quando `moeda` é diferente de `BRL`, procura primeiro
- * `STRIPE_PRICE_<PLANO>_<MOEDA>` (ex.: `STRIPE_PRICE_PRO_USD`,
- * `STRIPE_PRICE_PRO_EUR`, `STRIPE_PRICE_PRO_GBP`, `STRIPE_PRICE_PRO_MXN`).
- * Se não estiver configurado, cai no `STRIPE_PRICE_<PLANO>` padrão (BRL).
- *
- * Para saber QUAL moeda será cobrada de fato (e nunca exibir uma moeda na tela
- * cobrando outra no iframe do Stripe), use `precoResolvidoDoPlano`.
+ * Multi-moeda: quando `moeda` é diferente de `BRL`, procura:
+ *  1. `STRIPE_PRICE_<PLANO>_<MOEDA>` no ambiente;
+ *  2. `STRIPE_PRICES_POR_MOEDA` (JSON compacto `{ "USD": { "pro": "price_..." } }`);
+ *  3. `PRECOS_LIVE_ATENZA_POR_MOEDA` quando a instalação usa o catálogo live oficial da Atenza;
+ *  4. fallback para `STRIPE_PRICE_<PLANO>` padrão (BRL).
  */
 export function precoResolvidoDoPlano(plano: PlanoId, moeda: Moeda = "BRL"): PrecoResolvido | null {
   const sufixoPlano = plano.toUpperCase();
@@ -180,6 +276,16 @@ export function precoResolvidoDoPlano(plano: PlanoId, moeda: Moeda = "BRL"): Pre
     const porMoeda = (process.env[`STRIPE_PRICE_${sufixoPlano}_${moeda}`] ?? "").trim();
     if (porMoeda.length > 0) {
       return { priceId: porMoeda, moedaCobrada: moeda };
+    }
+    const doJson = lerMapaDePrecosJson()?.[moeda]?.[plano]?.trim();
+    if (doJson) {
+      return { priceId: doJson, moedaCobrada: moeda };
+    }
+    if (usaCatalogoLiveAtenza(plano)) {
+      const oficial = PRECOS_LIVE_ATENZA_POR_MOEDA[moeda]?.[plano];
+      if (oficial) {
+        return { priceId: oficial, moedaCobrada: moeda };
+      }
     }
   }
   const padrao = (process.env[`STRIPE_PRICE_${sufixoPlano}`] ?? "").trim();
@@ -214,12 +320,16 @@ export function mercadoCobradoParaPlanos(
 export function planoDoPreco(priceId: string): PlanoId | null {
   const alvo = priceId.trim();
   if (!alvo) return null;
+  const mapaJson = lerMapaDePrecosJson();
   for (const id of ORDEM_DOS_PLANOS) {
     const sufixoPlano = id.toUpperCase();
     if ((process.env[`STRIPE_PRICE_${sufixoPlano}`] ?? "").trim() === alvo) return id;
+    if (PRECOS_LIVE_ATENZA_BRL[id] === alvo) return id;
     for (const moeda of TODAS_MOEDAS) {
       if (moeda === "BRL") continue;
       if ((process.env[`STRIPE_PRICE_${sufixoPlano}_${moeda}`] ?? "").trim() === alvo) return id;
+      if (mapaJson?.[moeda]?.[id]?.trim() === alvo) return id;
+      if (PRECOS_LIVE_ATENZA_POR_MOEDA[moeda]?.[id] === alvo) return id;
     }
   }
   return null;

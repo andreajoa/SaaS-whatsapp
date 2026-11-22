@@ -8,7 +8,22 @@ export function idiomaDaUrlPublica(caminho: string): IdiomaDoSite {
   return "pt-BR";
 }
 
-export const IDIOMAS_PUBLICOS = { "pt-BR": "/", en: "/en", es: "/es", "fr-FR": "/fr", "x-default": "/" };
+export const IDIOMAS_PUBLICOS = {
+  "pt-BR": "/",
+  en: "/en",
+  "en-US": "/en-us",
+  "en-GB": "/en-gb",
+  es: "/es",
+  "es-MX": "/mx",
+  "es-CO": "/es/colombia",
+  "es-AR": "/es/argentina",
+  "es-CL": "/es/chile",
+  "es-PE": "/es/peru",
+  "es-ES": "/es/espana",
+  "fr-FR": "/fr",
+  "de-DE": "/de",
+  "x-default": "/",
+};
 export const SELETOR_DE_IDIOMA = [
   { href: "/", lang: "pt-BR", label: "Português" },
   { href: "/en", lang: "en", label: "English" },
@@ -190,6 +205,7 @@ export const AREA_ATENDIDA = [
 
 export function identidadePublica(nome: string, base: string, logoUrl: string | null) {
   const url = new URL("/", base).toString();
+  const oficial = ehDominioOficial(base);
   return [
     {
       "@type": "Organization",
@@ -198,9 +214,30 @@ export function identidadePublica(nome: string, base: string, logoUrl: string | 
       url,
       ...(logoUrl ? { logo: new URL(logoUrl, base).toString() } : {}),
       areaServed: AREA_ATENDIDA,
-      knowsLanguage: ["pt-BR", "en", "es"],
-      // sameAs liga a marca ao perfil social no Knowledge Graph e nas respostas de IA.
-      ...(ehDominioOficial(base) ? { sameAs: [INSTAGRAM_ATENZA, FACEBOOK_ATENZA] } : {}),
+      knowsLanguage: ["pt-BR", "en", "es", "fr", "de"],
+      knowsAbout: [
+        "WhatsApp Business API",
+        "WhatsApp CRM",
+        "AI Customer Support Agents",
+        "Shared WhatsApp Team Inbox",
+        "Sales Pipeline Kanban",
+        "Automated WhatsApp Follow-up",
+        "Google Calendar Scheduling via WhatsApp",
+        "LGPD and GDPR Data Privacy",
+        "Model Context Protocol (MCP)",
+      ],
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          url: new URL("/contato", base).toString(),
+          availableLanguage: ["Portuguese", "English", "Spanish", "French", "German"],
+        },
+      ],
+      // sameAs liga a marca aos perfis oficiais no Knowledge Graph e nas respostas de IA.
+      ...(oficial
+        ? { sameAs: [INSTAGRAM_ATENZA, FACEBOOK_ATENZA, RECLAME_AQUI_ATENZA] }
+        : {}),
     },
     {
       "@type": "WebSite",
@@ -208,7 +245,7 @@ export function identidadePublica(nome: string, base: string, logoUrl: string | 
       name: nome,
       url,
       publisher: { "@id": `${url}#organization` },
-      inLanguage: ["pt-BR", "en", "es"],
+      inLanguage: ["pt-BR", "en", "es", "fr", "de"],
     },
   ];
 }
@@ -279,6 +316,27 @@ export function schemaDoFaq(
       "@type": "Question",
       name: p.question,
       acceptedAnswer: { "@type": "Answer", text: p.answer },
+    })),
+  };
+}
+
+/** Passos visíveis de ativação na página viram HowTo para busca e respostas de IA. */
+export function schemaDoComoFunciona(
+  base: string,
+  caminho: string,
+  nome: string,
+  passos: readonly string[],
+) {
+  const url = new URL(caminho, base).toString();
+  return {
+    "@type": "HowTo",
+    "@id": `${url}#howto`,
+    name: nome,
+    step: passos.map((texto, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: texto,
+      text: texto,
     })),
   };
 }

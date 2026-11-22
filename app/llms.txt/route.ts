@@ -67,12 +67,20 @@ Fatos principais:
 - Integrações: Shopify, WooCommerce, Nuvemshop, API e webhooks
 - LGPD: dados isolados por empresa, pedidos de titular e trilha de auditoria
 - Teste: ${DIAS_DE_TRIAL} dias sem cobrança no início
-- Idiomas do site: português (Brasil), inglês e espanhol
-- Países com página própria: Brasil, ${PAGINAS_DE_PAIS.map((p) => p.nome).join(", ")}
+- Moedas ativas no checkout Stripe: ${[...moedasCobraveis()].join(", ")}
+- Idiomas do site: português (Brasil), inglês (EUA, Reino Unido e internacional), espanhol, francês e alemão
+- Países com página própria: Brasil, França, Reino Unido, ${PAGINAS_DE_PAIS.map((p) => p.nome).join(", ")}
+- Documentação completa para IAs: ${url("/llms-full.txt")}
 
 ## Planos no Brasil (preço mensal em reais)
 
 ${planos}
+
+## Preços internacionais
+
+- [Preços Brasil (BRL)](${url("/precos")})
+- [US Pricing (USD)](${url("/en-us/pricing")})
+- [UK Pricing (GBP)](${url("/en-gb/pricing")})
 
 ## Páginas
 
@@ -83,6 +91,7 @@ ${paginas}
 - [Contato](${url("/contato")}): falar com o suporte
 - [Instagram @atenzaon](https://www.instagram.com/atenzaon/): novidades e conteúdo da Atenza
 - [Facebook @atenzaon](https://www.facebook.com/atenzaon): página oficial da Atenza no Facebook
+- [Reclame Aqui — Atenza](https://www.reclameaqui.com.br/busca/?q=atenza): reputação e cadastro da empresa
 - [Termos e privacidade](${url("/legal")}): documentos legais
 
 ## Páginas por país
@@ -96,8 +105,12 @@ ${ARTIGOS.map((a) => `- [${a.title.replaceAll("{marca}", nome)}](${url(a.caminho
 
 ## Versões em outros idiomas
 
-- [English](${url("/en")})
+- [English (Global)](${url("/en")})
+- [English (US)](${url("/en-us")})
+- [English (UK)](${url("/en-gb")})
 - [Español](${url("/es")})
+- [Français](${url("/fr")})
+- [Deutsch](${url("/de")})
 `;
   return new Response(texto, {
     headers: {

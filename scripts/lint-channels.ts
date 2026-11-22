@@ -216,7 +216,7 @@ const KNOWN_DEBT: { reason: string; files: string[] }[] = [
       "irmã já recusa fazer nas Fases 0–2 — só que agora duplicada aqui porque " +
       "o dicionário é espelho, não fonte. Sai junto com a Fase 3 do seam, quando " +
       "a cópia de tela na fonte deixar de nomear o provider.",
-    files: ["lib/i18n/dicionario.ts"],
+    files: ["lib/i18n/dicionario-en.ts", "lib/i18n/dicionario.ts"],
   },
 ];
 

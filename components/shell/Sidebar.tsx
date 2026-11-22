@@ -119,7 +119,7 @@ export function SidebarContent({
     <>
       <div
         className={cn(
-          "flex h-14 items-center border-b px-4",
+          "flex h-14 items-center border-b-2 border-neutral-900/90 px-4 dark:border-border-strong",
           collapsed ? "justify-center" : "justify-start",
         )}
       >
@@ -215,7 +215,7 @@ export function SidebarContent({
                     type="button"
                     onClick={() => toggleGrupo(group.id)}
                     aria-expanded={aberto}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground"
+                    className="flex w-full items-center justify-between rounded-md px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground"
                   >
                     {t(group.label)}
                     <CaretDown
@@ -247,10 +247,10 @@ export function SidebarContent({
                           aria-current={isActive ? "page" : undefined}
                           onClick={onNavigate}
                           className={cn(
-                            "relative flex items-center gap-3 rounded-md px-3 py-1 text-sm transition-colors",
+                            "relative flex items-center gap-3 rounded-md border px-3 py-1 text-sm font-medium transition-all",
                             isActive
-                              ? "bg-accent text-accent-foreground"
-                              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                              ? "border-neutral-900 bg-accent font-semibold text-accent-foreground shadow-[3px_3px_0_var(--color-neutral-900)] dark:border-accent-200 dark:shadow-[3px_3px_0_rgba(0,0,0,0.65)]"
+                              : "border-transparent text-muted-foreground hover:bg-accent/15 hover:text-foreground",
                             collapsed && "justify-center px-2",
                           )}
                         >
@@ -273,10 +273,10 @@ export function SidebarContent({
                         aria-current={pathname === group.hub.href ? "page" : undefined}
                         onClick={onNavigate}
                         className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-1 text-sm transition-colors",
+                          "flex items-center gap-3 rounded-md border px-3 py-1 text-sm font-medium transition-all",
                           pathname === group.hub.href
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                            ? "border-neutral-900 bg-accent font-semibold text-accent-foreground shadow-[3px_3px_0_var(--color-neutral-900)] dark:border-accent-200 dark:shadow-[3px_3px_0_rgba(0,0,0,0.65)]"
+                            : "border-transparent text-muted-foreground hover:bg-accent/15 hover:text-foreground",
                           collapsed && "justify-center px-2",
                         )}
                       >
@@ -291,7 +291,7 @@ export function SidebarContent({
           );
         })}
       </nav>
-      <div className="border-t p-2">
+      <div className="border-t-2 border-neutral-900/15 p-2 dark:border-border">
         {rodape && (
           <Link
             href={rodape.href}
@@ -299,10 +299,10 @@ export function SidebarContent({
             aria-current={pathname.startsWith(rodape.href) ? "page" : undefined}
             onClick={onNavigate}
             className={cn(
-              "mb-1 flex items-center gap-3 rounded-md px-3 py-1 text-sm transition-colors",
+              "mb-1 flex items-center gap-3 rounded-md border px-3 py-1 text-sm font-medium transition-all",
               pathname.startsWith(rodape.href)
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                ? "border-neutral-900 bg-accent font-semibold text-accent-foreground shadow-[3px_3px_0_var(--color-neutral-900)] dark:border-accent-200 dark:shadow-[3px_3px_0_rgba(0,0,0,0.65)]"
+                : "border-transparent text-muted-foreground hover:bg-accent/15 hover:text-foreground",
               collapsed && "justify-center px-2",
             )}
           >
@@ -358,7 +358,7 @@ export function Sidebar({ collapsed }: { collapsed: boolean }) {
         //
         // `shrink-0` porque item de flex encolhe por padrão, e uma barra de 60
         // espremida para caber é o mesmo defeito por outro caminho.
-        "sticky top-0 z-30 flex h-screen shrink-0 flex-col border-r bg-card transition-[width] duration-200",
+        "sticky top-0 z-30 flex h-screen shrink-0 flex-col border-r-2 border-neutral-900/90 bg-card shadow-[3px_0_0_rgba(14,36,29,0.08)] transition-[width] duration-200 dark:border-border-strong",
         collapsed ? "w-16" : "w-60",
       )}
     >

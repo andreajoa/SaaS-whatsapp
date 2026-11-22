@@ -1277,3 +1277,22 @@
 .fundo-de-conversa > * {
   position: relative;
 }
+
+/* ── FlowNexa-inspired tactile canvas for Atenza App / Auth / Onboarding ──── */
+.atenza-app-canvas {
+  background-color: var(--color-bg);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 54px,
+    rgba(18, 63, 52, 0.028) 54px 108px
+  );
+  background-attachment: fixed;
+}
+[data-theme="dark"] .atenza-app-canvas {
+  background-color: var(--color-bg);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 54px,
+    rgba(255, 255, 255, 0.015) 54px 108px
+  );
+}

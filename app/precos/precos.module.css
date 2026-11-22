@@ -1,6 +1,9 @@
 .pagina {
-  background: #f8faf7;
-  color: #17212b;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 53px, rgba(18, 63, 52, 0.026) 53px 107px),
+    radial-gradient(ellipse 37% 62% at 0% 24%, #d6efe0 0, transparent 100%),
+    #fafbf8;
+  color: #0e241d;
   min-height: 100vh;
 }
 .topo {

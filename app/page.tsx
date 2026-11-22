@@ -6,9 +6,11 @@ import { redirect } from "next/navigation";
 import {
   ArrowRight,
   Bot,
+  CalendarDays,
   Check,
   History,
   LockKeyhole,
+  MessagesSquare,
   Play,
   QrCode,
   ShieldCheck,
@@ -19,15 +21,27 @@ import {
 import { LogotipoDoProduto, SimboloDaMarca } from "@/components/branding/MarcaDoProduto";
 import { CapturaDeLead } from "@/components/site/CapturaDeLead";
 import { ConviteDeLead } from "@/components/site/ConviteDeLead";
+import {
+  HeroCelularAtenza,
+  type TextosHeroCelular,
+} from "@/components/site/HeroCelularAtenza";
 import { IntegracoesDaHome } from "@/components/site/IntegracoesDaHome";
 import { Medidor } from "@/components/site/Medidor";
 import { MegaMenu } from "@/components/site/MegaMenu";
-import { montarMenu } from "@/lib/marketing/menu";
+import { PaisesDisponiveis } from "@/components/site/PaisesDisponiveis";
 import {
   ProdutoDemonstracao,
   type CenarioDaDemonstracao,
   type TextosDoProduto,
 } from "@/components/site/ProdutoDemonstracao";
+import {
+  PublicosInterativosAtenza,
+  type TextosPublicos,
+} from "@/components/site/PublicosInterativosAtenza";
+import {
+  RecursosInterativosAtenza,
+  type TextosRecursosInterativos,
+} from "@/components/site/RecursosInterativosAtenza";
 import {
   VideoDeContexto,
   VideoExplicativo,
@@ -40,10 +54,13 @@ import { marcaDaSaida, type MarcaDeSaida } from "@/lib/branding/saida";
 import {
   DIAS_DE_TRIAL,
   ORDEM_DOS_PLANOS,
+  PLANOS,
   instalacaoCobra,
   precoDoPlano,
   type PlanoId,
 } from "@/lib/billing/planos";
+import { ID_DA_SECAO_DE_PLANOS } from "@/lib/marketing/caminhos";
+import { montarMenu } from "@/lib/marketing/menu";
 import {
   identidadePublica,
   jsonLdSeguro,
@@ -53,11 +70,10 @@ import {
 } from "@/lib/marketing/seo";
 import { env } from "@/lib/env";
 import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
-import { type IdiomaDoSite } from "@/lib/mercado/paises";
+import { precoLegivelNoMercado, type IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
 import { ehBotDeBusca, visitanteAtual } from "@/lib/mercado/visitante";
 import { transcricaoDoVideo, videoDaApresentacao } from "@/lib/marketing/video";
-import { PaisesDisponiveis } from "@/components/site/PaisesDisponiveis";
 import { createClient, SESSION_COOKIE_NAME } from "@/lib/supabase/server";
 
 // O mesmo interruptor da cobrança preserva o clone self-host sem vitrine de assinatura.
@@ -118,7 +134,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
       "Quero receber dicas, novidades e campanhas sazonais por e-mail, no máximo uma mensagem comercial por dia. Posso cancelar a qualquer momento.",
     ),
   };
-  // As ilhas recebem os três idiomas da vitrine por prop, sem importar o dicionário do produto.
+
   const produto: TextosDoProduto = {
     demonstracao: t("Demonstração"),
     titulo: t("Explore o produto"),
@@ -149,7 +165,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     mover: t("Mover para"),
     demonstracaoTexto: t("Experimente mudar a etapa deste contato no exemplo acima."),
   };
-  // Dois negócios diferentes, um por quadro: loja no topo, clínica na seção do produto.
+
   const cenarioLoja: CenarioDaDemonstracao = {
     nome: "Mariana",
     perfil: t("Cliente da loja"),
@@ -178,6 +194,145 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
       { nome: "Bruno", ultima: t("Qual o endereço da clínica?") },
     ],
   };
+
+  const textosHeroCelular: TextosHeroCelular = {
+    ariaCelular: t("Prévia ilustrativa com dados fictícios"),
+    ariaPontos: t("Explore o produto"),
+    entradaPlaceholder: t("Escreva uma mensagem..."),
+    agora: t("Agora"),
+    seloAoVivoTitulo: t("IA no WhatsApp 24h"),
+    seloAoVivoSubtitulo: t("Resposta imediata"),
+    previewUmRotulo: t("Funil de vendas"),
+    previewUmTitulo: t("O próximo passo fica à vista"),
+    previewDoisRotulo: t("Agentes de IA"),
+    previewDoisTitulo: t("O conhecimento é da sua empresa."),
+    slides: [
+      {
+        titulo: t("Comércio e e-commerce"),
+        contato: "Mariana",
+        status: t("Cliente da loja"),
+        bolhas: [
+          { role: "in", text: cenarioLoja.pergunta },
+          { role: "out", text: cenarioLoja.resposta },
+          { role: "in", text: cenarioLoja.segunda },
+          {
+            role: "out",
+            text: cenarioLoja.proximoTexto,
+            link: t("Produtos e serviços"),
+          },
+        ],
+      },
+      {
+        titulo: t("Clínicas e saúde"),
+        contato: "Ricardo",
+        status: t("Paciente da clínica"),
+        bolhas: [
+          { role: "in", text: cenarioClinica.pergunta },
+          { role: "out", text: cenarioClinica.resposta },
+          { role: "in", text: cenarioClinica.segunda },
+          {
+            role: "out",
+            text: cenarioClinica.proximoTexto,
+            link: t("Agendamento com Google Agenda e Meet."),
+          },
+        ],
+      },
+      {
+        titulo: t("Serviços e B2B"),
+        contato: "Camila",
+        status: t("Conversa atribuída à equipe"),
+        bolhas: [
+          { role: "in", text: t("Vocês aceitam Pix?") },
+          { role: "out", text: t("O histórico acompanha a conversa quando ela passa da IA para a equipe.") },
+          { role: "in", text: t("Qual o prazo de entrega para Campinas?") },
+          {
+            role: "out",
+            text: t("Qualifique os contatos e mantenha o próximo passo visível para o time."),
+            link: t("CRM e funil de vendas"),
+          },
+        ],
+      },
+    ],
+  };
+
+  const textosRecursosInterativos: TextosRecursosInterativos = {
+    titulo: t("Principais recursos no WhatsApp"),
+    subtitulo: t("Da primeira mensagem ao próximo passo da venda."),
+    ariaLista: t("Funcionalidades"),
+    ariaCelular: t("Prévia ilustrativa com dados fictícios"),
+    cabecalhoCelular: t("Demonstração"),
+    ctaRotulo: t("Conhecer os planos"),
+    ctaHref: vendidos.length ? "/precos" : "#como-funciona",
+    itens: [
+      {
+        rotulo: t("Agentes de IA"),
+        titulo: t("O conhecimento é da sua empresa."),
+        descricao: t("Configure instruções, base de conhecimento e quando pedir ajuda ao time."),
+        mensagens: [
+          cenarioLoja.pergunta,
+          cenarioLoja.resposta,
+          cenarioLoja.segunda,
+          cenarioLoja.proximoTexto,
+        ],
+      },
+      {
+        rotulo: t("Multiatendimento"),
+        titulo: t("Um histórico para o time inteiro"),
+        descricao: t("O histórico acompanha a conversa quando ela passa da IA para a equipe."),
+        mensagens: [
+          t("Quero trocar o tamanho do pedido."),
+          t("Uma pessoa assume com contexto"),
+          t("Qual o prazo de entrega para Campinas?"),
+          t("Todos acompanham o que já foi conversado."),
+        ],
+      },
+      {
+        rotulo: t("CRM e funil de vendas"),
+        titulo: t("A conversa tem um próximo passo."),
+        descricao: t("Organize os contatos e acompanhe as oportunidades."),
+        mensagens: [
+          t("Vocês aceitam Pix?"),
+          t("Em atendimento"),
+          t("Proposta"),
+          t("Concluído"),
+        ],
+      },
+      {
+        rotulo: t("Agenda"),
+        titulo: t("Agendamento com Google Agenda e Meet."),
+        descricao: t("Organize o primeiro contato e encaminhe dúvidas para a equipe responsável."),
+        mensagens: [
+          cenarioClinica.pergunta,
+          cenarioClinica.resposta,
+          cenarioClinica.segunda,
+          cenarioClinica.proximoTexto,
+        ],
+      },
+      {
+        rotulo: t("Follow-up automático"),
+        titulo: t("A dúvida chega. A conversa continua."),
+        descricao: t("Qualifique os contatos e mantenha o próximo passo visível para o time."),
+        mensagens: [
+          t("Vocês atendem convênio?"),
+          t("Convênios aceitos"),
+          t("Preciso remarcar minha consulta."),
+          t("Confirmar a consulta e enviar o lembrete na véspera."),
+        ],
+      },
+      {
+        rotulo: t("API, webhooks e MCP"),
+        titulo: t("Conecte qualquer sistema."),
+        descricao: t("Lojas, APIs e webhooks para trazer mais contexto ao atendimento."),
+        mensagens: [
+          t("Produtos e serviços"),
+          t("Prazos e entregas"),
+          t("Trocas e devoluções"),
+          t("O contexto acompanha cada proposta."),
+        ],
+      },
+    ],
+  };
+
   const video: TextosDoVideo = {
     titulo: t("Veja como funciona"),
     descricao: t(
@@ -199,8 +354,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     paragrafo4: t(
       "Vários atendentes no mesmo número, a API oficial do WhatsApp e os seus dados protegidos pela LGPD. Atenza: WhatsApp que atende e vende 24h. Teste sete dias sem cobrança.",
     ),
-  }; // Versão local do vídeo: a transcrição é a da narração que se ouve, e a
-  // descrição não promete legenda em português.
+  };
   const transcricaoLocal = transcricaoDoVideo(apresentacao);
   if (transcricaoLocal) {
     video.descricao = t("Um passeio pelo atendimento, pela IA e pelo funil, em menos de 1 minuto.");
@@ -211,39 +365,136 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
   const condicoes = t(
     "Cartão necessário. Renovação automática após a avaliação. Cancele quando quiser.",
   );
-  const segmentos = [
+
+  const textosPublicos: TextosPublicos = {
+    eyebrow: t("Para quem é a plataforma"),
+    titulo: t("No ritmo do seu negócio."),
+    subtitulo: t("Veja onde a plataforma entra na sua rotina."),
+    ariaAbas: t("Segmentos"),
+    respostaAutomatica: t("Resposta imediata"),
+    proximoPasso: t("Próximo passo"),
+    comoUsar: t("Explore o produto"),
+    nota: t(
+      "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.",
+    ),
+    estatisticas: [
+      { valor: "24/7", rotulo: t("Agentes de IA") },
+      { valor: "1", rotulo: t("WhatsApp oficial") },
+      { valor: `${DIAS_DE_TRIAL}d`, rotulo: t("dias sem cobrança") },
+    ],
+    itens: [
+      {
+        arquivo: "segmento-comercio.webp",
+        alt: t("Empreendedora organizando pedidos de uma loja"),
+        nome: t("Comércio e e-commerce"),
+        resumo: t("Produtos e serviços"),
+        titulo: t("A dúvida chega. A conversa continua."),
+        texto: t("Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja."),
+        gatilho: t("Vocês aceitam Pix?"),
+        passo1: t("Cliente da loja"),
+        resposta: t("Oi, Mariana! Temos sim. Posso te ajudar a escolher o tamanho?"),
+        passo3: t("Confirmar o tamanho e acompanhar a decisão."),
+        categorias: `${t("Produtos e serviços")} · ${t("Prazos e entregas")} · ${t("Trocas e devoluções")}`,
+        beneficios: [
+          { titulo: t("Agentes de IA"), texto: t("O conhecimento é da sua empresa.") },
+          { titulo: t("Multiatendimento"), texto: t("Um histórico para o time inteiro") },
+          { titulo: t("Funil de vendas"), texto: t("O próximo passo fica à vista") },
+          { titulo: t("API, webhooks e MCP"), texto: t("Conecte qualquer sistema.") },
+        ],
+      },
+      {
+        arquivo: "segmento-clinica.webp",
+        alt: t("Profissional de recepção em uma clínica"),
+        nome: t("Clínicas e saúde"),
+        resumo: t("Agenda"),
+        titulo: t("Mais atenção a quem precisa agendar."),
+        texto: t("Organize o primeiro contato e encaminhe dúvidas para a equipe responsável."),
+        gatilho: t("Vocês atendem convênio?"),
+        passo1: t("Paciente da clínica"),
+        resposta: t("Boa tarde, Ricardo! Temos quinta às 15h ou sexta às 10h. Qual fica melhor?"),
+        passo3: t("Confirmar a consulta e enviar o lembrete na véspera."),
+        categorias: `${t("Tratamentos e valores")} · ${t("Convênios aceitos")} · ${t("Preparo e horários")}`,
+        beneficios: [
+          { titulo: t("Agenda"), texto: t("Agendamento com Google Agenda e Meet.") },
+          { titulo: t("Limites definidos por você"), texto: t("Uma pessoa assume com contexto") },
+          { titulo: t("Follow-up automático"), texto: t("A conversa tem um próximo passo.") },
+          { titulo: t("Histórico compartilhado"), texto: t("Todos acompanham o que já foi conversado.") },
+        ],
+      },
+      {
+        arquivo: "segmento-educacao.webp",
+        alt: t("Profissional de educação acompanhando informações no computador"),
+        nome: t("Educação"),
+        resumo: t("Do interessado à matrícula."),
+        titulo: t("Do interesse à próxima conversa."),
+        texto: t("Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil."),
+        gatilho: t("Qual o endereço da clínica?"),
+        passo1: t("Novo contato"),
+        resposta: t("Configure instruções, base de conhecimento e quando pedir ajuda ao time."),
+        passo3: t("Organize os contatos e acompanhe as oportunidades."),
+        categorias: `${t("Conversas")} · ${t("Agentes de IA")} · ${t("Funil de vendas")}`,
+        beneficios: [
+          { titulo: t("Campanhas"), texto: t("Avisos e promoções para listas segmentadas.") },
+          { titulo: t("CRM e funil de vendas"), texto: t("Cada negociação no seu lugar.") },
+          { titulo: t("Acesso por pessoa"), texto: t("O time assume quando o atendimento pede.") },
+          { titulo: t("Dados protegidos"), texto: t("Direitos do titular dentro do sistema.") },
+        ],
+      },
+      {
+        arquivo: "segmento-servicos.webp",
+        alt: t("Profissional de serviços conversando com um cliente"),
+        nome: t("Serviços e B2B"),
+        resumo: t("CRM e funil de vendas"),
+        titulo: t("O contexto acompanha cada proposta."),
+        texto: t("Qualifique os contatos e mantenha o próximo passo visível para o time."),
+        gatilho: t("Qual o prazo de entrega para Campinas?"),
+        passo1: t("Em atendimento"),
+        resposta: t("O histórico acompanha a conversa quando ela passa da IA para a equipe."),
+        passo3: t("Cada negociação no seu lugar."),
+        categorias: `${t("Multiatendimento")} · ${t("CRM e funil de vendas")} · ${t("Follow-up automático")}`,
+        beneficios: [
+          { titulo: t("IA e pessoas, na mesma conversa"), texto: t("Uma pessoa assume com contexto") },
+          { titulo: t("Funil de vendas"), texto: t("O próximo passo fica à vista") },
+          { titulo: t("API, webhooks e MCP"), texto: t("Conecte qualquer sistema.") },
+          { titulo: t("Acesso por pessoa"), texto: t("Cada integrante entra com o próprio acesso e as permissões definidas pela empresa.") },
+        ],
+      },
+    ],
+  };
+
+  const proofItens = [
     {
-      arquivo: "segmento-comercio.webp",
-      nome: t("Comércio e e-commerce"),
-      titulo: t("A dúvida chega. A conversa continua."),
-      texto: t("Reúna perguntas sobre produtos, pedidos e entregas com o contexto da sua loja."),
-      alt: t("Empreendedora organizando pedidos de uma loja"),
+      foto: "/media/atenza/segmento-comercio.webp",
+      tag: t("Comércio e e-commerce"),
+      canal: "WHATSAPP",
+      quote: cenarioLoja.pergunta,
+      nota: t("Agentes de IA"),
     },
     {
-      arquivo: "segmento-clinica.webp",
-      nome: t("Clínicas e saúde"),
-      titulo: t("Mais atenção a quem precisa agendar."),
-      texto: t("Organize o primeiro contato e encaminhe dúvidas para a equipe responsável."),
-      alt: t("Profissional de recepção em uma clínica"),
+      foto: "/media/atenza/segmento-clinica.webp",
+      tag: t("Clínicas e saúde"),
+      canal: t("Agenda"),
+      quote: cenarioClinica.pergunta,
+      nota: t("Agendamento com Google Agenda e Meet."),
     },
     {
-      arquivo: "segmento-educacao.webp",
-      nome: t("Educação"),
-      titulo: t("Do interesse à próxima conversa."),
-      texto: t("Centralize dúvidas sobre cursos e acompanhe os interessados pelo funil."),
-      alt: t("Profissional de educação acompanhando informações no computador"),
+      foto: "/media/atenza/segmento-educacao.webp",
+      tag: t("Educação"),
+      canal: "CRM",
+      quote: t("Do interesse à próxima conversa."),
+      nota: t("Funil de vendas"),
     },
     {
-      arquivo: "segmento-servicos.webp",
-      nome: t("Serviços e B2B"),
-      titulo: t("O contexto acompanha cada proposta."),
-      texto: t("Qualifique os contatos e mantenha o próximo passo visível para o time."),
-      alt: t("Profissional de serviços conversando com um cliente"),
+      foto: "/media/atenza/segmento-servicos.webp",
+      tag: t("Serviços e B2B"),
+      canal: t("Multiatendimento"),
+      quote: t("O contexto acompanha cada proposta."),
+      nota: t("Um histórico para o time inteiro"),
     },
   ];
 
   return (
-    <div className={styles.home}>
+    <div className={styles.home} id="topo">
       <Medidor
         idioma={visitante.idioma}
         moeda={mercado.moeda}
@@ -264,6 +515,8 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
       <a className={styles.skipLink} href="#conteudo">
         {t("Ir para o conteúdo")}
       </a>
+
+      {/* Floating Pill Navbar (FlowNexa layout in Atenza palette) */}
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <Link href="/" aria-label={marca.nome} className={styles.brandLink}>
@@ -281,6 +534,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </div>
       </header>
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -293,66 +547,337 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           }),
         }}
       />
+
       <main id="conteudo">
-        <section className={styles.hero}>
-          <Image
-            src="/media/atenza/hero-office.webp"
-            alt=""
-            fill
-            preload
-            sizes="100vw"
-            className={styles.heroImage}
-          />
-          <div className={styles.heroContent}>
-            <h1>
-              {t("Seu atendimento cresce.")}
-              <br />
-              {t("Seu cliente não espera.")}
-            </h1>
-            <p>{t("WhatsApp, agentes de IA e funil de vendas na mesma plataforma.")}</p>
-            <div className={styles.heroActions}>
-              <a href="#video-explicativo" className={styles.button}>
-                <Play size={17} aria-hidden />
-                {t("Ver em ação")}
-              </a>
-              <a
-                href={vendidos.length ? "/precos" : "#como-funciona"}
-                className={styles.buttonOutline}
-              >
-                {vendidos.length ? t("Conhecer os planos") : t("Como funciona")}
-                <ArrowRight size={17} aria-hidden />
-              </a>
+        {/* 1. FlowNexa 2-Column Hero with Animated iPhone */}
+        <div className={styles.heroShell}>
+          <section className={styles.hero}>
+            <div className={styles.heroContent}>
+              <div className={styles.heroMicro}>
+                <span aria-hidden>✦</span> {t("WhatsApp oficial")}{" "}
+                <small>{t("Agentes de IA")}</small>
+              </div>
+              <h1>
+                <span className={styles.heroHighlight}>{t("Seu atendimento cresce.")}</span>
+                <br />
+                {t("Seu cliente não espera.")}
+              </h1>
+              <p>{t("WhatsApp, agentes de IA e funil de vendas na mesma plataforma.")}</p>
+              <div className={styles.heroActions}>
+                <Link href="/signup" data-medir="cta-hero" className={styles.button}>
+                  {`${t("Começar com")} ${trial}`}
+                  <ArrowRight size={17} aria-hidden />
+                </Link>
+                <a href="#video-explicativo" className={styles.buttonOutline}>
+                  <Play size={16} aria-hidden />
+                  {t("Ver em ação")}
+                </a>
+                <a
+                  href={vendidos.length ? "/precos" : "#como-funciona"}
+                  className={styles.buttonOutline}
+                >
+                  {vendidos.length ? t("Conhecer os planos") : t("Como funciona")}
+                </a>
+              </div>
+              <span className={styles.heroDemoNote}>
+                {t("Prévia ilustrativa com dados fictícios")}
+              </span>
             </div>
-          </div>
-          <div className={styles.heroProduct}>
-            <ProdutoDemonstracao
-              textos={produto}
-              cenario={cenarioLoja}
-              marca={marca.nome}
-              compacto
-            />
-            <span className={styles.heroDemoNote}>
-              {t("Prévia ilustrativa com dados fictícios")}
-            </span>
-          </div>
-        </section>
-        <div className={styles.benefits}>
-          <span>
-            <Check size={17} aria-hidden />
-            {t("Seu número de WhatsApp continua o mesmo")}
-          </span>
-          <span>
-            <Check size={17} aria-hidden />
-            {trial}
-          </span>
-          <span>
-            <Check size={17} aria-hidden />
-            {t("O controle continua com você")}
-          </span>
+
+            <HeroCelularAtenza textos={textosHeroCelular} />
+          </section>
         </div>
 
+        {/* 2. FlowNexa Proof Strip Continuous Ticker */}
+        <section className={styles.proofStrip} aria-label={t("No ritmo do seu negócio.")}>
+          <div className={styles.proofLead}>
+            {t("WhatsApp, IA e CRM para negócios reais")}
+          </div>
+          <div className={styles.proofWindow}>
+            <div className={styles.proofTrack}>
+              {[0, 1].map((dup) => (
+                <div className={styles.proofGroup} key={dup} aria-hidden={dup === 1}>
+                  {proofItens.map((item) => (
+                    <article className={styles.proofItem} key={`${dup}-${item.tag}`}>
+                      <Image
+                        className={styles.proofPhoto}
+                        src={item.foto}
+                        alt={dup === 0 ? item.tag : ""}
+                        width={58}
+                        height={58}
+                      />
+                      <div className={styles.proofInfo}>
+                        <div className={styles.proofMeta}>
+                          <strong>{item.tag}</strong>
+                          <span>{item.canal}</span>
+                        </div>
+                        <div className={styles.proofQuote}>{item.quote}</div>
+                        <div className={styles.proofNote}>{item.nota} →</div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 3. FlowNexa Conversion Section + 3-Device Workflow Stage */}
+        <section className={styles.conversionSection} aria-labelledby="conversion-title">
+          <span className={`${styles.conversionShape} ${styles.conversionShapeLeft}`} aria-hidden />
+          <span className={`${styles.conversionShape} ${styles.conversionShapeRight}`} aria-hidden />
+          <div className={styles.conversionInner}>
+            <div className={styles.conversionPill}>
+              <span className={styles.conversionShield} aria-hidden>
+                ✦
+              </span>
+              <strong>{t("WhatsApp oficial")}</strong>
+              <span>{t("Conexão pela API oficial do WhatsApp, da Meta.")}</span>
+            </div>
+            <h2 id="conversion-title">
+              {t("Veja o atendimento acontecer.")}
+              <span>{t("Da primeira mensagem ao próximo passo da venda.")}</span>
+            </h2>
+            <p className={styles.conversionDescription}>
+              {t(
+                "A IA ajuda no repetitivo. Sua equipe entra com atenção, contexto e autonomia quando o cliente precisa.",
+              )}
+            </p>
+            <div className={styles.conversionActions}>
+              <Link href="/signup" className={styles.button}>
+                {t("Criar conta")}
+                <ArrowRight size={17} aria-hidden />
+              </Link>
+              <a href="#como-funciona" className={styles.buttonOutline}>
+                {t("Explore o produto")}
+              </a>
+            </div>
+            <div className={styles.conversionAssurances}>
+              <span>
+                <Check size={17} aria-hidden />
+                {t("Seu número de WhatsApp continua o mesmo")}
+              </span>
+              <span>
+                <Check size={17} aria-hidden />
+                {trial}
+              </span>
+              <span>
+                <Check size={17} aria-hidden />
+                {t("O controle continua com você")}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Three-Device Workflow Showcase + Dark Integration Band */}
+        <section
+          className={styles.workflowShowcase}
+          aria-label={t("Veja o atendimento acontecer.")}
+        >
+          <div className={styles.workflowStage}>
+            <div className={styles.workflowArc} aria-hidden />
+            <div className={styles.workflowDevices}>
+              <div className={`${styles.workflowDevice} ${styles.workflowDeviceLeft}`}>
+                <div className={styles.workflowUser}>
+                  <span className={styles.workflowUserIcon}>M</span>
+                  <span>
+                    <b>Mariana</b>
+                    <small>{t("Cliente da loja")}</small>
+                  </span>
+                </div>
+                <div className={styles.workflowChat}>
+                  <div className={styles.workflowLine}>{cenarioLoja.pergunta}</div>
+                  <div className={`${styles.workflowLine} ${styles.workflowAnswer}`}>
+                    <span className={styles.workflowKeyword}>{t("Agentes de IA")}:</span>{" "}
+                    {cenarioLoja.resposta}
+                  </div>
+                </div>
+              </div>
+
+              <div className={`${styles.workflowDevice} ${styles.workflowDeviceCenter}`}>
+                <div className={styles.workflowUser}>
+                  <span className={styles.workflowUserIcon}>R</span>
+                  <span>
+                    <b>Ricardo</b>
+                    <small>{t("Paciente da clínica")}</small>
+                  </span>
+                </div>
+                <div className={styles.workflowChat}>
+                  <div className={`${styles.workflowLine} ${styles.workflowAnswer}`}>
+                    {cenarioClinica.resposta}
+                  </div>
+                  <div className={styles.workflowProduct}>
+                    <div className={styles.workflowPromo}>
+                      24/7 <small>{t("WhatsApp oficial")}</small>
+                    </div>
+                    <p>{cenarioClinica.proximoTexto}</p>
+                    <span className={styles.workflowProductTag}>{t("Agenda")} →</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`${styles.workflowDevice} ${styles.workflowDeviceRight}`}>
+                <div className={styles.workflowUser}>
+                  <span className={styles.workflowUserIcon}>✓</span>
+                  <span>
+                    <b>{t("Sua equipe")}</b>
+                    <small>{t("Funil de vendas")}</small>
+                  </span>
+                </div>
+                <div className={styles.workflowFollowup}>
+                  <div className={styles.workflowLine}>{t("Uma pessoa assume com contexto")}</div>
+                  <div className={styles.workflowLine}>
+                    {t("O próximo passo fica à vista")}
+                  </div>
+                  <div className={styles.workflowGreen}>{t("Concluído")} ✓</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.workflowFloat} ${styles.workflowFloatA}`}>
+              <span className={styles.workflowFicon} aria-hidden>
+                <MessagesSquare size={20} />
+              </span>
+              <span>
+                <strong>{t("Multiatendimento")}</strong>
+                <small>{t("Um histórico para o time inteiro")}</small>
+              </span>
+            </div>
+            <div className={`${styles.workflowFloat} ${styles.workflowFloatB}`}>
+              <span className={styles.workflowFicon} aria-hidden>
+                <Bot size={20} />
+              </span>
+              <span>
+                <strong>{t("Agentes de IA")}</strong>
+                <small>{t("O conhecimento é da sua empresa.")}</small>
+              </span>
+            </div>
+            <div className={`${styles.workflowFloat} ${styles.workflowFloatC}`}>
+              <span className={styles.workflowFicon} aria-hidden>
+                <CalendarDays size={20} />
+              </span>
+              <span>
+                <strong>{t("Agenda")}</strong>
+                <small>{t("Agendamento com Google Agenda e Meet.")}</small>
+              </span>
+            </div>
+            <div className={`${styles.workflowFloat} ${styles.workflowFloatD}`}>
+              <span className={styles.workflowFicon} aria-hidden>
+                <SquareKanban size={20} />
+              </span>
+              <span>
+                <strong>{t("Funil de vendas")}</strong>
+                <small>{t("Cada negociação no seu lugar.")}</small>
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.integrationBand}>
+            <p>{t("Conecte o que sua operação já usa.")}</p>
+            <div className={styles.integrationList}>
+              <span>WhatsApp Cloud API</span>
+              <span>Shopify</span>
+              <span>WooCommerce</span>
+              <span>Nuvemshop</span>
+              <span>Google Calendar</span>
+              <span>Webhooks</span>
+              <span>API &amp; MCP</span>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. FlowNexa Goldmine Headline + 3 Neo-Brutalist Evidence Cards */}
+        <section className={styles.goldmineSection} aria-labelledby="goldmine-heading">
+          <h2 id="goldmine-heading">
+            <span className={styles.headlineLine}>
+              {t("Seu WhatsApp")}{" "}
+              <span className={`${styles.headlineLabel} ${styles.headlineLabelFirst}`}>
+                {t("atende na hora.")}
+              </span>
+            </span>
+            <span className={styles.headlineLine}>
+              {t("Sua equipe")}{" "}
+              <span className={`${styles.headlineLabel} ${styles.headlineLabelSecond}`}>
+                {t("fecha com contexto.")}
+              </span>
+            </span>
+          </h2>
+          <p>{t("Organize o atendimento. Dê contexto à equipe. Acompanhe o próximo passo.")}</p>
+        </section>
+
+        <section className={styles.evidenceSection} aria-label={t("Explore o produto")}>
+          <div className={styles.evidenceGrid}>
+            <article className={`${styles.evidenceCard} ${styles.evidenceMint}`}>
+              <div className={styles.evidenceNumber}>24h</div>
+              <h3>{t("IA e pessoas, na mesma conversa")}</h3>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxData}`}>
+                <strong>{t("O CONTEXTO")}</strong>
+                <p>{t("O conhecimento é da sua empresa.")}</p>
+              </div>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxProblem}`}>
+                <strong>
+                  <span className={styles.problemSymbol}>✕</span> {t("O PROBLEMA")}
+                </strong>
+                <p>{t("Sem resposta rápida, o interessado esfria e procura outro lugar.")}</p>
+              </div>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxSolution}`}>
+                <strong>
+                  <span className={styles.solutionSymbol}>✓</span> {t("COM A PLATAFORMA")}
+                </strong>
+                <p>{t("Configure instruções, base de conhecimento e quando pedir ajuda ao time.")}</p>
+              </div>
+            </article>
+
+            <article className={`${styles.evidenceCard} ${styles.evidenceGold}`}>
+              <div className={styles.evidenceNumber}>1×</div>
+              <h3>{t("Um histórico para o time inteiro")}</h3>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxData}`}>
+                <strong>{t("O CONTEXTO")}</strong>
+                <p>{t("Todos acompanham o que já foi conversado.")}</p>
+              </div>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxProblem}`}>
+                <strong>
+                  <span className={styles.problemSymbol}>✕</span> {t("O PROBLEMA")}
+                </strong>
+                <p>{t("Um celular na mão de uma pessoa só trava o time inteiro.")}</p>
+              </div>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxSolution}`}>
+                <strong>
+                  <span className={styles.solutionSymbol}>✓</span> {t("COM A PLATAFORMA")}
+                </strong>
+                <p>{t("O histórico acompanha a conversa quando ela passa da IA para a equipe.")}</p>
+              </div>
+            </article>
+
+            <article className={`${styles.evidenceCard} ${styles.evidenceTeal}`}>
+              <div className={styles.evidenceNumber}>100%</div>
+              <h3>{t("O próximo passo fica à vista")}</h3>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxData}`}>
+                <strong>{t("O CONTEXTO")}</strong>
+                <p>{t("A conversa tem um próximo passo.")}</p>
+              </div>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxProblem}`}>
+                <strong>
+                  <span className={styles.problemSymbol}>✕</span> {t("O PROBLEMA")}
+                </strong>
+                <p>{t("Conversas soltas viram propostas esquecidas no fim da semana.")}</p>
+              </div>
+              <div className={`${styles.evidenceBox} ${styles.evidenceBoxSolution}`}>
+                <strong>
+                  <span className={styles.solutionSymbol}>✓</span> {t("COM A PLATAFORMA")}
+                </strong>
+                <p>{t("Organize os contatos e acompanhe as oportunidades.")}</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        {/* 6. Editorial Proof Card — "O que é a Atenza?" (SEO / GEO / Human Clarity) */}
         <section className={styles.oQueE} aria-labelledby="o-que-e">
           <div className={styles.oQueECard}>
+            <span className={styles.oQueEQuote} aria-hidden>
+              “
+            </span>
             <h2 id="o-que-e">
               {t("O que é a")} {marca.nome}?
             </h2>
@@ -370,13 +895,15 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </section>
 
-        <PaisesDisponiveis idioma={visitante.idioma} />
+        {/* 7. FlowNexa Interactive Features Showcase (Forest Textured + Wave) */}
+        <RecursosInterativosAtenza textos={textosRecursosInterativos} marca={marca.nome} />
 
+        {/* 8. Full Interactive Product Workspace Demo */}
         <section id="como-funciona" className={`${styles.section} ${styles.productSection}`}>
           <div className={styles.container}>
             <div className={styles.centerHeading}>
-              <h2>{t("Veja o atendimento acontecer.")}</h2>
-              <p>{t("Da primeira mensagem ao próximo passo da venda.")}</p>
+              <h2>{t("Explore o produto")}</h2>
+              <p>{t("Experimente mudar a etapa deste contato no exemplo acima.")}</p>
             </div>
             <ProdutoDemonstracao textos={produto} cenario={cenarioClinica} marca={marca.nome} />
             <div className={styles.productBenefits}>
@@ -399,42 +926,13 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </section>
 
-        <section id="recursos" className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.sectionHeading}>
-              <h2>{t("No ritmo do seu negócio.")}</h2>
-              <p>{t("Veja onde a plataforma entra na sua rotina.")}</p>
-            </div>
-            <div className={styles.segmentGrid}>
-              {segmentos.map((s, i) => (
-                <article
-                  className={`${styles.segment} ${i === 0 ? styles.segmentFeatured : ""}`}
-                  key={s.arquivo}
-                >
-                  <div className={styles.segmentImage}>
-                    <Image
-                      src={`/media/atenza/${s.arquivo}`}
-                      alt={s.alt}
-                      fill
-                      sizes="(max-width: 599px) 100vw, (max-width: 1023px) 50vw, 40vw"
-                    />
-                  </div>
-                  <div className={styles.segmentCopy}>
-                    <span>{s.nome}</span>
-                    <h3>{s.titulo}</h3>
-                    <p>{s.texto}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className={styles.useCaseNote}>
-              {t(
-                "Exemplos de uso. A configuração deve respeitar os processos e as responsabilidades da sua empresa.",
-              )}
-            </p>
-          </div>
-        </section>
+        {/* 9. FlowNexa Interactive Audience Tabs (4 Atenza Segments) */}
+        <PublicosInterativosAtenza textos={textosPublicos} />
 
+        {/* 10. Countries Available */}
+        <PaisesDisponiveis idioma={visitante.idioma} />
+
+        {/* 11. Integrations Marquee */}
         <section id="integracoes" className={`${styles.section} ${styles.integrationSection}`}>
           <div className={styles.container}>
             <div className={styles.centerHeading}>
@@ -460,6 +958,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </section>
 
+        {/* 12. Care / Context Video */}
         <section className={styles.careSection}>
           <div className={styles.careLayout}>
             <VideoDeContexto
@@ -515,6 +1014,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </section>
 
+        {/* 13. Explainer Video */}
         <section className={styles.section}>
           <div className={`${styles.container} ${styles.explainerLayout}`}>
             <div className={styles.sectionHeading}>
@@ -558,57 +1058,116 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </section>
 
-        <section id="perguntas" className={styles.section}>
-          <div className={`${styles.container} ${styles.faqLayout}`}>
-            <div className={styles.sectionHeading}>
-              <h2>{t("Respostas antes do primeiro passo.")}</h2>
-              <p>{t("O que costumam perguntar antes de assinar")}</p>
-              <Link href="/contato" className={styles.textLink}>
-                {t("Fale com a gente")}
-                <ArrowRight size={17} aria-hidden />
-              </Link>
+        {/* 14. Live Localized Plans Section (Stripe Multi-Currency) */}
+        {vendidos.length > 0 && (
+          <section
+            id={ID_DA_SECAO_DE_PLANOS}
+            className={styles.pricingSection}
+            aria-labelledby="planos-titulo"
+          >
+            <div className={styles.container}>
+              <div className={styles.centerHeading}>
+                <h2 id="planos-titulo">{t("Planos e preços")}</h2>
+                <p>{`${trial}. ${condicoes}`}</p>
+              </div>
+              <div className={styles.plans}>
+                {vendidos.map((id) => {
+                  const plano = PLANOS[id];
+                  const destaque = id === "pro";
+                  return (
+                    <article
+                      key={id}
+                      className={`${styles.plan} ${destaque ? styles.featuredPlan : ""}`}
+                    >
+                      <div className={styles.planHeading}>
+                        <h3>{t(plano.nome)}</h3>
+                        {destaque && <span>{t("Recomendado")}</span>}
+                      </div>
+                      <p className={styles.price}>
+                        {precoLegivelNoMercado(id, mercado)}
+                        <small>{t("/mês")}</small>
+                      </p>
+                      <ul>
+                        {plano.destaques.map((d) => (
+                          <li key={d}>
+                            <Check size={17} aria-hidden />
+                            {t(d)}
+                          </li>
+                        ))}
+                      </ul>
+                      <Link
+                        href="/signup"
+                        data-medir={`plano-${id}`}
+                        className={destaque ? styles.buttonLight : styles.buttonOutline}
+                      >
+                        {`${t("Começar com")} ${trial}`}
+                        <ArrowRight size={17} aria-hidden />
+                      </Link>
+                      <p className={styles.planTerms}>{condicoes}</p>
+                    </article>
+                  );
+                })}
+              </div>
             </div>
-            <div className={styles.faq}>
-              <Pergunta
-                pergunta={t("Preciso trocar de número?")}
-                resposta={t(
-                  "Não. Você conecta o número que a empresa já usa lendo um QR code, e as conversas seguem de onde pararam.",
-                )}
-              />
-              <Pergunta
-                pergunta={t("A IA responde sozinha o tempo todo?")}
-                resposta={t(
-                  "Só até onde você deixar. Ela responde o que está na base de conhecimento e entrega a conversa a uma pessoa do time quando o assunto sai dali.",
-                )}
-              />
-              <Pergunta
-                pergunta={t("O time todo consegue usar?")}
-                resposta={t(
-                  "Sim. Cada pessoa entra com o próprio acesso e você decide o que cada uma pode ver e fazer.",
-                )}
-              />
-              <Pergunta
-                pergunta={t("E se eu quiser cancelar?")}
-                resposta={t(
-                  "O cancelamento é um clique na própria tela de cobrança, sem falar com ninguém. O acesso continua até o fim do período já pago.",
-                )}
-              />
-              <Pergunta
-                pergunta={t("Onde ficam os dados dos meus clientes?")}
-                resposta={t(
-                  "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.",
-                )}
-              />
-              <Pergunta
-                pergunta={t("O uso de IA tem alguma configuração adicional?")}
-                resposta={t(
-                  "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.",
-                )}
-              />
+          </section>
+        )}
+
+        {/* 15. FlowNexa FAQ Showcase (Forest BG + White Rounded Panel) */}
+        <section id="perguntas" className={styles.faqShowcase}>
+          <div className={styles.faqPanel}>
+            <div className={styles.faqLayout}>
+              <div className={styles.sectionHeading}>
+                <span className={styles.faqKicker}>{t("Perguntas frequentes")}</span>
+                <h2>{t("Respostas antes do primeiro passo.")}</h2>
+                <p>{t("O que costumam perguntar antes de assinar")}</p>
+                <Link href="/contato" className={styles.textLink}>
+                  {t("Fale com a gente")}
+                  <ArrowRight size={17} aria-hidden />
+                </Link>
+              </div>
+              <div className={styles.faq}>
+                <Pergunta
+                  pergunta={t("Preciso trocar de número?")}
+                  resposta={t(
+                    "Não. Você conecta o número que a empresa já usa lendo um QR code, e as conversas seguem de onde pararam.",
+                  )}
+                />
+                <Pergunta
+                  pergunta={t("A IA responde sozinha o tempo todo?")}
+                  resposta={t(
+                    "Só até onde você deixar. Ela responde o que está na base de conhecimento e entrega a conversa a uma pessoa do time quando o assunto sai dali.",
+                  )}
+                />
+                <Pergunta
+                  pergunta={t("O time todo consegue usar?")}
+                  resposta={t(
+                    "Sim. Cada pessoa entra com o próprio acesso e você decide o que cada uma pode ver e fazer.",
+                  )}
+                />
+                <Pergunta
+                  pergunta={t("E se eu quiser cancelar?")}
+                  resposta={t(
+                    "O cancelamento é um clique na própria tela de cobrança, sem falar com ninguém. O acesso continua até o fim do período já pago.",
+                  )}
+                />
+                <Pergunta
+                  pergunta={t("Onde ficam os dados dos meus clientes?")}
+                  resposta={t(
+                    "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.",
+                  )}
+                />
+                <Pergunta
+                  pergunta={t("O uso de IA tem alguma configuração adicional?")}
+                  resposta={t(
+                    "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.",
+                  )}
+                />
+              </div>
             </div>
           </div>
         </section>
 
+        {/* 16. Final CTA Band */}
         <section className={styles.finalSection}>
           <div className={styles.container}>
             <h2>{t("A próxima conversa pode ser o começo de uma venda.")}</h2>
@@ -621,6 +1180,7 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
           </div>
         </section>
       </main>
+
       <footer className={styles.footer}>
         <div className={`${styles.container} ${styles.footerBottom}`}>
           <nav aria-label="Language">

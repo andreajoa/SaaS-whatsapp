@@ -30,17 +30,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-accent text-accent-foreground hover:bg-accent-hover shadow-xs",
+          "border-2 border-neutral-900 bg-accent font-semibold text-accent-foreground shadow-[3px_3px_0_var(--color-neutral-900)] hover:-translate-y-0.5 hover:bg-accent-hover active:shadow-none dark:border-accent-200 dark:shadow-[3px_3px_0_rgba(0,0,0,0.65)]",
         default:
-          "bg-accent text-accent-foreground hover:bg-accent-hover shadow-xs",
+          "border-2 border-neutral-900 bg-accent font-semibold text-accent-foreground shadow-[3px_3px_0_var(--color-neutral-900)] hover:-translate-y-0.5 hover:bg-accent-hover active:shadow-none dark:border-accent-200 dark:shadow-[3px_3px_0_rgba(0,0,0,0.65)]",
         secondary:
-          "bg-surface-elevated text-text border border-border hover:border-accent hover:text-accent",
+          "bg-surface-elevated text-text border-2 border-border-strong hover:border-neutral-900 hover:bg-accent-soft hover:text-accent dark:hover:border-accent-300",
         outline:
-          "bg-transparent text-text border border-border hover:border-accent hover:text-accent",
+          "bg-surface text-text border-2 border-border-strong hover:border-neutral-900 hover:bg-accent-soft hover:text-accent dark:hover:border-accent-300",
         ghost:
           "bg-transparent text-text hover:bg-accent-soft hover:text-accent",
         destructive:
-          "bg-error text-white hover:brightness-95 shadow-xs",
+          "border-2 border-neutral-900 bg-error font-semibold text-white shadow-[3px_3px_0_var(--color-neutral-900)] hover:brightness-95 active:shadow-none dark:border-error/60",
         link:
           "bg-transparent text-accent underline underline-offset-4 decoration-1 hover:decoration-2 h-auto p-0",
       },

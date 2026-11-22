@@ -10580,6 +10580,28 @@ export const DICIONARIO: Traducoes = {
     {
       es: "Para conectar WhatsApp, registra la tarjeta en el paso Plan. Son 7 días gratis y el cobro solo empieza el 7.º día.",
     },
+
+  // Vitrine principal (layout FlowNexa na paleta Atenza)
+  Agora: { es: "Ahora" },
+  "IA no WhatsApp 24h": { es: "IA en WhatsApp 24/7" },
+  "Resposta imediata": { es: "Respuesta inmediata" },
+  "Principais recursos no WhatsApp": { es: "Principales funciones en WhatsApp" },
+  "Para quem é a plataforma": { es: "Para quién es la plataforma" },
+  "WhatsApp, IA e CRM para negócios reais": { es: "WhatsApp, IA y CRM para negocios reales" },
+  "atende na hora.": { es: "responde al instante." },
+  "fecha com contexto.": { es: "cierra con contexto." },
+  "O CONTEXTO": { es: "EL CONTEXTO" },
+  "O PROBLEMA": { es: "EL PROBLEMA" },
+  "Sem resposta rápida, o interessado esfria e procura outro lugar.": {
+    es: "Sin una respuesta rápida, el interesado pierde interés y busca otra opción.",
+  },
+  "COM A PLATAFORMA": { es: "CON LA PLATAFORMA" },
+  "Um celular na mão de uma pessoa só trava o time inteiro.": {
+    es: "Un celular en manos de una sola persona frena a todo el equipo.",
+  },
+  "Conversas soltas viram propostas esquecidas no fim da semana.": {
+    es: "Las conversaciones sueltas se vuelven propuestas olvidadas al final de la semana.",
+  },
 };
 
 for (const [chave, ingles] of Object.entries(DICIONARIO_EN)) {

@@ -363,11 +363,30 @@ export function moedasCobraveis(): ReadonlySet<Moeda> {
     .split(",")
     .map((m) => m.trim().toUpperCase())
     .filter((m): m is Moeda => (TODAS_MOEDAS as readonly string[]).includes(m));
-  // Auto-detecta qualquer moeda que tenha ao menos um STRIPE_PRICE_<PLANO>_<MOEDA> configurado.
+  // Auto-detecta moedas configuradas via STRIPE_PRICE_<PLANO>_<MOEDA>, STRIPE_PRICES_POR_MOEDA ou catálogo live oficial da Atenza.
   const configuradasPorPreco: Moeda[] = [];
+  let chavesJson: string[] = [];
+  const brutoJson = (process.env.STRIPE_PRICES_POR_MOEDA ?? "").trim();
+  if (brutoJson) {
+    try {
+      const parsed = JSON.parse(brutoJson) as unknown;
+      if (typeof parsed === "object" && parsed !== null) {
+        chavesJson = Object.keys(parsed);
+      }
+    } catch {
+      chavesJson = [];
+    }
+  }
+  const ehCatalogoAtenzaLive =
+    (process.env.STRIPE_PRICE_ESSENCIAL ?? "").trim() === "price_1UHqM8G3HxcyUpFWDj4Wv7pW" ||
+    (process.env.STRIPE_PRICE_PRO ?? "").trim() === "price_1UHqM9G3HxcyUpFWgj7aIi7x" ||
+    (process.env.STRIPE_PRICE_ILIMITADO ?? "").trim() === "price_1UHqMBG3HxcyUpFWH3Aa7k1a";
+
   for (const moeda of TODAS_MOEDAS) {
     if (moeda === "BRL") continue;
     if (
+      ehCatalogoAtenzaLive ||
+      chavesJson.includes(moeda) ||
       (process.env[`STRIPE_PRICE_ESSENCIAL_${moeda}`] ?? "").trim() ||
       (process.env[`STRIPE_PRICE_PRO_${moeda}`] ?? "").trim() ||
       (process.env[`STRIPE_PRICE_ILIMITADO_${moeda}`] ?? "").trim()

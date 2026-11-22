@@ -358,7 +358,7 @@ function chavesUsadas(): Map<string, string[]> {
     anda(join(RAIZ, area));
     for (const arq of arquivos) {
       const rel = relative(RAIZ, arq).split(sep).join("/");
-      if (rel === "lib/i18n/dicionario.ts") continue;
+      if (rel === "lib/i18n/dicionario.ts" || rel === "lib/i18n/dicionario-en.ts") continue;
       const src = readFileSync(arq, "utf8");
       if (!/\bt\(|\btraduzir\(/.test(src)) continue;
       const fonte = ts.createSourceFile(arq, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);

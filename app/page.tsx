@@ -65,6 +65,9 @@ import {
   identidadePublica,
   jsonLdSeguro,
   metadadosDaHome,
+  schemaDoComoFunciona,
+  schemaDoFaq,
+  schemaDoVideo,
   LINKS_SEO,
   SELETOR_DE_IDIOMA,
 } from "@/lib/marketing/seo";
@@ -493,6 +496,56 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
     },
   ];
 
+  const faqHome = [
+    {
+      question: t("Preciso trocar de número?"),
+      answer: t(
+        "Não. Você conecta o número que a empresa já usa lendo um QR code, e as conversas seguem de onde pararam.",
+      ),
+    },
+    {
+      question: t("A IA responde sozinha o tempo todo?"),
+      answer: t(
+        "Só até onde você deixar. Ela responde o que está na base de conhecimento e entrega a conversa a uma pessoa do time quando o assunto sai dali.",
+      ),
+    },
+    {
+      question: t("O time todo consegue usar?"),
+      answer: t(
+        "Sim. Cada pessoa entra com o próprio acesso e você decide o que cada uma pode ver e fazer.",
+      ),
+    },
+    {
+      question: t("E se eu quiser cancelar?"),
+      answer: t(
+        "O cancelamento é um clique na própria tela de cobrança, sem falar com ninguém. O acesso continua até o fim do período já pago.",
+      ),
+    },
+    {
+      question: t("Onde ficam os dados dos meus clientes?"),
+      answer: t(
+        "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.",
+      ),
+    },
+    {
+      question: t("O uso de IA tem alguma configuração adicional?"),
+      answer: t(
+        "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.",
+      ),
+    },
+  ];
+  const passosHome = [
+    t("Conecte o seu WhatsApp"),
+    t("Ensine o atendente"),
+    t("Acompanhe pelo funil"),
+  ];
+  const caminhoHome = idioma === "pt-BR" ? "/" : `/${idioma}`;
+  const { "@context": _videoCtx, ...videoNode } = schemaDoVideo(
+    marca.nome,
+    env.NEXT_PUBLIC_APP_URL,
+  );
+  void _videoCtx;
+
   return (
     <div className={styles.home} id="topo">
       <Medidor
@@ -542,7 +595,15 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
             "@context": "https://schema.org",
             "@graph": [
               ...identidadePublica(marca.nome, env.NEXT_PUBLIC_APP_URL, marca.logoUrl),
-              schemaDoSoftware(marca.nome, env.NEXT_PUBLIC_APP_URL),
+              schemaDoSoftware(marca.nome, env.NEXT_PUBLIC_APP_URL, idioma, mercado),
+              schemaDoFaq(env.NEXT_PUBLIC_APP_URL, caminhoHome, faqHome),
+              schemaDoComoFunciona(
+                env.NEXT_PUBLIC_APP_URL,
+                caminhoHome,
+                t("Conheça antes de decidir."),
+                passosHome,
+              ),
+              videoNode,
             ],
           }),
         }}
@@ -1126,42 +1187,13 @@ export default async function HomePage({ params }: { params?: Promise<{ idioma?:
                 </Link>
               </div>
               <div className={styles.faq}>
-                <Pergunta
-                  pergunta={t("Preciso trocar de número?")}
-                  resposta={t(
-                    "Não. Você conecta o número que a empresa já usa lendo um QR code, e as conversas seguem de onde pararam.",
-                  )}
-                />
-                <Pergunta
-                  pergunta={t("A IA responde sozinha o tempo todo?")}
-                  resposta={t(
-                    "Só até onde você deixar. Ela responde o que está na base de conhecimento e entrega a conversa a uma pessoa do time quando o assunto sai dali.",
-                  )}
-                />
-                <Pergunta
-                  pergunta={t("O time todo consegue usar?")}
-                  resposta={t(
-                    "Sim. Cada pessoa entra com o próprio acesso e você decide o que cada uma pode ver e fazer.",
-                  )}
-                />
-                <Pergunta
-                  pergunta={t("E se eu quiser cancelar?")}
-                  resposta={t(
-                    "O cancelamento é um clique na própria tela de cobrança, sem falar com ninguém. O acesso continua até o fim do período já pago.",
-                  )}
-                />
-                <Pergunta
-                  pergunta={t("Onde ficam os dados dos meus clientes?")}
-                  resposta={t(
-                    "Os dados são separados por empresa, com controles de acesso. A plataforma oferece recursos de exportação e de atendimento a solicitações de privacidade.",
-                  )}
-                />
-                <Pergunta
-                  pergunta={t("O uso de IA tem alguma configuração adicional?")}
-                  resposta={t(
-                    "Sim. O agente precisa de uma base de conhecimento, instruções e credenciais do provedor de IA configuradas na sua operação. O consumo do provedor pode ter custos próprios.",
-                  )}
-                />
+                {faqHome.map((item) => (
+                  <Pergunta
+                    key={item.question}
+                    pergunta={item.question}
+                    resposta={item.answer}
+                  />
+                ))}
               </div>
             </div>
           </div>

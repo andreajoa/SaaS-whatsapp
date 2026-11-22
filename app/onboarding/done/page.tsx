@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function DonePage() {
   const user = await requireAuth();
   const activeOrg = await resolveActiveOrg(user);
-  if (!activeOrg) redirect("/login");
+  if (!activeOrg) redirect("/get-started");
 
   const { state } = await loadOnboardingState(activeOrg.orgId);
 

@@ -88,7 +88,7 @@ describe("troca normal exige vínculo ativo mesmo sendo platform admin", () => {
     expect((await setActiveOrg(org)).ok).toBe(true);
     expect(chain.eq).toHaveBeenCalledWith("organizations.status", "active");
     expect(chain.not).toHaveBeenCalledWith("accepted_at", "is", null);
-    expect(h.cookie).toHaveBeenCalledWith("active_org", org, expect.objectContaining({ httpOnly: true, sameSite: "strict" }));
+    expect(h.cookie).toHaveBeenCalledWith("active_org", org, expect.objectContaining({ httpOnly: true, sameSite: "lax" }));
     expect(h.audit).toHaveBeenCalledWith(expect.objectContaining({ action: "organization.switched", actorUserId: actor, organizationId: org }));
   });
 });

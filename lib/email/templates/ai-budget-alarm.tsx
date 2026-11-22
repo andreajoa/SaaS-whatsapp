@@ -14,6 +14,7 @@ export interface BudgetAlarmEmailOptions {
   consumedCents: number;
   limitCents: number;
   orgName?: string | null;
+  brandName?: string | null;
   dashboardUrl: string;
 }
 
@@ -32,7 +33,10 @@ export function buildBudgetAlarmEmail(opts: BudgetAlarmEmailOptions): {
   text: string;
 } {
   const pctStr = `${opts.pct.toFixed(2)}%`;
-  const subject = `Alerta IA: orçamento atingiu ${pctStr} — DeskcommCRM`;
+  const marca = opts.brandName?.trim() || opts.orgName?.trim() || null;
+  const subject = marca
+    ? `Alerta IA: orçamento atingiu ${pctStr} — ${marca}`
+    : `Alerta IA: orçamento atingiu ${pctStr}`;
   const orgLine = opts.orgName
     ? `<p style="margin:0 0 16px;font-size:14px;color:#57534e">Organização: <strong>${escapeHtml(opts.orgName)}</strong></p>`
     : "";

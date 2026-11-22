@@ -23,7 +23,7 @@ export async function setActiveOrg(orgId: string): Promise<{ ok: boolean; error?
   const store = await cookies();
   const previous = store.get("active_org")?.value;
   store.set("active_org", orgId, {
-    httpOnly: true, sameSite: "strict", secure: cookieSecure(), path: "/", maxAge: 60 * 60 * 24 * 30,
+    httpOnly: true, sameSite: "lax", secure: cookieSecure(), path: "/", maxAge: 60 * 60 * 24 * 30,
   });
   await audit({ action: "organization.switched", actorUserId: user.id,
     organizationId: orgId, resourceType: "organization", resourceId: orgId,

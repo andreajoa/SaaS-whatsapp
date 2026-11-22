@@ -113,6 +113,10 @@ export default defineConfig({
   retries: 0,
   use: {
     baseURL: BASE_URL,
+    // Fixa pt-BR no navegador da suíte para que runners Linux (en-US) não
+    // troquem `/login` e `/signup` para inglês via Accept-Language e quebrem
+    // os seletores em português das specs.
+    locale: "pt-BR",
     // ⚠️ Era `on-first-retry`, e com `retries: 0` logo acima isso significa
     // **trace nunca gravado**. As duas linhas estão certas isoladamente e
     // erradas juntas: uma diz "só no retry", a outra diz "não há retry".

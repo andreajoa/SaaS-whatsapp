@@ -111,7 +111,7 @@ export async function aplicarConvite(params: {
   // mostrar — o mesmo motivo pelo qual o botão de aceite sempre gravou aqui.
   (await cookies()).set("active_org", payload.organization_id, {
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: cookieSecure(),
     path: "/",
     maxAge: 60 * 60 * 24 * 30,

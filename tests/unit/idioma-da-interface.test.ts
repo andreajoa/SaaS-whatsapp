@@ -26,9 +26,10 @@ import { NAV_DESTINATIONS, NAV_GROUPS } from "@/lib/navigation/registry";
 import { DICIONARIO } from "@/lib/i18n/dicionario";
 
 describe("traduzir", () => {
-  it("devolve o espanhol quando existe", () => {
+  it("devolve o espanhol e o inglês quando existem", () => {
     expect(traduzir("Assumir", "es")).toBe("Asumir");
     expect(traduzir("Contatos", "es")).toBe("Contactos");
+    expect(traduzir("Contatos", "en")).toBe("Contacts");
   });
 
   it("em português devolve a própria chave — ela É o texto", () => {
@@ -54,15 +55,16 @@ describe("traduzir", () => {
 });
 
 describe("normalizar o idioma que veio do perfil", () => {
-  it("aceita os que sabemos servir", () => {
+  it("aceita os que sabemos servir (incluindo variantes regionais)", () => {
     expect(normalizarIdioma("es")).toBe("es");
+    expect(normalizarIdioma("es-MX")).toBe("es");
     expect(normalizarIdioma("pt-BR")).toBe("pt-BR");
+    expect(normalizarIdioma("en")).toBe("en");
+    expect(normalizarIdioma("en-US")).toBe("en");
+    expect(normalizarIdioma("en-GB")).toBe("en");
   });
 
   it("fecha no padrão para o que não conhece", () => {
-    // `en-US` esteve no seletor por muito tempo e nunca teve tradução. Um
-    // perfil antigo ainda o traz, e deixá-lo passar mostraria a CHAVE na tela.
-    expect(normalizarIdioma("en-US")).toBe(IDIOMA_PADRAO);
     expect(normalizarIdioma("klingon")).toBe(IDIOMA_PADRAO);
     expect(normalizarIdioma(null)).toBe(IDIOMA_PADRAO);
     expect(normalizarIdioma(undefined)).toBe(IDIOMA_PADRAO);
@@ -115,11 +117,10 @@ describe("os elos que somem sem barulho", () => {
   });
 
   it("o seletor oferece só o que MUDA a tela", () => {
-    // `en-US` saiu: nunca teve tradução. Oferecer um idioma que não muda nada é
-    // prometer o que a tela não cumpre.
     const perfil = readFileSync("app/app/settings/profile/_form.tsx", "utf8");
     expect(perfil).toMatch(/value="es">Español/);
-    expect(perfil, "ainda oferece um idioma sem tradução").not.toMatch(/value="en-US"/);
+    expect(perfil).toMatch(/value="en">English/);
+    expect(perfil, "não usa código legado sem correspondência").not.toMatch(/value="en-US"/);
   });
 
   it("a barra lateral traduz — ela aparece em TODA tela", () => {

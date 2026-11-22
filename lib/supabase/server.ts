@@ -10,6 +10,9 @@ import { cookieSecure } from "@/lib/supabase/cookie-secure";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env";
 
+/** Nome canônico do cookie de sessão Supabase (compartilhado com proxy e home). */
+export const SESSION_COOKIE_NAME = "sb-deskcomm-auth";
+
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -30,9 +33,12 @@ export async function createClient() {
       },
     },
     // D-01.01: cookie name canônico alinhado ao middleware.
+    // SameSite=Lax (OWASP / RFC 6265bis): bloqueia CSRF em POSTs cross-site e
+    // preserva a sessão em navegações GET top-level vindas do Stripe Billing
+    // Portal, retornos 3DS/Pix/Boleto e links de e-mail.
     cookieOptions: {
-      name: "sb-deskcomm-auth",
-      sameSite: "strict",
+      name: SESSION_COOKIE_NAME,
+      sameSite: "lax",
       httpOnly: true,
       secure: cookieSecure(),
       path: "/",

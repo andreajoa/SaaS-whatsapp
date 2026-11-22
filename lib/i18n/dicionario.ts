@@ -31,6 +31,7 @@
  * chave crua nem para erro. Uma tradução incompleta não pode deixar a tela pior
  * do que estava.
  */
+import { DICIONARIO_EN } from "./dicionario-en";
 import type { Idioma } from "./idiomas";
 
 /** `pt-BR` não aparece: é a chave. Só o que DIFERE precisa de linha. */
@@ -10580,6 +10581,15 @@ export const DICIONARIO: Traducoes = {
       es: "Para conectar WhatsApp, registra la tarjeta en el paso Plan. Son 7 días gratis y el cobro solo empieza el 7.º día.",
     },
 };
+
+for (const [chave, ingles] of Object.entries(DICIONARIO_EN)) {
+  const entrada = DICIONARIO[chave];
+  if (entrada) {
+    entrada.en = ingles;
+  } else {
+    DICIONARIO[chave] = { en: ingles };
+  }
+}
 
 /**
  * Traduz, ou devolve o próprio texto.

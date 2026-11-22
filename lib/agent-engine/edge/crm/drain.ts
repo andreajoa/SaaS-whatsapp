@@ -19,6 +19,7 @@ import type { Logger } from '../../obs/logger';
 import { enqueueJob } from '../../queue/queue';
 import { TIPOS_DERIVAVEIS, DERIVACAO_TERMINADA } from '@/lib/messaging/media/derivable';
 import { decidirElegibilidadeDaConversa } from '@/lib/ai/elegibilidade/consulta-pg';
+import { organizacaoTemAcessoAtivoPg } from '@/lib/billing/gate-runtime';
 
 const DRAIN_CONSUMER = 'agent-engine';
 
@@ -168,6 +169,17 @@ async function processEvent(
   );
   if (modeRows[0]?.mode === 'external') {
     log.info('drain: org em modo external (spec 14) — evento pulado', { event_id: event.id });
+    return 'processado';
+  }
+
+  // Gate de assinatura SaaS: organização cancelada/inadimplente ou sem cartão
+  // não consome chave de IA da instalação. Em self-host (`!instalacaoCobra()`),
+  // retorna `true` sem tocar no banco.
+  if (!(await organizacaoTemAcessoAtivoPg(pool, event.organization_id))) {
+    log.info('drain: org sem assinatura ativa — evento pulado', {
+      event_id: event.id,
+      organization_id: event.organization_id,
+    });
     return 'processado';
   }
 

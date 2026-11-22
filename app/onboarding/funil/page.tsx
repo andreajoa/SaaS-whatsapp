@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 export default async function FunilPage() {
   const user = await requireAuth();
   const activeOrg = await resolveActiveOrg(user);
-  if (!activeOrg) redirect("/login");
+  if (!activeOrg) redirect("/get-started");
   const idioma = user.idioma;
 
   const { atual, sugestao } = await dadosDoPasso(activeOrg.orgId, activeOrg.name);

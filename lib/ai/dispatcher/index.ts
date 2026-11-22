@@ -25,6 +25,7 @@
 import { randomUUID } from "node:crypto";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { organizacaoTemAcessoAtivo } from "@/lib/billing/gate-runtime";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { aiDispatchModeSchema } from "@/lib/schemas/settings";
@@ -154,6 +155,12 @@ export async function dispatchAgents(opts: DispatchOptions = {}): Promise<Dispat
     const claimed = await claimEvent(event.id);
     if (!claimed) continue;
     summary.batch_size += 1;
+
+    if (!(await organizacaoTemAcessoAtivo(admin, event.organization_id))) {
+      await markEventProcessed(event, "no_match");
+      summary.outcomes.no_match += 1;
+      continue;
+    }
 
     try {
       const outcome = await processEvent(event);

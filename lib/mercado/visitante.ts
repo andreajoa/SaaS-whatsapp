@@ -128,6 +128,18 @@ function dispositivoDoAgente(ua: string): Visitante["dispositivo"] {
 }
 
 /** Lê o visitante da requisição em curso. Só serve em componente de servidor. */
+const BOT_DE_BUSCA =
+  /googlebot|bingbot|duckduckbot|applebot|yandexbot|slurp|baiduspider|gptbot|claudebot|perplexitybot|oai-searchbot|facebookexternalhit|linkedinbot|twitterbot|whatsapp/i;
+
+/**
+ * Crawlers de busca e prévia social nunca devem ser redirecionados por geo-IP:
+ * o Googlebot rastreia a partir dos EUA (`cf-ipcountry: US`), e redirecioná-lo
+ * em `/` impediria a indexação da home brasileira.
+ */
+export function ehBotDeBusca(userAgent: string | null | undefined): boolean {
+  return BOT_DE_BUSCA.test(userAgent ?? "");
+}
+
 export async function visitanteAtual(): Promise<Visitante> {
   const h = await headers();
   const pais = primeiro(h, GEO.pais);

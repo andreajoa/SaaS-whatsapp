@@ -24,6 +24,9 @@ import { authenticateWahaWebhook } from "@/lib/waha/webhook-auth";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+/** Limite defensivo contra payloads gigantes no endpoint público de webhook. */
+const MAX_WEBHOOK_BODY_BYTES = 5 * 1024 * 1024;
+
 interface RouteCtx {
   params: Promise<{ token: string }>;
 }
@@ -36,7 +39,15 @@ export async function POST(req: NextRequest, ctx: RouteCtx): Promise<NextRespons
     return fail("not_found", "unknown webhook token", 404, { requestId });
   }
 
+  const contentLength = Number(req.headers.get("content-length") ?? "0");
+  if (Number.isFinite(contentLength) && contentLength > MAX_WEBHOOK_BODY_BYTES) {
+    return fail("payload_too_large", "Webhook body exceeds 5MB limit.", 413, { requestId });
+  }
+
   const rawBody = await req.text();
+  if (Buffer.byteLength(rawBody, "utf8") > MAX_WEBHOOK_BODY_BYTES) {
+    return fail("payload_too_large", "Webhook body exceeds 5MB limit.", 413, { requestId });
+  }
   // ─── O contrato do fio, em DOIS momentos ─────────────────────────────────
   //
   // Isto era `JSON.parse(rawBody) as WahaEnvelope`: um cast, que não checa nada

@@ -1792,7 +1792,6 @@ STUB
   fi
   printf '  ✓ com v1.0.0/v1.9.0/v1.10.0 no remoto, o .env nasce pinado em 1.10.0 (as três imagens)\n'
 ) || fail=1
-rm -rf "$TMP_PIN"
 
 echo "packaging: a tag do git não basta — as imagens têm de existir"
 # A tag nasce minutos antes das imagens, e as do worker/scheduler só passaram a
@@ -1813,9 +1812,10 @@ case "$1" in
 esac
 exit 0
 STUB
+  export REPO_URL="$TMP_PIN/origem.git"
   export DUBLE_GHCR=403          # pacote existe mas está PRIVADO
   saida="$(rodar install.sh --yes)"
-  unset DUBLE_GHCR
+  unset DUBLE_GHCR REPO_URL
 
   if ! printf '%s' "$saida" | grep -q "construídas neste servidor"; then
     printf '  ✗ com as imagens inalcançáveis, o instalador não avisou que ia construir aqui\n'
@@ -1830,7 +1830,7 @@ STUB
   fi
   printf '  ✓ e mesmo assim conclui a instalação (constrói é lento, não é impedimento)\n'
 ) || fail=1
-rm -rf "$TMP_PRIV"
+rm -rf "$TMP_PIN" "$TMP_PRIV"
 
 echo "integração: os TRÊS provedores de IA que o instalador oferece"
 # A pergunta "qual IA vai atender" tem três respostas, e até aqui só uma delas
@@ -1869,7 +1869,8 @@ STUB
     env_ia="$(printf '%s\n' "$BASE_ENV" | grep -v '^ANTHROPIC_API_KEY=')"
     printf '%s\n%s=%s\n' "$env_ia" "$var" "'$val'" > "$raiz/crmia/.env"
     : > "$raiz/docker.log"
-    saida="$(cd "$raiz/crmia" && env PATH="$raiz/bin:$PATH" DOCKER_LOG="$raiz/docker.log" \
+    saida="$(cd "$raiz/crmia" && env -u OPENROUTER_API_KEY -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u AI_PROVIDER \
+      PATH="$raiz/bin:$PATH" DOCKER_LOG="$raiz/docker.log" \
       CRONTAB_SANDBOX="$CRONTAB_SANDBOX" bash "$raiz/install.sh" --yes 2>&1 || true \
       | sed -E 's/\x1b\[[0-9;]*m//g')"
     if printf '%s' "$saida" | grep -q 'comando não encontrado\|command not found'; then

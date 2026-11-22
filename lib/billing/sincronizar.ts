@@ -16,6 +16,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { gravarAssinatura } from "@/lib/billing/assinatura";
+import { limparCacheDeAcesso } from "@/lib/billing/gate-runtime";
 import { ehPlanoConhecido, planoDoPreco, type PlanoId, type StatusAssinatura } from "@/lib/billing/planos";
 import type { StripeSubscription } from "@/lib/billing/stripe";
 
@@ -81,6 +82,7 @@ export async function sincronizarAssinatura(
     canceledAt: comoData(sub.canceled_at),
   });
   if (error) throw new Error(`org_subscriptions upsert: ${error}`);
+  limparCacheDeAcesso(organizationId);
 
   return { plano, status };
 }

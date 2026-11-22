@@ -4,7 +4,14 @@ import { patchOnboardingState } from "@/app/actions/onboarding/_shared";
 import { PlanosDaConta } from "@/components/billing/PlanosDaConta";
 import { requireAuth, resolveActiveOrg } from "@/lib/auth/server";
 import { estadoDaCobranca } from "@/lib/billing/assinatura";
-import { DIAS_DE_TRIAL, ORDEM_DOS_PLANOS, instalacaoCobra, precoDoPlano, type PlanoId } from "@/lib/billing/planos";
+import {
+  DIAS_DE_TRIAL,
+  ORDEM_DOS_PLANOS,
+  instalacaoCobra,
+  mercadoCobradoParaPlanos,
+  precoDoPlano,
+  type PlanoId,
+} from "@/lib/billing/planos";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { mercadoDaOrganizacao } from "@/lib/mercado/organizacao";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -53,8 +60,9 @@ export default async function PlanoPage({
     redirect("/onboarding");
   }
 
-  const mercado = mercadoDaOrganizacao(org?.settings);
-  const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  const mercadoOrg = mercadoDaOrganizacao(org?.settings);
+  const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p, mercadoOrg.moeda) !== null);
+  const mercado = mercadoCobradoParaPlanos(mercadoOrg, vendidos);
   const bruto = (await searchParams).sessao;
   const sessao = typeof bruto === "string" && bruto.startsWith("cs_") ? bruto : null;
 

@@ -432,14 +432,24 @@ describe("a chave é o texto em português, e o português não muda", () => {
   });
 });
 
-describe("toda chave usada na tela tem espanhol", () => {
-  it("nenhuma chamada t() cai no português por falta de tradução", () => {
+describe("toda chave usada na tela tem espanhol e inglês", () => {
+  it("nenhuma chamada t() cai no português por falta de tradução em espanhol", () => {
     const semEspanhol = [...chavesUsadas().entries()]
       .filter(([chave]) => !DICIONARIO[chave]?.es)
       .map(([chave, onde]) => `${onde[0]} → t(${JSON.stringify(chave)})`);
     expect(
       semEspanhol,
       `${semEspanhol.length} chamada(s) t() sem tradução em espanhol: a tela cai no português`,
+    ).toEqual([]);
+  });
+
+  it("nenhuma chamada t() cai no português por falta de tradução em inglês", () => {
+    const semIngles = [...chavesUsadas().entries()]
+      .filter(([chave]) => !DICIONARIO[chave]?.en)
+      .map(([chave, onde]) => `${onde[0]} → t(${JSON.stringify(chave)})`);
+    expect(
+      semIngles,
+      `${semIngles.length} chamada(s) t() sem tradução em inglês: a tela cai no português`,
     ).toEqual([]);
   });
 });

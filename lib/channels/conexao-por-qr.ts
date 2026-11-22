@@ -86,7 +86,7 @@ export async function iniciarConexaoPorQr(dados: {
   nomeDaOrganizacao: string;
   baseUrl: string;
   origem: OrigemDaConexaoPorQr;
-  idioma: "pt-BR" | "es";
+  idioma: "pt-BR" | "es" | "en";
   marca: string;
   corPrimaria: string | null;
   segredoDoServidor: string;

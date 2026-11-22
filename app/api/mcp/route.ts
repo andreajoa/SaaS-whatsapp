@@ -15,6 +15,8 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 
 import { createMcpServer } from "@/lib/mcp/server";
 import { McpAuthError, validateBearerToken } from "@/lib/mcp/auth";
+import { organizacaoTemAcessoAtivo } from "@/lib/billing/gate-runtime";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -45,6 +47,14 @@ async function handle(req: NextRequest): Promise<Response> {
     }
     const msg = err instanceof Error ? err.message : "auth_failed";
     return jsonRpcError(-32603, msg, 500);
+  }
+
+  if (!(await organizacaoTemAcessoAtivo(createAdminClient(), auth.organizationId))) {
+    return jsonRpcError(
+      -32002,
+      "Subscription inactive or past due. Update billing in Settings > Billing.",
+      402,
+    );
   }
 
   const transport = new WebStandardStreamableHTTPServerTransport({});

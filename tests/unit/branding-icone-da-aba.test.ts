@@ -55,6 +55,11 @@ describe("o ícone carrega para quem NÃO entrou", () => {
     expect(isPublicPath("/manifest.webmanifest")).toBe(true);
   });
 
+  it("/logo-512.png e /apple-icon são caminhos públicos", () => {
+    expect(isPublicPath("/logo-512.png")).toBe(true);
+    expect(isPublicPath("/apple-icon")).toBe(true);
+  });
+
   it("a entrada é ancorada — não abre /icon-secreto nem /admin/icon", () => {
     // Regex de caminho público sem âncora é como allowlist vira buraco.
     expect(isPublicPath("/iconografia")).toBe(false);

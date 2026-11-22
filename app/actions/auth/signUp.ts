@@ -13,6 +13,19 @@ import { verifyInviteToken } from "@/lib/auth/invite-token";
 import { audit, hashEmail } from "@/lib/audit";
 import { authRateLimited, AUTH_LIMITS } from "@/lib/auth/rate-limit";
 import { env } from "@/lib/env";
+import type { Idioma } from "@/lib/i18n/idiomas";
+import { idiomaDoProduto, mercadoDoPais } from "@/lib/mercado/paises";
+import { idiomaDoVisitante, paisDosCabecalhos } from "@/lib/mercado/visitante";
+
+function idiomaInicialDoCadastro(hdrs: Headers): Idioma {
+  const cookieHeader = hdrs.get("cookie") ?? "";
+  const match = cookieHeader.match(/(?:^|;\s*)atenza_market=([^;]+)/);
+  const stored = match?.[1]?.trim().toLowerCase();
+  if (stored === "en-us" || stored === "en-gb") return "en";
+  if (stored === "pt-br") return "pt-BR";
+  const mercado = mercadoDoPais(paisDosCabecalhos(hdrs));
+  return idiomaDoProduto(idiomaDoVisitante(hdrs, mercado));
+}
 
 export type SignUpResult =
   | {
@@ -104,6 +117,8 @@ export async function signUp(
     convite = inviteToken;
   }
 
+  const idiomaInicial = idiomaInicialDoCadastro(hdrs);
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
@@ -124,8 +139,9 @@ export async function signUp(
         ? {
             invite_token: convite,
             full_name: (parsed.data as SignupComConviteInput).full_name,
+            locale: idiomaInicial,
           }
-        : { org_name: (parsed.data as SignupInput).org_name },
+        : { org_name: (parsed.data as SignupInput).org_name, locale: idiomaInicial },
     },
   });
 

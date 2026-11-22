@@ -8,6 +8,10 @@ import { ARTIGOS } from "@/lib/marketing/artigos";
 import { caminhoDaPagina, PAGINAS_DE_PAIS } from "@/lib/marketing/paises-seo";
 import { IDIOMAS_PUBLICOS } from "@/lib/marketing/seo";
 
+// Runtime dinâmico obrigatório: sem `force-dynamic`, a imagem Docker buildada
+// sem STRIPE_SECRET_KEY fixa `<urlset/>` vazio em produção.
+export const dynamic = "force-dynamic";
+
 /**
  * As páginas que existem para quem ainda não tem conta.
  *

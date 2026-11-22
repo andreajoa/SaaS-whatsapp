@@ -22,12 +22,13 @@ import { fail, ok } from "@/lib/api/wrappers";
 import { audit } from "@/lib/audit";
 import { requireRole } from "@/lib/auth/require-role";
 import { estadoDaCobranca } from "@/lib/billing/assinatura";
-import { DIAS_DE_TRIAL, instalacaoCobra, precoDoPlano } from "@/lib/billing/planos";
+import { DIAS_DE_TRIAL, instalacaoCobra, precoResolvidoDoPlano } from "@/lib/billing/planos";
 import { criarCheckoutSession, StripeError } from "@/lib/billing/stripe";
 import { env } from "@/lib/env";
 import type { Idioma } from "@/lib/i18n/idiomas";
 import { requireSupportWrite } from "@/lib/impersonate/support";
 import { registrarTentativa } from "@/lib/marketing/funil";
+import { mercadoDaOrganizacao } from "@/lib/mercado/organizacao";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +51,7 @@ const corpoSchema = z.object({
 const LOCALE_DO_STRIPE: Record<Idioma, string> = {
   "pt-BR": "pt-BR",
   es: "es",
+  en: "en",
 };
 
 function baseUrl(req: NextRequest): string {
@@ -80,20 +82,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
   const plano = parsed.data.plano;
 
-  const priceId = precoDoPlano(plano);
-  if (!priceId) {
-    return fail("invalid_request", `O plano ${plano} não está configurado nesta instalação.`, 422, {
-      requestId,
-    });
-  }
-
   const admin = createAdminClient();
 
   const { data: org } = await admin
     .from("organizations")
-    .select("created_at")
+    .select("created_at, settings")
     .eq("id", orgId)
     .maybeSingle();
+
+  const mercado = mercadoDaOrganizacao(org?.settings);
+  const precoResolvido = precoResolvidoDoPlano(plano, mercado.moeda);
+  if (!precoResolvido) {
+    return fail("invalid_request", `O plano ${plano} não está configurado nesta instalação.`, 422, {
+      requestId,
+    });
+  }
+  const { priceId, moedaCobrada } = precoResolvido;
 
   const estado = await estadoDaCobranca(admin, orgId, org?.created_at ?? null);
 
@@ -156,7 +160,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // `customer_creation`, medido em produção. Uma sessão de checkout aberta
       // e não usada não cobra nada e expira sozinha, então o custo de abrir
       // duas é zero; o de repetir um erro já consertado é a venda.
-      idempotencyKey: `checkout:${orgId}:${plano}:${new Date().toISOString().slice(0, 16)}`,
+      idempotencyKey: `checkout:${orgId}:${plano}:${moedaCobrada}:${new Date().toISOString().slice(0, 16)}`,
     });
     clientSecret = sessao.client_secret;
     sessionId = sessao.id;
@@ -183,7 +187,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     resourceType: "org_subscriptions",
     resourceId: orgId,
     requestId,
-    metadata: { plano, sessao: sessionId },
+    metadata: { plano, moeda: moedaCobrada, sessao: sessionId },
   });
 
   // A anotação do funil. Sem ela não existe "carrinho largado": uma sessão que

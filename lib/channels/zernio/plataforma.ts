@@ -202,7 +202,7 @@ export async function linkDeConexao(
     profileId: string;
     redirectUrl: string;
     marca: string;
-    idioma: "pt-BR" | "es";
+    idioma: "pt-BR" | "es" | "en";
     corPrimaria: string | null;
   },
 ): Promise<string> {

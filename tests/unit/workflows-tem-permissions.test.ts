@@ -57,6 +57,10 @@ const ESCRITA_JUSTIFICADA: Record<string, string> = {
   "acolhida.yml::pull-requests: write":
     "comenta a acolhida no PR de fork; é o ÚNICO escopo do workflow (o bloco zera o resto), " +
     "e o job não faz checkout nem usa action nenhuma — ver tests/unit/acolhida-nao-toca-no-fork.test.ts",
+  "nexacloud.yml::id-token: write":
+    "emite token OIDC do GitHub Actions para autenticar o deploy na NexaCloud sem segredo estático",
+  "nexacloud.yml::pull-requests: write":
+    "comenta a URL de preview da NexaCloud nos pull requests",
 };
 
 interface Workflow {

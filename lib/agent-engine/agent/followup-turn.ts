@@ -2,6 +2,7 @@ import {claimOfJob,type JobClaim} from "../queue/claim";
 import {resultadoDoEnvioDoFollowup} from "../edge/crm/send-ledger";
 import { parseServiceBoundary } from "@/lib/atendimento/fronteira";
 import { requireCurrentServiceBoundary } from "@/lib/atendimento/fronteira-server";
+import { organizacaoTemAcessoAtivoPg } from "@/lib/billing/gate-runtime";
 /**
  * Handler do job `followup_turn` (F3-03; blueprint 1.3) — a peça BUILD da
  * continuidade. A F3-01 (cron persistente) dispara e a F3-02 (tool schedule_followup)
@@ -244,6 +245,13 @@ export function createFollowupTurnHandler(deps: FollowupTurnDeps) {
     const leadId = job.contact_id;
     if (leadId === null) {
       throw new Error('job followup_turn sem contact_id — o CHECK da fila deveria impedir');
+    }
+    if (!(await organizacaoTemAcessoAtivoPg(pool, tenantId))) {
+      deps.log.info('followup_turn pulado — org sem assinatura ativa', {
+        job_id: job.id,
+        tenant_id: tenantId,
+      });
+      return;
     }
     const payload = followupTurnPayloadSchema.parse(job.payload);
 

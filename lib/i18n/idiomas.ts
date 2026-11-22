@@ -45,7 +45,7 @@
  * alcançar quem entra depois e nunca abriu o próprio perfil.
  */
 
-export const IDIOMAS = ["pt-BR", "es"] as const;
+export const IDIOMAS = ["pt-BR", "es", "en"] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
 export const IDIOMA_PADRAO: Idioma = "pt-BR";
@@ -53,12 +53,16 @@ export const IDIOMA_PADRAO: Idioma = "pt-BR";
 /**
  * O que veio do perfil é um idioma que sabemos servir?
  *
- * Fecha para o padrão em vez de confiar: o campo aceita qualquer string desde
- * antes desta feature (o seletor já ofereceu `en-US`, que nunca teve tradução),
- * e um valor desconhecido chegando ao dicionário devolveria a CHAVE na tela.
+ * Aceita variantes regionais comuns (`en-US`, `en-GB`, `es-MX`, `pt-PT`)
+ * mapeando para o código canônico suportado, e fecha no padrão para valores
+ * desconhecidos — garantindo que nenhuma chave crua apareça na tela.
  */
 export function normalizarIdioma(bruto: string | null | undefined): Idioma {
-  return (IDIOMAS as readonly string[]).includes(bruto ?? "")
-    ? (bruto as Idioma)
-    : IDIOMA_PADRAO;
+  const limpo = (bruto ?? "").trim();
+  if ((IDIOMAS as readonly string[]).includes(limpo)) return limpo as Idioma;
+  const lower = limpo.toLowerCase();
+  if (lower === "en" || lower.startsWith("en-") || lower.startsWith("en_")) return "en";
+  if (lower === "es" || lower.startsWith("es-") || lower.startsWith("es_")) return "es";
+  if (lower === "pt" || lower.startsWith("pt-") || lower.startsWith("pt_")) return "pt-BR";
+  return IDIOMA_PADRAO;
 }

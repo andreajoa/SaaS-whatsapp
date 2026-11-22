@@ -3,6 +3,11 @@ import type { MetadataRoute } from "next";
 import { instalacaoCobra } from "@/lib/billing/planos";
 import { env } from "@/lib/env";
 
+// Runtime dinâmico obrigatório: a imagem Docker genérica é buildada sem
+// STRIPE_SECRET_KEY. Sem `force-dynamic`, o Next pré-renderiza `Disallow: /`
+// no build e bloqueia 100% da indexação em produção.
+export const dynamic = "force-dynamic";
+
 /**
  * O que os buscadores podem ler.
  *

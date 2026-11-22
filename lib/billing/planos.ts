@@ -1,3 +1,5 @@
+import { MERCADO_PADRAO, TODAS_MOEDAS, type Mercado, type Moeda } from "@/lib/mercado/paises";
+
 /**
  * O catálogo de planos e o interruptor que decide se esta instalação COBRA.
  *
@@ -155,28 +157,70 @@ export function instalacaoCobra(): boolean {
   return (process.env.STRIPE_SECRET_KEY ?? "").trim().length > 0;
 }
 
-/**
- * O `price` do Stripe correspondente a um plano, ou `null` quando o operador
- * não configurou aquele plano nesta instalação.
- *
- * Plano sem preço configurado NÃO é erro — é um plano que esta instalação não
- * vende. A tela simplesmente não o oferece. Lançar aqui derrubaria a tela
- * inteira por causa de um plano que ninguém pediu.
- */
-export function precoDoPlano(plano: PlanoId): string | null {
-  const porPlano: Record<PlanoId, string | undefined> = {
-    essencial: process.env.STRIPE_PRICE_ESSENCIAL,
-    pro: process.env.STRIPE_PRICE_PRO,
-    ilimitado: process.env.STRIPE_PRICE_ILIMITADO,
-  };
-  const valor = (porPlano[plano] ?? "").trim();
-  return valor.length > 0 ? valor : null;
+export interface PrecoResolvido {
+  priceId: string;
+  moedaCobrada: Moeda;
 }
 
-/** O caminho inverso: de `price_...` de volta ao plano, para o webhook. */
+/**
+ * O `price` do Stripe correspondente a um plano e moeda (opcional), ou `null`
+ * quando o operador não configurou aquele plano nesta instalação.
+ *
+ * Multi-moeda: quando `moeda` é diferente de `BRL`, procura primeiro
+ * `STRIPE_PRICE_<PLANO>_<MOEDA>` (ex.: `STRIPE_PRICE_PRO_USD`,
+ * `STRIPE_PRICE_PRO_EUR`, `STRIPE_PRICE_PRO_GBP`, `STRIPE_PRICE_PRO_MXN`).
+ * Se não estiver configurado, cai no `STRIPE_PRICE_<PLANO>` padrão (BRL).
+ *
+ * Para saber QUAL moeda será cobrada de fato (e nunca exibir uma moeda na tela
+ * cobrando outra no iframe do Stripe), use `precoResolvidoDoPlano`.
+ */
+export function precoResolvidoDoPlano(plano: PlanoId, moeda: Moeda = "BRL"): PrecoResolvido | null {
+  const sufixoPlano = plano.toUpperCase();
+  if (moeda !== "BRL") {
+    const porMoeda = (process.env[`STRIPE_PRICE_${sufixoPlano}_${moeda}`] ?? "").trim();
+    if (porMoeda.length > 0) {
+      return { priceId: porMoeda, moedaCobrada: moeda };
+    }
+  }
+  const padrao = (process.env[`STRIPE_PRICE_${sufixoPlano}`] ?? "").trim();
+  if (padrao.length > 0) {
+    return { priceId: padrao, moedaCobrada: "BRL" };
+  }
+  return null;
+}
+
+export function precoDoPlano(plano: PlanoId, moeda?: Moeda): string | null {
+  return precoResolvidoDoPlano(plano, moeda ?? "BRL")?.priceId ?? null;
+}
+
+/**
+ * Mercado efetivo para exibição dos planos na tela de assinatura: só mostra
+ * valores na moeda local da organização quando os preços Stripe dessa moeda
+ * existem de fato; caso contrário cai no mercado padrão (BRL) para que o valor
+ * exibido nunca discorde do cobrado no iframe do Stripe.
+ */
+export function mercadoCobradoParaPlanos(
+  mercado: Mercado,
+  planos: readonly PlanoId[] = ORDEM_DOS_PLANOS,
+): Mercado {
+  if (mercado.moeda === "BRL" || planos.length === 0) return mercado;
+  const todosNaMoedaLocal = planos.every(
+    (p) => precoResolvidoDoPlano(p, mercado.moeda)?.moedaCobrada === mercado.moeda,
+  );
+  return todosNaMoedaLocal ? mercado : MERCADO_PADRAO;
+}
+
+/** O caminho inverso: de `price_...` de volta ao plano, cobrindo todas as moedas. */
 export function planoDoPreco(priceId: string): PlanoId | null {
+  const alvo = priceId.trim();
+  if (!alvo) return null;
   for (const id of ORDEM_DOS_PLANOS) {
-    if (precoDoPlano(id) === priceId) return id;
+    const sufixoPlano = id.toUpperCase();
+    if ((process.env[`STRIPE_PRICE_${sufixoPlano}`] ?? "").trim() === alvo) return id;
+    for (const moeda of TODAS_MOEDAS) {
+      if (moeda === "BRL") continue;
+      if ((process.env[`STRIPE_PRICE_${sufixoPlano}_${moeda}`] ?? "").trim() === alvo) return id;
+    }
   }
   return null;
 }

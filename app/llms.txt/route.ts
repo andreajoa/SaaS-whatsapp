@@ -82,6 +82,7 @@ ${planos}
 ${paginas}
 - [Contato](${url("/contato")}): falar com o suporte
 - [Instagram @atenzaon](https://www.instagram.com/atenzaon/): novidades e conteúdo da Atenza
+- [Facebook @atenzaon](https://www.facebook.com/atenzaon): página oficial da Atenza no Facebook
 - [Termos e privacidade](${url("/legal")}): documentos legais
 
 ## Páginas por país

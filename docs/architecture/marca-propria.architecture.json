@@ -26,6 +26,7 @@
     "interface"
   ],
   "nodes": [
+    { "id": "logoemail512", "lane": "saida", "col": 7, "type": "api", "label": "app/logo-512.png/route.ts", "sublabel": "PNG público 512 px, marca em runtime, cache curto; sem mutação nem dados privados" },
     {
       "id": "installsh",
       "lane": "config",
@@ -103,6 +104,8 @@
     { "id": "pdf", "lane": "saida", "col": 7, "type": "service", "label": "lib/lgpd/pdf-renderer.tsx", "sublabel": "DESLIGADO da marca de propósito — ver o card vermelho" }
   ],
   "edges": [
+    { "id": "email-logo-input", "from": "saida", "to": "logoemail512", "label": "marcaDaSaida(null), mesmo ladrilho do ícone" },
+    { "id": "email-logo-output", "from": "logoemail512", "to": "caixaentrada", "label": "URL pública para Organization nas anotações dos e-mails" },
     { "id": "e1", "from": "installsh", "to": "env", "label": "grava a marca no .env — e o arquivo é escrito com truncamento: chave que o script não grava some no update seguinte" },
     { "id": "e2", "from": "env", "to": "platformbranding", "label": "sementeDoAmbiente(): a 1ª leitura semeia a tabela e marca seeded_from_env" },
     { "id": "e3", "from": "env", "to": "resolver", "label": "camadaDoAmbiente() — a camada mais baixa da pilha, e a ÚNICA porta por onde um hex torto entra: lib/env.ts:201 não valida formato (o formulário e o CHECK barram os outros dois caminhos)" },

@@ -522,6 +522,18 @@ if (env.WAHA_API_BASE_URL && !/^https?:\/\//i.test(env.WAHA_API_BASE_URL)) {
       "o endereço dele (https://...). Num deploy serverless ele NÃO roda junto com o app.",
   );
 }
+if (
+  isProd &&
+  !isBuildPhase &&
+  env.WAHA_HMAC_SECRET.trim().length >= 16 &&
+  env.WAHA_WEBHOOK_REQUIRE_SIGNATURE !== "true"
+) {
+  console.warn(
+    "[env] WAHA_HMAC_SECRET está configurada, mas WAHA_WEBHOOK_REQUIRE_SIGNATURE != 'true'. " +
+      "Webhooks do WAHA sem cabeçalho X-Webhook-Hmac ainda serão aceitos. " +
+      "Se o contêiner WAHA usa WHATSAPP_HOOK_HMAC_KEY, defina WAHA_WEBHOOK_REQUIRE_SIGNATURE=true.",
+  );
+}
 
 const modoSecreta = env.STRIPE_SECRET_KEY.startsWith("sk_live_")
   ? "live"

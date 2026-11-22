@@ -22,7 +22,7 @@ export async function POST() {
   const store = await cookies();
   store.delete(IMPERSONATE_COOKIE_NAME);
   if (session?.previous_organization_id) store.set("active_org", session.previous_organization_id,
-    { httpOnly: true, secure: cookieSecure(), sameSite: "strict", path: "/", maxAge: 60*60*24*30 });
+    { httpOnly: true, secure: cookieSecure(), sameSite: "lax", path: "/", maxAge: 60*60*24*30 });
   if (session?.id) await audit({ action: "platform_admin.impersonate_ended", actorUserId: user.id,
     actingAsPlatformAdmin: true, bypassedRls: true, organizationId: session.organization_id,
     resourceType: "organization", resourceId: session.organization_id, requestId,

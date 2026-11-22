@@ -94,9 +94,9 @@ const COOKIES: DocumentoLegal = {
       ],
       itens: [
         {
-          pt: "Sessão — mantém você autenticado. É `HttpOnly`, `Secure` e `SameSite=Strict`: não é legível por JavaScript nem viaja para outro site.",
-          es: "Sesión — te mantiene autenticado. Es `HttpOnly`, `Secure` y `SameSite=Strict`: no es legible por JavaScript ni viaja a otro sitio.",
-          en: "Session — keeps you authenticated. It is `HttpOnly`, `Secure` and `SameSite=Strict`: not readable by JavaScript and never sent to another site.",
+          pt: "Sessão — mantém você autenticado. É `HttpOnly`, `Secure` e `SameSite=Lax`: não é legível por JavaScript e bloqueia envio forjado por terceiros, preservando o acesso ao voltar de provedores externos como o portal de cobrança.",
+          es: "Sesión — te mantiene autenticado. Es `HttpOnly`, `Secure` y `SameSite=Lax`: no es legible por JavaScript y bloquea envíos forjados de terceros, preservando el acceso al volver de proveedores externos como el portal de cobro.",
+          en: "Session — keeps you authenticated. It is `HttpOnly`, `Secure` and `SameSite=Lax`: not readable by JavaScript and blocks cross-site forged requests while keeping you signed in when returning from external portals such as billing.",
         },
         {
           pt: "Preferência de tema e idioma — guarda a escolha que você fez na interface.",

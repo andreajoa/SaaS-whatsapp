@@ -1,6 +1,7 @@
 import { llmDeNascimento } from "@/lib/ai/llm-de-nascimento";
+import { normalizarIdioma, type Idioma } from "@/lib/i18n/idiomas";
 import { settingsDoMercado } from "@/lib/mercado/organizacao";
-import type { Mercado } from "@/lib/mercado/paises";
+import { idiomaDoProduto, type Mercado } from "@/lib/mercado/paises";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { audit } from "@/lib/audit";
 
@@ -42,6 +43,8 @@ type ProvisionOptions = {
    * como sempre nasceu, e a tela de cobrança cai no mercado padrão.
    */
   mercado?: Mercado;
+  /** Idioma inicial da organização (opcional; herda de `user_metadata.locale` ou do mercado). */
+  locale?: Idioma;
 };
 
 /**
@@ -85,6 +88,13 @@ export async function ensureTenantForUser(
     ...(options.mercado ? settingsDoMercado(options.mercado) : {}),
     ...(llm ? { llm } : {}),
   };
+  const localeDaOrg: Idioma | null =
+    options.locale ??
+    (typeof user.user_metadata?.locale === "string" && user.user_metadata.locale.trim().length > 0
+      ? normalizarIdioma(user.user_metadata.locale)
+      : options.mercado
+        ? idiomaDoProduto(options.mercado.idioma)
+        : null);
 
   // ponytail: check-then-insert tem janela de corrida se o mesmo link for
   // confirmado 2x em paralelo (pior caso: org duplicada órfã). Advisory lock
@@ -100,6 +110,7 @@ export async function ensureTenantForUser(
         legal_name: orgName,
         status: "active",
         created_by: user.id,
+        ...(localeDaOrg ? { locale: localeDaOrg } : {}),
         // O mercado é gravado UMA vez, no nascimento da organização. Não há
         // caminho que o reescreva depois — mudar de mercado é mudar de preço, e
         // isso não pode acontecer porque o dono viajou. Ver

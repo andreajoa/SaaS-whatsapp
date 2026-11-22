@@ -26,14 +26,14 @@ import { PublicEnvScript } from "./public-env-script";
 import "./globals.css";
 
 const atkinson = Atkinson_Hyperlegible({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   weight: ["400", "700"],
   display: "swap",
   variable: "--font-atkinson",
 });
 
 const plexMono = IBM_Plex_Mono({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   weight: ["400", "500"],
   display: "swap",
   variable: "--font-mono",

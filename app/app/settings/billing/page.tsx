@@ -12,6 +12,7 @@ import {
   DIAS_DE_TRIAL,
   ORDEM_DOS_PLANOS,
   instalacaoCobra,
+  mercadoCobradoParaPlanos,
   precoDoPlano,
   type PlanoId,
 } from "@/lib/billing/planos";
@@ -97,11 +98,12 @@ export default async function BillingPage({
   // do IP de agora — ver o cabeçalho de `lib/mercado/organizacao.ts`. Org sem
   // mercado gravado (toda org criada antes desta linha existir) cai no padrão,
   // que é exatamente o que ela sempre viu.
-  const mercado = mercadoDaOrganizacao(org?.settings);
+  const mercadoOrg = mercadoDaOrganizacao(org?.settings);
 
   // Só oferece o que esta instalação de fato vende — plano sem `price_...`
   // configurado não é erro, é plano que não existe aqui.
-  const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p) !== null);
+  const vendidos: PlanoId[] = ORDEM_DOS_PLANOS.filter((p) => precoDoPlano(p, mercadoOrg.moeda) !== null);
+  const mercado = mercadoCobradoParaPlanos(mercadoOrg, vendidos);
 
   const params = await searchParams;
   const bruto = params.sessao;

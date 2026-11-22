@@ -277,6 +277,7 @@ type Memoria = { readonly linha: LinhaDaMarca | null; readonly expiraEm: number 
  */
 declare global {
   var __memoDaMarcaDaInstalacao: Memoria | null | undefined;
+  var __vooDaMarcaDaInstalacao: Promise<LinhaDaMarca | null> | null | undefined;
   /**
    * Contador de escritas. Mora em `globalThis` pelo MESMO motivo que o memo — e
    * o motivo está escrito acima: a rota que grava e a tela que renderiza são
@@ -303,6 +304,7 @@ export function invalidarMarcaDaInstalacao(): void {
   // A geração sobe ANTES de zerar: quem estiver lendo agora fica marcado como
   // anterior a esta escrita e não poderá reinstalar o que leu.
   globalThis.__geracaoDaMarcaDaInstalacao = (globalThis.__geracaoDaMarcaDaInstalacao ?? 0) + 1;
+  globalThis.__vooDaMarcaDaInstalacao = null;
   guardarMemo(null);
 }
 
@@ -350,11 +352,23 @@ export async function marcaDaInstalacao(): Promise<LinhaDaMarca | null> {
   // O `Date.now()` do TTL também passa a ser lido DEPOIS da ida ao banco: antes
   // ele era capturado antes, e a espera do banco descontava do próprio TTL.
   const geracao = globalThis.__geracaoDaMarcaDaInstalacao ?? 0;
-  const linha = await lerOuSemear();
-  if ((globalThis.__geracaoDaMarcaDaInstalacao ?? 0) === geracao) {
-    guardarMemo({ linha, expiraEm: Date.now() + TTL_MS });
+  if (globalThis.__vooDaMarcaDaInstalacao) {
+    return globalThis.__vooDaMarcaDaInstalacao;
   }
-  return linha;
+  const promessa = lerOuSemear()
+    .then((linha) => {
+      if ((globalThis.__geracaoDaMarcaDaInstalacao ?? 0) === geracao) {
+        guardarMemo({ linha, expiraEm: Date.now() + TTL_MS });
+      }
+      return linha;
+    })
+    .finally(() => {
+      if (globalThis.__vooDaMarcaDaInstalacao === promessa) {
+        globalThis.__vooDaMarcaDaInstalacao = null;
+      }
+    });
+  globalThis.__vooDaMarcaDaInstalacao = promessa;
+  return promessa;
 }
 
 async function lerOuSemear(): Promise<LinhaDaMarca | null> {

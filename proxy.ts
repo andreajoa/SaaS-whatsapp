@@ -3,6 +3,7 @@ import { cookieSecure } from "@/lib/supabase/cookie-secure";
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import { isPublicPath } from "@/lib/auth/public-paths";
+import { ehBotDeBusca } from "@/lib/mercado/visitante";
 import {
   verifyImpersonateCookieEdge,
   IMPERSONATE_COOKIE_NAME_EDGE,
@@ -39,7 +40,7 @@ export async function proxy(request: NextRequest) {
       secure: request.nextUrl.protocol === "https:",
     });
   }
-  if (pathname === "/precos" && request.method === "GET") {
+  if (pathname === "/precos" && request.method === "GET" && !ehBotDeBusca(request.headers.get("user-agent"))) {
     const locale = request.cookies.get("atenza_market")?.value;
     const country = request.headers.get("x-vercel-ip-country") ?? request.headers.get("cf-ipcountry");
     const market = locale === "en-gb" || locale === "en-us" ? locale
@@ -67,7 +68,7 @@ export async function proxy(request: NextRequest) {
       },
       cookieOptions: {
         name: COOKIE_NAME,
-        sameSite: "strict",
+        sameSite: "lax",
         httpOnly: true,
         secure: cookieSecure(),
         path: "/",

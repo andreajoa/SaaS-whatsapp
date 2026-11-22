@@ -79,8 +79,23 @@ export function ehIdiomaDoSite(valor: string): valor is IdiomaDoSite {
 }
 
 /** ISO-4217 em maiúsculas, como a doutrina de API exige. */
-export type Moeda =
-  "BRL" | "USD" | "MXN" | "EUR" | "COP" | "CLP" | "PEN" | "ARS" | "INR" | "IDR" | "MYR" | "ZAR";
+export const TODAS_MOEDAS = [
+  "BRL",
+  "USD",
+  "GBP",
+  "MXN",
+  "EUR",
+  "COP",
+  "CLP",
+  "PEN",
+  "ARS",
+  "INR",
+  "IDR",
+  "MYR",
+  "ZAR",
+] as const;
+
+export type Moeda = (typeof TODAS_MOEDAS)[number];
 
 /**
  * Moedas sem centavos NO STRIPE: o `unit_amount` é a unidade inteira.
@@ -230,6 +245,38 @@ export const MERCADOS: readonly Mercado[] = [
     precos: { essencial: 19900, pro: 49900, ilimitado: 99900 },
   },
   {
+    pais: "US",
+    nome: "Estados Unidos",
+    moeda: "USD",
+    idioma: "en",
+    locale: "en-US",
+    precos: { essencial: 3900, pro: 9900, ilimitado: 19900 },
+  },
+  {
+    pais: "GB",
+    nome: "Reino Unido",
+    moeda: "GBP",
+    idioma: "en",
+    locale: "en-GB",
+    precos: { essencial: 2900, pro: 7900, ilimitado: 15900 },
+  },
+  {
+    pais: "FR",
+    nome: "França",
+    moeda: "EUR",
+    idioma: "en",
+    locale: "fr-FR",
+    precos: { essencial: 4900, pro: 12900, ilimitado: 24900 },
+  },
+  {
+    pais: "DE",
+    nome: "Alemanha",
+    moeda: "EUR",
+    idioma: "en",
+    locale: "de-DE",
+    precos: { essencial: 4900, pro: 12900, ilimitado: 24900 },
+  },
+  {
     pais: "ZA",
     nome: "África do Sul",
     moeda: "ZAR",
@@ -302,13 +349,10 @@ export function precoLegivelNoMercado(plano: PlanoId, mercado: Mercado): string 
 
 /**
  * O idioma do produto correspondente ao do site.
- *
- * `en` não existe dentro do app: quem entra vê a tela em espanhol, que é o
- * mais próximo que temos com tradução humana. Traduzir o app por máquina para
- * fechar a lacuna trocaria uma falta visível por um erro invisível.
+ * O app agora serve os três idiomas completos (`pt-BR`, `es`, `en`).
  */
 export function idiomaDoProduto(doSite: IdiomaDoSite): Idioma {
-  return doSite === "pt-BR" ? "pt-BR" : "es";
+  return doSite;
 }
 
 /** O `IDIOMA_PADRAO` do produto, como idioma de site — para quem não negociou nada. */
@@ -318,8 +362,20 @@ export function moedasCobraveis(): ReadonlySet<Moeda> {
   const extras = (process.env.STRIPE_MOEDAS ?? "")
     .split(",")
     .map((m) => m.trim().toUpperCase())
-    .filter((m) => m.length > 0) as Moeda[];
-  return new Set<Moeda>(["BRL", ...extras]);
+    .filter((m): m is Moeda => (TODAS_MOEDAS as readonly string[]).includes(m));
+  // Auto-detecta qualquer moeda que tenha ao menos um STRIPE_PRICE_<PLANO>_<MOEDA> configurado.
+  const configuradasPorPreco: Moeda[] = [];
+  for (const moeda of TODAS_MOEDAS) {
+    if (moeda === "BRL") continue;
+    if (
+      (process.env[`STRIPE_PRICE_ESSENCIAL_${moeda}`] ?? "").trim() ||
+      (process.env[`STRIPE_PRICE_PRO_${moeda}`] ?? "").trim() ||
+      (process.env[`STRIPE_PRICE_ILIMITADO_${moeda}`] ?? "").trim()
+    ) {
+      configuradasPorPreco.push(moeda);
+    }
+  }
+  return new Set<Moeda>(["BRL", ...extras, ...configuradasPorPreco]);
 }
 
 export function precoParaQuemCompara(plano: PlanoId, mercado: Mercado, locale: string): string {

@@ -55,10 +55,10 @@ import { env } from "@/lib/env";
 import { schemaDoSoftware } from "@/lib/marketing/schema-do-produto";
 import { type IdiomaDoSite } from "@/lib/mercado/paises";
 import { textoDoSite } from "@/lib/mercado/textos";
-import { visitanteAtual } from "@/lib/mercado/visitante";
+import { ehBotDeBusca, visitanteAtual } from "@/lib/mercado/visitante";
 import { transcricaoDoVideo, videoDaApresentacao } from "@/lib/marketing/video";
 import { PaisesDisponiveis } from "@/components/site/PaisesDisponiveis";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, SESSION_COOKIE_NAME } from "@/lib/supabase/server";
 
 // O mesmo interruptor da cobrança preserva o clone self-host sem vitrine de assinatura.
 export const dynamic = "force-dynamic";
@@ -74,20 +74,28 @@ export async function generateMetadata({
 
 export default async function HomePage({ params }: { params?: Promise<{ idioma?: string }> } = {}) {
   if (!instalacaoCobra()) redirect("/app");
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) redirect("/app");
+  const cookieStore = await import("next/headers").then((mod) => mod.cookies());
+  const temCookieDeSessao = cookieStore
+    .getAll()
+    .some((c) => c.name === SESSION_COOKIE_NAME || c.name.startsWith(`${SESSION_COOKIE_NAME}.`));
+  if (temCookieDeSessao) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) redirect("/app");
+  }
 
   const [origem, marca] = await Promise.all([visitanteAtual(), marcaDaSaida(null)]);
   const escolhido = (await params)?.idioma;
   if (!escolhido) {
-    if (origem.pais === "GB") redirect("/en-gb");
-    if (origem.pais === "US") redirect("/en-us");
-    if (!origem.pais && origem.idioma === "en") {
-      const h = await import("next/headers").then((mod) => mod.headers());
-      redirect(h.get("accept-language")?.toLowerCase().startsWith("en-gb") ? "/en-gb" : "/en-us");
+    const h = await import("next/headers").then((mod) => mod.headers());
+    if (!ehBotDeBusca(h.get("user-agent"))) {
+      if (origem.pais === "GB") redirect("/en-gb");
+      if (origem.pais === "US") redirect("/en-us");
+      if (!origem.pais && origem.idioma === "en") {
+        redirect(h.get("accept-language")?.toLowerCase().startsWith("en-gb") ? "/en-gb" : "/en-us");
+      }
     }
   }
 

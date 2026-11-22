@@ -4,6 +4,9 @@ import { getWahaClient } from "@/lib/waha/client";
 import { ConnectWhatsappClient } from "./_client";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { conexaoPorQrDisponivel } from "@/lib/channels/conexao-por-qr";
+import { precisaDeCartao } from "@/lib/billing/assinatura";
+import { instalacaoCobra } from "@/lib/billing/planos";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +14,10 @@ export const dynamic = "force-dynamic";
 export default async function ConnectWhatsappPage() {
   const user = await requireAuth();
   const activeOrg = await resolveActiveOrg(user);
-  if (!activeOrg) redirect("/login");
+  if (!activeOrg) redirect("/get-started");
+  if (instalacaoCobra() && (await precisaDeCartao(createAdminClient(), activeOrg.orgId))) {
+    redirect("/onboarding/plano");
+  }
   const idioma = user.idioma;
 
   const wahaConfigured = getWahaClient() !== null;

@@ -47,7 +47,7 @@ jobs:
           DF=Dockerfile
           if [ ! -f Dockerfile ]; then curl -fsS https://app.nexaclouds.online/ci/dockerfile.mjs -o "$RUNNER_TEMP/ncdf.mjs" && node "$RUNNER_TEMP/ncdf.mjs" "$NC_NODE" > "$RUNNER_TEMP/Dockerfile.nexacloud"; DF="$RUNNER_TEMP/Dockerfile.nexacloud"; fi
           jq -r 'to_entries[] | "\(.key)=\(.value|@sh)"' "$RUNNER_TEMP/nc-vars.json" > "$RUNNER_TEMP/nc.env"
-          ARGS=(--build-arg "NC_ENV_HASH=$(sha256sum "$RUNNER_TEMP/nc-vars.json" | cut -c1-64)" --build-arg "APP_VERSION=${GITHUB_SHA::7}")
+          ARGS=(--build-arg "NC_ENV_HASH=$(sha256sum "$RUNNER_TEMP/nc-vars.json" | cut -c1-64)")
           for k in $(grep -oE '^[[:space:]]*ARG[[:space:]]+[A-Za-z_][A-Za-z0-9_]*' "$DF" | awk '{print $2}' | sort -u); do
             if jq -e --arg k "$k" 'has($k)' "$RUNNER_TEMP/nc-vars.json" >/dev/null; then ARGS+=(--build-arg "$k=$(jq -r --arg k "$k" '.[$k]' "$RUNNER_TEMP/nc-vars.json")"); fi
           done

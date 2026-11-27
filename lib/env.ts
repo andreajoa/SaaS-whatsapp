@@ -270,6 +270,18 @@ const schema = z.object({
   RESEND_FROM_EMAIL: z.string().optional().default(""),
 
   /**
+   * Transbordo (27/11/2026): quando a Resend bate o limite do plano, o envio tenta
+   * o Brevo e depois o NovaMail. Follow-ups da sequência de marketing saem direto
+   * pelo NovaMail. Tudo vazio = comportamento antigo (só Resend).
+   * `NOVAMAIL_FROM_EMAIL` precisa ser de um domínio verificado no NovaMail; vazio
+   * usa o `RESEND_FROM_EMAIL` com o domínio trocado por `mail.<domínio>`.
+   */
+  BREVO_API_KEY: z.string().optional().default(""),
+  NOVAMAIL_API_KEY: z.string().optional().default(""),
+  NOVAMAIL_FROM_EMAIL: z.string().optional().default(""),
+  NOVAMAIL_API_URL: z.string().optional().default(""),
+
+  /**
    * E-mail de suporte que a instalação mostra ao CLIENTE FINAL (tela de conta
    * suspensa, tela de cobrança).
    *

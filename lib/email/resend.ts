@@ -51,11 +51,18 @@ interface SendArgs {
    * `lib/marketing/descadastro.ts` monta o par; aqui é só o cano.
    */
   headers?: Record<string, string>;
+  /**
+   * Follow-up (passo da sequência de marketing): sai pelo NovaMail e só volta
+   * para a Resend se o NovaMail falhar. Primeiro contato e avisos: Resend →
+   * (limite) Brevo → (limite) NovaMail.
+   */
+  followUp?: boolean;
 }
 
 interface SendResult {
   ok: boolean;
   id?: string;
+  provider?: "resend" | "brevo" | "novamail";
   error?: "not_configured" | "send_failed" | "rate_limited" | "dominio_nao_verificado";
   details?: string;
 }
@@ -91,14 +98,14 @@ export function fromAddress(fromName?: string): string | null {
  * já paga neste projeto: erro que não nomeia a causa vira caça ao fantasma.
  */
 function classificar(nome: string, mensagem: string): NonNullable<SendResult["error"]> {
-  if (nome.toLowerCase().includes("rate")) return "rate_limited";
+  if (nome.toLowerCase().includes("rate") || /quota|limit|exceeded|too many/i.test(`${nome} ${mensagem}`)) return "rate_limited";
   if (/not verified|domain is not verified|não verificad/i.test(mensagem)) {
     return "dominio_nao_verificado";
   }
   return "send_failed";
 }
 
-export async function sendEmail(args: SendArgs): Promise<SendResult> {
+async function viaResend(args: SendArgs): Promise<SendResult> {
   const client = getClient();
   const from = fromAddress(args.fromName);
 
@@ -137,7 +144,7 @@ export async function sendEmail(args: SendArgs): Promise<SendResult> {
         details: error.message,
       };
     }
-    return { ok: true, id: data?.id };
+    return { ok: true, id: data?.id, provider: "resend" };
   } catch (err) {
     return {
       ok: false,
@@ -145,6 +152,103 @@ export async function sendEmail(args: SendArgs): Promise<SendResult> {
       details: err instanceof Error ? err.message : String(err),
     };
   }
+}
+
+// ── Transbordo ────────────────────────────────────────────────────────────────
+
+const NOVAMAIL_URL = () => (env.NOVAMAIL_API_URL || "https://api.novamail.nexaclouds.online").replace(/\/$/, "");
+
+/** Remetente no NovaMail: o configurado, ou o da Resend com o domínio em `mail.`. */
+export function novamailFrom(fromName?: string): string | null {
+  const configured = env.NOVAMAIL_FROM_EMAIL.trim();
+  let endereco = configured;
+  if (!endereco) {
+    const base = env.RESEND_FROM_EMAIL.trim();
+    const m = base.match(/^([^@\s]+)@(.+)$/);
+    if (!m) return null;
+    endereco = m[2]!.startsWith("mail.") ? base : `${m[1]}@mail.${m[2]}`;
+  }
+  const nome = (fromName ?? "").replace(/[<>"\r\n]/g, "").trim();
+  return nome.length > 0 ? `${nome} <${endereco}>` : endereco;
+}
+
+async function viaNovaMail(args: SendArgs): Promise<SendResult> {
+  const key = env.NOVAMAIL_API_KEY;
+  const from = novamailFrom(args.fromName);
+  if (!key || !from) return { ok: false, error: "not_configured" };
+  try {
+    const res = await fetch(`${NOVAMAIL_URL()}/emails`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        from,
+        to: Array.isArray(args.to) ? args.to : [args.to],
+        subject: args.subject,
+        html: args.html,
+        text: args.text,
+        reply_to: args.replyTo ? [args.replyTo] : undefined,
+        headers: args.headers,
+        tags: args.tags?.map((t) => ({ name: t.name.replace(/[^A-Za-z0-9_-]/g, "_"), value: t.value.replace(/[^A-Za-z0-9_-]/g, "_") })),
+      }),
+    });
+    const data = (await res.json().catch(() => ({}))) as { id?: string; message?: string; name?: string };
+    if (!res.ok || !data.id) return { ok: false, error: classificar(String(data.name ?? (res.status === 429 ? "rate" : "")), data.message ?? ""), details: data.message ?? String(res.status) };
+    return { ok: true, id: `nm:${data.id}`, provider: "novamail" };
+  } catch (err) {
+    return { ok: false, error: "send_failed", details: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+function brevoAddress(v: string) {
+  const m = v.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  return m ? { name: m[1]!.trim() || undefined, email: m[2]!.trim() } : { email: v.trim() };
+}
+
+async function viaBrevo(args: SendArgs): Promise<SendResult> {
+  const key = env.BREVO_API_KEY;
+  const from = fromAddress(args.fromName);
+  if (!key || !from) return { ok: false, error: "not_configured" };
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": key, "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({
+        sender: brevoAddress(from),
+        to: (Array.isArray(args.to) ? args.to : [args.to]).map((email) => ({ email })),
+        replyTo: args.replyTo ? brevoAddress(args.replyTo) : undefined,
+        subject: args.subject,
+        htmlContent: args.html,
+        textContent: args.text,
+        headers: args.headers,
+        tags: args.tags?.map((t) => `${t.name}:${t.value}`),
+      }),
+    });
+    const data = (await res.json().catch(() => ({}))) as { messageId?: string; message?: string; code?: string };
+    if (!res.ok || !data.messageId) return { ok: false, error: classificar(res.status === 429 ? "rate" : String(data.code ?? ""), data.message ?? ""), details: data.message ?? String(res.status) };
+    return { ok: true, id: `brevo:${data.messageId}`, provider: "brevo" };
+  } catch (err) {
+    return { ok: false, error: "send_failed", details: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Ordem (pedido do André, 27/11/2026): follow-up → NovaMail (volta à Resend se
+ * falhar). Resto → Resend; no limite → Brevo; no limite → NovaMail. A Resend e o
+ * Brevo nunca são desligados — o NovaMail só soma.
+ */
+export async function sendEmail(args: SendArgs): Promise<SendResult> {
+  if (args.followUp && env.NOVAMAIL_API_KEY) {
+    const nm = await viaNovaMail(args);
+    if (nm.ok) return nm;
+    console.warn("[email] NovaMail falhou num follow-up; usando a Resend:", nm.details);
+  }
+  const first = await viaResend(args);
+  if (first.ok || first.error !== "rate_limited") return first;
+  const brevo = await viaBrevo(args);
+  if (brevo.ok) return brevo;
+  if (brevo.error !== "rate_limited" && brevo.error !== "not_configured") return brevo;
+  const nm = await viaNovaMail(args);
+  return nm.ok || nm.error !== "not_configured" ? nm : first;
 }
 
 /**

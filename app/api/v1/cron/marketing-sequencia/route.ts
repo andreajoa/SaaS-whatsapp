@@ -224,6 +224,8 @@ async function handle(req: NextRequest): Promise<Response> {
       headers: email.headers,
       fromName: marca.nome,
       tags: [{ name: "sequencia", value: passo.id }],
+      // Follow-up da sequência: sai pelo NovaMail (pedido do André, 27/11/2026).
+      followUp: true,
     });
 
     if (!resultado.ok) {
